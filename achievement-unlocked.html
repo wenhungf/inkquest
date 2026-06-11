@@ -891,7 +891,7 @@ e2s11a:{
   <p>"Days are for taking care of someone," Sam says. That is all. The door of that sentence closes gently, and you do not knock again.</p>
   <p>Instead Sam tells you something else: there is a ${vb('back lane','back_lane')} behind this building that cuts straight to the MRT station. "Saves six minutes. Nobody uses it. People don't look."</p>
   <p>People don't look. You know a system that agrees.</p>
-  <p class="quiet">You ${vb('file the lane away','file_away')}. Somehow you are sure it will matter someday.</p>`,
+  <p>You ${vb('file the lane away','file_away')}. Somehow you are sure it will matter someday.</p>`,
  onEnter:()=>{ state.flags.guard_story = true; },
  choices:[ {t:'Home', go:'e2s12'} ]
 },
@@ -1015,7 +1015,7 @@ e2s20a:{
   ])}
   <p>On your map, the fog over Yancheng dissolves like sugar in tea. A whole district, lit up and yours.</p>
   <p>But walking to the bus stop, your thumb keeps returning to the photos. The trophy. The covered line beneath it.</p>
-  <p class="quiet">Painted by a real hand. Whose?</p>`,
+  <p class="beat">Painted by a real hand. Whose?</p>`,
  onEnter:()=>{ pay('e2_clear',30); grant('district_clear'); if(!state.map_unlocked.includes('yancheng')) state.map_unlocked.push('yancheng'); },
  choices:[ {t:'Sunday', go:'e2s22'} ]
 },
