@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>InkQuest — Every quest begins with a word</title>
+<meta name="description" content="Interactive gamebooks for English learners. Branching stories you play in the browser, graded to CEFR levels.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #12141c;          /* deep ink blue-black */
+    --ink-raised: #1a1d28;   /* card surface */
+    --parchment: #f0ead8;    /* headings */
+    --mist: #b9b2a0;         /* body text */
+    --faded: #7d7868;        /* captions, footer */
+    --gold: #c9a554;         /* brand accent */
+    --lantern: #c25b3c;      /* Night Train accent */
+    --coffee: #c87d2a;       /* Lost Phone accent */
+    --pixel: #7ec850;        /* Achievement Unlocked accent */
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: var(--ink) !important;
+  }
+
+  body {
+    font-family: 'Crimson Pro', Georgia, serif;
+    color: var(--mist);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 4rem 1.25rem 3rem;
+  }
+
+  /* ---------- Header ---------- */
+  header { text-align: center; margin-bottom: 3.5rem; }
+
+  .wordmark {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(2.6rem, 9vw, 3.8rem);
+    letter-spacing: 0.01em;
+    color: var(--parchment);
+  }
+  .wordmark .q { color: var(--gold); }
+
+  /* signature: an ink stroke that draws itself beneath the wordmark */
+  .stroke { width: min(240px, 60vw); margin: 0.4rem auto 1rem; display: block; }
+  .stroke path {
+    stroke: var(--gold);
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+    stroke-dasharray: 260;
+    stroke-dashoffset: 260;
+    animation: draw 1.1s ease-out 0.2s forwards;
+  }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  .tagline {
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--mist);
+  }
+
+  .intro {
+    margin: 2.25rem auto 0;
+    max-width: 52ch;
+    text-align: center;
+    color: var(--mist);
+  }
+
+  /* ---------- Story cards ---------- */
+  .shelf-label {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--faded);
+    text-align: center;
+    margin: 3rem 0 1.5rem;
+  }
+
+  .stories { display: flex; flex-direction: column; gap: 1.25rem; list-style: none; }
+
+  .card {
+    display: block;
+    position: relative;
+    background: var(--ink-raised);
+    border: 1px solid rgba(240, 234, 216, 0.08);
+    border-left: 6px solid var(--accent, var(--gold));
+    border-radius: 10px;
+    padding: 1.5rem 1.5rem 1.4rem 1.75rem;
+    text-decoration: none;
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  }
+  .card:hover, .card:focus-visible {
+    transform: translateX(4px);
+    background: #1f2330;
+    border-color: rgba(240, 234, 216, 0.18);
+    border-left-color: var(--accent, var(--gold));
+  }
+  .card:focus-visible { outline: 2px solid var(--accent, var(--gold)); outline-offset: 3px; }
+
+  .eyebrow {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent, var(--gold));
+    margin-bottom: 0.35rem;
+  }
+
+  .card h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 700;
+    font-size: 1.6rem;
+    line-height: 1.2;
+    color: var(--parchment);
+    margin-bottom: 0.45rem;
+  }
+
+  .card p { color: var(--mist); font-size: 1.05rem; max-width: 48ch; }
+
+  .card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+    gap: 1rem;
+  }
+
+  .level {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--ink);
+    background: var(--accent, var(--gold));
+    border-radius: 999px;
+    padding: 0.2rem 0.75rem;
+    white-space: nowrap;
+  }
+
+  .start {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--accent, var(--gold));
+    white-space: nowrap;
+  }
+  .start::after { content: " →"; transition: margin-left 0.18s ease; }
+  .card:hover .start::after { margin-left: 4px; }
+
+  /* under construction */
+  .card.soon {
+    border-style: dashed;
+    border-left-style: solid;
+    opacity: 0.65;
+    cursor: default;
+  }
+  .card.soon:hover { transform: none; background: var(--ink-raised); }
+  .soon-badge {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--accent, var(--gold));
+    border: 1px dashed var(--accent, var(--gold));
+    border-radius: 999px;
+    padding: 0.2rem 0.75rem;
+    white-space: nowrap;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    margin-top: 4rem;
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--faded);
+    line-height: 1.8;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stroke path { animation: none; stroke-dashoffset: 0; }
+    .card, .start::after { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1 class="wordmark">Ink<span class="q">Quest</span></h1>
+    <svg class="stroke" viewBox="0 0 240 16" aria-hidden="true">
+      <path d="M4 11 C 50 3, 90 14, 130 8 S 210 4, 236 9" />
+    </svg>
+    <p class="tagline">Every quest begins with a word.</p>
+    <p class="intro">
+      Interactive gamebooks for English learners. Pick a story, make your
+      choices, and see where they lead. Tap a word for help — or switch the
+      tips off and just enjoy the ride.
+    </p>
+  </header>
+
+  <p class="shelf-label">Choose your story</p>
+
+  <ul class="stories">
+
+    <li>
+      <a class="card" href="night-train-to-kyufun.html" style="--accent: var(--lantern);">
+        <p class="eyebrow">Mystery · 1930s Taiwan</p>
+        <h2>Night Train to Kyūfun</h2>
+        <p>A night train climbs into the mountains. A passenger is not who
+        he says he is. By morning, you must know the truth.</p>
+        <div class="card-foot">
+          <span class="level">A2–B1</span>
+          <span class="start">Start reading</span>
+        </div>
+      </a>
+    </li>
+
+    <li>
+      <a class="card" href="the-lost-phone.html" style="--accent: var(--coffee);">
+        <p class="eyebrow">Modern Mystery · A Café</p>
+        <h2>The Lost Phone</h2>
+        <p>Someone left a phone on the table next to yours. The screen is
+        locked. The owner is gone. What do you do?</p>
+        <div class="card-foot">
+          <span class="level">A1–A2</span>
+          <span class="start">Start reading</span>
+        </div>
+      </a>
+    </li>
+
+    <li>
+      <a class="card" href="achievement-unlocked.html" style="--accent: var(--pixel);">
+        <p class="eyebrow">New · In Progress</p>
+        <h2>Achievement Unlocked</h2>
+        <p>A new adventure begins. Episode 1 is ready to play — more
+        episodes are on the way.</p>
+        <div class="card-foot">
+          <span class="soon-badge">🚧 Only EP1 available</span>
+          <span class="start">Start reading</span>
+        </div>
+      </a>
+    </li>
+
+  </ul>
+
+  <footer>
+    <p>© 2026 Wen-Hung Fang. All rights reserved.</p>
+    <p>Feel free to play and share links — please don't republish or redistribute.</p>
+  </footer>
+
+</div>
+</body>
+</html>
