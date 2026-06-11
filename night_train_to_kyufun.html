@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<!-- v3 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>Night Train to Kyūfun — InkQuest</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Serif+TC:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --ink: #1a1208;
+    --parchment: #f5efe0;
+    --gold: #c8922a;
+    --gold-light: #e8b84b;
+    --red: #8b2020;
+    --mist: #9ab8c8;
+    --mist-dark: #3a5a6a;
+    --shadow: rgba(26,18,8,0.15);
+    --panel-bg: #fdf7ec;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    background: #0b1628 !important;
+  }
+
+  body {
+    background: #0b1628 !important;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Crimson Pro', 'Noto Serif TC', serif;
+    padding: 20px;
+    color-scheme: dark;
+  }
+
+  /* Atmospheric background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(30,60,110,0.45) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(200,146,42,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 80%, rgba(139,32,32,0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #app {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 740px;
+  }
+
+  /* ── Header ── */
+  .masthead {
+    text-align: center;
+    margin-bottom: 8px;
+    animation: fadeDown 0.8s ease both;
+  }
+  .masthead .series-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.25em;
+    color: var(--mist);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .masthead h1 {
+    font-family: 'Crimson Pro', serif;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 300;
+    color: var(--parchment);
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+  }
+  .masthead h1 em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+  .masthead .subtitle {
+    font-size: 0.85rem;
+    color: var(--mist);
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  /* ── Tips Toggle ── */
+  .tips-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 10px;
+    animation: fadeDown 0.8s 0.2s ease both;
+  }
+  .tips-toggle label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: var(--mist);
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .toggle-switch {
+    position: relative;
+    width: 40px;
+    height: 22px;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: #1a2d44;
+    border-radius: 11px;
+    cursor: pointer;
+    transition: background 0.3s;
+    border: 1px solid var(--mist-dark);
+  }
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 14px; height: 14px;
+    background: var(--mist);
+    border-radius: 50%;
+    transition: transform 0.3s, background 0.3s;
+  }
+  .toggle-switch input:checked + .toggle-track { background: var(--mist-dark); }
+  .toggle-switch input:checked + .toggle-track::after {
+    transform: translateX(18px);
+    background: var(--gold-light);
+  }
+
+  /* ── Stats Bar ── */
+  .stats-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    animation: fadeDown 0.8s 0.3s ease both;
+  }
+  .stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(26,18,8,0.6);
+    border: 1px solid rgba(200,146,42,0.3);
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--parchment);
+  }
+  .stat-pill .stat-label {
+    color: var(--mist);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .stat-pill .stat-val {
+    color: var(--gold-light);
+    font-weight: 700;
+  }
+  .stat-pill .hp-bar {
+    width: 60px;
+    height: 6px;
+    background: #2a2018;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .stat-pill .hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--red), var(--gold));
+    border-radius: 3px;
+    transition: width 0.6s ease;
+  }
+  .skill-badge {
+    background: rgba(58,90,106,0.4);
+    border: 1px solid var(--mist-dark);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--mist);
+    letter-spacing: 0.08em;
+  }
+  .skill-badge.active {
+    background: rgba(58,90,106,0.8);
+    border-color: var(--mist);
+    color: var(--gold-light);
+  }
+
+  /* ── Main Panel ── */
+  .panel {
+    background: var(--panel-bg);
+    border-radius: 4px;
+    padding: 32px 36px;
+    box-shadow:
+      0 2px 0 var(--gold),
+      0 4px 40px rgba(0,0,0,0.6),
+      inset 0 0 60px rgba(200,146,42,0.04);
+    border: 1px solid rgba(200,146,42,0.2);
+    border-top: 3px solid var(--gold);
+    animation: fadeUp 0.6s 0.1s ease both;
+    min-height: 300px;
+    position: relative;
+    overflow: hidden;
+  }
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+    opacity: 0.5;
+  }
+
+  /* Scene illustration band */
+  .scene-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mist-dark);
+    margin-bottom: 16px;
+  }
+  .scene-tag::before, .scene-tag::after {
+    content: '';
+    height: 1px;
+    width: 30px;
+    background: var(--mist-dark);
+    opacity: 0.4;
+  }
+
+  /* Section number */
+  .section-num {
+    font-family: 'Crimson Pro', serif;
+    font-size: 3rem;
+    font-weight: 300;
+    color: rgba(200,146,42,0.18);
+    position: absolute;
+    top: 12px;
+    right: 20px;
+    line-height: 1;
+    user-select: none;
+  }
+
+  /* Prose */
+  .prose {
+    color: var(--ink);
+    font-size: 1.05rem;
+    line-height: 1.85;
+    font-weight: 400;
+    transition: opacity 0.3s;
+  }
+  .prose p { margin-bottom: 1.1em; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { font-weight: 600; color: var(--mist-dark); }
+  .prose em { font-style: italic; color: #4a3020; }
+
+  /* ── Language Tips ── */
+  .tip {
+    border-bottom: 1.5px dotted var(--gold);
+    cursor: help;
+    color: var(--mist-dark);
+    font-style: italic;
+    transition: color 0.2s, border-color 0.2s;
+    position: relative;
+  }
+  .tip:hover { color: var(--red); border-color: var(--red); }
+  .tip-popup {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: var(--parchment);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-family: 'Crimson Pro', serif;
+    font-style: normal;
+    white-space: nowrap;
+    border: 1px solid var(--gold);
+    z-index: 100;
+    pointer-events: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  .tip-popup::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--gold);
+  }
+  .tip-popup .zh { color: var(--gold-light); display: block; font-size: 0.9rem; }
+  .tip-popup .grammar { color: var(--mist); font-size: 0.7rem; font-family: 'Space Mono', monospace; }
+  .tips-off .tip {
+    border-bottom: none;
+    color: inherit;
+    font-style: inherit;
+    cursor: default;
+  }
+  .tips-off .tip:hover { color: inherit; }
+  .tips-off .tip-popup { display: none !important; }
+  .tip:hover .tip-popup { display: block; }
+
+  /* ── Combat ── */
+  .combat-box {
+    background: rgba(139,32,32,0.06);
+    border: 1px solid rgba(139,32,32,0.25);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin: 20px 0;
+  }
+  .combat-box h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 12px;
+  }
+  .enemy-stat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: var(--ink);
+  }
+  .enemy-stat .e-label { color: var(--mist-dark); font-size: 0.75rem; font-family: 'Space Mono', monospace; text-transform: uppercase; min-width: 60px; }
+  .enemy-hp-bar { flex: 1; height: 8px; background: #d9cfc0; border-radius: 4px; overflow: hidden; }
+  .enemy-hp-fill { height: 100%; background: linear-gradient(90deg, var(--red), #c05050); border-radius: 4px; transition: width 0.6s ease; }
+  .combat-log {
+    font-size: 0.85rem;
+    color: #4a3020;
+    background: rgba(245,239,224,0.8);
+    border-radius: 3px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    min-height: 60px;
+    font-style: italic;
+    line-height: 1.6;
+  }
+  .combat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 9px 20px;
+    background: var(--red);
+    color: var(--parchment);
+    border: none;
+    border-radius: 3px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .combat-btn:hover { background: #a03030; }
+  .combat-btn:active { transform: scale(0.97); }
+  .combat-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── Choices ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(200,146,42,0.4), transparent);
+    margin: 24px 0;
+  }
+  .choices-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mist-dark);
+    margin-bottom: 12px;
+  }
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: transparent;
+    border: 1px solid rgba(200,146,42,0.3);
+    border-radius: 4px;
+    padding: 12px 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .choice-btn:hover {
+    background: rgba(200,146,42,0.06);
+    border-color: var(--gold);
+    color: var(--red);
+    transform: translateX(4px);
+  }
+  .choice-btn .choice-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--gold);
+    min-width: 22px;
+    padding-top: 3px;
+    font-weight: 700;
+  }
+  .choice-btn .skill-req {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--mist);
+    display: block;
+    margin-top: 2px;
+    letter-spacing: 0.08em;
+  }
+  .choice-btn.requires-skill .choice-num { color: var(--mist); }
+
+  /* ── Skill Selection Screen ── */
+  .skill-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .skill-card {
+    border: 1px solid rgba(200,146,42,0.25);
+    border-radius: 6px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(245,239,224,0.5);
+    position: relative;
+  }
+  .skill-card:hover { border-color: var(--gold); background: rgba(200,146,42,0.08); }
+  .skill-card.selected {
+    border-color: var(--gold);
+    background: rgba(200,146,42,0.12);
+    box-shadow: 0 0 0 2px rgba(200,146,42,0.2);
+  }
+  .skill-card .sk-icon { font-size: 1.6rem; margin-bottom: 8px; }
+  .skill-card .sk-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mist-dark);
+    margin-bottom: 4px;
+  }
+  .skill-card .sk-desc { font-size: 0.88rem; color: #5a4530; line-height: 1.4; }
+  .skill-card.selected .sk-name { color: var(--gold); }
+  .start-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 10px;
+  }
+  .start-btn:hover { background: var(--gold-light); }
+  .start-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── Ending ── */
+  .ending-banner {
+    text-align: center;
+    padding: 20px 0 10px;
+  }
+  .ending-banner .ending-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--mist);
+    margin-bottom: 10px;
+  }
+  .ending-banner h2 {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: var(--gold);
+    font-style: italic;
+  }
+  .badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin: 16px 0;
+  }
+  .badge {
+    background: rgba(26,18,8,0.08);
+    border: 1px solid var(--gold);
+    border-radius: 30px;
+    padding: 5px 14px;
+    font-size: 0.82rem;
+    color: var(--mist-dark);
+  }
+  .badge .badge-icon { margin-right: 5px; }
+  .restart-btn {
+    padding: 10px 28px;
+    background: transparent;
+    border: 1px solid var(--mist-dark);
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mist-dark);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+  }
+  .restart-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ── Transitions ── */
+  .fade-out { animation: fadeOut 0.3s ease forwards; }
+  .fade-in  { animation: fadeIn  0.4s ease forwards; }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeOut {
+    to { opacity: 0; transform: translateY(-8px); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 540px) {
+    .panel { padding: 22px 18px; }
+    .skill-grid { grid-template-columns: 1fr; }
+    .stats-bar { gap: 8px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="masthead">
+    <div class="series-label">InkQuest · English Adventure · Level A2–B1 · Taiwan, 1936</div>
+    <h1>Night Train to <em>Kyūfun</em></h1>
+    <div class="subtitle">A mystery gamebook set in 1930s colonial Taiwan · For English learners</div>
+  </div>
+
+  <div class="tips-toggle">
+    <label for="tipsToggle">Language Tips</label>
+    <label class="toggle-switch">
+      <input type="checkbox" id="tipsToggle" checked>
+      <span class="toggle-track"></span>
+    </label>
+  </div>
+
+  <div class="stats-bar" id="statsBar" style="display:none">
+    <div class="stat-pill">
+      <span class="stat-label">Health</span>
+      <div class="hp-bar"><div class="hp-fill" id="hpFill" style="width:100%"></div></div>
+      <span class="stat-val" id="hpVal">20</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-label">Skill</span>
+      <span class="stat-val" id="skillVal">—</span>
+    </div>
+    <div class="stat-pill" id="itemPill" style="display:none">
+      <span class="stat-label">Item</span>
+      <span class="stat-val" id="itemVal">—</span>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+</div>
+
+<script>
+// ── State ──
+const state = {
+  hp: 20, maxHp: 20,
+  skill: null,        // 'detective' | 'athlete' | 'linguist'
+  hasTicket: false,
+  hasNote: false,
+  enemyHp: 10,
+  tipsOn: true,
+  badges: [],
+};
+
+// ── Tips system ──
+document.getElementById('tipsToggle').addEventListener('change', e => {
+  state.tipsOn = e.target.checked;
+  document.getElementById('panel').classList.toggle('tips-off', !state.tipsOn);
+});
+
+// tip(word, zh, grammar) → HTML string
+function tip(word, zh, grammar = '') {
+  const g = grammar ? `<span class="grammar">${grammar}</span>` : '';
+  return `<span class="tip">${word}<span class="tip-popup"><span class="zh">${zh}</span>${g}</span></span>`;
+}
+
+// ── Render engine ──
+function render(sectionFn) {
+  const panel = document.getElementById('panel');
+  panel.classList.add('fade-out');
+  setTimeout(() => {
+    panel.classList.remove('fade-out');
+    panel.innerHTML = sectionFn();
+    panel.classList.add('fade-in');
+    setTimeout(() => panel.classList.remove('fade-in'), 400);
+    if (!state.tipsOn) panel.classList.add('tips-off');
+    else panel.classList.remove('tips-off');
+    updateStats();
+  }, 300);
+}
+
+function updateStats() {
+  const bar = document.getElementById('statsBar');
+  if (!state.skill) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  const pct = Math.max(0, (state.hp / state.maxHp) * 100);
+  document.getElementById('hpFill').style.width = pct + '%';
+  document.getElementById('hpVal').textContent = state.hp;
+  const labels = { detective: '🔍 Detective', athlete: '⚡ Athlete', linguist: '🗣 Linguist' };
+  document.getElementById('skillVal').textContent = labels[state.skill] || '—';
+  if (state.hasTicket || state.hasNote) {
+    document.getElementById('itemPill').style.display = 'flex';
+    const items = [];
+    if (state.hasTicket) items.push('🎫 Ticket');
+    if (state.hasNote) items.push('📝 Note');
+    document.getElementById('itemVal').textContent = items.join(' · ');
+  }
+}
+
+function choices(arr) {
+  return `<div class="divider"></div>
+  <div class="choices-label">What do you do?</div>
+  <div class="choices">
+    ${arr.map((c, i) => `
+      <button class="choice-btn ${c.skill ? 'requires-skill' : ''}" onclick="${c.action}">
+        <span class="choice-num">${i + 1}.</span>
+        <span>${c.text}${c.skill ? `<span class="skill-req">Requires: ${c.skill}</span>` : ''}</span>
+      </button>`).join('')}
+  </div>`;
+}
+
+// ── Sections ──
+
+function s_intro() {
+  return `
+  <div class="scene-tag">Prologue · Taihoku Station · Autumn, 1936</div>
+  <div class="section-num">0</div>
+  <div class="prose">
+    <p><em>Taiwan, 1936. The island is under Japanese colonial rule. In the mountain town of Kyūfun, gold and coal mines draw workers from across the island — and in the tea-growing valleys of Heirin to the south, certain families have grown wealthy over three generations, and wealthy families make targets. Tonight, something is moving on the Yilan Line.</em></p>
+    <p>Your name is <strong>Alex Mercer</strong>. You are a staff reporter for the <em>Shanghai Evening Courier</em>, a small but ${tip('well-regarded', '受到好評的', 'adj — respected; people have a good opinion of it')} English-language paper based in the ${tip('International Settlement', '公共租界', 'noun — an area of Shanghai governed by foreign powers, not China; home to many foreign businesses and newspapers in the 1930s')}. Your editor has sent you to Taiwan on a ${tip('tip-off', '線報', 'noun — a piece of secret information passed to a reporter')} — and tonight a ${tip('telegram', '電報', 'noun — a message sent quickly by electric wire, received as a printed slip of paper')} arrived at your Taihoku hotel:</p>
+    <p><em>"Take the 9:47 Yilan Line to Zuihō. Carriage 5. Man in green ${tip('jacket', '夾克', 'noun — a short coat')}. Something ${tip('suspicious', '可疑的', 'adj — makes you think something is wrong')} on board. Don't miss it."</em></p>
+    <p>You don't know what she means. But a reporter's job is to ask questions — and to ${tip('follow leads', '追蹤線索', 'phrase — follow hints or clues')}.</p>
+    <p>You ${tip('rush', '趕緊；匆忙', 'verb — move very fast because you are in a hurry')} to Taihoku Station. Even at this hour it ${tip('hums', '嗡嗡作響', 'verb — is full of low, busy noise and activity')} — coolies with freight carts, a family of islanders with too much luggage, two ${tip('gendarmes', '憲兵', 'noun — military police; the Japanese colonial authorities used gendarmes to enforce order')} smoking by the gate. The 9:47 sits on Platform 3, engine breathing slow and heavy. As a foreigner, you ${tip('stand out', '顯眼', 'phrasal verb — be easy to notice in a crowd')} — which is either an ${tip('asset', '優勢', 'noun — something useful or helpful')} or a ${tip('liability', '不利條件', 'noun — something that causes problems or danger')} tonight. You haven't decided which.</p>
+    <p>You have just enough time to buy a ticket — or to ${tip('sneak on', '偷偷上車', 'phrasal verb — get on without permission')} without one. What kind of reporter are you?</p>
+  </div>
+  <div class="divider"></div>
+  <div class="choices-label">First, choose your skill:</div>
+  ${skillSelect()}`;
+}
+
+function skillSelect() {
+  return `
+  <div class="skill-grid">
+    <div class="skill-card" id="sk-detective" onclick="selectSkill('detective')">
+      <div class="sk-icon">🔍</div>
+      <div class="sk-name">Detective</div>
+      <div class="sk-desc">You notice things others miss. Good at finding clues and reading people.</div>
+    </div>
+    <div class="skill-card" id="sk-athlete" onclick="selectSkill('athlete')">
+      <div class="sk-icon">⚡</div>
+      <div class="sk-name">Athlete</div>
+      <div class="sk-desc">Fast and strong. You can chase suspects, jump gaps, and break free from danger.</div>
+    </div>
+    <div class="skill-card" id="sk-linguist" onclick="selectSkill('linguist')">
+      <div class="sk-icon">🗣</div>
+      <div class="sk-name">Linguist</div>
+      <div class="sk-desc">You speak Mandarin, Taiwanese, and some Japanese. People trust you easily.</div>
+    </div>
+  </div>
+  <button class="start-btn" id="startBtn" disabled onclick="beginGame()">→ Board the Train</button>`;
+}
+
+function selectSkill(sk) {
+  ['detective','athlete','linguist'].forEach(s => {
+    document.getElementById('sk-'+s)?.classList.remove('selected');
+  });
+  document.getElementById('sk-'+sk)?.classList.add('selected');
+  state.skill = sk;
+  document.getElementById('startBtn').disabled = false;
+}
+
+function beginGame() {
+  if (!state.skill) return;
+  render(s_platform);
+}
+
+function s_platform() {
+  const buyTicket = `<button class="choice-btn" onclick="render(s_ticket_window)">
+    <span class="choice-num">1.</span>
+    <span>Buy a ticket at the window. <span class="skill-req">Costs time — train leaves in 3 minutes</span></span>
+  </button>`;
+  const sneak = `<button class="choice-btn" onclick="render(s_sneak)">
+    <span class="choice-num">2.</span>
+    <span>Slip past the gate and board without a ticket.</span>
+  </button>`;
+  const detectiveOpt = state.skill === 'detective' ? `<button class="choice-btn" onclick="render(s_detective_platform)">
+    <span class="choice-num">3.</span>
+    <span>🔍 <em>Use Detective skill:</em> Scan the platform for anything strange before boarding.<span class="skill-req">Requires: Detective</span></span>
+  </button>` : '';
+  return `
+  <div class="scene-tag">Section 1 · Taihoku Station, Platform 3 · 9:41 pm</div>
+  <div class="section-num">1</div>
+  <div class="prose">
+    <p>Platform 3 is long and gas-lit, the air thick with coal smoke and the iron smell of wet rails. The 9:47 Yilan Line — a standard ${tip('steam locomotive', '蒸汽機車', 'noun — a train engine powered by burning coal to boil water into steam')} with six carriages — ${tip('idles', '怠速運轉', 'verb — runs slowly, not moving, waiting to depart')} at the far end like something patient and large. A porter wheels a cart of freight past you without looking up.</p>
+    <p>The ticket window has a short ${tip('queue', '排隊的人群', 'noun — a line of people waiting')} — maybe two minutes. The ${tip('gendarme', '憲兵', 'noun — military police officer')} at the gate has turned to speak with a stationmaster. His back is to the platform.</p>
+    <p>A young ${tip('errand boy', '跑腿小弟', 'noun — a boy who carries messages or does small tasks')} ${tip('weaves', '穿梭', 'verb — moves through a crowd by turning and twisting')} through the crowd and tugs your sleeve. He holds out a folded ${tip('telegram slip', '電報紙條', 'noun — the printed paper strip on which a received telegram is written out')}, then bolts before you can tip him. It has been forwarded from your hotel via the stationmaster — your editor's latest message: <em>"Carriage 5. Man in green ${tip('jacket', '夾克', 'noun — a short coat')}. Do not let him see you first."</em></p>
+  </div>
+  <div class="divider"></div>
+  <div class="choices-label">What do you do?</div>
+  <div class="choices">${buyTicket}${sneak}${detectiveOpt}</div>`;
+}
+
+function s_ticket_window() {
+  state.hasTicket = true;
+  return `
+  <div class="scene-tag">Section 2A · Ticket Window</div>
+  <div class="section-num">2</div>
+  <div class="prose">
+    <p>You buy a ticket to Zuihō. The clerk hands it over without ${tip('looking up', '抬起頭看', 'phrasal verb — raise your eyes from what you are doing')}. He ${tip('does a double-take', '愣了一下', 'phrase — looks again in surprise, usually at something unexpected')} at your foreign face, then simply points at the train. <em>"Last Yilan Line tonight. ${tip('Hurry', '趕快', 'verb — move fast, do not waste time')}."</em></p>
+    <p>You run. The guard's whistle ${tip('blows', '吹響', 'verb — makes a loud sound by pushing air through')}. You ${tip('leap', '跳上', 'verb — jump with energy')} onto the last carriage just as the train ${tip('lurches', '猛地晃動', 'verb — moves suddenly and unevenly')} forward.</p>
+    <p>You made it. You have a ticket — and a clear ${tip('conscience', '良心', 'noun — the feeling that you did the right thing')}. Now find Carriage 5.</p>
+  </div>
+  ${choices([
+    { text: 'Walk through the carriages toward Carriage 5.', action: 'render(s_carriage5)' }
+  ])}`;
+}
+
+function s_sneak() {
+  const isAthlete = state.skill === 'athlete';
+  if (!isAthlete) state.hp -= 2;
+  return `
+  <div class="scene-tag">Section 2B · The Gate</div>
+  <div class="section-num">2</div>
+  <div class="prose">
+    ${isAthlete
+      ? `<p>The gendarme's back is still turned. You ${tip('vault', '跳過', 'verb — jump over something using your hands')} the wooden ${tip('barrier', '柵欄', 'noun — a simple fence or gate used to block entry')} in one clean movement, land softly, and walk. A stationmaster glances up from his clipboard. You give him the confident nod of a man who belongs everywhere. He looks back down.</p>
+         <p>Effortless. The train is still boarding.</p>`
+      : `<p>You ${tip('vault', '跳過', 'verb — jump over something using your hands')} the wooden ${tip('barrier', '柵欄', 'noun — a simple fence or gate used to block entry')}. Almost — but your bag ${tip('catches', '勾住', 'verb — gets stuck on something')} the latch and you ${tip('stumble', '踉蹌', 'verb — almost fall while walking')} hard onto the platform stones.</p>
+         <p>The gendarme turns at the sound. You are already walking, fast, head down. He shouts something. You don't stop. Your ${tip('knee', '膝蓋', 'noun — the joint in the middle of your leg')} ${tip('throbs', '陣陣作痛', 'verb — hurts with a dull, rhythmic pain')} from the fall. <strong>−2 Health.</strong></p>`
+    }
+    <p>You're on the train. No ticket. Hopefully no one checks between here and Zuihō.</p>
+  </div>
+  ${choices([
+    { text: 'Find Carriage 5 quickly.', action: 'render(s_carriage5)' },
+    { text: 'Hide in the bathroom first, in case the gendarme follows.', action: 'render(s_hide)' }
+  ])}`;
+}
+
+function s_detective_platform() {
+  return `
+  <div class="scene-tag">Section 2C · Detective's Eye</div>
+  <div class="section-num">2</div>
+  <div class="prose">
+    <p>You slow down. ${tip('Breathe', '呼吸', 'verb — take air in and out')}. Look.</p>
+    <p>Most travelers are tired — slumped shoulders, heavy bags. But one man near the Carriage 5 door stands very straight. Green jacket. He is not looking at the train. He is looking at the <em>people</em> coming through the gate.</p>
+    <p>He is ${tip('watching', '監視；觀察', 'verb — looking carefully for a long time')} for someone. Maybe for <em>you</em>.</p>
+    <p>Near his feet, something small catches your eye — a yellow ${tip('envelope', '信封', 'noun — a paper container for a letter')} on the platform stones. He hasn't noticed it. His attention is on a family with a crying child, pushing through the gate.</p>
+    <p>You buy your ticket quickly and board Carriage 3 instead, planning to move through the train once it departs. <strong>🔍 Bonus: You now have extra information.</strong></p>
+  </div>
+  ${choices([
+    { text: 'Pick up the yellow envelope before boarding.', action: 'render(s_envelope)' },
+    { text: 'Leave it. Board quietly and approach him from behind.', action: 'render(s_carriage5_aware)' }
+  ])}`;
+}
+
+function s_hide() {
+  return `
+  <div class="scene-tag">Section 2D · Bathroom</div>
+  <div class="section-num">2</div>
+  <div class="prose">
+    <p>You lock yourself in the tiny bathroom. The train ${tip('lurches', '猛地晃動', 'verb — moves suddenly and unevenly')} forward. Zuihō-bound.</p>
+    <p>Two minutes pass. You hear footsteps in the corridor — slow, official — pass and fade. Safe, for now.</p>
+    <p>You look at your face in the mirror. <em>What am I getting into?</em></p>
+  </div>
+  ${choices([
+    { text: 'Leave the bathroom. Head to Carriage 5.', action: 'render(s_carriage5)' }
+  ])}`;
+}
+
+function s_envelope() {
+  state.hasNote = true;
+  return `
+  <div class="scene-tag">Section 3A · The Envelope</div>
+  <div class="section-num">3</div>
+  <div class="prose">
+    <p>You ${tip('scoop', '撿起', 'verb — pick something up quickly')} the envelope as you walk past, smooth as a ${tip('pickpocket', '扒手', 'noun — a thief who steals from pockets')} — only in ${tip('reverse', '相反', 'noun/adj — opposite direction')}. You tuck it into your jacket without looking at it.</p>
+    <p>On the train, once the lights of Taihoku have fallen away behind you, you open it. Inside is a small card with a Japanese ${tip('chop', '印章', 'noun — an official stamp or seal, common in East Asian bureaucracy')} in the corner — and below it, a single line in careful English:</p>
+    <p><em>"Zuihō. East warehouse, near the daisha tracks. Do not trust green jacket."</em></p>
+    <p>Your heart ${tip('pounds', '猛烈跳動', 'verb — beats very hard and fast')}. Someone knew this was coming — and knew a foreigner might find this note. The warning about the man in the green jacket complicates everything. Is he the enemy? Or something else entirely?</p>
+    <p><strong>📝 You found a secret note. This may change the ending.</strong></p>
+  </div>
+  ${choices([
+    { text: 'Go to Carriage 5 and find the man in the green jacket.', action: 'render(s_carriage5_aware)' }
+  ])}`;
+}
+
+function s_bump() {
+  return `
+  <div class="scene-tag">Section 4C · The Bump</div>
+  <div class="section-num">4</div>
+  <div class="prose">
+    <p>You walk past slowly, then ${tip('stumble', '踉蹌', 'verb — lose your balance and nearly fall')} deliberately into his shoulder. <em>"Terribly sorry — beg your pardon."</em></p>
+    <p>He looks up sharply. For a moment his eyes are ${tip('alert', '警覺的', 'adj — watchful; ready to react quickly')} — not annoyed, not surprised. <em>Alert.</em> This man is expecting trouble tonight.</p>
+    <p>Then his face ${tip('relaxes', '放鬆', 'verb — becomes less tense')} when he sees a ${tip('bewildered', '困惑的', 'adj — confused and unable to understand what is happening')} foreigner. He gives a short nod and looks back out the window.</p>
+    <p>But in the half-second of contact, you felt it — something hard and flat inside his jacket. Not a weapon. A ${tip('document wallet', '文件夾', 'noun — a flat folder used to carry important papers')}. He is carrying papers. Important ones.</p>
+  </div>
+  ${choices([
+    { text: 'Take your seat and watch him more carefully.', action: 'render(s_watch)' },
+    { text: 'Sit across from him and try to start a conversation.', action: 'render(s_talk)' }
+  ])}`;
+}
+
+function s_carriage5() {
+  return `
+  <div class="scene-tag">Section 4 · Carriage 5 · Somewhere on the Yilan Line</div>
+  <div class="section-num">4</div>
+  <div class="prose">
+    <p>Carriage 5 is ${tip('dim', '昏暗的', 'adj — not very bright; slightly dark')} and ${tip('half-empty', '半空的', 'adj — about half the seats have no people')}. It smells like tea and old wood and someone's cold rice supper. Outside, the city has given way to darkness — the Yilan Line climbs east through mountain tunnels and river gorges. You feel the train lean into each curve.</p>
+    <p>The man in the green jacket sits near the window. He is ${tip('middle-aged', '中年的', 'adj — not young, not old; maybe 40–55 years old')}, with short gray hair and a face like he hasn't slept in days. On the seat beside him is a small ${tip('briefcase', '公事包', 'noun — a flat bag for carrying papers or important items')}. His hands rest on his knees. Still — too still.</p>
+    <p>He hasn't seen you yet. You can act now — or wait and watch.</p>
+  </div>
+  ${choices([
+    { text: 'Sit down across from him and start a casual conversation.', action: 'render(s_talk)', skill: state.skill === 'linguist' ? 'Best with Linguist' : null },
+    { text: 'Pretend to sleep and watch him through half-closed eyes.', action: 'render(s_watch)', skill: state.skill === 'detective' ? 'Best with Detective' : null },
+    { text: 'Walk past and "accidentally" bump into him to see his reaction.', action: 'render(s_bump)' }
+  ])}`;
+}
+
+function s_carriage5_aware() {
+  return `
+  <div class="scene-tag">Section 4B · Carriage 5 — Alert</div>
+  <div class="section-num">4</div>
+  <div class="prose">
+    <p>You enter from the back of Carriage 5, keeping your head down. The note is still warm in your jacket pocket. The man in the green jacket sits near the window — ${tip('tense', '緊張的；繃緊的', 'adj — not relaxed; the body feels tight')}, pulling out his ${tip('pocket watch', '懷錶', 'noun — a watch kept in a pocket, attached to a chain; common in the 1930s')} every few minutes and snapping it shut without really looking at it.</p>
+    <p>Coming in quietly from behind gives you a moment. His ${tip('left hand', '左手', 'noun — the hand on your left side')} ${tip('trembles', '顫抖', 'verb — shakes in small, fast movements')} slightly on the briefcase latch. He is ${tip('afraid', '害怕的', 'adj — feeling fear')} of something. The note said not to trust him — but a man waiting to do harm doesn't look like this. He looks like a man waiting to be found out.</p>
+    <p>If he is the ${tip('villain', '反派；壞人', 'noun — the bad person in a story')}, why is he afraid?</p>
+  </div>
+  ${choices([
+    { text: 'Sit near him and wait for him to speak first.', action: 'render(s_watch)' },
+    { text: 'Slide into the seat next to him and speak quietly in Mandarin.', action: 'render(s_talk)' }
+  ])}`;
+}
+
+function s_talk() {
+  const bonus = state.skill === 'linguist';
+  return `
+  <div class="scene-tag">Section 5A · Conversation</div>
+  <div class="section-num">5</div>
+  <div class="prose">
+    <p>You sit across from him and ${tip('clear your throat', '清嗓子', 'phrase — make a small sound to get attention or prepare to speak')}. As a foreigner on a late mountain train, you need no other ${tip('icebreaker', '打破僵局的話', 'noun — something said or done to start a conversation comfortably')}. <em>"Long way to Zuihō at this hour,"</em> you say in English. <em>"Business or pleasure?"</em></p>
+    <p>He looks at you carefully. Then, in English — ${tip('accented', '帶口音的', 'adj — speaking a language with the sounds of a different language')} but clear: <em>"You are journalist."</em> Not a question. Your ${tip('press badge', '記者證', 'noun — an official card showing that someone works for a news organization')} is half-visible in your jacket pocket. <em>Careless.</em></p>
+    <p>You keep your face ${tip('neutral', '無表情的', 'adj — not showing any emotion')}. <em>"Foreign correspondent. Shanghai Evening Courier. Just passing through."</em></p>
+    ${bonus ? `<p><em>(Your Linguist skill helps — you add a few words in Taiwanese that make him blink. A foreigner who speaks the island's language is either very dangerous or very useful. He decides to gamble on useful.)</em></p>` : ''}
+    <p>He ${tip('glances', '瞥了一眼', 'verb — looks quickly')} at the door, then leans forward. <em>"A foreign reporter — this is perhaps good. What I tell you, the Japanese ${tip('authorities', '當局', 'noun — the people in power; here, the colonial government')} cannot so easily ${tip('suppress', '壓制', 'verb — stop something from being known or published')} in Shanghai."</em></p>
+    <p>He tells you about the tea. A colonial ${tip('broker', '掮客', 'noun — a middleman who arranges deals, sometimes through pressure or deception')} has arranged for a Taiwanese family's century-old ${tip('Baozhong', '包種茶', 'noun — a lightly oxidized oolong tea, the prized specialty of the Heirin hills; its name means "wrapped tea"')} collection to be seized tonight — stored in a warehouse on Zuihō's eastern edge, near the ${tip('daisha', '台車', 'noun — the narrow push-cart railway used to haul ore and supplies up to Kyūfun and the mining areas')} staging tracks. Tomorrow at dawn the crates would be pushed up to Kyūfun, held in a second warehouse until nightfall, then hand-carried down the mountain paths to a small fishing landing — away from ${tip('Kīrun', '基隆', 'noun — the major northern port city; its harbour had customs inspectors the smugglers wanted to avoid')} and its customs posts. Once the tea left those waters, there would be no getting it back. He needs a witness. A foreign one.</p>
+    <p>He needs you.</p>
+  </div>
+  ${choices([
+    { text: 'Agree to help. This is the story of the year.', action: 'render(s_help)' },
+    { text: 'Show him the note you found. (Only if you have it.)', action: state.hasNote ? 'render(s_reveal_note)' : 'render(s_no_note)' },
+    { text: 'Say nothing. Watch him and decide later.', action: 'render(s_watch_after_talk)' }
+  ])}`;
+}
+
+function s_watch() {
+  return `
+  <div class="scene-tag">Section 5B · Watching</div>
+  <div class="section-num">5</div>
+  <div class="prose">
+    <p>You take a seat two rows back and tilt your hat forward. Through your ${tip('lashes', '睫毛', 'noun — the small hairs on your eyelids')} you watch him.</p>
+    <p>Twice he draws out a ${tip('pocket watch', '懷錶', 'noun — a watch on a chain, kept in a waistcoat pocket')} and studies it. Once he ${tip('glances', '瞥了一眼', 'verb — looks briefly, quickly')} at the dark window, watching the reflection of the carriage door behind him. He picks up his ${tip('briefcase', '公事包', 'noun — a flat bag for carrying documents or important items')}, then puts it down again. He is ${tip('waiting', '等待', 'verb — staying somewhere until something happens')} for someone.</p>
+    <p>The train slows — a brief ${tip('halt', '臨時停靠站', 'noun — a small stopping point on a railway line')} at Matsuyama, east of the city. Only two passengers board. One is a woman in a gray ${tip('coat', '外套', 'noun — a piece of clothing worn over other clothes')}. She moves through the carriage without hurry and sits one row ahead of him. They do not look at each other.</p>
+    <p>But under the seat, her foot ${tip('taps', '輕敲', 'verb — touches lightly and quickly, making a small sound')} three times against the floor. His foot taps back twice. A ${tip('signal', '暗號', 'noun — a secret sign used to send a message')}.</p>
+    <p>Your heart ${tip('quickens', '加速', 'verb — becomes faster')}. They know each other. This is bigger than one man.</p>
+  </div>
+  ${choices([
+    { text: 'Follow the woman when she moves.', action: 'render(s_follow_woman)' },
+    { text: 'Confront the man directly. You have enough to go on.', action: 'render(s_confront)' }
+  ])}`;
+}
+
+function s_no_note() {
+  return `
+  <div class="scene-tag">Section 5C · No Note</div>
+  <div class="section-num">5</div>
+  <div class="prose">
+    <p>You don't have anything to show him. You keep your face ${tip('impassive', '面無表情的', 'adj — showing no emotion; impossible to read')}. <em>"I don't know what you're talking about."</em></p>
+    <p>He studies you — the press badge still half-visible in your pocket, the notebook ${tip('bulge', '鼓起', 'noun — a rounded lump under cloth')} under your jacket. He is not ${tip('convinced', '信服的', 'adj — believing something is true')}. He turns back to the window with a quiet sigh.</p>
+    <p>The train rolls on. You've lost the thread — for now.</p>
+  </div>
+  ${choices([
+    { text: 'Try a different approach — admit you are a reporter.', action: 'render(s_help)' },
+    { text: 'Watch him quietly instead.', action: 'render(s_watch)' }
+  ])}`;
+}
+
+function s_reveal_note() {
+  return `
+  <div class="scene-tag">Section 5D · The Note Revealed</div>
+  <div class="section-num">5</div>
+  <div class="prose">
+    <p>You slide the yellow envelope across the seat.</p>
+    <p>The color ${tip('drains', '消退', 'verb — leaves, disappears (often used for color or emotion in a face)')} from his face. <em>"Where did you get this?"</em></p>
+    <p><em>"Platform at Taihoku,"</em> you say. <em>"Near your feet. I picked it up."</em></p>
+    <p>He stares at you. A long moment. Then — slowly — a small, exhausted smile. <em>"You have sharp eyes. Good. Tonight I need sharp eyes."</em></p>
+    <p>He tells you everything. There is a ${tip('cache', '藏匿之處', 'noun — a hidden place where things are stored')} of rare, century-old ${tip('Baozhong', '包種茶', 'noun — a lightly oxidized oolong tea, the prized specialty of the Heirin hills')} tea — ${tip('heirloom', '傳家之寶', 'noun — something valuable passed down through a family across generations')} stock from the Lin family of Heirin, three generations in the making. A colonial ${tip('broker', '掮客', 'noun — a person who arranges deals between buyers and sellers, sometimes dishonestly')} has been ${tip('pressuring', '施壓', 'verb — using power or threats to force someone to do something')} the family to sign the collection over for almost nothing. Tonight, before the family can ${tip('contest', '提出異議', 'verb — officially disagree with or challenge a decision')} the seizure, someone is moving the tea to a warehouse on the eastern edge of Zuihō — to be pushed up to Kyūfun by ${tip('daisha', '台車', 'noun — narrow push-cart railways used to haul goods up the steep mountain roads')} at first light, staged overnight, then hand-carried down to a small fishing landing away from ${tip('Kīrun', '基隆', 'noun — the major northern port, with customs inspectors the smugglers wanted to avoid')}. His job is to stop the transfer. Alone, he will fail.</p>
+    <p><strong>🔍 Secret path unlocked: The East Warehouse.</strong></p>
+  </div>
+  ${choices([
+    { text: 'Join him. This is the story — and the right thing to do.', action: 'render(s_team_up)' }
+  ])}`;
+}
+
+function s_watch_after_talk() {
+  return `
+  <div class="scene-tag">Section 5E · Waiting</div>
+  <div class="section-num">5</div>
+  <div class="prose">
+    <p>You say nothing. He waits. You wait. The train ${tip('rocks', '搖晃', 'verb — moves from side to side gently')} through a long mountain ${tip('cutting', '切割路段', 'noun — a section of railway dug through a hillside')}. The lights outside disappear entirely, then reappear.</p>
+    <p>Then, from behind you, someone grabs your shoulder. Hard.</p>
+    <p><em>"You should not be here,"</em> says a rough voice in English. A large man — gray suit, face like a concrete wall — stands in the aisle. <em>"Get off at the next ${tip('halt', '臨時停靠站', 'noun — a small stopping point on a railway line')}."</em></p>
+    <p>The man in the green jacket stands quickly. <em>"Leave them alone, Kang."</em></p>
+    <p>And now, whether you want it or not, you are in the middle of this.</p>
+  </div>
+  ${choices([
+    { text: 'Fight off "Kang" — or try to.', action: 'render(s_combat)' },
+    ...(state.skill === 'athlete' ? [{ text: '⚡ Use Athlete skill: Break his grip and put him between you and the door.', action: 'render(s_combat)' }] : []),
+    { text: 'Break away and run toward the back of the train.', action: 'render(s_train_run)' }
+  ])}`;
+}
+
+function s_train_run() {
+  const isAthlete = state.skill === 'athlete';
+  if (!isAthlete) state.hp -= 2;
+  return `
+  <div class="scene-tag">Section 6E · Back of the Train</div>
+  <div class="section-num">6</div>
+  <div class="prose">
+    ${isAthlete
+      ? `<p>You ${tip('wrench', '猛力扭轉', 'verb — twist free with sudden force')} free of Kang's grip and go — fast, low, through the carriage door and into the next. He is big and the aisle is narrow. By the time he pushes through after you, you are two carriages back and the train guard is already coming the other way, lantern in hand, drawn by the noise.</p>
+         <p>Kang stops. He looks at the guard, then at you. He turns and walks forward.</p>`
+      : `<p>You twist free — barely — and run. Kang's hand catches your collar and tears it before you ${tip('pull clear', '掙脫', 'verb — break free by pulling hard')}. You stumble through the carriage door, ${tip('winded', '喘不過氣', 'adj — breathing with difficulty')} and two stitches short of your best speed. <strong>−2 Health.</strong> The train guard appears with a lantern. Kang, caught in the corridor between you, goes still.</p>`
+    }
+    <p>The man in the green jacket has not moved from his seat. When you return — shaken, the guard behind you — he simply looks at you and says, quietly: <em>"Now will you let me explain?"</em></p>
+  </div>
+  ${choices([
+    { text: 'Sit down. Listen.', action: 'render(s_help)' }
+  ])}`;
+}
+
+function s_help() {
+  return `
+  <div class="scene-tag">Section 6A · Agreement</div>
+  <div class="section-num">6</div>
+  <div class="prose">
+    <p>You lean forward. <em>"Tell me everything,"</em> you say. Notebook out.</p>
+    <p>His name is Mr. Lin — Lîm Bun-hông in his family's Taiwanese tongue, Hayashi Bunkou to the colonial ${tip('registry', '戶籍', 'noun — the official record of people\'s names and addresses')}. He works quietly on behalf of several Taiwanese families as a ${tip('heritage', '文化遺產', 'noun — things from the past that are important to a culture or family')} investigator — not police, and careful never to appear ${tip('subversive', '顛覆性的', 'adj — secretly working against those in power; a dangerous label under colonial rule')}.</p>
+    <p>A powerful colonial ${tip('broker', '掮客', 'noun — a middleman who arranges deals, sometimes through pressure or deception')} has arranged for the Lin family's century-old ${tip('Baozhong', '包種茶', 'noun — a lightly oxidized oolong tea, the prized specialty of the Heirin hills; its name means "wrapped tea"')} collection to be seized and moved tonight — to a warehouse on the eastern edge of Zuihō, near the ${tip('daisha', '台車', 'noun — the narrow push-cart railways used to carry ore and goods up to Kyūfun')} staging area. At dawn the crates would go up to Kyūfun on the push-carts, sit in a second warehouse until night, then be hand-carried down the mountain paths to a small fishing landing far from ${tip('Kīrun', '基隆', 'noun — the major northern port city')} and its ${tip('customs inspectors', '海關人員', 'noun — officials who check goods entering or leaving a country')}. Once it left those waters, the family would have no ${tip('recourse', '救濟途徑', 'noun — a way to seek help or justice')}. A local reporter who published this would be ${tip('silenced', '被噤聲', 'verb (passive) — forced to stop speaking or writing')} within the week.</p>
+    <p><em>"But a Shanghai paper,"</em> he says quietly, <em>"is harder to silence."</em></p>
+    <p>He's right. And you both know it.</p>
+    <p>He also tells you he sent word to a ${tip('sympathetic', '同情的', 'adj — understanding and supportive of someone\'s situation')} Zuihō constable this afternoon — a man who owes the Lin family a debt of honour. The constable will make his way to the warehouse district after his evening ${tip('rounds', '巡邏', 'noun — a regular patrol of an area')}. But he cannot act without ${tip('evidence', '證據', 'noun — facts or objects that help prove something is true')}.</p>
+    <p>The train ${tip('shudders', '震動', 'verb — shakes suddenly')} and begins to slow. Through the window, on the high ridge to the north, you catch the faint scatter of lights that is Kyūfun — strung across the dark hillside like something precious almost lost. The train is not going there. It never was. But that is exactly the point.</p>
+    <p>Zuihō station is two minutes away.</p>
+  </div>
+  ${choices([
+    { text: 'Go to the warehouse together with Mr. Lin.', action: 'render(s_warehouse)' },
+    { text: 'Split up — you take the back road, he goes direct.', action: 'render(s_split)' }
+  ])}`;
+}
+
+function s_team_up() {
+  return `
+  <div class="scene-tag">Section 6B · Team</div>
+  <div class="section-num">6</div>
+  <div class="prose">
+    <p>Mr. Lin tells you his plan — simple, direct, and slightly ${tip('reckless', '魯莽的', 'adj — doing things without thinking about danger')}. He will ${tip('distract', '分散注意力', 'verb — make someone look the other way')} the men inside the warehouse. You will photograph the cargo — the crates, the markings, the faces — and if things go wrong, run for the ${tip('police box', '派出所', 'noun — a small local police station, common in Japanese colonial Taiwan')} near the Zuihō shrine.</p>
+    <p><em>"You have a camera?"</em> he asks. You ${tip('pat', '輕拍', 'verb — touch gently with your hand')} the ${tip('film camera', '底片相機', 'noun — a camera that uses rolls of film to take photographs; standard in the 1930s')} hanging at your side. <em>"Good. One clear photograph. That is all we need."</em></p>
+    <p>The train stops. The night air off the platform smells like coal dust and river water. On the high ridge to the north, the lights of Kyūfun ${tip('glitter', '閃爍', 'verb — shine with many small, bright points of light')} faint and unreachable — the place the tea was supposed to disappear to, in another twelve hours. Not tonight.</p>
+    <p><em>"The east warehouse is fifteen minutes on foot,"</em> Mr. Lin says quietly. <em>"We must go now."</em></p>
+  </div>
+  ${choices([
+    { text: 'Follow the plan. Head to the warehouse.', action: 'render(s_warehouse)' }
+  ])}`;
+}
+
+function s_follow_woman() {
+  return `
+  <div class="scene-tag">Section 6C · The Gray Coat</div>
+  <div class="section-num">6</div>
+  <div class="prose">
+    <p>You follow the woman carefully. Off the platform, through Zuihō's main street — quiet at this hour, a few late lanterns above closed shop fronts — then east, into the part of town that smells of coal and machine oil. The streets narrow. The buildings get lower and darker. She doesn't slow.</p>
+    <p>About fifteen minutes from the station she turns down an ${tip('unpaved', '未鋪設路面的', 'adj — a road with no stone or concrete surface; just dirt or gravel')} lane running alongside the ${tip('daisha', '台車', 'noun — the push-cart railway tracks used to haul goods up to Kyūfun')} tracks. The rails catch a little moonlight. At the end of the lane, a warehouse — low roof, heavy doors, a lamp burning inside one window.</p>
+    <p>Three men are moving wooden crates inside. Each crate is ${tip('stenciled', '用模板印上字的', 'adj — marked with letters or symbols using a cut-out template')} in old ${tip('brushwork', '毛筆字', 'noun — characters written with a traditional ink brush')} — tea varieties, harvest years, the Lin family mark.</p>
+    <p>She turns and sees you. Her face goes cold. <em>"You followed me."</em></p>
+    <p>Before you can ${tip('react', '反應', 'verb — respond to something that just happened')}, one of the men steps out of the warehouse door.</p>
+  </div>
+  ${choices([
+    { text: 'Run and call for help.', action: 'render(s_run)' },
+    { text: 'Stand your ground and raise your camera.', action: 'render(s_photo)' }
+  ])}`;
+}
+
+function s_confront() {
+  return `
+  <div class="scene-tag">Section 6D · Confrontation</div>
+  <div class="section-num">6</div>
+  <div class="prose">
+    <p>You walk up and sit across from the man. <em>"I know about the tea,"</em> you say quietly. <em>"And I know about the warehouse."</em></p>
+    <p>It is a ${tip('bluff', '虛張聲勢', 'noun — pretending to know or have more than you do')} — but it works. His eyes go wide.</p>
+    <p>Then he ${tip('composes', '恢復鎮定', 'verb — becomes calm again; controls emotions')} himself. <em>"Who sent you?"</em></p>
+    <p><em>"My editor,"</em> you say honestly. <em>"She said to watch you."</em></p>
+    <p>A long pause. Outside, the dark shapes of the foothills slide past the window. The train is close to Zuihō now. Then: <em>"Then watch carefully. We are almost there."</em></p>
+  </div>
+  ${choices([
+    { text: 'Go with him to the warehouse.', action: 'render(s_warehouse)' }
+  ])}`;
+}
+
+function s_run() {
+  const isAthlete = state.skill === 'athlete';
+  if (isAthlete) {
+    return `
+    <div class="scene-tag">Section 7A · Fast Escape</div>
+    <div class="section-num">7</div>
+    <div class="prose">
+      <p>You run. The lane outside the warehouse runs east before it dead-ends against the rising ${tip('foothills', '山麓丘陵', 'noun — the lower slopes at the base of a mountain')}. You know that. You go north instead — up a short, steep path of rough stone steps cut into the hillside behind the warehouse row, the kind that connects the working district below to the residential lanes above. Your ${tip('training', '訓練', 'noun — practice that makes you stronger or better at something')} takes over. Lungs burning, legs driving. The men give up halfway.</p>
+      <p>You find the Zuihō ${tip('police box', '派出所', 'noun — a small local police station, common in Japanese colonial Taiwan')} two streets over from the shrine and ${tip('pound', '猛敲', 'verb — knock very hard and loudly')} on the door. The officer on duty grabs his coat. When he reaches the warehouse, the tea is still inside. The broker's men are ${tip('caught', '被抓到', 'verb (past) — captured; unable to escape')}.</p>
+      <p>Mr. Lin finds you afterward, ${tip('breathless', '喘不過氣的', 'adj — breathing very hard from exertion')}. He is ${tip('grateful', '感謝的', 'adj — feeling or showing thanks')}. <em>"A Shanghai byline,"</em> he says. <em>"They cannot make it disappear."</em></p>
+      <p>You write the story that night in your Zuihō lodging house. It runs in the <em>Shanghai Evening Courier</em> three days later: <strong>COLONIAL BROKER ATTEMPTS SEIZURE OF TAIWAN FAMILY HEIRLOOM TEAS.</strong> It is the best thing you have ever written.</p>
+    </div>
+    ${endingSection('Good Ending: The Fast Reporter', true, ['⚡ Athlete', '📰 Story Filed', '🏃 Quick Escape'])}`;
+  } else {
+    state.hp -= 4;
+    return `
+    <div class="scene-tag">Section 7A · Narrow Escape</div>
+    <div class="section-num">7</div>
+    <div class="prose">
+      <p>You run — but one of the men is faster. He ${tip('catches', '抓住', 'verb — grabs; stops from escaping')} your jacket at the lane's edge. You ${tip('twist', '扭轉', 'verb — turn sharply')} free but ${tip('tumble', '跌倒', 'verb — fall in a rolling way')} hard against the stone ${tip('retaining wall', '擋土牆', 'noun — a wall built to hold back earth on a hillside')} at the base of the path. <strong>−4 Health.</strong></p>
+      <p>You ${tip('drag yourself', '拖著身子', 'phrase — move with great effort because of pain or exhaustion')} up the rough hillside steps to the Zuihō police box. It takes twenty minutes. By the time the officer reaches the warehouse, two men are gone — but the crates remain. Not a perfect victory. But the family gets something back. And your article runs in the <em>Shanghai Evening Courier</em> — the sketch you made of the crate markings, combined with Mr. Lin's testimony, enough to identify the broker in print. The colonial ${tip('authorities', '當局', 'noun — the people in power')} cannot easily silence a Shanghai byline.</p>
+    </div>
+    ${endingSection('Neutral Ending: The Bruised Reporter', false, ['📰 Story Filed', '🏃 Partial Escape'])}`;
+  }
+}
+
+function s_photo() {
+  return `
+  <div class="scene-tag">Section 7B · The Photo</div>
+  <div class="section-num">7</div>
+  <div class="prose">
+    <p>Your hand is ${tip('steady', '穩定的', 'adj — not shaking; calm and controlled')}. You raise your ${tip('camera', '相機', 'noun — a device for taking photographs')}. One ${tip('shot', '快照', 'noun — a single photograph')} — the crates, the Lin family ${tip('brushwork', '毛筆字', 'noun — characters written with a traditional ink brush')} on the stencils, the woman's face, the warehouse interior. The ${tip('shutter', '快門', 'noun — the part of a camera that opens and closes to take a photo')} ${tip('clicks', '喀嚓聲', 'verb — makes a short sharp sound')}.</p>
+    <p>She moves toward you.</p>
+    <p>But Mr. Lin steps out from behind a stack of crates — he had been ${tip('tailing', '跟蹤', 'verb — following someone secretly')} the woman from the train by a different street, arriving moments before you. <em>"It's over,"</em> he says. The flat ${tip('blast', '一聲響', 'noun — a sudden loud sound')} of a police ${tip('whistle', '哨子', 'noun — a small device you blow to make a loud, high sound; used by police in colonial Taiwan')} cuts through the warehouse dark.</p>
+    <p>The broker's men freeze. The woman ${tip('drops', '放棄；放下', 'verb — lets something fall; gives up')} her ${tip('pretense', '偽裝；假裝', 'noun — acting as something you are not')}.</p>
+    <p>The tea stays in Taiwan. Your photograph — crates, markings, faces, all of it sharp in the ${tip('flash powder', '閃光粉', 'noun — a powder that burns with a bright flash, used in 1930s photography')} light — runs on the front page of the <em>Shanghai Evening Courier</em>. The colonial broker's name appears in print across three countries. On the high ridge above the town, the lights of Kyūfun burn on, unknowing, as they always have.</p>
+  </div>
+  ${endingSection('Best Ending: The Photo That Changed Everything', true, ['📸 Perfect Shot', '🍵 Tea Saved', '🌙 Night in Zuihō'])}`;
+}
+
+function s_warehouse() {
+  return `
+  <div class="scene-tag">Section 7C · The East Warehouse</div>
+  <div class="section-num">7</div>
+  <div class="prose">
+    <p>Fifteen minutes on foot from Zuihō station, east along the ${tip('daisha', '台車', 'noun — the push-cart railway used to haul goods up to Kyūfun')} tracks. The lane is dark and smells of coal dust and damp earth. Above the town, on the ridge to the north, the lights of Kyūfun ${tip('glitter', '閃爍', 'verb — shine with many small, bright points of light')} — the place these crates were supposed to reach by dawn. Not tonight.</p>
+    <p>The warehouse is low-roofed, heavy-doored, a lamp burning behind one shutter. Three men move wooden crates inside. Each crate is ${tip('stenciled', '用模板印上字的', 'adj — marked with letters or symbols using a cut-out template')} in old ${tip('brushwork', '毛筆字', 'noun — characters written with a traditional ink brush')} — ${tip('Baozhong', '包種茶', 'noun — a lightly oxidized oolong tea, the prized specialty of the Heirin hills')} tea from the Lin family gardens in Heirin, three generations in the making.</p>
+    <p>Mr. Lin holds up a ${tip('deed', '契約文件', 'noun — an official legal document proving ownership')}. <em>"Stop. I have the family title documents for every crate in that building. Touch one more and you are thieves in front of a Shanghai witness."</em></p>
+    <p>One man reaches into his jacket. You raise your ${tip('camera', '相機', 'noun — a device for taking photographs')} and photograph everything — faces, crates, the Lin family markings. The ${tip('flash powder', '閃光粉', 'noun — a powder that burns with a bright flash, used in 1930s photography')} lights up the warehouse like noon.</p>
+    <p>Someone grabs Mr. Lin. You shout. Two ${tip('constables', '巡查', 'noun — colonial-era police officers who patrolled on foot')} come running down the lane — the sympathetic contact Mr. Lin had arranged, and a colleague he brought along.</p>
+    <p>In the chaos, two men escape into the dark. But the tea stays. The photographs run in the <em>Shanghai Evening Courier</em> under your byline a week later. A colonial broker's career ends quietly. The Lin family keeps their tea — and the daisha will carry nothing up to Kyūfun at dawn tomorrow except ore and morning supplies, as it always should have done.</p>
+  </div>
+  ${endingSection('Good Ending: Guardians of the Tea Road', true, ['🍵 Tea Saved', '📸 Evidence Secured', '🌙 Night in Zuihō'])}`;
+}
+
+function s_split() {
+  const isAthlete = state.skill === 'athlete';
+  if (!isAthlete) state.hp -= 3;
+  return `
+  <div class="scene-tag">Section 7D · Split Path</div>
+  <div class="section-num">7</div>
+  <div class="prose">
+    <p>You take the back way — a different route through Zuihō's eastern residential lanes, climbing the hillside behind the town before cutting down toward the warehouse district. The path is older than the town around it, steep and unlit, the stones ${tip('slick', '滑溜的', 'adj — smooth and wet; easy to slip on')} with the night's ${tip('damp', '潮濕', 'noun — slight wetness in the air')}.</p>
+    ${isAthlete
+      ? `<p>Your footing is sure even in the dark — you ${tip('pick your way', '小心選擇落腳點', 'phrase — move carefully, choosing each step')} up and over the ridge without breaking stride, descending the far side fast enough to arrive at the warehouse lane before Mr. Lin expected you.</p>`
+      : `<p>In the dark, you ${tip('twist', '扭傷', 'verb — injure by turning suddenly')} your ${tip('ankle', '腳踝', 'noun — the joint connecting your foot and leg')} on a loose stone near the top. <strong>−3 Health.</strong> You ${tip('limp', '跛行', 'verb — walk unevenly due to pain')} the rest of the way down, jaw set.</p>`
+    }
+    <p>You arrive at the warehouse lane just in time to see Mr. Lin already holding two of the men at ${tip('bay', '保持距離', 'phrase — "hold at bay" = keep away; prevent from getting closer')}. From the shadow of the wall, you sketch the scene in your notebook — crate markings, faces, the Lin family brushwork on each stencil — fast and accurate. A reporter's eye.</p>
+    <p>The ${tip('constables', '巡查', 'noun — colonial-era police officers')} arrive. The story is yours — and it runs in the <em>Shanghai Evening Courier</em> four days later, illustrated with your warehouse sketches and Mr. Lin's ownership documents.</p>
+  </div>
+  ${endingSection('Good Ending: The Long Way Around', true, isAthlete ? ['⚡ Sure-Footed', '✏️ Warehouse Sketches', '🍵 Tea Saved'] : ['✏️ Warehouse Sketches', '🍵 Tea Saved', '🦶 Sore Ankle'])}`;
+}
+
+function s_combat() {
+  const isAthlete = state.skill === 'athlete';
+  const dmgTaken = isAthlete ? 1 : 3;
+  state.hp = Math.max(0, state.hp - dmgTaken);
+
+  if (state.hp <= 0) {
+    return s_defeat();
+  }
+
+  return `
+  <div class="scene-tag">Section 7E · Fight!</div>
+  <div class="section-num">7</div>
+  <div class="prose">
+    <p>${tip('"Kang"', '一個壞人', 'proper noun — the name of this villain')} is big. He grabs for you. The train ${tip('rocks', '搖晃', 'verb — moves from side to side')} — the perfect moment.</p>
+    ${isAthlete
+      ? `<p>Your Athlete training takes over. You ${tip('sidestep', '側步閃開', 'verb — quickly move to the side to avoid something')}, grab his arm, and use his own ${tip('momentum', '動力；衝勁', 'noun — the force of movement')} to send him into the seat. He sits down, stunned. You've barely broken a sweat. <strong>−${dmgTaken} Health.</strong></p>`
+      : `<p>You catch his fist with both hands — barely. He is very strong. You ${tip('shove', '用力推', 'verb — push with force')} back hard and he steps away, ${tip('winded', '喘不過氣', 'adj — breathing with difficulty after a shock or impact')}. Your ribs ache. <strong>−${dmgTaken} Health.</strong></p>`
+    }
+    <p>Mr. Lin grabs Kang from behind. Together, you ${tip('restrain', '制伏', 'verb — hold someone so they cannot move')} him until the train guard arrives and takes him to the front carriage.</p>
+  </div>
+  ${choices([
+    { text: 'Get off at Zuihō. Head to the warehouse now.', action: 'render(s_warehouse)' }
+  ])}`;
+}
+
+function s_defeat() {
+  return `
+  <div class="scene-tag">Game Over</div>
+  <div class="section-num">✕</div>
+  <div class="prose">
+    <p>You fall hard. The world ${tip('tilts', '傾斜', 'verb — moves to one side; becomes unsteady')}. The last thing you hear is the train's wheels grinding to a stop.</p>
+    <p>When you come round, you are slumped in a carriage seat. The train is ${tip('stationary', '靜止的', 'adj — not moving')} at Zuihō station. The platform is empty. Your notebook is gone — and so is the story. On the ridge above the town, the lights of Kyūfun burn on, indifferent.</p>
+    <p>But ${tip('correspondents', '駐外記者', 'noun — reporters who work in a foreign country')} never give up. There is always another lead.</p>
+  </div>
+  ${endingSection('Bad Ending: Not This Time', false, ['Try Again'])}`;
+}
+
+function endingSection(title, isGood, badges) {
+  const badgeHtml = badges.map(b => `<div class="badge"><span class="badge-icon">★</span>${b}</div>`).join('');
+  return `
+  <div class="divider"></div>
+  <div class="ending-banner">
+    <div class="ending-label">${isGood ? '✦ Ending Reached ✦' : '✧ Ending Reached ✧'}</div>
+    <h2>${title}</h2>
+    <div class="badge-row">${badgeHtml}</div>
+    <p style="font-size:0.9rem;color:#5a4530;margin:12px 0;font-style:italic;">
+      The Lin family keeps their tea. The broker's name is in print. The story is yours.
+    </p>
+    <button class="restart-btn" onclick="restartGame()">↺ Play Again — Try a Different Path</button>
+  </div>`;
+}
+
+function restartGame() {
+  state.hp = 20; state.maxHp = 20;
+  state.skill = null;
+  state.hasTicket = false;
+  state.hasNote = false;
+  state.enemyHp = 10;
+  state.badges = [];
+  render(s_intro);
+}
+
+// ── Start ──
+render(s_intro);
+</script>
+</body>
+</html>

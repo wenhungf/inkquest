@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Achievement Unlocked — Episode 1: Tutorial</title>
+<style>
+  :root{
+    --night:#0e1216;        /* Kaohsiung asphalt at 11 p.m. */
+    --paper:#c9c4ba;        /* tired fluorescent warmth     */
+    --dim:#8a857c;
+    --hud:#4ee6a8;          /* system green                 */
+    --hud-dim:#2a6e54;
+    --gold:#e6b84e;
+    --line:#222a31;
+    --boxbg:#10181d;
+  }
+  html{ background:var(--night) !important; }
+  body{
+    background:var(--night) !important;
+    color:var(--paper);
+    margin:0;
+    font-family:Georgia,'Noto Serif','Times New Roman',serif;
+    font-size:1.06rem;
+    line-height:1.75;
+    -webkit-text-size-adjust:100%;
+  }
+  #app{ max-width:600px; margin:0 auto; padding:28px 22px 90px; }
+
+  /* ---------- narrative ---------- */
+  .scene p{ margin:0 0 1.1em; }
+  .beat{ letter-spacing:.04em; }
+  .quiet{ color:var(--dim); }
+  .big{ font-size:1.3em; }
+
+  /* ---------- system UI ---------- */
+  .sys{
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    font-size:.86rem;
+    line-height:1.6;
+    border:1px solid var(--hud-dim);
+    background:var(--boxbg);
+    border-radius:6px;
+    padding:14px 16px;
+    margin:1.4em 0;
+    color:var(--hud);
+    box-shadow:0 0 18px rgba(78,230,168,.07);
+    animation:sysin .5s ease-out;
+  }
+  .sys .tag{ color:var(--hud); opacity:.7; font-size:.72rem; letter-spacing:.18em; display:block; margin-bottom:6px; }
+  .sys .name{ font-weight:bold; font-size:1rem; }
+  .sys .pts{ display:block; margin-top:6px; opacity:.9; }
+  .sys .flair{ display:block; margin-top:6px; opacity:.75; font-style:italic; }
+  .sys.gold{ border-color:#7a6328; color:var(--gold); box-shadow:0 0 18px rgba(230,184,78,.1); }
+  .sys.fail{ border-color:#4a4a4a; color:#9a958c; box-shadow:none; }
+  @keyframes sysin{
+    from{ opacity:0; transform:translateY(6px); box-shadow:0 0 0 rgba(78,230,168,0); }
+    to{ opacity:1; transform:none; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .sys{ animation:none; }
+  }
+
+  /* ---------- panel / menu ---------- */
+  .panel{
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    font-size:.88rem;
+    border:1px solid var(--hud-dim);
+    background:var(--boxbg);
+    border-radius:6px;
+    padding:16px;
+    margin:1.4em 0;
+    color:var(--hud);
+  }
+  .panel h3{ margin:0 0 10px; font-size:.78rem; letter-spacing:.2em; opacity:.7; font-weight:normal; }
+  .panel .row{ display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px dotted #1c2930; }
+  .panel .row:last-child{ border-bottom:none; }
+  .panel .lock{ opacity:.45; }
+  .panel .goldtxt{ color:var(--gold); }
+
+  /* ---------- choices ---------- */
+  .choices{ margin-top:2em; }
+  .choice{
+    display:block; width:100%; box-sizing:border-box;
+    background:transparent; color:var(--paper);
+    border:1px solid var(--line); border-radius:8px;
+    font-family:inherit; font-size:1rem; line-height:1.5;
+    text-align:left; padding:13px 16px; margin:10px 0;
+    cursor:pointer; transition:border-color .15s, background .15s;
+  }
+  .choice:hover, .choice:focus-visible{ border-color:var(--hud-dim); background:#121a20; outline:none; }
+  .choice:focus-visible{ box-shadow:0 0 0 2px var(--hud-dim); }
+  .choice .arrow{ color:var(--hud); margin-right:8px; }
+
+  /* ---------- vocab tooltips ---------- */
+  .vb{
+    border-bottom:1px dotted var(--hud);
+    cursor:pointer; color:inherit;
+    position:relative;
+  }
+  .vb .tip{
+    display:none; position:absolute; left:0; bottom:1.6em; z-index:5;
+    background:#16222a; color:#d7efe4; border:1px solid var(--hud-dim);
+    border-radius:6px; padding:8px 11px;
+    font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;
+    font-size:.82rem; line-height:1.5;
+    white-space:normal; width:max-content; max-width:min(300px,80vw);
+    box-shadow:0 4px 16px rgba(0,0,0,.5);
+  }
+  .vb.open .tip{ display:block; }
+  .vb .tip.below{ bottom:auto; top:1.6em; }
+
+  /* ---------- title screen ---------- */
+  .title-wrap{ text-align:center; padding-top:9vh; }
+  .title-eyebrow{
+    font-family:ui-monospace,'SF Mono',Menlo,monospace;
+    font-size:.72rem; letter-spacing:.3em; color:var(--hud); opacity:.8;
+  }
+  h1.gametitle{
+    font-size:2rem; line-height:1.2; margin:.5em 0 .2em; color:#efe9dc;
+    font-weight:normal; letter-spacing:.02em;
+  }
+  .ep-label{ color:var(--gold); font-family:ui-monospace,Menlo,monospace; font-size:.8rem; letter-spacing:.2em; }
+  .blurb{ margin:2.2em auto 2.6em; max-width:430px; text-align:center; }
+  .blurb p{ margin:.4em 0; }
+  .blurb .sysline{ font-family:ui-monospace,Menlo,monospace; color:var(--hud); }
+  .menu-btns{ max-width:340px; margin:0 auto; }
+  .small-note{ font-size:.78rem; color:var(--dim); margin-top:2.2em; }
+
+  /* ---------- end-of-episode menu ---------- */
+  .ach-list .row{ align-items:baseline; }
+  .ach-name{ font-weight:bold; }
+  .ach-desc{ display:block; font-size:.78rem; opacity:.65; font-style:italic; }
+  .savebox{ width:100%; box-sizing:border-box; background:#0a0f12; color:var(--hud);
+    border:1px solid var(--line); border-radius:6px; padding:10px;
+    font-family:ui-monospace,Menlo,monospace; font-size:.74rem; min-height:60px; }
+  .btn-line{ display:flex; gap:10px; }
+  .btn-line .choice{ flex:1; }
+  hr.sep{ border:none; border-top:1px solid var(--line); margin:2em 0; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* =====================================================
+   ACHIEVEMENT UNLOCKED — Episode 1: Tutorial
+   InkQuest · single-file build · EP append-ready
+   ===================================================== */
+
+const SAVE_KEY = 'au_save';
+const SAVE_VERSION = 1;
+
+function freshState(){
+  return {
+    version: SAVE_VERSION,
+    episode: 1,
+    section: 's1',
+    points: 0,
+    level: 1,
+    skills: [],
+    achievements: [],
+    flags: {},
+    map_unlocked: ['commute_route'],
+    failCount: 0
+  };
+}
+
+let state = freshState();
+let storageOK = true;
+
+function loadSave(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return null;
+    const s = JSON.parse(raw);
+    if(typeof s.version !== 'number') return null;
+    /* future migrations go here: if(s.version < 2){...} */
+    return Object.assign(freshState(), s);
+  }catch(e){ storageOK = false; return null; }
+}
+function save(){
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+  catch(e){ storageOK = false; }
+}
+function wipeSave(){
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+}
+
+/* ---------- achievements ---------- */
+const ACH = {
+  overtime_14:   { name:'Overtime Streak: Day 14', pts:1,  desc:'You worked late. Again. And again.' },
+  staring:       { name:'Staring Contest (You Lost)', pts:0, desc:'You watched the window. It did not blink.' },
+  cat_person:    { name:'Cat Person', pts:1, desc:'You stopped for the cat. The cat allowed it.' },
+  explorers_eye: { name:"Explorer's Eye", pts:0, desc:'"You looked. That\'s how it starts."' },
+  self_starter:  { name:'Self-Starter', pts:0, desc:'"We didn\'t ask. You went anyway."' }
+};
+function grant(id){
+  if(!state.achievements.includes(id)){
+    state.achievements.push(id);
+    state.points += ACH[id].pts;
+  }
+}
+function addPts(n){ state.points += n; }
+
+/* ---------- vocab ---------- */
+const VOCAB = {
+  achievement:{en:'something you did well — the game gives you a badge for it', zh:'成就'},
+  quest:{en:'a task or mission in a game', zh:'任務'},
+  streak:{en:'doing the same thing many days in a row', zh:'連續（做某事的天數）'},
+  reward:{en:'something good you get for finishing a task', zh:'獎勵'},
+  alley:{en:'a small, narrow road between buildings', zh:'巷子'},
+  explorer:{en:'a person who goes to new places', zh:'探險者'},
+  panel:{en:'a screen that shows your information', zh:'面板'},
+  locked:{en:'closed — you cannot use it yet', zh:'鎖住的'},
+  floating:{en:'staying in the air, not falling', zh:'漂浮的'},
+  hot_plate:{en:'a flat, hot metal surface for cooking', zh:'鐵板'},
+  overtime:{en:'extra work time after normal hours', zh:'加班'},
+  clerk:{en:'a person who works at a store counter', zh:'店員'},
+  rub:{en:'to press and move your hand on something', zh:'揉、搓'},
+  fade:{en:'to slowly disappear', zh:'漸漸消失'},
+  stall:{en:'a small open shop on the street', zh:'攤子'},
+  steam:{en:'the white cloud that rises from hot water', zh:'蒸氣'},
+  fog:{en:'a thick grey cloud near the ground', zh:'霧'},
+  harbor:{en:'a place where ships stop, by the sea', zh:'港口'},
+  blanket:{en:'a warm cover for your bed', zh:'毯子'},
+  sidewalk:{en:'the path beside a road, for walking', zh:'人行道'},
+  disappointed:{en:'sad because something you wanted did not happen', zh:'失望的'},
+  narrow:{en:'thin; not wide', zh:'狹窄的'},
+  ceiling:{en:'the top inside part of a room', zh:'天花板'},
+  pet:{en:'to touch an animal gently', zh:'輕撫（動物）'},
+  security_guard:{en:'a person whose job is to keep a building safe', zh:'警衛'},
+  switches_off:{en:'stops working — like turning off a light', zh:'（腦袋）關機、自動運作'},
+  self_starter:{en:'a person who starts doing things without being told', zh:'主動自發的人'},
+  tutorial:{en:'the first part of a game — it teaches you how to play', zh:'新手教學'}
+};
+function tipTxt(k){ return VOCAB[k].en + '<br><span style="opacity:.75">'+VOCAB[k].zh+'</span>'; }
+function vb(word, key){
+  const k = key || word.toLowerCase();
+  return '<span class="vb" data-v="1">'+word+'<span class="tip">'+tipTxt(k)+'</span></span>';
+}
+
+/* ---------- UI builders ---------- */
+function sysBox(tag, name, lines, cls){
+  let h = '<div class="sys '+(cls||'')+'"><span class="tag">'+tag+'</span><span class="name">'+name+'</span>';
+  (lines||[]).forEach(l=>{ h += '<span class="'+l[0]+'">'+l[1]+'</span>'; });
+  return h+'</div>';
+}
+
+/* =====================================================
+   SECTIONS — Episode 1
+   ===================================================== */
+const SECTIONS = {
+
+/* ---------- ACT I · the grey days ---------- */
+
+s1:{
+ html:()=>`
+  <p class="quiet">EPISODE 1 — ${vb('TUTORIAL','tutorial')}</p>
+  <p>It is 11:42 p.m. You are still at your desk.</p>
+  <p>The office is empty. The lights above you make a low sound. On your screen, there is a report. It is the same report as last week. Only the numbers are different.</p>
+  <p>You press <b>Save</b>. You stand up. Your back hurts a little.</p>
+  <p>Time to go home.</p>
+  <p class="beat">Again.</p>`,
+ choices:[ {t:'Leave the office', go:'s2'} ]
+},
+
+s2:{
+ html:()=>`
+  <p>The elevator takes a long time. It always does.</p>
+  <p>Downstairs, the ${vb('security guard','security_guard')} sits behind the desk. You see this person every day. Morning and night. You do not know the guard's name.</p>
+  <p>You nod. The guard nods back. Neither of you says a word.</p>
+  <p>Outside, the night air of Kaohsiung is warm and a little wet. Scooters pass. Somewhere, someone is selling fried chicken. The smell follows you down the street.</p>`,
+ choices:[ {t:'Walk to the convenience store', go:'s3'} ]
+},
+
+s3:{
+ html:()=>`
+  <p>The convenience store is bright. Too bright. The door makes its little sound when you walk in.</p>
+  <p>"Welcome," says the ${vb('clerk')}, not looking up.</p>
+  <p>You walk to the coffee machine at the back. You know this machine. You know it better than you know most people.</p>
+  <p>Every night, the same choice.</p>`,
+ choices:[
+   {t:'Black coffee. Like always.', go:'s4'},
+   {t:'Latte. Like always.', go:'s4'}
+ ]
+},
+
+s4:{
+ html:()=>`
+  <p>You press the button. The machine hums. The cup fills.</p>
+  <p>You did not really choose, did you? You pressed the same button you press every night. Your hand knows the way.</p>
+  <p>You carry the cup to the counter.</p>`,
+ choices:[ {t:'Pay', go:'s5'} ]
+},
+
+/* ---------- ACT II · the first words ---------- */
+
+s5:{
+ onEnter:()=>{ grant('overtime_14'); },
+ html:()=>`
+  <p>You tap your card. <i>Beep.</i></p>
+  <p>And then you see it.</p>
+  <p>Words. In the air. Right in front of you.</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED',vb('Overtime','overtime')+' '+vb('Streak','streak')+': Day 14',[['pts','+1 point']])}
+  <p>You look at the clerk. The clerk looks at you.</p>
+  <p>"…Do you see that?" you ask.</p>
+  <p>"See what?"</p>`,
+ choices:[ {t:'Look again', go:'s6'} ]
+},
+
+s6:{
+ html:()=>`
+  <p>You ${vb('rub')} your eyes. You close them. You count to three. You open them.</p>
+  <p>The words are still there. ${vb('Floating','floating')}. Soft green light, like an old computer screen.</p>
+  <p><i>I am tired,</i> you think. <i>I am very, very tired. That is all.</i></p>
+  <p>You reach out and touch the words.</p>
+  <p>Your hand goes right through them.</p>`,
+ choices:[ {t:'Leave. Quickly.', go:'s7'} ]
+},
+
+s7:{
+ html:()=>`
+  <p>You walk home fast. The words follow you for a while, floating near your shoulder like a quiet dog. Then, somewhere near your street, they ${vb('fade')} away.</p>
+  <p>Good, you think. It was nothing. Too much work. Too little sleep. People see things when they are tired. This is normal. You are normal.</p>
+  <p>You wash your face. You brush your teeth. You lie down in bed and look at the ${vb('ceiling')}.</p>
+  <p>The ceiling looks back.</p>
+  ${sysBox('📋 NEW QUEST','A Different Road',[
+    ['flair','Tomorrow, walk to work by a road you have never used before.'],
+    ['pts','<span class="vb">Reward<span class="tip">'+tipTxt('reward')+'</span></span>: +10 points']
+  ])}`,
+ choices:[
+   {t:'Close your eyes. Tomorrow is a work day.', go:'s9'},
+   {t:'Stare at it. Wait for it to explain.', go:'s8b'}
+ ]
+},
+
+s8b:{
+ onEnter:()=>{ grant('staring'); },
+ html:()=>`
+  <p>You stare at the floating window.</p>
+  <p>The floating window does nothing.</p>
+  <p>You stare harder. You whisper: "Hello? What are you? Who sent you?"</p>
+  <p>Nothing. The words just float there, green and calm, like they have all the time in the world.</p>
+  <p>At 1:04 a.m., you give up.</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Staring Contest (You Lost)',[['pts','+0 points']])}
+  <p class="quiet">Zero points. Great. Even the strange magic window thinks you wasted your time.</p>`,
+ choices:[ {t:'Sleep. Finally.', go:'s9'} ]
+},
+
+/* ---------- ACT III · the first quest ---------- */
+
+s9:{
+ html:(st)=>{
+   const day = st.failCount===0 ? '' :
+     st.failCount===1 ? '<p class="quiet">Day two. Same door. Same choice.</p>' :
+     '<p class="quiet">Day three.</p>';
+   let extra = '';
+   if(st.failCount>=2){
+     extra = `<p>You look at the old road. You have walked it about 1,800 times. You know every crack in it.</p>
+      <p>And suddenly you cannot do it. Not because of the points. Because of a small, hot question inside you:</p>
+      <p class="beat"><i>Is this really my life? I can't even take a different road?</i></p>`;
+   }
+   return `
+  ${day}
+  <p>Morning. The alarm rings. You silence it with one finger, eyes still closed.</p>
+  <p>When you open them, the <span class="vb">quest<span class="tip">${tipTxt('quest')}</span></span> window is waiting in the corner of your eye. Under it, a timer is counting down: <b>TIME LEFT&nbsp;&nbsp;01:13:42</b>. Work starts at nine.</p>
+  <p>You stand at your front door with your bag.</p>
+  <p>To the left: the road you have walked for five years.</p>
+  <p>To the right: a narrow <span class="vb">alley<span class="tip">${tipTxt('alley')}</span></span> you have never entered. Not once.</p>
+  ${extra}`;
+ },
+ choices:(st)=>{
+   if(st.failCount>=2){
+     return [ {t:'Take the alley.', go:'s10b'} ];
+   }
+   return [
+     {t:'Take the old road. This is silly. You are an adult.', go:'s10a'},
+     {t:'Take the alley. It\'s just a small detour.', go:'s10b'}
+   ];
+ }
+},
+
+s10a:{
+ onEnter:()=>{ state.failCount++; },
+ html:()=>`
+  <p>You turn left.</p>
+  <p>The old road is the old road. The same shops, still closed. The same broken tile in front of the bank. Your feet move by themselves. You don't have to think at all.</p>
+  <p>That used to feel comfortable.</p>
+  <p>The quest window floats beside you the whole way. It does not beep. It does not warn you. It says nothing at all.</p>
+  <p>Somehow, the silence is louder than any alarm.</p>
+  <p>You tap your card at the office door.</p>
+  ${sysBox('QUEST FAILED','A Different Road',[
+    ['flair',"Don't worry. The road will still be there tomorrow."]
+  ],'fail')}
+  <p class="quiet">It is not angry. It is just… patient. Like it knows something you don't.</p>`,
+ choices:[ {t:'Work. Sleep. Morning again.', go:'s9'} ]
+},
+
+s10b:{
+ html:()=>`
+  <p>You turn right.</p>
+  <p>The alley is ${vb('narrow')} and quiet. Morning light falls between the buildings in long yellow lines. Someone's window has a row of small fat plants on the iron bars, all leaning toward the sun.</p>
+  <p>At the corner, a noodle ${vb('stall')} is washing its floor. ${vb('Steam','steam')} rises from a big silver pot. The smell of soup follows you, warm and salty.</p>
+  <p>On a parked scooter, a cat is sleeping on the seat. It is the most relaxed living thing you have seen in months.</p>`,
+ choices:[
+   {t:'Stop and pet the cat', go:'s11'},
+   {t:'Keep walking. You have a job.', go:'s12'}
+ ]
+},
+
+s11:{
+ onEnter:()=>{ grant('cat_person'); },
+ html:()=>`
+  <p>You stop. You hold out your hand, slow and polite.</p>
+  <p>The cat opens one eye. It studies you for a long second — your shoes, your bag, your tired face. Then it closes the eye again.</p>
+  <p>Permission. Probably.</p>
+  <p>You ${vb('pet')} it gently. It is warm from the morning sun. It makes a small sound, like a tiny engine.</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Cat Person',[['pts','+1 point']])}
+  <p class="quiet">One point for the cat. One point for fourteen days of overtime. You are starting to understand this system's opinion of your life choices.</p>`,
+ choices:[ {t:'Keep walking', go:'s12'} ]
+},
+
+s12:{
+ html:()=>`
+  <p>Deeper in the alley, you find it.</p>
+  <p>A breakfast shop. Small, old, the sign so faded you can hardly read it. Inside, an old man stands at a ${vb('hot plate','hot_plate')}, making egg pancakes. The sound — <i>tss, tss</i> — is somehow the best sound you have heard all week.</p>
+  <p>The shop looks like it has been here for thirty years.</p>
+  <p>You have lived ten minutes away for five. You never knew it existed.</p>
+  <p>The old man looks up. He gives you a small nod — the kind of nod you give an old customer. But you have never been here in your life.</p>`,
+ choices:[
+   {t:'Buy an egg pancake (NT$35)', go:'s13', set:{breakfast_shop_known:true} },
+   {t:'Smile, nod back, and keep moving', go:'s13'}
+ ]
+},
+
+s13:{
+ html:(st)=>{
+   const ate = st.flags.breakfast_shop_known ?
+     `<p>The egg pancake is hot in your hand, wrapped in paper. You eat it as you walk. It is simple and perfect. You decide, quietly, that you will come back.</p>` :
+     `<p>You nod back and keep walking. But you memorize the corner. Some part of you already knows you will return.</p>`;
+   return `
+  ${ate}
+  <p>The alley turns once more — and suddenly you are out. Your office building stands right in front of you.</p>
+  <p>You check the time.</p>
+  <p>This road is <b>three minutes faster</b> than your old road.</p>
+  <p>Five years. You did the math without wanting to: five years, two roads a day…</p>
+  <p class="beat">You have walked the slow way about 1,800 times.</p>
+  ${sysBox('✅ QUEST COMPLETE','A Different Road',[['pts','+10 points']])}
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED',"<span class='vb'>Explorer<span class='tip'>"+tipTxt('explorer')+"</span></span>'s Eye",[
+    ['flair','"You looked. That\'s how it starts."']
+  ])}`;
+ },
+ onEnter:()=>{
+   if(!state.flags.q1_paid){ addPts(10); state.flags.q1_paid = true; }
+   grant('explorers_eye');
+ },
+ choices:[ {t:'Go to work', go:'s14'} ]
+},
+
+/* ---------- ACT IV · another road ---------- */
+
+s14:{
+ html:()=>`
+  <p>The office is the office. The report is the report. The numbers are still only numbers.</p>
+  <p>But something is different, and the something is you.</p>
+  <p>At your desk, between two emails, you catch yourself thinking about the cat. The plants on the window bars. The old man's nod.</p>
+  <p>You were there for ten minutes. You have thought about it all morning.</p>`,
+ choices:[ {t:'Lunch break', go:'s15'} ]
+},
+
+s15:{
+ html:()=>`
+  <p>At lunch, alone with your phone, you open the map app.</p>
+  <p>You look at the space between your home and your office. You start counting the roads you have never used.</p>
+  <p>Eleven.</p>
+  <p>Eleven roads, sitting there for five years, waiting. Each one ten minutes from your bed.</p>
+  <p>A strange feeling rises in your chest. It is not happiness, not exactly. It is more like hunger.</p>`,
+ choices:[ {t:'Back to work. Watch the clock.', go:'s16'} ]
+},
+
+s16:{
+ html:()=>`
+  <p>Six o'clock. You shut down your computer and walk out — on time, for once.</p>
+  <p>Outside, you stop. You wait.</p>
+  <p>Nothing happens.</p>
+  <p>No green words. No new quest. The air is just air.</p>
+  <p>You stand there for a moment, and you notice something embarrassing about yourself:</p>
+  <p class="beat">You are ${vb('disappointed')}.</p>
+  <p>One day. One quest. And you are already waiting for the next one, like a kid waiting for a game to load.</p>`,
+ choices:[
+   {t:'Go home the normal way', go:'s17'},
+   {t:'Pick one of the eleven roads. No quest. Just because.', go:'s17b'}
+ ]
+},
+
+s17:{
+ html:()=>`
+  <p>You start walking the normal way. Your feet know it. Your brain ${vb('switches off','switches_off')}.</p>
+  <p>Halfway home, you stop in the middle of the ${vb('sidewalk')}.</p>
+  <p>A scooter beeps around you. You ignore it.</p>
+  <p><i>Eleven roads,</i> you think. <i>And I am walking this one. Again.</i></p>
+  <p>You turn around.</p>`,
+ choices:[ {t:'Pick a new road', go:'s17b'} ]
+},
+
+s17b:{
+ html:()=>`
+  <p>The new road is nothing special. A laundry shop. A small temple between two apartment buildings, its red lights already on. Two old men playing chess on a folding table, arguing happily about the last move.</p>
+  <p>Nothing special. And you can't stop looking at all of it.</p>
+  <p>You are almost home when the green light blinks at the edge of your eye.</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED',vb('Self-Starter','self_starter'),[
+    ['flair','"We didn\'t ask. You went anyway."'],
+    ['pts','+0 points']
+  ])}
+  <p>Another zero. But this zero reads differently.</p>
+  <p>This zero sounds almost like respect.</p>`,
+ onEnter:()=>{ grant('self_starter'); },
+ choices:[ {t:'Home', go:'s19'} ]
+},
+
+/* ---------- ACT V · the panel ---------- */
+
+s19:{
+ html:()=>`
+  <p>Night. Your small apartment. Dinner was a convenience store bento, eaten standing up, and for once you didn't mind.</p>
+  <p>You are about to turn off the light when the words appear again. Not a badge this time. A message.</p>
+  ${sysBox('💬 SYSTEM',vb('Tutorial','tutorial')+' complete.',[
+    ['flair','Your <span class="vb">panel<span class="tip">'+tipTxt('panel')+'</span></span> is now open.'],
+    ['flair','Say or think: <b>"Menu."</b>']
+  ])}
+  <p>You sit down on the bed. You look at the floating words for a long time.</p>
+  <p>Then, feeling like a complete fool, you think the word.</p>`,
+ choices:[ {t:'"Menu."', go:'s20'} ]
+},
+
+s20:{
+ html:(st)=>`
+  <p>The room does not change. But the world steps back, the way a crowd steps back from a stage.</p>
+  <p>And in front of you, soft and green, it opens.</p>
+  <div class="panel">
+    <h3>PLAYER</h3>
+    <div class="row"><span>Level</span><span>${st.level}</span></div>
+    <div class="row"><span>Points</span><span>${st.points}</span></div>
+    <div class="row lock"><span>Skills</span><span>🔒 <span class="vb">locked<span class="tip">${tipTxt('locked')}</span></span></span></div>
+    <div class="row"><span>Quests</span><span>1 complete</span></div>
+    <div class="row"><span>Achievements</span><span>${st.achievements.length}</span></div>
+    <div class="row"><span>Map</span><span>tap to open</span></div>
+  </div>
+  <p>No name on the panel. Just <i>Player</i>.</p>
+  <p>Somehow, that feels right. You have a name for the office, a name for the bank, a name for the family group chat. <i>Player</i> is new. <i>Player</i> has no history yet.</p>`,
+ choices:[ {t:'Open the map', go:'s21'} ]
+},
+
+s21:{
+ html:()=>`
+  <p>The map unfolds in the air like smoke finding a shape.</p>
+  <p>It is Kaohsiung — you recognize the ${vb('harbor')} line, the long curve of the coast. But almost all of it is covered in grey ${vb('fog')}. Soft, slow-moving, silent.</p>
+  <p>Only one small piece of the city glows: a thin little shape between your home and your office. Your world.</p>
+  <p>You look at it for a long time.</p>
+  <p>Five years of your life, and on this map it is the size of a fingernail.</p>
+  <div class="panel">
+    <h3>MAP</h3>
+    <div class="row"><span>Kaohsiung</span><span>7% explored</span></div>
+  </div>`,
+ choices:[ {t:'Look closer at the fog', go:'s22'} ]
+},
+
+s22:{
+ html:()=>`
+  <p>You move your finger through the fog, south, toward the sea.</p>
+  <p>And there — deep in the grey, where you have never been — something shines.</p>
+  <p>A small point of light. Not green, like everything else.</p>
+  <p class="beat">Gold.</p>
+  <p>You tap it.</p>
+  ${sysBox('❓ ???','[ Locked ]',[['flair','Level required: ???']],'gold')}
+  <p>You tap it again. Same answer.</p>
+  <p>You stare at the small gold light until your eyes hurt. Then you close the panel, lie down, and pull up the ${vb('blanket')}. Tomorrow is a work day. Reports. Emails. The elevator. The guard.</p>
+  <p>But lying there in the dark, you notice you are thinking about something you have not thought about in years.</p>
+  <p class="beat big">What will tomorrow's quest be?</p>`,
+ choices:[ {t:'EPISODE COMPLETE — open the Menu', go:'end'} ]
+},
+
+/* ---------- end-of-episode menu ---------- */
+
+end:{
+ html:(st)=>{
+   let achHtml = '';
+   Object.keys(ACH).forEach(id=>{
+     const a = ACH[id];
+     const got = st.achievements.includes(id);
+     achHtml += '<div class="row"><span>'+
+       (got ? '🏆 <span class="ach-name">'+a.name+'</span><span class="ach-desc">'+a.desc+'</span>'
+            : '<span class="lock">🔒 ???</span>')+
+       '</span><span>'+(got ? (a.pts>0?'+'+a.pts:'—') : '')+'</span></div>';
+   });
+   return `
+  <p class="quiet">EPISODE 1 — TUTORIAL</p>
+  ${sysBox('✅ EPISODE COMPLETE','Tutorial',[['flair','"The road will still be there tomorrow." — and so will you.']])}
+  <div class="panel">
+    <h3>PLAYER</h3>
+    <div class="row"><span>Level</span><span>${st.level}</span></div>
+    <div class="row"><span>Points</span><span>${st.points}</span></div>
+    <div class="row"><span>Map</span><span>7% explored</span></div>
+    <div class="row"><span class="goldtxt">???</span><span class="goldtxt">[ Locked ]</span></div>
+  </div>
+  <div class="panel ach-list">
+    <h3>ACHIEVEMENTS (${st.achievements.length}/${Object.keys(ACH).length})</h3>
+    ${achHtml}
+  </div>
+  <p class="quiet">Missing one? Some choices lead to different badges. The road will still be there…</p>
+  <hr class="sep">
+  <div class="panel">
+    <h3>SAVE</h3>
+    <p style="font-family:inherit;font-size:.8rem;opacity:.8;margin:0 0 8px;">
+      Your progress saves automatically on this device.${storageOK?'':' (Saving is not available here — use Export to keep your progress.)'}
+      Export a save code to keep it safe or move to another device.</p>
+    <div class="btn-line">
+      <button class="choice" id="btnExport">Export save</button>
+      <button class="choice" id="btnImport">Import save</button>
+    </div>
+    <textarea class="savebox" id="saveBox" placeholder="Your save code appears here. Or paste a code and press Import." spellcheck="false"></textarea>
+  </div>`;
+ },
+ choices:[
+   {t:'Replay Episode 1', go:'__replay'},
+   {t:'Back to title', go:'__title'}
+ ],
+ onRender:()=>{
+   const box = document.getElementById('saveBox');
+   document.getElementById('btnExport').onclick = ()=>{
+     box.value = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+     box.select();
+   };
+   document.getElementById('btnImport').onclick = ()=>{
+     try{
+       const s = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
+       if(typeof s.version !== 'number') throw 0;
+       state = Object.assign(freshState(), s);
+       save();
+       box.value = 'Save imported ✓';
+     }catch(e){ box.value = 'That code did not work. Check it and try again.'; }
+   };
+ }
+}
+};
+
+/* =====================================================
+   ENGINE
+   ===================================================== */
+const app = document.getElementById('app');
+
+function go(id){
+  if(id==='__title'){ renderTitle(); return; }
+  if(id==='__replay'){
+    const keep = state; /* replay resets EP1 progress */
+    state = freshState();
+    save();
+    go('s1'); return;
+  }
+  const sec = SECTIONS[id];
+  if(!sec) return;
+  state.section = id;
+  if(sec.onEnter) sec.onEnter(state);
+  save();
+  render(sec);
+  window.scrollTo({top:0, behavior:'auto'});
+}
+
+function render(sec){
+  const html = (typeof sec.html==='function') ? sec.html(state) : sec.html;
+  let ch = (typeof sec.choices==='function') ? sec.choices(state) : sec.choices;
+  let btns = '';
+  (ch||[]).forEach((c,i)=>{
+    btns += '<button class="choice" data-i="'+i+'"><span class="arrow">▸</span>'+c.t+'</button>';
+  });
+  app.innerHTML = '<div class="scene">'+html+'</div><div class="choices">'+btns+'</div>';
+  (ch||[]).forEach((c,i)=>{
+    app.querySelector('[data-i="'+i+'"]').onclick = ()=>{
+      if(c.set){ Object.assign(state.flags, c.set); }
+      go(c.go);
+    };
+  });
+  if(sec.onRender) sec.onRender();
+}
+
+/* vocab tooltip toggling (event delegation) */
+document.addEventListener('click', (e)=>{
+  const v = e.target.closest('.vb');
+  document.querySelectorAll('.vb.open').forEach(x=>{ if(x!==v) x.classList.remove('open'); });
+  if(v){
+    v.classList.toggle('open');
+    if(v.classList.contains('open')){
+      const tip = v.querySelector('.tip');
+      tip.style.left = '0px';
+      tip.classList.remove('below');
+      requestAnimationFrame(()=>{
+        const r = tip.getBoundingClientRect();
+        const overR = r.right - (window.innerWidth - 8);
+        if(overR > 0) tip.style.left = (-overR)+'px';
+        const r2 = tip.getBoundingClientRect();
+        if(r2.left < 8) tip.style.left = (parseFloat(tip.style.left) + (8 - r2.left))+'px';
+        if(tip.getBoundingClientRect().top < 8) tip.classList.add('below');
+      });
+    }
+    e.stopPropagation();
+  }
+});
+
+/* ---------- title screen ---------- */
+function renderTitle(){
+  const existing = loadSave();
+  const hasSave = existing && existing.section && existing.section!=='s1';
+  let btns = '';
+  if(hasSave){
+    btns += '<button class="choice" id="btnContinue"><span class="arrow">▸</span>Continue <span class="quiet">(EP'+existing.episode+' · '+existing.points+' points)</span></button>';
+  }
+  btns += '<button class="choice" id="btnNew"><span class="arrow">▸</span>New Game</button>';
+  app.innerHTML = `
+  <div class="title-wrap">
+    <div class="title-eyebrow">AN INKQUEST GAMEBOOK</div>
+    <h1 class="gametitle">ACHIEVEMENT UNLOCKED</h1>
+    <div class="ep-label">EPISODE 1 · TUTORIAL</div>
+    <div class="blurb">
+      <p>Same office. Same coffee. Same road — for five years.</p>
+      <p class="sysline">🏆 ACHIEVEMENT UNLOCKED</p>
+      <p><b>Your life is now a game.</b></p>
+    </div>
+    <div class="menu-btns">${btns}</div>
+    <p class="small-note">English level: A2 · Tap <span class="vb">dotted words<span class="tip">words with a dotted line — tap them to see what they mean</span></span> to learn them · 15–20 min</p>
+  </div>`;
+  if(hasSave){
+    document.getElementById('btnContinue').onclick = ()=>{
+      state = existing;
+      go(state.section);
+    };
+  }
+  const startFresh = ()=>{ wipeSave(); state = freshState(); save(); go('s1'); };
+  document.getElementById('btnNew').onclick = ()=>{
+    if(!hasSave){ startFresh(); return; }
+    const wrap = document.querySelector('.menu-btns');
+    wrap.innerHTML = '<p style="color:var(--gold);font-family:ui-monospace,Menlo,monospace;font-size:.82rem;">Erase your progress and start over?</p>'+
+      '<button class="choice" id="btnYes"><span class="arrow">▸</span>Yes, erase and start new</button>'+
+      '<button class="choice" id="btnNo"><span class="arrow">▸</span>Cancel</button>';
+    document.getElementById('btnYes').onclick = startFresh;
+    document.getElementById('btnNo').onclick = renderTitle;
+  };
+}
+
+renderTitle();
+</script>
+</body>
+</html>

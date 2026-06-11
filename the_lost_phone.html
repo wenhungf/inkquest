@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<!-- InkQuest · The Lost Phone · v2.0 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>The Lost Phone — InkQuest</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --ink:        #1c1208;
+    --parchment:  #f5efe0;
+    --gold:       #c87d2a;
+    --gold-light: #d4962e;
+    --red:        #8b2020;
+    --mist:       #b8a898;
+    --mist-dark:  #7a6a58;
+    --panel-bg:   #fdf7ec;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { background: #1c1208 !important; color-scheme: dark; }
+
+  body {
+    background: #1c1208 !important;
+    color-scheme: dark;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Crimson Pro', serif;
+    padding: 20px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 60%, rgba(200,125,42,0.18) 0%, transparent 55%),
+      radial-gradient(ellipse at 75% 25%, rgba(139,32,32,0.10) 0%, transparent 50%),
+      radial-gradient(ellipse at 55% 85%, rgba(212,150,46,0.08) 0%, transparent 45%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #app { position: relative; z-index: 1; width: 100%; max-width: 740px; }
+
+  .masthead { text-align: center; margin-bottom: 8px; animation: fadeDown 0.8s ease both; }
+  .masthead .series-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem; letter-spacing: 0.25em;
+    color: var(--mist); text-transform: uppercase; margin-bottom: 6px;
+  }
+  .masthead h1 {
+    font-family: 'Crimson Pro', serif;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 300; color: var(--parchment); letter-spacing: 0.04em; line-height: 1.1;
+  }
+  .masthead h1 em { font-style: italic; color: var(--gold-light); }
+  .masthead .subtitle { font-size: 0.85rem; color: var(--mist); margin-top: 6px; font-style: italic; }
+
+  .tips-toggle {
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 10px; margin-bottom: 10px; animation: fadeDown 0.8s 0.2s ease both;
+  }
+  .tips-toggle label {
+    font-family: 'Space Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.12em; color: var(--mist); text-transform: uppercase; cursor: pointer;
+  }
+  .toggle-switch { position: relative; width: 40px; height: 22px; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    position: absolute; inset: 0; background: #2a1e10;
+    border-radius: 11px; cursor: pointer; transition: background 0.3s;
+    border: 1px solid var(--mist-dark);
+  }
+  .toggle-track::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 14px; height: 14px; background: var(--mist);
+    border-radius: 50%; transition: transform 0.3s, background 0.3s;
+  }
+  .toggle-switch input:checked + .toggle-track { background: #3a2a18; }
+  .toggle-switch input:checked + .toggle-track::after { transform: translateX(18px); background: var(--gold-light); }
+
+  .stats-bar {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 14px; animation: fadeDown 0.8s 0.3s ease both;
+  }
+  .stat-pill {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(28,18,8,0.65); border: 1px solid rgba(200,125,42,0.3);
+    border-radius: 6px; padding: 5px 12px;
+    font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--parchment);
+  }
+  .stat-pill .stat-label { color: var(--mist); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  .stat-pill .stat-val { color: var(--gold-light); font-weight: 700; }
+
+  .panel {
+    background: var(--panel-bg); border-radius: 4px; padding: 32px 36px;
+    box-shadow: 0 2px 0 var(--gold), 0 4px 40px rgba(0,0,0,0.55), inset 0 0 60px rgba(200,125,42,0.04);
+    border: 1px solid rgba(200,125,42,0.22); border-top: 3px solid var(--gold);
+    animation: fadeUp 0.6s 0.1s ease both; min-height: 300px;
+    position: relative; overflow: hidden;
+  }
+  .panel::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-light), transparent); opacity: 0.45;
+  }
+
+  .scene-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Space Mono', monospace; font-size: 0.6rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--mist-dark); margin-bottom: 16px;
+  }
+  .scene-tag::before, .scene-tag::after {
+    content: ''; height: 1px; width: 30px; background: var(--mist-dark); opacity: 0.4;
+  }
+
+  .section-num {
+    font-family: 'Crimson Pro', serif; font-size: 3rem; font-weight: 300;
+    color: rgba(200,125,42,0.16); position: absolute;
+    top: 12px; right: 20px; line-height: 1; user-select: none;
+  }
+
+  .prose { color: var(--ink); font-size: 1.05rem; line-height: 1.88; font-weight: 400; }
+  .prose p { margin-bottom: 1.1em; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose strong { font-weight: 600; color: #3a2010; }
+  .prose em { font-style: italic; color: #4a3020; }
+
+  .phone-screen {
+    background: #0d0d1a; border-radius: 16px; padding: 18px 16px 14px; margin: 16px 0;
+    border: 2px solid #2a2a40; box-shadow: 0 0 24px rgba(100,100,200,0.12);
+  }
+  .phone-screen .lock-bar {
+    font-family: 'Space Mono', monospace; font-size: 0.58rem;
+    letter-spacing: 0.12em; color: #4444aa; text-align: center;
+    margin-bottom: 12px; text-transform: uppercase;
+  }
+  .phone-msg {
+    background: #1a1a2e; border-radius: 14px 14px 14px 4px;
+    padding: 14px 18px; margin: 8px 0; max-width: 88%;
+  }
+  .phone-msg .msg-name {
+    font-family: 'Space Mono', monospace; font-size: 0.62rem;
+    letter-spacing: 0.1em; color: #8888cc; margin-bottom: 6px; text-transform: uppercase;
+  }
+  .phone-msg .msg-text { color: #e8e8f0; font-size: 0.98rem; line-height: 1.55; }
+  .phone-msg .msg-time {
+    font-family: 'Space Mono', monospace; font-size: 0.58rem;
+    color: #5555aa; margin-top: 6px; text-align: right;
+  }
+
+  .tip {
+    border-bottom: 1.5px dotted var(--gold); cursor: help;
+    color: var(--mist-dark); font-style: italic;
+    transition: color 0.2s, border-color 0.2s; position: relative;
+  }
+  .tip:hover { color: var(--red); border-color: var(--red); }
+  .tip-popup {
+    display: none; position: absolute; bottom: calc(100% + 8px);
+    left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: var(--parchment);
+    padding: 8px 12px; border-radius: 6px; font-size: 0.78rem;
+    font-family: 'Crimson Pro', serif; font-style: normal;
+    white-space: normal; max-width: min(300px, 80vw); width: max-content;
+    border: 1px solid var(--gold); z-index: 100; pointer-events: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5); line-height: 1.5;
+  }
+  .tip:hover .tip-popup { display: block; }
+  .tip-popup::after {
+    content: ''; position: absolute; top: 100%;
+    left: var(--caret-left, 50%); transform: translateX(-50%);
+    border: 5px solid transparent; border-top-color: var(--gold);
+  }
+  .tip-popup .zh { color: var(--gold-light); display: block; font-size: 0.9rem; }
+  .tip-popup .grammar { color: var(--mist); font-size: 0.7rem; font-family: 'Space Mono', monospace; }
+  .tips-off .tip { border-bottom: none; color: inherit; font-style: inherit; cursor: default; }
+  .tips-off .tip:hover { color: inherit; }
+  .tips-off .tip-popup { display: none !important; }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(200,125,42,0.4), transparent);
+    margin: 24px 0;
+  }
+
+  .choices-label {
+    font-family: 'Space Mono', monospace; font-size: 0.62rem;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--mist-dark); margin-bottom: 12px;
+  }
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: transparent; border: 1px solid rgba(200,125,42,0.3);
+    border-radius: 4px; padding: 12px 16px; text-align: left; cursor: pointer;
+    transition: all 0.2s; font-family: 'Crimson Pro', serif;
+    font-size: 1rem; color: var(--ink); line-height: 1.5;
+  }
+  .choice-btn:hover {
+    background: rgba(200,125,42,0.06); border-color: var(--gold);
+    color: var(--red); transform: translateX(4px);
+  }
+  .choice-btn .choice-num {
+    font-family: 'Space Mono', monospace; font-size: 0.65rem;
+    color: var(--gold); min-width: 22px; padding-top: 3px; font-weight: 700;
+  }
+  .choice-btn .skill-note {
+    font-family: 'Space Mono', monospace; font-size: 0.6rem;
+    color: var(--mist); display: block; margin-top: 2px; letter-spacing: 0.08em;
+  }
+
+  .skill-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 20px 0; }
+  .skill-card {
+    border: 1px solid rgba(200,125,42,0.25); border-radius: 6px; padding: 16px 14px;
+    cursor: pointer; transition: all 0.2s; background: rgba(245,239,224,0.5);
+  }
+  .skill-card:hover { border-color: var(--gold); background: rgba(200,125,42,0.08); }
+  .skill-card.selected {
+    border-color: var(--gold); background: rgba(200,125,42,0.12);
+    box-shadow: 0 0 0 2px rgba(200,125,42,0.2);
+  }
+  .skill-card .sk-icon { font-size: 1.5rem; margin-bottom: 8px; }
+  .skill-card .sk-name {
+    font-family: 'Space Mono', monospace; font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--mist-dark); margin-bottom: 4px;
+  }
+  .skill-card .sk-desc { font-size: 0.86rem; color: #5a4530; line-height: 1.4; }
+  .skill-card.selected .sk-name { color: var(--gold); }
+
+  .start-btn {
+    display: block; width: 100%; padding: 14px;
+    background: var(--gold); color: var(--ink); border: none; border-radius: 4px;
+    font-family: 'Space Mono', monospace; font-size: 0.75rem; letter-spacing: 0.15em;
+    text-transform: uppercase; font-weight: 700; cursor: pointer; transition: background 0.2s; margin-top: 10px;
+  }
+  .start-btn:hover { background: var(--gold-light); }
+  .start-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .ending-banner { text-align: center; padding: 20px 0 10px; }
+  .ending-banner .ending-label {
+    font-family: 'Space Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.25em; text-transform: uppercase; color: var(--mist); margin-bottom: 10px;
+  }
+  .ending-banner h2 {
+    font-family: 'Crimson Pro', serif; font-size: 1.8rem;
+    font-weight: 300; color: var(--gold); font-style: italic;
+  }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 16px 0; }
+  .badge {
+    background: rgba(28,18,8,0.08); border: 1px solid var(--gold);
+    border-radius: 30px; padding: 5px 14px; font-size: 0.82rem; color: var(--mist-dark);
+  }
+  .restart-btn {
+    padding: 10px 28px; background: transparent; border: 1px solid var(--mist-dark);
+    border-radius: 4px; font-family: 'Space Mono', monospace; font-size: 0.68rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--mist-dark);
+    cursor: pointer; transition: all 0.2s; margin-top: 10px;
+  }
+  .restart-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  .fade-out { animation: fadeOut 0.3s ease forwards; }
+  .fade-in  { animation: fadeIn  0.4s ease forwards; }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp   { from { opacity: 0; transform: translateY(14px);  } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeOut  { to   { opacity: 0; transform: translateY(-8px);  } }
+  @keyframes fadeIn   { from { opacity: 0; transform: translateY(8px);   } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 540px) {
+    .panel { padding: 22px 18px; }
+    .skill-grid { grid-template-columns: 1fr; }
+    .stats-bar { gap: 8px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="masthead">
+    <div class="series-label">InkQuest · English Adventure · Level A1–A2 · A City Café</div>
+    <h1>The <em>Lost Phone</em></h1>
+    <div class="subtitle">An everyday mystery for English learners · What do you do?</div>
+  </div>
+
+  <div class="tips-toggle">
+    <label for="tipsToggle">Language Tips</label>
+    <label class="toggle-switch">
+      <input type="checkbox" id="tipsToggle" checked>
+      <span class="toggle-track"></span>
+    </label>
+  </div>
+
+  <div class="stats-bar" id="statsBar" style="display:none">
+    <div class="stat-pill">
+      <span class="stat-label">Skill</span>
+      <span class="stat-val" id="skillVal">—</span>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+</div>
+
+<script>
+// ── State ──
+const state = { skill: null, tipsOn: true };
+
+// ── Tips toggle ──
+document.getElementById('tipsToggle').addEventListener('change', e => {
+  state.tipsOn = e.target.checked;
+  document.getElementById('panel').classList.toggle('tips-off', !state.tipsOn);
+});
+
+// ── Tooltip clipping correction ──
+// CSS handles show/hide via :hover. This only nudges left offset when the
+// popup would overflow the viewport edge, and tracks the caret accordingly.
+document.addEventListener('mouseover', function(e) {
+  var tipEl = e.target.closest('.tip');
+  if (!tipEl) return;
+  var popup = tipEl.querySelector('.tip-popup');
+  if (!popup) return;
+
+  // Reset any previous nudge so getBoundingClientRect reflects natural position
+  popup.style.left = '';
+  popup.style.transform = '';
+  popup.style.removeProperty('--caret-left');
+
+  // Read natural position after a brief paint tick
+  requestAnimationFrame(function() {
+    var pr  = popup.getBoundingClientRect();
+    var vw  = window.innerWidth;
+    var pad = 10;
+
+    var nudge = 0;
+    if (pr.right > vw - pad)  nudge = (vw - pad) - pr.right;
+    if (pr.left + nudge < pad) nudge = pad - pr.left;
+
+    if (nudge !== 0) {
+      // translateX(-50%) centers it; we add the nudge on top
+      popup.style.transform = 'translateX(calc(-50% + ' + nudge + 'px))';
+      // Move caret the opposite direction so it still points at the word
+      var caretPct = 50 - (nudge / pr.width * 100);
+      caretPct = Math.max(10, Math.min(90, caretPct));
+      popup.style.setProperty('--caret-left', caretPct + '%');
+    }
+  });
+});
+
+// tip(word, zh, grammar) → HTML
+function tip(word, zh, grammar) {
+  const g = grammar ? '<span class="grammar">' + grammar + '</span>' : '';
+  return '<span class="tip">' + word + '<span class="tip-popup"><span class="zh">' + zh + '</span>' + g + '</span></span>';
+}
+
+// ── Render engine ──
+function render(fn) {
+  const panel = document.getElementById('panel');
+  panel.classList.add('fade-out');
+  setTimeout(function() {
+    panel.classList.remove('fade-out');
+    panel.innerHTML = fn();
+    panel.classList.add('fade-in');
+    setTimeout(function() { panel.classList.remove('fade-in'); }, 400);
+    panel.classList.toggle('tips-off', !state.tipsOn);
+    updateStats();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 300);
+}
+
+function updateStats() {
+  const bar = document.getElementById('statsBar');
+  if (!state.skill) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  const labels = { honest: '🤝 Honest', careful: '🔎 Careful', curious: '💡 Curious' };
+  document.getElementById('skillVal').textContent = labels[state.skill] || '—';
+}
+
+function choices(arr) {
+  return '<div class="divider"></div><div class="choices-label">What do you do?</div><div class="choices">' +
+    arr.map(function(c, i) {
+      return '<button class="choice-btn" onclick="' + c.action + '">' +
+        '<span class="choice-num">' + (i+1) + '.</span>' +
+        '<span>' + c.text + (c.note ? '<span class="skill-note">' + c.note + '</span>' : '') + '</span>' +
+        '</button>';
+    }).join('') + '</div>';
+}
+
+function endingSection(title, isGood, badges, flavor) {
+  const badgeHtml = badges.map(function(b) { return '<div class="badge">' + b + '</div>'; }).join('');
+  return '<div class="divider"></div>' +
+    '<div class="ending-banner">' +
+      '<div class="ending-label">' + (isGood ? '✦ Ending Reached ✦' : '✧ Ending Reached ✧') + '</div>' +
+      '<h2>' + title + '</h2>' +
+      '<div class="badge-row">' + badgeHtml + '</div>' +
+      '<p style="font-size:0.9rem;color:#5a4530;margin:12px 0;font-style:italic;">' + flavor + '</p>' +
+      '<button class="restart-btn" onclick="restartGame()">↺ Play Again — Try a Different Path</button>' +
+    '</div>';
+}
+
+// ── Skill selection ──
+function selectSkill(sk) {
+  ['honest','careful','curious'].forEach(function(s) {
+    var el = document.getElementById('sk-'+s);
+    if (el) el.classList.remove('selected');
+  });
+  var sel = document.getElementById('sk-'+sk);
+  if (sel) sel.classList.add('selected');
+  state.skill = sk;
+  document.getElementById('startBtn').disabled = false;
+}
+
+function beginGame() {
+  if (!state.skill) return;
+  render(s_cafe);
+}
+
+// ──────────────────────────────────────────────
+// SECTION 0 — Intro & Skill Selection
+// ──────────────────────────────────────────────
+function s_intro() {
+  return '' +
+  '<div class="scene-tag">Prologue · A Café · Tuesday Afternoon</div>' +
+  '<div class="section-num">0</div>' +
+  '<div class="prose">' +
+    '<p>You are at a small café. You have a coffee. You have your bag. You have a little time.</p>' +
+    '<p>The café is warm. Outside, it is cold and grey. People walk fast on the street. But inside, everything is slow and quiet. The coffee smells good. You are glad to be here.</p>' +
+    '<p>The table next to you is ' + tip('empty','空的','adj — with nothing on it; no one is sitting there') + ' now. A few minutes ago, a person sat there. They left fast. They took their bag. But they did not take their phone.</p>' +
+    '<p>The phone is still on the table.</p>' +
+    '<p>Then — the ' + tip('screen','螢幕','noun — the flat part of a phone or computer that shows light and images') + ' lights up. A message ' + tip('appears','出現','verb — becomes visible; you can suddenly see it') + '.</p>' +
+  '</div>' +
+  '<div class="divider"></div>' +
+  '<div class="choices-label">First, who are you?</div>' +
+  '<div class="skill-grid">' +
+    '<div class="skill-card" id="sk-honest" onclick="selectSkill(\'honest\')">' +
+      '<div class="sk-icon">🤝</div>' +
+      '<div class="sk-name">Honest</div>' +
+      '<div class="sk-desc">You always do the right thing. People trust you. You find it easy to ask for help.</div>' +
+    '</div>' +
+    '<div class="skill-card" id="sk-careful" onclick="selectSkill(\'careful\')">' +
+      '<div class="sk-icon">🔎</div>' +
+      '<div class="sk-name">Careful</div>' +
+      '<div class="sk-desc">You notice small things. You think before you act. You see what others miss.</div>' +
+    '</div>' +
+    '<div class="skill-card" id="sk-curious" onclick="selectSkill(\'curious\')">' +
+      '<div class="sk-icon">💡</div>' +
+      '<div class="sk-name">Curious</div>' +
+      '<div class="sk-desc">You ask questions. You like to know things. You think fast and reason well.</div>' +
+    '</div>' +
+  '</div>' +
+  '<button class="start-btn" id="startBtn" disabled onclick="beginGame()">→ Start the Story</button>';
+}
+
+// ──────────────────────────────────────────────
+// SECTION 1 — The Phone Lights Up
+// ──────────────────────────────────────────────
+function s_cafe() {
+  var skillNote = (state.skill === 'careful') ? '🔎 Your Careful skill helps here.' : '';
+  return '' +
+  '<div class="scene-tag">Section 1 · The Café · The Phone Lights Up</div>' +
+  '<div class="section-num">1</div>' +
+  '<div class="prose">' +
+    '<p>You look at the phone. The ' + tip('screen','螢幕','noun — the flat part of a phone that shows light and images') + ' is bright. There is a message. You can see it from your seat.</p>' +
+    '<div class="phone-screen">' +
+      '<div class="lock-bar">☁ 14:32 · ' + tip('Notifications','通知','noun — messages that appear on your screen to tell you something new') + '</div>' +
+      '<div class="phone-msg">' +
+        '<div class="msg-name">MOM 📱</div>' +
+        '<div class="msg-text">Mei!! Don\'t forget — Dad\'s birthday dinner is TONIGHT. 7pm. Don\'t be late AGAIN 😤</div>' +
+        '<div class="msg-time">just now</div>' +
+      '</div>' +
+    '</div>' +
+    '<p>So. The phone ' + tip('belongs','屬於','verb — "it belongs to her" = it is her phone') + ' to someone named Mei. And Mei\'s family is waiting for her tonight.</p>' +
+    '<p>You look around the café. Mei is not here. She is gone.</p>' +
+    '<p>The ' + tip('barista','咖啡師','noun — the person who makes coffee in a café') + ' — a young man with a green hat — wipes the counter. He does not see the phone.</p>' +
+    '<p>What do you do?</p>' +
+  '</div>' +
+  choices([
+    { text: 'Pick up the phone. Take it to the barista.', action: 'render(s_barista)' },
+    { text: 'Wait at your table. Maybe Mei comes back.', action: 'render(s_wait)' },
+    { text: 'Look at the phone more carefully. Maybe there is more information.', action: 'render(s_look)', note: skillNote },
+  ]);
+}
+
+// ──────────────────────────────────────────────
+// SECTION 2A — Take it to the barista
+// ──────────────────────────────────────────────
+function s_barista() {
+  var isHonest = (state.skill === 'honest');
+  var honestExtra = isHonest
+    ? '<p>You remember now. Yes — there was a woman at that table. A red ' + tip('scarf','圍巾','noun — a piece of cloth you wear around your neck to stay warm') + '. You noticed her when she got up, the way you always notice people near you. You can ' + tip('describe','描述','verb — say what someone looks like, with details') + ' her well.</p>' +
+      '<p><em>"Yes,"</em> you say. <em>"She was tall. Red scarf, blue bag. She went out the front door."</em></p>' +
+      '<p>The barista ' + tip('nods','點頭','verb — moves his head up and down to mean "yes"') + '. <em>"That\'s Mei. She always comes in on Tuesdays — I know her face. She\'ll be back for this."</em></p>'
+    : '<p>You did not see the person leave. <em>"I just found the phone on the table,"</em> you say. <em>"I don\'t know what she looked like."</em></p>' +
+      '<p>The barista nods. <em>"Okay. I\'ll keep it here. If she comes back, I\'ll know her."</em></p>' +
+      '<p>He sets the phone down and goes back to work.</p>';
+
+  return '' +
+  '<div class="scene-tag">Section 2A · The Counter</div>' +
+  '<div class="section-num">2</div>' +
+  '<div class="prose">' +
+    '<p>You pick up the phone and walk to the ' + tip('counter','櫃台','noun — the long table at the front of a café where you order') + '. The barista looks up.</p>' +
+    '<p><em>"' + tip('Excuse me','不好意思','phrase — a polite way to get someone\'s attention') + ',"</em> you say. <em>"Someone left this phone. Can you keep it?"</em></p>' +
+    '<p>The barista takes the phone. He turns it over in his hand.</p>' +
+    '<p><em>"Sure,"</em> he says. He sets it on the counter and looks at you. <em>"Did you see the person who left it?"</em></p>' +
+    honestExtra +
+  '</div>' +
+  (isHonest
+    ? choices([
+        { text: 'Wait here. The barista knows her. She will come back.', action: 'render(s_honest_wait)' },
+        { text: 'Go outside now. You know what she looks like.', action: 'render(s_honest_outside)' },
+      ])
+    : choices([
+        { text: 'Go back to your seat. Your coffee is getting cold.', action: 'render(s_neutral_wait)' },
+        { text: 'Look at the phone before the barista puts it away.', action: 'render(s_careful_counter)' },
+      ])
+  );
+}
+
+// ──────────────────────────────────────────────
+// SECTION 2B — Wait at your table
+// ──────────────────────────────────────────────
+function s_wait() {
+  return '' +
+  '<div class="scene-tag">Section 2B · Your Table · Waiting</div>' +
+  '<div class="section-num">2</div>' +
+  '<div class="prose">' +
+    '<p>You sit. You drink your coffee. You watch the door.</p>' +
+    '<p>Five minutes. Ten minutes. The door opens — but it is not Mei. It is an old man with an umbrella. He sits down and opens a newspaper.</p>' +
+    '<p>Your coffee is cold now.</p>' +
+    '<p>Then the ' + tip('screen','螢幕','noun — the flat surface of a phone that shows light and images') + ' lights up again.</p>' +
+    '<div class="phone-screen">' +
+      '<div class="lock-bar">☁ 14:44 · ' + tip('Notifications','通知','noun — messages that appear on your phone screen to tell you something new') + '</div>' +
+      '<div class="phone-msg">' +
+        '<div class="msg-name">MOM 📱</div>' +
+        '<div class="msg-text">Mei? Are you there? Call me back!! 😰</div>' +
+        '<div class="msg-time">just now</div>' +
+      '</div>' +
+    '</div>' +
+    '<p>The mother is ' + tip('worried','擔心的','adj — thinking something bad might happen; not calm') + '. Mei does not answer because Mei has no phone.</p>' +
+    '<p>You touch the ' + tip('screen','螢幕','noun — the flat surface of a phone that shows light and images') + '. It does not open — there is a ' + tip('lock screen','鎖定畫面','noun — the screen you see before you enter a code; you cannot open the phone without the code') + '. But you can see the ' + tip('mirror selfie','鏡子自拍','noun — a photo you take of yourself in a mirror, holding up the camera') + '. Short hair. A wide smile. You would know her face now if she walked in.</p>' +
+    '<p>You look around the café again. Nothing.</p>' +
+  '</div>' +
+  choices([
+    { text: 'Take the phone to the barista. Tell him what you saw.', action: 'render(s_barista)' },
+    { text: 'Go outside. You saw her face. Look for a woman with short hair.', action: 'render(s_outside_look)' },
+    { text: 'Keep waiting. She will come back.', action: 'render(s_bad_wait)' },
+  ]);
+}
+
+// ──────────────────────────────────────────────
+// SECTION 2C — Look at the phone more carefully
+// ──────────────────────────────────────────────
+function s_look() {
+  var isCareful = (state.skill === 'careful');
+  var carefulExtra = isCareful
+    ? '<p>You pick up the phone. You know a trick: press the side button five times fast, and the phone shows the owner\'s emergency ' + tip('medical','醫療的','adj — about health and the body') + ' card — no code needed. Not everyone knows this. You do.</p>' +
+      '<p>You try it. It works. Name: <strong>Mei Chen</strong>. Emergency contact: <strong>Mom · 0912-887-441</strong>.</p>' +
+      '<p>You look at the number. You could call Mei\'s mum right now. But think: even if her mum reaches someone who knows where Mei is — how long does that take? Mei is probably still close. She will come back faster on her own.</p>' +
+      '<p>You put the phone down and decide to wait.</p>'
+    : '<p>The phone is ' + tip('locked','鎖住的','adj — you cannot open it without a code') + '. You cannot get inside. There is no name, no number — just the case, the charm, and that photo.</p>' +
+      '<p>You pick it up and take it to the barista.</p>';
+
+  return '' +
+  '<div class="scene-tag">Section 2C · Your Table · A Closer Look</div>' +
+  '<div class="section-num">2</div>' +
+  '<div class="prose">' +
+    '<p>You do not pick up the phone yet. You look at it carefully from your seat.</p>' +
+    '<p>The phone has a dark green ' + tip('case','手機殼','noun — a cover for a phone, usually hard plastic or rubber') + '. It is a little ' + tip('scratched','有刮痕的','adj — with small marks on the surface from wear or use') + '. There is a small silver cat ' + tip('charm','吊飾','noun — a small decoration that hangs from a phone or bag') + ' on the corner. On the ' + tip('lock screen','鎖定畫面','noun — the screen you see before you enter a code') + ': a ' + tip('mirror selfie','鏡子自拍','noun — a photo you take of yourself in a mirror, holding up the camera') + ' — a young woman holding up this exact phone, the same green case and silver cat visible in her hand, ' + tip('grinning','咧嘴笑','verb — smiling very wide, showing teeth') + ' at her own ' + tip('reflection','倒影；鏡中影像','noun — the image of yourself that you see in a mirror') + '.</p>' +
+    carefulExtra +
+  '</div>' +
+  (isCareful
+    ? choices([
+        { text: 'Wait at your table. Keep the phone safe. She will come back.', action: 'render(s_careful_wait)', note: '🔎 You used your Careful skill.' },
+        { text: 'Call the emergency contact. It might still be faster than waiting.', action: 'render(s_careful_call_mom)' },
+      ])
+    : choices([
+        { text: 'Take it to the barista.', action: 'render(s_barista)' },
+      ])
+  );
+}
+
+// ──────────────────────────────────────────────
+// SECTION 3 — HONEST PATHS
+// ──────────────────────────────────────────────
+
+function s_honest_wait() {
+  return '' +
+  '<div class="scene-tag">Section 3A · The Counter · Waiting</div>' +
+  '<div class="section-num">3</div>' +
+  '<div class="prose">' +
+    '<p>You go back to your seat. The barista puts Mei\'s phone behind the counter. He makes coffee. He washes cups. The café ' + tip('hums along','嗡嗡運轉著','phrase — continues with quiet, steady activity') + '.</p>' +
+    '<p>Twenty minutes later, the door opens fast. A woman with a red ' + tip('scarf','圍巾','noun — a piece of cloth you wear around your neck') + ' and a blue bag comes in. She looks at the ' + tip('empty','空的','adj — with nothing on it; no one is sitting there') + ' table. Her face goes white.</p>' +
+    '<p><em>"My phone—"</em></p>' +
+    '<p>The barista holds it up before she can finish. <em>"This person saw you leave,"</em> he says, and points at you.</p>' +
+    '<p>Mei crosses the café in four steps. She is ' + tip('out of breath','喘不過氣','phrase — breathing fast because you ran') + ' — she ran back from the street.</p>' +
+    '<p><em>"Thank you,"</em> she says. She holds the phone against her chest for a moment. Then she looks at her ' + tip('notifications','通知','noun — messages that appear on your phone screen to tell you something new') + ' and laughs — a little ' + tip('embarrassed','不好意思的；尷尬的','adj — feeling silly or uncomfortable because of something you did') + '. <em>"My mum. Of course."</em></p>' +
+    '<p>She calls right there. <em>"I\'m fine, Mum. I have my phone. I\'ll be there at seven."</em></p>' +
+    '<p>She hangs up. She looks at you. <em>"Can I buy you a coffee?"</em></p>' +
+    '<p>You say yes.</p>' +
+  '</div>' +
+  endingSection(
+    'Good Ending: She Always Comes Back', true,
+    ['🤝 Right Thing Done', '☕ Coffee Earned', '🎂 Seven O\'Clock'],
+    'You gave the phone to the right person. You waited. The barista knew her face. It was enough.'
+  );
+}
+
+function s_honest_outside() {
+  return '' +
+  '<div class="scene-tag">Section 3B · The Street · Red Scarf</div>' +
+  '<div class="section-num">3</div>' +
+  '<div class="prose">' +
+    '<p>You push open the café door. Cold air hits your face.</p>' +
+    '<p>You look left. You look right. A bus. A taxi. People with ' + tip('umbrellas','雨傘','noun — a thing you open above your head to stay dry in the rain') + '. Then — there. A woman in a red scarf on the corner. One hand is in her bag. She opens it. Closes it. Opens it again. She knows something is wrong.</p>' +
+    '<p><em>"' + tip('Excuse me','不好意思','phrase — a polite way to get someone\'s attention') + '!"</em> you call. You walk fast. <em>"Did you sit in the café just now?"</em></p>' +
+    '<p>She looks up. Her eyes are wide.</p>' +
+    '<p>You hold up the phone.</p>' +
+    '<p>She grabs it with both hands and holds it against her chest. For a moment she just stands on the cold street and breathes.</p>' +
+    '<p><em>"Oh my god,"</em> she says. <em>"I thought — today is my dad\'s birthday—"</em> She stops. She looks at you. <em>"How did you know it was mine?"</em></p>' +
+    '<p><em>"Your mum sent a message,"</em> you say. <em>"I didn\'t read it. I just saw the name on the ' + tip('screen','螢幕','noun — the flat surface of a phone that shows light and images') + '."</em></p>' +
+    '<p>Mei laughs — loud and ' + tip('relieved','如釋重負的','adj — feeling much better because something worrying is now finished') + '.</p>' +
+    '<p><em>"Thank you,"</em> she says. <em>"Seriously."</em></p>' +
+  '</div>' +
+  endingSection(
+    'Best Ending: Found on the Corner', true,
+    ['🏃 Fast Mover', '🤝 Honest Instinct', '🎂 Birthday Saved'],
+    'You described her. You ran after her. You got there first. Some days the right thing is also the fast thing.'
+  );
+}
+
+// ──────────────────────────────────────────────
+// SECTION 3 — CAREFUL PATHS
+// ──────────────────────────────────────────────
+
+function s_careful_wait() {
+  return '' +
+  '<div class="scene-tag">Section 3C · Your Table · The Silver Cat</div>' +
+  '<div class="section-num">3</div>' +
+  '<div class="prose">' +
+    '<p>You set the phone on your table where you can see it. You order another coffee. You wait.</p>' +
+    '<p>You look at the phone again. Dark green ' + tip('case','手機殼','noun — a cover for a phone, usually hard plastic or rubber') + '. Small silver cat ' + tip('charm','吊飾','noun — a small decoration that hangs from a phone or bag') + '. A tiny ' + tip('crack','裂痕','noun — a thin line where something is broken or damaged') + ' in the bottom corner of the ' + tip('screen','螢幕','noun — the flat surface of a phone that shows light and images') + '. You know this phone now. If someone says it is theirs, you will know if they are telling the truth.</p>' +
+    '<p>Thirty minutes pass. You drink your coffee slowly. You watch the door.</p>' +
+    '<p>Then a woman comes in. Short hair. She goes straight to the ' + tip('empty','空的','adj — with nothing on it; no one is sitting there') + ' table. She looks under it. She looks around the café with wide eyes.</p>' +
+    '<p>You stand up. <em>"Dark green case? Silver cat?"</em></p>' +
+    '<p>Her whole face changes. <em>"Yes. Yes — that\'s mine."</em></p>' +
+    '<p>You hand it to her. She checks the charm, the crack, the lock ' + tip('screen','螢幕','noun — the flat surface of a phone that shows light and images') + '. She nods fast.</p>' +
+    '<p><em>"I\'m Mei,"</em> she says. <em>"Thank you. Tonight is my dad\'s birthday and my mum—"</em> She stops. She sees her ' + tip('notifications','通知','noun — messages that appear on your phone screen to tell you something new') + '. She laughs and calls her mum right there.</p>' +
+    '<p>You go back to your coffee. It is still warm.</p>' +
+  '</div>' +
+  endingSection(
+    'Good Ending: You Knew Her Phone', true,
+    ['🔎 Sharp Eyes', '🐱 Silver Cat', '☕ Still Warm'],
+    'You noticed everything. You waited. When she came back, you were ready for her.'
+  );
+}
+
+function s_careful_call_mom() {
+  return '' +
+  '<div class="scene-tag">Section 3D · Your Table · The Long Way Around</div>' +
+  '<div class="section-num">3</div>' +
+  '<div class="prose">' +
+    '<p>You press the side button five times. The ' + tip('emergency','緊急','adj — very serious; needs fast action') + ' ' + tip('medical','醫療的','adj — about health and the body') + ' screen ' + tip('appears','出現','verb — becomes visible; you can suddenly see it') + '. Emergency contact: <strong>Mom · 0912-887-441</strong>.</p>' +
+    '<p>You dial from your own phone. It rings twice.</p>' +
+    '<p><em>"Hello?"</em></p>' +
+    '<p><em>"Hello — I found your daughter\'s phone at a café. Is there a way to reach her?"</em></p>' +
+    '<p>Silence. Then: <em>"Oh! Oh no. I\'ll call her friend Lin. Or her office—"</em></p>' +
+    '<p>You can hear the worry. Mei\'s mum does not know exactly where Mei is right now. She hangs up to start making calls.</p>' +
+    '<p>You were right — it is not fast. The message has to go from the mum, to someone, and then to Mei. That takes time.</p>' +
+    '<p>But twenty minutes later, Mei walks in — she came back on her own. She went to the ' + tip('subway','捷運','noun — an underground train that runs under a city') + ' ' + tip('entrance','入口','noun — the door or opening you go through to enter a place') + ', put her hand in her bag, and knew immediately. She turned around and ran.</p>' +
+    '<p>Her phone ' + tip('buzzes','震動','verb — vibrates with a low sound, like a phone with sound turned off') + ' the moment you hand it back. Three missed calls from Mum.</p>' +
+    '<p>Mei laughs and calls her back. <em>"I have it, Mum. I have it. Someone helped."</em></p>' +
+  '</div>' +
+  endingSection(
+    'Good Ending: Two Roads to the Same Place', true,
+    ['📞 Good Try', '🔎 Careful Thinking', '🎂 Home by Seven'],
+    'Your call started a chain. Mei came back anyway. Sometimes the long way around still works.'
+  );
+}
+
+function s_careful_counter() {
+  return '' +
+  '<div class="scene-tag">Section 3E · The Counter · The Emergency Screen</div>' +
+  '<div class="section-num">3</div>' +
+  '<div class="prose">' +
+    '<p>Before the barista puts the phone away, you lean forward. <em>"Wait — I know something."</em></p>' +
+    '<p>You take the phone and press the side button five times fast. The ' + tip('emergency','緊急','adj — very serious; needs fast action') + ' ' + tip('medical','醫療的','adj — about health and the body') + ' screen ' + tip('appears','出現','verb — becomes visible; you can suddenly see it') + ' — no code needed. Name: <strong>Mei Chen</strong>.</p>' +
+    '<p>The barista reads it. <em>"Mei Chen—"</em> He looks at the photo on the ' + tip('lock screen','鎖定畫面','noun — the screen you see before you enter a code') + '. His face changes. <em>"I know her. She always comes in on Tuesdays — I know her face."</em></p>' +
+    '<p>He puts the phone behind the counter. Twenty minutes later, Mei runs through the door. The barista holds up the phone before she can say a word.</p>' +
+    '<p>She stops. She looks at the phone, then at you, then back at the phone. She takes it with both hands.</p>' +
+    '<p><em>"How—"</em> she starts. Then she stops. She does not need to know. <em>"Thank you,"</em> she says. <em>"Really. Thank you."</em></p>' +
+    '<p>She checks her ' + tip('notifications','通知','noun — messages that appear on your phone screen to tell you something new') + ' — her mum, twice. She calls back right there. <em>"I\'m fine, Mum. I\'ll be there at seven."</em></p>' +
+  '</div>' +
+  endingSection(
+    'Best Ending: The Detail That Mattered', true,
+    ['🔎 Emergency Screen', '🤝 Barista Helped', '🎂 Home by Seven'],
+    'You found what others miss. The barista did the rest. Good team.'
+  );
+}
+
+// ──────────────────────────────────────────────
+// SECTION 3 — CURIOUS PATHS
+// ──────────────────────────────────────────────
+
+function s_outside_look() {
+  var isCurious = (state.skill === 'curious');
+  var body = isCurious
+    ? '<p>You stop. You think. <em>If I left a café and forgot my phone — what would I do?</em> I would look in my bag. Then I would stop walking. Then I would turn around.</p>' +
+      '<p>She is probably close. And she is probably already coming back.</p>' +
+      '<p>You wait on the ' + tip('pavement','人行道','noun — the flat path next to the road where people walk') + ' right outside the café door. Thirty seconds. One minute.</p>' +
+      '<p>Then — running. Yellow jacket. She sees the phone in your hand and stops so fast she almost falls.</p>' +
+      '<p><em>"Is that—"</em></p>' +
+      '<p><em>"It\'s yours,"</em> you say.</p>' +
+      '<p>She takes it. She sees the ' + tip('notifications','通知','noun — messages that appear on your phone screen to tell you something new') + ' from her mum and makes a face. Then she laughs.</p>' +
+      '<p><em>"I got to the subway ' + tip('entrance','入口','noun — the door or opening you go through to enter a place') + ',"</em> she says. <em>"I put my hand in my bag and I just — knew. I turned around and ran."</em></p>' +
+      '<p><em>"I thought you would,"</em> you say.</p>'
+    : '<p>One block. Two blocks. Too many people. You do not see her.</p>' +
+      '<p>You stop. You do not know which way she went. The phone is cold in your hand.</p>' +
+      '<p>You go back to the café. You give the phone to the barista and tell him what she looks like — short hair, the face from the lock screen photo. He nods and puts it behind the counter.</p>' +
+      '<p>An hour later, Mei comes back. The barista gives her the phone. He says a ' + tip('stranger','陌生人','noun — a person you do not know') + ' tried to find her on the street. She looks around — but you are already gone.</p>';
+
+  return '' +
+  '<div class="scene-tag">Section 3F · The Street · Looking</div>' +
+  '<div class="section-num">3</div>' +
+  '<div class="prose">' +
+    '<p>You pick up the phone and go outside. Cold. Busy. You look for short hair — the face from the ' + tip('mirror selfie','鏡子自拍','noun — a photo you take of yourself in a mirror, holding up the camera') + '.</p>' +
+    body +
+  '</div>' +
+  (isCurious
+    ? endingSection(
+        'Best Ending: You Waited at the Door', true,
+        ['💡 Thought First', '🏃 She Was Already Running', '🎂 Made It'],
+        'You didn\'t chase. You reasoned. She was already on her way. You just needed to be there.'
+      )
+    : endingSection(
+        'Neutral Ending: The Stranger Who Tried', false,
+        ['🚶 You Went Out', '📱 Phone Returned', '❓ Never Met'],
+        'You tried. Mei got her phone back. She never knew your name. That\'s okay too.'
+      )
+  );
+}
+
+// ──────────────────────────────────────────────
+// NEUTRAL & BAD ENDINGS
+// ──────────────────────────────────────────────
+
+function s_neutral_wait() {
+  return '' +
+  '<div class="scene-tag">Section 3G · Your Table · Cold Coffee</div>' +
+  '<div class="section-num">3</div>' +
+  '<div class="prose">' +
+    '<p>You go back to your seat. You drink your coffee. It is cold.</p>' +
+    '<p>The barista puts Mei\'s phone behind the counter. He gets busy — a long line of customers, six different orders. He forgets about the phone for a while.</p>' +
+    '<p>You put on your coat. You pick up your bag. You leave a ' + tip('tip','小費','noun — extra money you leave to thank someone who served you') + ' on the table.</p>' +
+    '<p>At the door, you look back. The café is warm. The barista is busy. Mei\'s phone is somewhere behind the counter, its ' + tip('screen','螢幕','noun — the flat surface of a phone that shows light and images') + ' dark now.</p>' +
+    '<p>You go out into the cold. Twenty minutes later, Mei runs back in. But you are not there to see it.</p>' +
+  '</div>' +
+  endingSection(
+    'Neutral Ending: You Did What You Could', false,
+    ['📱 Phone Is Safe', '☕ Cold Coffee', '❓ Gone Before She Arrived'],
+    'You gave it to the barista. That was the right call. You just didn\'t stay to see the ending.'
+  );
+}
+
+function s_bad_wait() {
+  return '' +
+  '<div class="scene-tag">Section 3H · Your Table · Too Long</div>' +
+  '<div class="section-num">3</div>' +
+  '<div class="prose">' +
+    '<p>You wait. And wait. The café fills up. New people sit at the table next to you. They do not ' + tip('notice','注意到','verb — see something and think about it') + ' the phone at first.</p>' +
+    '<p>Then a man with headphones picks it up. He turns it over. The ' + tip('screen','螢幕','noun — the flat surface of a phone that shows light and images') + ' lights up — another ' + tip('notification','通知','noun — a message that appears on your phone screen to tell you something new') + ' from Mum.</p>' +
+    '<p><em>"Someone left a phone,"</em> the man says.</p>' +
+    '<p>His friend shrugs. The man puts it in his bag.</p>' +
+    '<p>You watch this happen. You do not say anything. The moment passes.</p>' +
+    '<p>Later — much later — you think about Mei. You think about the birthday dinner. You think about all the things you could have done.</p>' +
+    '<p>You do not know how the story ended.</p>' +
+  '</div>' +
+  endingSection(
+    'Bad Ending: You Waited Too Long', false,
+    ['⏰ Too Slow', '😟 That Feeling', '❓ Unknown'],
+    'Sometimes we see something wrong and we don\'t act. It stays with us. Start again — there\'s still time to choose differently.'
+  );
+}
+
+// ──────────────────────────────────────────────
+// Restart
+// ──────────────────────────────────────────────
+function restartGame() {
+  state.skill = null;
+  render(s_intro);
+}
+
+// ── Start ──
+render(s_intro);
+</script>
+</body>
+</html>
