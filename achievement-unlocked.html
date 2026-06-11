@@ -150,7 +150,7 @@
    ===================================================== */
 
 const SAVE_KEY = 'au_save';
-const SAVE_VERSION = 1;
+const SAVE_VERSION = 2;
 
 function freshState(){
   return {
@@ -190,11 +190,17 @@ function wipeSave(){
 
 /* ---------- achievements ---------- */
 const ACH = {
-  overtime_14:   { name:'Overtime Streak: Day 14', pts:1,  desc:'You worked late. Again. And again.' },
-  staring:       { name:'Staring Contest (You Lost)', pts:0, desc:'You watched the window. It did not blink.' },
-  cat_person:    { name:'Cat Person', pts:1, desc:'You stopped for the cat. The cat allowed it.' },
-  explorers_eye: { name:"Explorer's Eye", pts:0, desc:'"You looked. That\'s how it starts."' },
-  self_starter:  { name:'Self-Starter', pts:0, desc:'"We didn\'t ask. You went anyway."' }
+  overtime_14:   { ep:1, name:'Overtime Streak: Day 14', pts:1,  desc:'You worked late. Again. And again.' },
+  staring:       { ep:1, name:'Staring Contest (You Lost)', pts:0, desc:'You watched the window. It did not blink.' },
+  cat_person:    { ep:1, name:'Cat Person', pts:1, desc:'You stopped for the cat. The cat allowed it.' },
+  explorers_eye: { ep:1, name:"Explorer's Eye", pts:0, desc:'"You looked. That\'s how it starts."' },
+  self_starter:  { ep:1, name:'Self-Starter', pts:0, desc:'"We didn\'t ask. You went anyway."' },
+  three_for_three:{ ep:2, name:'Three for Three', pts:10, desc:'All daily quests in one day. Look at you.' },
+  no_hesitation: { ep:2, name:'No Hesitation', pts:0, desc:'You picked the hard one first.' },
+  person_at_desk:{ ep:2, name:'The Person at the Desk', pts:0, desc:'2,400 times. You finally asked.' },
+  ach_2401:      { ep:2, name:'2,401', pts:1, desc:'This time, with a name.' },
+  district_clear:{ ep:2, name:'District Clear: Yancheng', pts:0, desc:'Five points before sunset.' },
+  off_the_map:   { ep:2, name:'Off the Map', pts:0, desc:'You traded points for a question.' }
 };
 function grant(id){
   if(!state.achievements.includes(id)){
@@ -203,6 +209,7 @@ function grant(id){
   }
 }
 function addPts(n){ state.points += n; }
+function pay(flag, n){ if(!state.flags[flag]){ state.flags[flag] = true; addPts(n); } }
 
 /* ---------- vocab ---------- */
 const VOCAB = {
@@ -233,7 +240,49 @@ const VOCAB = {
   security_guard:{en:'a person whose job is to keep a building safe', zh:'警衛'},
   switches_off:{en:'stops working — like turning off a light', zh:'（腦袋）關機、自動運作'},
   self_starter:{en:'a person who starts doing things without being told', zh:'主動自發的人'},
-  tutorial:{en:'the first part of a game — it teaches you how to play', zh:'新手教學'}
+  tutorial:{en:'the first part of a game — it teaches you how to play', zh:'新手教學'},
+  daily:{en:'happening every day', zh:'每日的'},
+  bonus:{en:'an extra reward', zh:'額外獎勵'},
+  stranger:{en:'a person you do not know', zh:'陌生人'},
+  district:{en:'one area of a city', zh:'（城市的）區'},
+  warehouse:{en:'a big building for keeping goods', zh:'倉庫'},
+  temple:{en:'a building where people pray', zh:'廟、寺'},
+  graffiti:{en:'words or pictures painted on walls', zh:'塗鴉'},
+  spray_paint:{en:'paint that comes out of a can, like a mist', zh:'噴漆'},
+  average:{en:'the usual or middle number', zh:'平均值'},
+  skill:{en:'something you can do well', zh:'技能'},
+  sunset:{en:'the time when the sun goes down', zh:'日落'},
+  hesitate:{en:'to stop for a moment because you are not sure', zh:'猶豫'},
+  jewelry:{en:'rings, gold chains, and other small beautiful things you wear', zh:'珠寶、金飾'},
+  bento:{en:'a boxed meal — rice, meat, and vegetables together', zh:'便當'},
+  vietnamese:{en:'from Vietnam', zh:'越南的'},
+  herbs:{en:'plants used to give food more taste', zh:'香草、香料植物'},
+  spring_roll:{en:'a thin, rolled food, often fried', zh:'春捲'},
+  wiping:{en:'cleaning something by moving a cloth over it', zh:'擦拭'},
+  invisible:{en:'cannot be seen', zh:'看不見的'},
+  rhythm:{en:'a pattern that repeats, like a beat in music', zh:'節奏'},
+  embarrassing:{en:'making you feel silly in front of others', zh:'令人尷尬的'},
+  still_adj:{en:'not moving at all', zh:'靜止不動'},
+  night_shifts:{en:'work hours during the night', zh:'夜班'},
+  back_lane:{en:'a small quiet road behind buildings', zh:'後巷'},
+  file_away:{en:'to keep something in your memory for later', zh:'默默記下、存起來'},
+  fanfare:{en:'loud music or celebration for something special', zh:'喧鬧的慶祝、號角聲'},
+  glowing:{en:'giving out a soft light', zh:'發著微光的'},
+  cheat_code:{en:'a secret code that makes a game easy', zh:'密技、作弊碼'},
+  plaque:{en:'a flat sign on a wall that tells about history', zh:'紀念牌、牌匾'},
+  sword:{en:'a long sharp weapon, like a knife but bigger', zh:'劍、刀劍'},
+  ping:{en:'to make a small, short sound, like a phone message', zh:'發出「叮」的提示音'},
+  dazed:{en:'confused; not able to think clearly', zh:'暈頭轉向的'},
+  trophy:{en:'a prize cup you win in a game or sport', zh:'獎盃'},
+  icon:{en:'a small picture or symbol on a screen', zh:'圖示'},
+  faded:{en:'with the color mostly gone after a long time', zh:'褪色的'},
+  clears_throat:{en:'makes a small "ahem" sound before speaking', zh:'清喉嚨'},
+  ceremony:{en:'the special, formal feeling of an important event', zh:'儀式（感）'},
+  slot:{en:'an empty space made for one thing to fit in', zh:'欄位、插槽'},
+  vision:{en:'the power to see', zh:'視覺、視力'},
+  sass:{en:'talk that is a little rude, but funny', zh:'嘴砲、俏皮話'},
+  recognizing:{en:'knowing who or what something is when you see it', zh:'認出'},
+  eve:{en:'the night before a day (like New Year\'s Eve)', zh:'前夕'}
 };
 function tipTxt(k){ return VOCAB[k].en + '<br><span style="opacity:.75">'+VOCAB[k].zh+'</span>'; }
 function vb(word, key){
@@ -486,7 +535,7 @@ s16:{
   <p>Outside, you stop. You wait.</p>
   <p>Nothing happens.</p>
   <p>No green words. No new quest. The air is just air.</p>
-  <p>You stand there for a moment, and you notice something embarrassing about yourself:</p>
+  <p>You stand there for a moment, and you notice something ${vb('embarrassing')} about yourself:</p>
   <p class="beat">You are ${vb('disappointed')}.</p>
   <p>One day. One quest. And you are already waiting for the next one, like a kid waiting for a game to load.</p>`,
  choices:[
@@ -524,7 +573,7 @@ s17b:{
 
 s19:{
  html:()=>`
-  <p>Night. Your small apartment. Dinner was a convenience store bento, eaten standing up, and for once you didn't mind.</p>
+  <p>Night. Your small apartment. Dinner was a convenience store ${vb('bento')}, eaten standing up, and for once you didn't mind.</p>
   <p>You are about to turn off the light when the words appear again. Not a badge this time. A message.</p>
   ${sysBox('💬 SYSTEM',vb('Tutorial','tutorial')+' complete.',[
     ['flair','Your <span class="vb">panel<span class="tip">'+tipTxt('panel')+'</span></span> is now open.'],
@@ -587,7 +636,7 @@ s22:{
 end:{
  html:(st)=>{
    let achHtml = '';
-   Object.keys(ACH).forEach(id=>{
+   Object.keys(ACH).filter(id=>ACH[id].ep===1).forEach(id=>{
      const a = ACH[id];
      const got = st.achievements.includes(id);
      achHtml += '<div class="row"><span>'+
@@ -606,7 +655,7 @@ end:{
     <div class="row"><span class="goldtxt">???</span><span class="goldtxt">[ Locked ]</span></div>
   </div>
   <div class="panel ach-list">
-    <h3>ACHIEVEMENTS (${st.achievements.length}/${Object.keys(ACH).length})</h3>
+    <h3>ACHIEVEMENTS (${st.achievements.filter(id=>ACH[id].ep===1).length}/${Object.keys(ACH).filter(id=>ACH[id].ep===1).length})</h3>
     ${achHtml}
   </div>
   <p class="quiet">Missing one? Some choices lead to different badges. The road will still be there…</p>
@@ -624,6 +673,7 @@ end:{
   </div>`;
  },
  choices:[
+   {t:'▶ Continue to Episode 2', go:'e2s1'},
    {t:'Replay Episode 1', go:'__replay'},
    {t:'Back to title', go:'__title'}
  ],
@@ -638,6 +688,482 @@ end:{
        const s = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
        if(typeof s.version !== 'number') throw 0;
        state = Object.assign(freshState(), s);
+       save();
+       box.value = 'Save imported ✓';
+     }catch(e){ box.value = 'That code did not work. Check it and try again.'; }
+   };
+ }
+},
+
+/* =====================================================
+   EPISODE 2 — DAILY QUESTS
+   ===================================================== */
+
+e2s1:{
+ onEnter:()=>{ state.episode = 2; },
+ html:()=>`
+  <p class="quiet">EPISODE 2 — ${vb('DAILY','daily')} QUESTS</p>
+  <p>Monday, 6:58 a.m.</p>
+  <p>You wake up two minutes before the alarm. That never happens.</p>
+  <p>And the system is already waiting, floating patiently above your blanket like a cat that wants breakfast.</p>
+  ${sysBox('📋 DAILY QUESTS — MONDAY','Three small things',[
+    ['flair','① Eat something new for lunch.'],
+    ['flair','② Learn one '+vb('stranger','stranger')+"'s name."],
+    ['flair','③ Spend 30 minutes in a place you have never stayed.'],
+    ['pts','+5 each · '+vb('Bonus','bonus')+': all three = +10']
+  ])}
+  <p>Three tasks. Fifteen points. Twenty-five with the bonus.</p>
+  <p>A week ago, your Monday plan was: survive until Friday.</p>
+  <p>You like this plan better.</p>`,
+ choices:[ {t:'Start the day', go:'e2s2'} ]
+},
+
+e2s2:{
+ html:()=>`
+  <p>Task one falls at lunch.</p>
+  <p>For five years, lunch has been the same beef noodle shop or the same convenience store ${vb('bento')}. Today you stand in front of a small shop you have passed a hundred times: a ${vb('Vietnamese','vietnamese')} place, steam on the windows, a menu you cannot fully read.</p>
+  <p>You point at something. The owner smiles and shouts at the kitchen.</p>
+  <p>What arrives is a bowl of noodles with ${vb('herbs')} you cannot name, a soup that tastes like lemons and morning, and a fried ${vb('spring roll','spring_roll')} the size of your wrist.</p>
+  ${sysBox('✅ DAILY ① COMPLETE','Something New',[['pts','+5']])}
+  <p class="quiet">Your life's new high score: a different lunch. Five points. You decide not to think too hard about what that says about the old high score.</p>`,
+ onEnter:()=>{ pay('e2_d1',5); },
+ choices:[ {t:'Afternoon. Task two.', go:'e2s3'} ]
+},
+
+e2s3:{
+ html:()=>`
+  <p>Task two is harder than it sounds.</p>
+  <p><i>Learn one stranger's name.</i></p>
+  <p>You make a list in your head. The breakfast shop owner from last week. The convenience store ${vb('clerk')} with the name tag. And…</p>
+  <p>The security guard.</p>
+  <p>Five years. Two nods a day. Around 2,400 nods, if anyone is counting.</p>
+  <p>Someone is counting. You have seen the counter.</p>
+  <p>Your heart does a strange small jump — and you notice it. <i>Why is this scary? It is one question.</i></p>`,
+ choices:[
+   {t:'The breakfast shop owner. Easy mode.', go:'e2s4a'},
+   {t:'The clerk with the name tag. Easier mode.', go:'e2s4b'},
+   {t:'The guard. No more nodding.', go:'e2s4g'}
+ ]
+},
+
+e2s4a:{
+ html:()=>`
+  <p>After work, you walk to the alley. The breakfast shop is closing, the old man ${vb('wiping')} the hot plate slowly, like he has all the time in the world.</p>
+  <p>In Taiwan, you don't really ask a shop owner for their name. There are rules. So you do it the proper way.</p>
+  <p>"Boss," you say. "May I ask your family name?"</p>
+  <p>"Lin," he says, without looking up. Then he looks up. "You came back."</p>
+  <p>"I came back, Boss Lin."</p>
+  <p>He nods, like this settles something important.</p>
+  ${sysBox('✅ DAILY ② COMPLETE','A Name (sort of)',[
+    ['flair','Family name only. Partial data. …Accepted.'],
+    ['pts','+5']
+  ])}
+  <p class="quiet">Even the system knows the rules of Taiwanese breakfast shops.</p>`,
+ onEnter:()=>{ pay('e2_d2',5); },
+ choices:[ {t:'Task three', go:'e2s5'} ]
+},
+
+e2s4b:{
+ html:()=>`
+  <p>On your way home, you stop at the convenience store. Same clerk as always. Tonight you finally look at the name tag.</p>
+  <p><b>Kiwi.</b></p>
+  <p>"Thank you… Kiwi," you say at the counter.</p>
+  <p>Kiwi blinks, then grins. "Whoa. Five years, and today you learn to read?"</p>
+  <p>Fair. Completely fair.</p>
+  ${sysBox('✅ DAILY ② COMPLETE','A Name (printed)',[
+    ['flair','Reading a name tag. Technically a success.'],
+    ['pts','+5']
+  ])}
+  <p class="quiet">The system's tone is getting ruder. You kind of like it.</p>`,
+ onEnter:()=>{ pay('e2_d2',5); },
+ choices:[ {t:'Task three', go:'e2s5'} ]
+},
+
+e2s4g:{
+ html:()=>`
+  <p>You don't ${vb('hesitate')}. You walk straight to the lobby desk before your brain can vote.</p>
+  <p>The guard looks up. Older than you. Tired eyes that miss nothing.</p>
+  <p>"Excuse me," you say. "We see each other every day. For five years. I never asked your name."</p>
+  <p>A long pause. The lobby clock ticks.</p>
+  <p>"Sam," the guard says. And then, quieter: "Five years. You are the first one to ask."</p>
+  <p>Something in your chest goes very ${vb('still','still_adj')}.</p>
+  ${sysBox('✅ DAILY ② COMPLETE','The Person at the Desk',[['pts','+5']])}
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','The Person at the Desk',[
+    ['flair','"2,400 times. You finally asked."'],
+    ['pts','+20']
+  ])}
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','No '+vb('Hesitation','hesitate'),[
+    ['flair','"You picked the hard one first."'],
+    ['pts','+0 points']
+  ])}
+  <p>Another zero. By now you can read this system's strange language: the zeros are the ones it respects.</p>`,
+ onEnter:()=>{ pay('e2_d2',5); pay('e2_guard',20); grant('person_at_desk'); grant('no_hesitation'); state.flags.guard_name_known = true; },
+ choices:[ {t:'Task three', go:'e2s5'} ]
+},
+
+e2s5:{
+ html:()=>`
+  <p>Task three: thirty minutes in a place you have never stayed.</p>
+  <p>You pick the small park by the water, ten minutes from your apartment. You have walked past it maybe a thousand times. You have never once sat down in it.</p>
+  <p>You sit down in it.</p>
+  <p>For the first five minutes, your hands keep reaching for your phone. For the next ten, you watch an old man do slow exercises like he is fighting an ${vb('invisible')}, very polite enemy. For the last fifteen, you just… sit. The water moves. The sky changes color twice.</p>
+  <p>Thirty minutes. It feels like a small vacation in the middle of an ordinary Monday.</p>
+  ${sysBox('✅ DAILY ③ COMPLETE','Thirty Minutes',[['pts','+5']])}
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Three for Three',[
+    ['flair','"All daily quests in one day. Look at you."'],
+    ['pts','+10 '+vb('bonus','bonus')]
+  ])}`,
+ onEnter:()=>{ pay('e2_d3',5); grant('three_for_three'); },
+ choices:[ {t:'Tuesday', go:'e2s6'} ]
+},
+
+e2s6:{
+ html:()=>`
+  <p class="quiet">TUESDAY</p>
+  <p>The week finds a ${vb('rhythm')}.</p>
+  <p>New lunch: +5. A different road home: +5. Thirty minutes on the office roof you didn't know was open: +5.</p>
+  <p>Small numbers. They keep adding up anyway.</p>
+  <p>At your desk, the report is still the report. But now there is a clock inside the day that only you can hear, and it is not counting down to the weekend. It is counting up.</p>`,
+ onEnter:()=>{ pay('e2_tue',15); },
+ choices:[ {t:'Wednesday', go:'e2s7'} ]
+},
+
+e2s7:{
+ html:(st)=> st.flags.guard_name_known ? `
+  <p class="quiet">WEDNESDAY</p>
+  <p>The morning quest is short.</p>
+  ${sysBox('📋 QUEST — WEDNESDAY','Again, With a Name',[
+    ['flair','You know it now. Use it.'],
+    ['pts','+1']
+  ])}
+  <p>You walk into the lobby. Sam is at the desk, same as 2,400 mornings before.</p>
+  <p>"Morning, Sam."</p>
+  <p>Sam looks up — and for half a second, the tired eyes are not tired at all.</p>
+  <p>"Morning."</p>
+  <p>Nod number 2,401. The first one with a name on it.</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','2,401',[['flair','"This time, with a name."'],['pts','+1']])}` : `
+  <p class="quiet">WEDNESDAY</p>
+  <p>The system has noticed your easy-mode choice on Monday. Wednesday's quest arrives with a very specific address.</p>
+  ${sysBox('📋 QUEST — WEDNESDAY','The Person at the Desk',[
+    ['flair','You have seen this person about 2,400 times.'],
+    ['flair','Learn their name.'],
+    ['pts','+20']
+  ])}
+  <p>2,400 times.</p>
+  <p>You read the number twice. The system has a talent for math that hurts.</p>`,
+ onEnter:()=>{ if(state.flags.guard_name_known){ if(!state.achievements.includes('ach_2401')){ grant('ach_2401'); } } },
+ choices:(st)=> st.flags.guard_name_known ?
+   [ {t:'Thursday', go:'e2s13'} ] :
+   [ {t:'After work. The lobby.', go:'e2s8'} ]
+},
+
+e2s8:{
+ html:()=>`
+  <p>Six o'clock. The lobby is emptying out. The guard sits behind the desk, watching the door the way the guard has watched it for five years.</p>
+  <p>You walk over. Your heart is doing something ${vb('embarrassing')}.</p>
+  <p>This is the strange physics of it: talking to a true ${vb('stranger')} is easy. Talking to someone you have silently nodded at for five years — that is the hardest conversation in the world. The silence has weight now. Five years of weight.</p>
+  <p>You stop at the desk. The guard looks up.</p>`,
+ choices:[ {t:'"Excuse me. Can I ask you something?"', go:'e2s9'} ]
+},
+
+e2s9:{
+ html:()=>`
+  <p>"We see each other every day," you say. "For five years. Two nods a day. And I… I never asked your name. I'm sorry it took so long."</p>
+  <p>A long pause. The lobby clock ticks. Somewhere above you, an elevator hums.</p>
+  <p>"Sam," the guard says.</p>
+  <p>And then, quieter, almost to the desk itself:</p>
+  <p class="beat">"Five years. You are the first one to ask."</p>
+  <p>Something in your chest goes very ${vb('still','still_adj')}.</p>
+  ${sysBox('✅ QUEST COMPLETE','The Person at the Desk',[['pts','+20']])}
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','The Person at the Desk',[
+    ['flair','"2,400 times. You finally asked."']
+  ])}`,
+ onEnter:()=>{ pay('e2_guard',20); grant('person_at_desk'); state.flags.guard_name_known = true; },
+ choices:[
+   {t:'"Thank you, Sam." Leave it there.', go:'e2s11b'},
+   {t:'Stay. Talk a little more.', go:'e2s11a'}
+ ]
+},
+
+e2s11a:{
+ html:()=>`
+  <p>You stay. You ask about the ${vb('night shifts','night_shifts')} — Sam works them all, you've noticed.</p>
+  <p>"Days are for taking care of someone," Sam says. That is all. The door of that sentence closes gently, and you do not knock again.</p>
+  <p>Instead Sam tells you something else: there is a ${vb('back lane','back_lane')} behind this building that cuts straight to the MRT station. "Saves six minutes. Nobody uses it. People don't look."</p>
+  <p>People don't look. You know a system that agrees.</p>
+  <p class="quiet">You ${vb('file the lane away','file_away')}. Somehow you are sure it will matter someday.</p>`,
+ onEnter:()=>{ state.flags.guard_story = true; },
+ choices:[ {t:'Home', go:'e2s12'} ]
+},
+
+e2s11b:{
+ html:()=>`
+  <p>"Thank you, Sam," you say. "Good night."</p>
+  <p>"Good night."</p>
+  <p>Two more words than the last 2,400 exchanges. It is enough. Some doors you open slowly.</p>`,
+ choices:[ {t:'Home', go:'e2s12'} ]
+},
+
+e2s12:{
+ html:()=>`
+  <p class="quiet">THURSDAY, 8:51 A.M.</p>
+  <p>You walk into the lobby. Sam is at the desk.</p>
+  <p>"Morning, Sam."</p>
+  <p>Sam looks up — and for half a second, the tired eyes are not tired at all.</p>
+  <p>"Morning."</p>
+  <p>Nod number 2,401. The first one with a name on it.</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','2,401',[['flair','"This time, with a name."'],['pts','+1']])}`,
+ onEnter:()=>{ grant('ach_2401'); },
+ choices:[ {t:'Thursday, Friday', go:'e2s13'} ]
+},
+
+e2s13:{
+ html:()=>`
+  <p class="quiet">THURSDAY · FRIDAY</p>
+  <p>The numbers keep climbing.</p>
+  <p>A lunch from a truck that only parks on Thursdays: +5. A staircase instead of the slow elevator, all eleven floors: +5, plus legs that complain all afternoon. Thirty minutes in the bookstore near the station, reading the first chapter of a novel you will probably never buy: +5.</p>
+  <p>Your points pass one hundred sometime on Friday morning. There is no ${vb('fanfare')}. The system just lets the number sit there, ${vb('glowing')} quietly, like it always believed you would get here.</p>`,
+ onEnter:()=>{ pay('e2_thufri',20); },
+ choices:[ {t:'Friday afternoon', go:'e2s14'} ]
+},
+
+e2s14:{
+ html:()=>`
+  <p>Friday, 3 p.m. You are refilling your water bottle when a colleague appears beside you, coffee in hand, casual in the way that is never actually casual.</p>
+  <p>"Hey. Can I ask you something weird?"</p>
+  <p>"Sure."</p>
+  <p>"You've been… different lately." The colleague studies you. "You disappear at lunch. You smile at nothing. Last Friday you skipped dinner with everyone. Are you okay? Or like — <i>too</i> okay?"</p>
+  <p>The question is friendly. Mostly. Underneath it there is a small, careful distance, the kind people keep from things they don't understand.</p>`,
+ choices:[
+   {t:'Be honest. A little.', go:'e2s15a'},
+   {t:'Laugh it off completely.', go:'e2s15b'}
+ ]
+},
+
+e2s15a:{
+ html:()=>`
+  <p>You decide to be honest. You open your mouth to say it.</p>
+  <p><i>I see floating windows. They give me quests. I got twenty points for learning the guard's name.</i></p>
+  <p>The words line up… and refuse to come out. Somewhere between your chest and your mouth, they turn into something else.</p>
+  <p>"I've just been… trying new things. Sleeping better. It's nothing."</p>
+  <p>"Huh," says the colleague. "Well. It's a good look on you." And walks away.</p>
+  <p>You stand there with your water bottle, understanding two things at once. One: you cannot tell anyone, even when you try. Two—</p>
+  <p class="beat">You are becoming a person with a secret. And you are getting good at it.</p>`,
+ choices:[ {t:'Saturday', go:'e2s16'} ]
+},
+
+e2s15b:{
+ html:()=>`
+  <p>"Too okay?" You laugh. "I started sleeping before midnight. Try it. It's a ${vb('cheat code','cheat_code')}."</p>
+  <p>The colleague laughs too, satisfied, and walks away with the coffee.</p>
+  <p>Easy. Smooth. The lie fit so well it didn't even feel like one.</p>
+  <p>You stand there with your water bottle, and a quiet thought arrives uninvited:</p>
+  <p class="beat">You are becoming a person with a secret. And you are getting good at it.</p>`,
+ choices:[ {t:'Saturday', go:'e2s16'} ]
+},
+
+e2s16:{
+ html:()=>`
+  <p class="quiet">SATURDAY, 9:00 A.M.</p>
+  <p>The system has been saving something for the weekend.</p>
+  ${sysBox('🗺️ WEEKEND QUEST',vb('District','district')+' Unlock: Yancheng',[
+    ['flair','Visit 5 marked points in Yancheng before '+vb('sunset','sunset')+'.'],
+    ['pts','+30 · new district']
+  ])}
+  <p>Yancheng. The old heart of the city, down by the harbor. Your map shows five small lights scattered across it, and around them, the grey fog you have been wanting to push back for a week.</p>
+  <p>You put on your shoes. The whole day stretches out in front of you, shaped exactly like a quest.</p>`,
+ choices:[ {t:'First point', go:'e2s17'} ]
+},
+
+e2s17:{
+ html:()=>`
+  <p><b>Point one</b> is a wall. Just a wall — until you read the small ${vb('plaque')}. A movie theater stood here for fifty years. Then it didn't.</p>
+  <p>An old man sees you reading and stops. "I watched my first movie there," he says, to you or to the wall, it is hard to tell. "${vb('Sword','sword')} fights. The whole street heard us cheering." He nods at the air and walks on.</p>
+  <p>The system ${vb('pings','ping')} softly. One light down.</p>
+  <p><b>Point two</b> is a street of gold shops — ${vb('jewelry')} stores with red signs, one after another, glass cases full of small suns. A shop auntie catches you staring and waves you in. You escape eight minutes later, slightly ${vb('dazed')}, having learned the daily gold price and the marriage status of her three sons.</p>
+  <p>Two lights down.</p>`,
+ onEnter:()=>{ pay('e2_pts12',10); },
+ choices:[ {t:'Point three: the harbor', go:'e2s19'} ]
+},
+
+e2s19:{
+ html:()=>`
+  <p><b>Point three</b> sits by the water: an old ${vb('warehouse')}, brick and iron, the kind of building that remembers more than the city does.</p>
+  <p>The marked spot is around the side, in a narrow gap between the warehouse and the sea wall. You squeeze in, the system pings — three lights down — and you turn to leave.</p>
+  <p>That is when you see it.</p>
+  <p>On the brick, at shoulder height: ${vb('spray paint','spray_paint')}.</p>
+  <p>A ${vb('trophy')}. <i>The</i> trophy — the exact ${vb('icon')} that floats in your vision every time you unlock an achievement. The same shape. The same proportions. Painted on a real wall, by a real hand, ${vb('faded')} by real rain.</p>
+  <p>You reach out and touch it. The paint is dry. It has been dry for a long time.</p>
+  <p>The system, which has an opinion about everything, says nothing at all.</p>
+  <p>Under the trophy there is a line of smaller writing — but someone has sprayed over it with grey paint. Covered it. On purpose.</p>
+  <p>The sun is getting lower. Two more points to visit.</p>`,
+ choices:[
+   {t:'Photograph it. Finish the quest. Points first.', go:'e2s20a'},
+   {t:'Forget the points. Study the wall.', go:'e2s20b'}
+ ]
+},
+
+e2s20a:{
+ html:()=>`
+  <p>You take three photos and make yourself walk away. Mysteries keep. Sunsets don't.</p>
+  <p><b>Point four</b> is the great ${vb('temple')} plaza, smoke and gold in the late light, a grandmother teaching a small child how to hold the incense properly — higher, higher, like that.</p>
+  <p><b>Point five</b> is a coffee shop that opens only in the afternoons, run by a man who appears to be at war with the concept of menus. "Sit," he says. "I'll decide." The coffee he decides on is the best you have had all year.</p>
+  <p>You step out as the sun touches the water.</p>
+  ${sysBox('✅ WEEKEND QUEST COMPLETE','District Clear: Yancheng',[['pts','+30']])}
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','District Clear: Yancheng',[
+    ['flair','"Five points before sunset."']
+  ])}
+  <p>On your map, the fog over Yancheng dissolves like sugar in tea. A whole district, lit up and yours.</p>
+  <p>But walking to the bus stop, your thumb keeps returning to the photos. The trophy. The covered line beneath it.</p>
+  <p class="quiet">Painted by a real hand. Whose?</p>`,
+ onEnter:()=>{ pay('e2_clear',30); grant('district_clear'); if(!state.map_unlocked.includes('yancheng')) state.map_unlocked.push('yancheng'); },
+ choices:[ {t:'Sunday', go:'e2s22'} ]
+},
+
+e2s20b:{
+ html:()=>`
+  <p>The sunset can wait. The points can wait. This wall has been waiting longer.</p>
+  <p>You crouch and study the covered line up close. Whoever hid it used cheap grey spray, and grey paint loses to time: at the right angle, in the low gold light, the old letters push through like bones.</p>
+  <p>Most of it is gone. But near the end, three characters survive:</p>
+  <p class="beat big">…LV9…</p>
+  <p>LV. Level.</p>
+  <p class="beat">Level 9.</p>
+  <p>You stand very still, while the meaning arrives in pieces. Levels belong to the system. The system belongs to you. You are the only one who—</p>
+  <p>You are not the only one.</p>
+  <p>Someone else has the system. Someone painted this — the trophy, a level, a message — on a wall in the real world, where only another player would ever understand it. And someone <i>else</i> covered it up.</p>
+  <p>You are level 2. Whoever wrote this was level 9.</p>
+  <p>The sun goes down while you stand there. The last two quest lights blink out, unvisited.</p>
+  ${sysBox('QUEST INCOMPLETE','District Unlock: Yancheng',[
+    ['flair','3 of 5 points visited. District unlocked anyway. You found something better.']
+  ],'fail')}
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Off the Map',[
+    ['flair','"You traded points for a question."'],
+    ['pts','+0 points']
+  ])}
+  <p class="quiet">Zero points. The biggest zero so far.</p>`,
+ onEnter:()=>{ pay('e2_partial',15); grant('off_the_map'); state.flags.graffiti_examined = true; if(!state.map_unlocked.includes('yancheng')) state.map_unlocked.push('yancheng'); },
+ choices:[ {t:'Sunday', go:'e2s22'} ]
+},
+
+e2s22:{
+ html:()=>`
+  <p class="quiet">SUNDAY, 9:14 P.M.</p>
+  <p>You are lying on your bed, pleasantly tired, your legs full of Yancheng, when the system ${vb('clears its throat','clears_throat')}. Not literally. But the box that appears has a certain ${vb('ceremony')} to it.</p>
+  ${sysBox('⬆️ LEVEL 2','Points: 100+',[
+    ['flair',vb('Skill','skill')+' '+vb('slot','slot')+' unlocked.']
+  ])}
+  ${sysBox('💠 NEW SKILL','Completion '+vb('Vision','vision'),[
+    ['flair','See how much of your day you really lived.']
+  ])}
+  <p>You sit up.</p>
+  <p>"Show me," you think.</p>`,
+ onEnter:()=>{ state.level = 2; if(!state.skills.includes('completion_vision')) state.skills.push('completion_vision'); },
+ choices:[ {t:'Today\'s number', go:'e2s23'} ]
+},
+
+e2s23:{
+ html:(st)=>`
+  <p>A single number rises in the dark, soft and green.</p>
+  <p class="beat big">TODAY: 89%</p>
+  <p>Eighty-nine percent of today, really lived. ${st.flags.e2_clear ?
+    'The walk, the gold street auntie, the temple smoke, the coffee dictator, the wall by the sea.' :
+    'The walk, the gold street auntie, the wall by the sea — and those three half-hidden letters you cannot stop seeing.'} It feels right. Today was a full cup.</p>
+  <p>You look at the number for a while, warm with it.</p>
+  <p>And then you do a dangerous thing. You ask a question you cannot un-ask.</p>
+  <p>"What was my ${vb('average','average')}… before?"</p>
+  <p>The system pauses. For the first time since it arrived, you could swear it hesitates — the way a doctor hesitates, or a friend with bad news.</p>
+  <p>Then it answers.</p>`,
+ choices:[ {t:'Look', go:'e2s24'} ]
+},
+
+e2s24:{
+ html:()=>`
+  <p class="beat big">BEFORE: 41%</p>
+  <p>Forty-one percent.</p>
+  <p>For five years, more than half of every day — the bigger half — just… passed. Unlived. The same road, the same lunch, the same nods without names. Days you cannot tell apart, because there was nothing in them to tell apart.</p>
+  <p>The system doesn't say anything else. No joke this time. No ${vb('sass')}. It just lets the two numbers float there in the dark, side by side:</p>
+  <p class="beat">41% &nbsp;→&nbsp; 89%</p>
+  <p>It knew all along, you realize. It has been counting since before you could see it. It was just waiting for you to ask.</p>
+  <p>You lie back down. You are not sad, exactly. It is the feeling of looking at an old photo of yourself and not ${vb('recognizing')} the person — except the photo is five years long.</p>`,
+ choices:[ {t:'Monday is coming', go:'e2s25'} ]
+},
+
+e2s25:{
+ html:(st)=>`
+  <p>Before you sleep, you open the map one more time.</p>
+  <p>Yancheng glows now, a whole new piece of the city, lit from inside. ${st.flags.graffiti_examined ?
+    'By the harbor, where the warehouse stands, you have placed your own small mark — the first thing on this map the system didn\'t put there. <i>LV9,</i> you think. <i>Who are you? And who covered you up?</i>' :
+    'By the harbor, your thumb hovers over the warehouse. The trophy in the photos. The covered line beneath it. Next weekend, you promise yourself. Next weekend you look closer.'}</p>
+  <p>Deep in the fog to the south, the gold light waits, patient as ever.</p>
+  <p>You close the panel. In the dark, you find yourself doing the math: Monday's three daily quests, plus whatever the week brings, plus the weekend…</p>
+  <p>Level 3 is maybe ten days away.</p>
+  <p>You fall asleep mid-calculation, smiling at the ceiling like an idiot.</p>
+  <p class="beat">Best ${vb('Monday-eve','eve')} in five years.</p>`,
+ choices:[ {t:'EPISODE COMPLETE — open the Menu', go:'end2'} ]
+},
+
+end2:{
+ html:(st)=>{
+   function achGroup(ep){
+     let h='';
+     Object.keys(ACH).filter(id=>ACH[id].ep===ep).forEach(id=>{
+       const a=ACH[id]; const got=st.achievements.includes(id);
+       h += '<div class="row"><span>'+
+         (got ? '🏆 <span class="ach-name">'+a.name+'</span><span class="ach-desc">'+a.desc+'</span>'
+              : '<span class="lock">🔒 ???</span>')+
+         '</span><span>'+(got ? (a.pts>0?'+'+a.pts:'—') : '')+'</span></div>';
+     });
+     return h;
+   }
+   const c1=st.achievements.filter(id=>ACH[id].ep===1).length, t1=Object.keys(ACH).filter(id=>ACH[id].ep===1).length;
+   const c2=st.achievements.filter(id=>ACH[id].ep===2).length, t2=Object.keys(ACH).filter(id=>ACH[id].ep===2).length;
+   return `
+  <p class="quiet">EPISODE 2 — DAILY QUESTS</p>
+  ${sysBox('✅ EPISODE COMPLETE','Daily Quests',[['flair','41% → 89%. The counting continues.']])}
+  <div class="panel">
+    <h3>PLAYER</h3>
+    <div class="row"><span>Level</span><span>${st.level}</span></div>
+    <div class="row"><span>Points</span><span>${st.points}</span></div>
+    <div class="row"><span>Skill</span><span>Completion Vision</span></div>
+    <div class="row"><span>Map</span><span>14% explored</span></div>
+    <div class="row"><span class="goldtxt">???</span><span class="goldtxt">[ Locked ]</span></div>
+  </div>
+  <div class="panel ach-list">
+    <h3>EPISODE 2 ACHIEVEMENTS (${c2}/${t2})</h3>
+    ${achGroup(2)}
+  </div>
+  <div class="panel ach-list">
+    <h3>EPISODE 1 ACHIEVEMENTS (${c1}/${t1})</h3>
+    ${achGroup(1)}
+  </div>
+  <p class="quiet">Missing some? Different choices, different badges. The wall is still there…</p>
+  <hr class="sep">
+  <div class="panel">
+    <h3>SAVE</h3>
+    <p style="font-family:inherit;font-size:.8rem;opacity:.8;margin:0 0 8px;">
+      Your progress saves automatically on this device.${storageOK?'':' (Saving is not available here — use Export to keep your progress.)'}
+      Export a save code to keep it safe or move to another device.</p>
+    <div class="btn-line">
+      <button class="choice" id="btnExport2">Export save</button>
+      <button class="choice" id="btnImport2">Import save</button>
+    </div>
+    <textarea class="savebox" id="saveBox2" placeholder="Your save code appears here. Or paste a code and press Import." spellcheck="false"></textarea>
+  </div>`;
+ },
+ choices:[
+   {t:'Back to title', go:'__title'}
+ ],
+ onRender:()=>{
+   const box = document.getElementById('saveBox2');
+   document.getElementById('btnExport2').onclick = ()=>{
+     box.value = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+     box.select();
+   };
+   document.getElementById('btnImport2').onclick = ()=>{
+     try{
+       const sv = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
+       if(typeof sv.version !== 'number') throw 0;
+       state = Object.assign(freshState(), sv);
        save();
        box.value = 'Save imported ✓';
      }catch(e){ box.value = 'That code did not work. Check it and try again.'; }
