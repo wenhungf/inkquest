@@ -10,9 +10,9 @@ No installs, no sign-ups. Pick a story, make your choices, see where they lead.
 
 | Title | Level | Genre |
 |-------|-------|-------|
-| *Night Train to Kyūfun* | A2–B1 | Mystery · 1930s Taiwan |
+| *Achievement Unlocked* | A1–B1 | New adventure · only EP1 available 🚧 |
 | *The Lost Phone* | A1–A2 | Modern mystery · a café, a phone, a stranger's life |
-| *Achievement Unlocked* | — | Under construction 🚧 |
+| *Night Train to Kyūfun* | A2–B1 | Mystery · 1930s Taiwan |
 
 More stories are on the way.
 
