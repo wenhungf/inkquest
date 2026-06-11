@@ -165,26 +165,6 @@
   .start::after { content: " →"; transition: margin-left 0.18s ease; }
   .card:hover .start::after { margin-left: 4px; }
 
-  /* under construction */
-  .card.soon {
-    border-style: dashed;
-    border-left-style: solid;
-    opacity: 0.65;
-    cursor: default;
-  }
-  .card.soon:hover { transform: none; background: var(--ink-raised); }
-  .soon-badge {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    color: var(--accent, var(--gold));
-    border: 1px dashed var(--accent, var(--gold));
-    border-radius: 999px;
-    padding: 0.2rem 0.75rem;
-    white-space: nowrap;
-  }
-
   /* ---------- Footer ---------- */
   footer {
     margin-top: 4rem;
@@ -222,13 +202,12 @@
 
     <li>
       <a class="card" href="achievement-unlocked.html" style="--accent: var(--pixel);">
-        <p class="eyebrow">New · In Progress</p>
+        <p class="eyebrow">New · EP1 Available</p>
         <h2>Achievement Unlocked</h2>
         <p>A new adventure begins. Episode 1 is ready to play — more
         episodes are on the way.</p>
         <div class="card-foot">
           <span class="level">A1–B1</span>
-          <span class="soon-badge">🚧 Only EP1 available</span>
           <span class="start">Start reading</span>
         </div>
       </a>
