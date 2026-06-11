@@ -290,7 +290,9 @@
     font-size: 0.78rem;
     font-family: 'Crimson Pro', serif;
     font-style: normal;
-    white-space: nowrap;
+    white-space: normal;
+    width: max-content;
+    max-width: min(300px, 80vw);
     border: 1px solid var(--gold);
     z-index: 100;
     pointer-events: none;
@@ -616,6 +618,27 @@ const state = {
 document.getElementById('tipsToggle').addEventListener('change', e => {
   state.tipsOn = e.target.checked;
   document.getElementById('panel').classList.toggle('tips-off', !state.tipsOn);
+});
+
+// Viewport nudge — prevent tooltips overflowing left/right edge on mobile
+document.getElementById('panel').addEventListener('mouseover', e => {
+  const tip = e.target.closest('.tip');
+  if (!tip) return;
+  const popup = tip.querySelector('.tip-popup');
+  if (!popup) return;
+  requestAnimationFrame(() => {
+    const r = popup.getBoundingClientRect();
+    const margin = 8;
+    if (r.right > window.innerWidth - margin) {
+      popup.style.left = 'auto';
+      popup.style.right = '0';
+      popup.style.transform = 'none';
+    } else if (r.left < margin) {
+      popup.style.left = '0';
+      popup.style.right = 'auto';
+      popup.style.transform = 'none';
+    }
+  });
 });
 
 // tip(word, zh, grammar) → HTML string
