@@ -318,8 +318,8 @@ document.getElementById('tipsToggle').addEventListener('change', e => {
 });
 
 // ── Tooltip clipping correction ──
-// CSS handles show/hide via :hover. This only nudges left offset when the
-// popup would overflow the viewport edge, and tracks the caret accordingly.
+// CSS handles show/hide via :hover. This nudges the popup horizontally when it
+// would overflow the panel (or viewport) edge, and tracks the caret accordingly.
 document.addEventListener('mouseover', function(e) {
   var tipEl = e.target.closest('.tip');
   if (!tipEl) return;
@@ -333,13 +333,17 @@ document.addEventListener('mouseover', function(e) {
 
   // Read natural position after a brief paint tick
   requestAnimationFrame(function() {
-    var pr  = popup.getBoundingClientRect();
-    var vw  = window.innerWidth;
-    var pad = 10;
+    var pr    = popup.getBoundingClientRect();
+    var panel = document.getElementById('panel').getBoundingClientRect();
+    var pad   = 10;
+
+    // Clamp to whichever boundary is tighter: the panel or the viewport
+    var leftBound  = Math.max(panel.left + pad, pad);
+    var rightBound = Math.min(panel.right - pad, window.innerWidth - pad);
 
     var nudge = 0;
-    if (pr.right > vw - pad)  nudge = (vw - pad) - pr.right;
-    if (pr.left + nudge < pad) nudge = pad - pr.left;
+    if (pr.right > rightBound)        nudge = rightBound - pr.right;
+    if (pr.left + nudge < leftBound)  nudge = leftBound - pr.left;
 
     if (nudge !== 0) {
       // translateX(-50%) centers it; we add the nudge on top
