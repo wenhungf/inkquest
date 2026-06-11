@@ -621,25 +621,39 @@ document.getElementById('tipsToggle').addEventListener('change', e => {
 });
 
 // Viewport nudge — prevent tooltips overflowing left/right edge on mobile
-document.getElementById('panel').addEventListener('mouseover', e => {
-  const tip = e.target.closest('.tip');
-  if (!tip) return;
-  const popup = tip.querySelector('.tip-popup');
+function nudgePopup(tipEl) {
+  const popup = tipEl.querySelector('.tip-popup');
   if (!popup) return;
+  // reset any previous nudge so measurement starts from the centered default
+  popup.style.left = '';
+  popup.style.right = '';
+  popup.style.transform = '';
   requestAnimationFrame(() => {
-    const r = popup.getBoundingClientRect();
-    const margin = 8;
-    if (r.right > window.innerWidth - margin) {
-      popup.style.left = 'auto';
-      popup.style.right = '0';
-      popup.style.transform = 'none';
-    } else if (r.left < margin) {
-      popup.style.left = '0';
-      popup.style.right = 'auto';
-      popup.style.transform = 'none';
-    }
+    requestAnimationFrame(() => {
+      const r = popup.getBoundingClientRect();
+      if (r.width === 0) return; // not visible, nothing to measure
+      const margin = 8;
+      if (r.left < margin) {
+        // overflowing left edge: shift right by the overflow amount
+        const shift = margin - r.left;
+        popup.style.transform = `translateX(calc(-50% + ${shift}px))`;
+      } else if (r.right > window.innerWidth - margin) {
+        // overflowing right edge: shift left by the overflow amount
+        const shift = r.right - (window.innerWidth - margin);
+        popup.style.transform = `translateX(calc(-50% - ${shift}px))`;
+      }
+    });
   });
+}
+const panelEl = document.getElementById('panel');
+panelEl.addEventListener('mouseover', e => {
+  const t = e.target.closest('.tip');
+  if (t) nudgePopup(t);
 });
+panelEl.addEventListener('touchstart', e => {
+  const t = e.target.closest('.tip');
+  if (t) nudgePopup(t);
+}, { passive: true });
 
 // tip(word, zh, grammar) → HTML string
 function tip(word, zh, grammar = '') {
