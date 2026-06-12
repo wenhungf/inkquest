@@ -756,7 +756,6 @@ end:{
  },
  choices:[
    {t:'▶ Continue to Episode 2', go:'e2s1'},
-   {t:'Replay Episode 1', go:'__replay'},
    {t:'Back to title', go:'__title'}
  ],
  onRender:()=>{
@@ -1341,7 +1340,7 @@ e3s5:{
   <p>The ${vb('guitar')} in the corner: <b>1,247 days ago.</b> The running shoes, bought in a January full of plans: <b>two runs, 980 days ago.</b> A box of university ${vb('textbooks','textbook')}: a date so old the label seems ${vb('embarrassed')} to show it.</p>
   <p>A month ago, those numbers would have hurt. Today you just look at them, the way you looked at 41%, and let them be true.</p>
   <p>You photograph the guitar, the shoes, half the books. You write honest descriptions. <i>${vb('Second-hand','second_hand')}. Barely used. Needs someone better than me.</i></p>
-  <p>By Thursday they are all gone, carried off by strangers who wanted them more. The ${vb('transfers','transfer')} land one by one: NT$800 total.</p>
+  <p>By Thursday they are all gone, carried off by strangers who wanted them more. The ${vb('transfers','transfer')} land one by one — and the quest, you notice, does not close until the last one arrives. <i>Sold</i> is not sold, says the system, until the money is in your hand. Thursday night, the last transfer lands, and the quest box finally turns green: NT$800 total.</p>
   ${sysBox('✅ SIDE QUEST COMPLETE','Letting Go',[['pts','NT$800 paid · +10 points']])}
   ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Letting Go',[
     ['flair','"1,247 days. You let it find new hands."'],
@@ -1356,7 +1355,7 @@ e3s6:{
  html:()=>`
   <p class="quiet">MONDAY — THURSDAY</p>
   <p>The week ${vb('rolls on','rolls_on')}. The daily quests keep their rhythm underneath everything, steady as a heartbeat. A new lunch here, a ${vb('borrowed')} staircase there, thirty minutes in places you keep being surprised ${vb('exist')}.</p>
-  <p>The points climb. And when the last transfer lands on Thursday, the lock on quest number three quietly disappears. Gold tier, open, waiting — but a NT$2,000 delivery across the water deserves a whole free day, not a tired weeknight. <i>Saturday,</i> you promise it. <i>Saturday.</i></p>
+  <p>The points climb. The lock on quest three is already gone — it vanished the moment your second side quest closed, without a sound, like it had only ever been waiting for that. Gold tier, open. But a NT$2,000 delivery across the water deserves a whole free day, not a tired weeknight. <i>Saturday,</i> you promise it. <i>Saturday.</i></p>
   <p>Almost ready. But first, Friday morning has a different plan for you.</p>`,
  onEnter:()=>{ pay('e3_week',35); },
  choices:[ {t:'Friday morning', go:'e3s7'} ]
@@ -1500,7 +1499,7 @@ e3s15:{
  html:()=>`
   <p>"Our old house," he says at last, turning the photos one by one. "Sea-sand concrete. They ${vb('demolished','demolished')} the whole row, years ago. Everything went — except a neighbor took the photos, and then the neighbor moved, and then…" He waves a hand at the long journey of the tin. "And then, today, you."</p>
   <p>He turns another photo and stops.</p>
-  <p>The longan tree fills the frame, heavy with fruit, a ladder leaning against it and children mid-climb.</p>
+  <p>The ${vb('longan')} tree fills the frame, heavy with fruit, a ladder leaning against it and children mid-climb.</p>
   <p class="beat">"My father planted it," he says. And nothing else, for a while.</p>
   <p>You sit with him in the kind of silence that doesn't need fixing. Through the window, a ferry blows its ${vb('horn')}. Somewhere below, the sea is doing what it has always done.</p>`,
  choices:[ {t:'One more photo', go:'e3s16'} ]
