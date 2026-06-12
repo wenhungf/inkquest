@@ -150,7 +150,7 @@
    ===================================================== */
 
 const SAVE_KEY = 'au_save';
-const SAVE_VERSION = 2;
+const SAVE_VERSION = 3;
 
 function freshState(){
   return {
@@ -158,6 +158,7 @@ function freshState(){
     episode: 1,
     section: 's1',
     points: 0,
+    money: 0,
     level: 1,
     skills: [],
     achievements: [],
@@ -200,7 +201,13 @@ const ACH = {
   person_at_desk:{ ep:2, name:'The Person at the Desk', pts:0, desc:'2,400 times. You finally asked.' },
   ach_2401:      { ep:2, name:'2,401', pts:1, desc:'This time, with a name.' },
   district_clear:{ ep:2, name:'District Clear: Yancheng', pts:0, desc:'Five points before sunset.' },
-  off_the_map:   { ep:2, name:'Off the Map', pts:0, desc:'You traded points for a question.' }
+  off_the_map:   { ep:2, name:'Off the Map', pts:0, desc:'You traded points for a question.' },
+  side_hustler:  { ep:3, name:'Side Hustler', pts:10, desc:'First job done. First money earned.' },
+  handy:         { ep:3, name:'Handy', pts:5, desc:'47 videos at 2 a.m. finally paid off.' },
+  letting_go:    { ep:3, name:'Letting Go', pts:0, desc:'1,247 days. You let it find new hands.' },
+  off_the_clock: { ep:3, name:'Off the Clock', pts:0, desc:'No quest. No points. You did it anyway.' },
+  not_yours:     { ep:3, name:'Not Yours to Open', pts:0, desc:'Some boxes are not questions.' },
+  crossing:      { ep:3, name:'Crossing', pts:20, desc:'Over the water, before sunset.' }
 };
 function grant(id){
   if(!state.achievements.includes(id)){
@@ -210,6 +217,7 @@ function grant(id){
 }
 function addPts(n){ state.points += n; }
 function pay(flag, n){ if(!state.flags[flag]){ state.flags[flag] = true; addPts(n); } }
+function earn(flag, nt){ if(!state.flags[flag]){ state.flags[flag] = true; state.money += nt; } }
 
 /* ---------- vocab ---------- */
 const VOCAB = {
@@ -282,7 +290,35 @@ const VOCAB = {
   vision:{en:'the power to see', zh:'視覺、視力'},
   sass:{en:'talk that is a little rude, but funny', zh:'嘴砲、俏皮話'},
   recognizing:{en:'knowing who or what something is when you see it', zh:'認出'},
-  eve:{en:'the night before a day (like New Year\'s Eve)', zh:'前夕'}
+  eve:{en:'the night before a day (like New Year\'s Eve)', zh:'前夕'},
+  ferry:{en:'a boat that carries people across water again and again', zh:'渡輪'},
+  pier:{en:'a place by the water where boats stop', zh:'碼頭'},
+  locker:{en:'a small metal box with a lock, for keeping things', zh:'置物櫃'},
+  courier:{en:'a person whose job is to carry and deliver things', zh:'快遞員、送件人'},
+  deliver:{en:'to take something to a person or place', zh:'遞送'},
+  tin:{en:'a metal box, often for cookies or tea', zh:'鐵盒'},
+  rope:{en:'thick, strong string', zh:'繩子'},
+  payment:{en:'money you get for work', zh:'報酬、付款'},
+  harmless:{en:'safe; cannot hurt anyone', zh:'無害的'},
+  optional:{en:'you can choose to do it, or not', zh:'可選的、非必須的'},
+  fuse:{en:'a small part that protects a machine from too much power', zh:'保險絲'},
+  second_hand:{en:'not new; used by someone before', zh:'二手的'},
+  dried:{en:'made dry in the sun or air, to keep it longer', zh:'曬乾的'},
+  longan:{en:'a small round fruit with sweet white inside, common in Taiwan', zh:'龍眼'},
+  demolished:{en:'pulled down and destroyed (a building)', zh:'被拆除的'},
+  neighbor:{en:'a person who lives near you', zh:'鄰居'},
+  repair:{en:'to fix something that is broken', zh:'修理'},
+  dust:{en:'dry dirt, like grey powder', zh:'灰塵'},
+  mango:{en:'a sweet orange-yellow fruit', zh:'芒果'},
+  guitar:{en:'a musical instrument with six strings', zh:'吉他'},
+  textbook:{en:'a book used for studying in school', zh:'課本、教科書'},
+  transfer:{en:'money moved from one bank account to another', zh:'轉帳'},
+  strokes:{en:'the lines made by a pen when writing', zh:'筆畫'},
+  trembled:{en:'shook a little, without wanting to', zh:'顫抖'},
+  deck:{en:'the open floor of a boat', zh:'甲板'},
+  foam:{en:'the white part on top of waves', zh:'浪花、泡沫'},
+  lid:{en:'the top cover of a box or pot', zh:'蓋子'},
+  peek:{en:'to look at something quickly and secretly', zh:'偷看'}
 };
 function tipTxt(k){ return VOCAB[k].en + '<br><span style="opacity:.75">'+VOCAB[k].zh+'</span>'; }
 function vb(word, key){
@@ -1151,6 +1187,7 @@ end2:{
   </div>`;
  },
  choices:[
+   {t:'▶ Continue to Episode 3', go:'e3s1'},
    {t:'Back to title', go:'__title'}
  ],
  onRender:()=>{
@@ -1160,6 +1197,413 @@ end2:{
      box.select();
    };
    document.getElementById('btnImport2').onclick = ()=>{
+     try{
+       const sv = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
+       if(typeof sv.version !== 'number') throw 0;
+       state = Object.assign(freshState(), sv);
+       save();
+       box.value = 'Save imported ✓';
+     }catch(e){ box.value = 'That code did not work. Check it and try again.'; }
+   };
+ }
+},
+
+/* =====================================================
+   EPISODE 3 — SIDE QUEST
+   ===================================================== */
+
+e3s1:{
+ onEnter:()=>{ state.episode = 3; },
+ html:()=>`
+  <p class="quiet">EPISODE 3 — SIDE QUEST</p>
+  <p>Saturday, 8:30 a.m. You wake up before the alarm again. This is who you are now, apparently.</p>
+  <p>The panel is waiting, and this morning it has grown a new tab.</p>
+  ${sysBox('💰 SIDE QUESTS — UNLOCKED','Real tasks. Real money.',[
+    ['flair',vb('Payment','payment')+' guaranteed by the system.'],
+    ['flair','⚠ Side quests are '+vb('optional','optional')+'.']
+  ])}
+  <p>You read it twice. Then a third time.</p>
+  <p>Points are one thing. Points are made of light. But money? Money comes from somewhere. Money has a bank account behind it, and bank accounts have names.</p>
+  <p><i>Guaranteed by the system.</i> Guaranteed how? By whom?</p>
+  <p>You hold the question up to the light, turn it around… and then your eyes drift to the pile of mail on your desk. The rent notice. Last month's credit card bill. The washing machine that makes a new dying sound every week.</p>
+  <p>The question loses.</p>`,
+ choices:[ {t:'Open the quest list', go:'e3s2'} ]
+},
+
+e3s2:{
+ html:()=>`
+  <p>Three quests sit in the new tab.</p>
+  ${sysBox('💰 SIDE QUESTS','Available',[
+    ['flair','① Fix a '+vb('neighbor','neighbor')+"'s electric fan · NT$150"],
+    ['flair','② Sell three things you no longer use · NT$800 (est.)'],
+    ['flair','③ '+vb('Delivery','deliver')+' to Cijin · NT$2,000'],
+    ['flair','　 [ Locked — complete 2 side quests first ]']
+  ])}
+  <p>Two thousand. For one delivery. Your eyes keep walking back to it, and the lock icon stares back, patient as everything else in this system.</p>
+  <p>Fine. Two quests first, then.</p>`,
+ choices:[
+   {t:'The fan. Practical things first.', go:'e3s3', set:{e3_pragmatic:true} },
+   {t:'The selling. Time to let go of some stuff anyway.', go:'e3s3', set:{e3_declutter:true} }
+ ]
+},
+
+e3s3:{
+ html:(st)=>`
+  <p>${st.flags.e3_pragmatic ?
+    'Practical things first. Money is money, and the fan is forty steps away.' :
+    'You decide to start the decluttering on Sunday, when you have the whole day. Which makes the fan today\'s job. Forty steps away.'}</p>
+  <p>The neighbor is the auntie from the fourth floor — the one who waters the stair plants and knows everyone's schedule better than the building's security camera. Her old electric fan has stopped turning, and the repair shop quoted her more than a new fan costs.</p>
+  <p>"You can fix it?" she asks, doubtful, holding the door half open.</p>
+  <p><i>No,</i> you think. <i>Absolutely not. I have never fixed a fan in my life.</i></p>
+  <p>You open your mouth to say so, and the system interrupts.</p>
+  ${sysBox('💡 SKILL CHECK','Buried Skills',[
+    ['flair','You have watched 47 '+vb('repair','repair')+' videos at 2 a.m. instead of sleeping.'],
+    ['flair','You know more than you think.']
+  ])}
+  <p>…Huh.</p>
+  <p>It is not wrong. All those nights, all those videos of strangers fixing things in garages. You thought you were wasting time.</p>
+  <p>"I can try," you say.</p>`,
+ choices:[ {t:'Open the fan', go:'e3s4'} ]
+},
+
+e3s4:{
+ html:()=>`
+  <p>You take the fan apart on her balcony, slow and careful, photographing every step like the videos taught you. The inside is a museum of ${vb('dust')}. You clean the motor. You check the wiring. And there — a blackened ${vb('fuse')}, dead as Monday morning.</p>
+  <p>The hardware store downstairs has a new one for thirty dollars.</p>
+  <p>You put everything back, plug it in, and press the switch.</p>
+  <p>The fan turns. Then it turns faster. The auntie makes a sound like she has just seen a magic trick, which, to be fair, is roughly how you feel too.</p>
+  <p>She presses NT$150 into your hand and refuses to take no. Then she adds two ${vb('mangoes','mango')} on top, which were not part of the deal, and closes the door before you can argue.</p>
+  ${sysBox('✅ SIDE QUEST COMPLETE','The Fan',[['pts','NT$150 paid · +10 points']])}
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Side Hustler',[
+    ['flair','"First job done. First money earned."'],
+    ['pts','+10']
+  ])}
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Handy',[
+    ['flair','"47 videos at 2 a.m. finally paid off."'],
+    ['pts','+5']
+  ])}
+  <p>The system doesn't give you new skills, you realize, walking home with warm mangoes. It shows you the ones you buried.</p>`,
+ onEnter:()=>{ pay('e3_fan',10); earn('e3_fan_nt',150); grant('side_hustler'); grant('handy'); },
+ choices:[ {t:'Sunday: the selling', go:'e3s5'} ]
+},
+
+e3s5:{
+ html:()=>`
+  <p>Sunday afternoon, you stand in the middle of your apartment and look at your life as if you were a stranger to it.</p>
+  <p>The system helps. Above each thing you own, a small grey label floats — not a price. A date.</p>
+  <p class="beat">LAST USED.</p>
+  <p>The ${vb('guitar')} in the corner: <b>1,247 days ago.</b> The running shoes, bought in a January full of plans: <b>two runs, 980 days ago.</b> A box of university ${vb('textbooks','textbook')}: a date so old the label seems embarrassed to show it.</p>
+  <p>A month ago, those numbers would have hurt. Today you just look at them, the way you looked at 41%, and let them be true.</p>
+  <p>You photograph the guitar, the shoes, half the books. You write honest descriptions. <i>${vb('Second-hand','second_hand')}. Barely used. Needs someone better than me.</i></p>
+  <p>By Thursday they are all gone, carried off by strangers who wanted them more. The ${vb('transfers','transfer')} land one by one: NT$800 total.</p>
+  ${sysBox('✅ SIDE QUEST COMPLETE','Letting Go',[['pts','NT$800 paid · +10 points']])}
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Letting Go',[
+    ['flair','"1,247 days. You let it find new hands."'],
+    ['pts','+0 points']
+  ])}
+  <p class="quiet">Zero points for the guitar. The system understands some sales are not about money.</p>`,
+ onEnter:()=>{ pay('e3_sell',10); earn('e3_sell_nt',800); grant('letting_go'); },
+ choices:[ {t:'The week rolls on', go:'e3s6'} ]
+},
+
+e3s6:{
+ html:()=>`
+  <p class="quiet">MONDAY — THURSDAY</p>
+  <p>The daily quests keep their rhythm underneath everything, steady as a heartbeat. A new lunch here, a borrowed staircase there, thirty minutes in places you keep being surprised exist.</p>
+  <p>The points climb. The lock on quest number three ticks down: <i>one more side quest</i>… then, Thursday evening, it quietly stops saying anything at all.</p>
+  <p>Almost ready. But first, Friday morning has a different plan for you.</p>`,
+ onEnter:()=>{ pay('e3_week',35); },
+ choices:[ {t:'Friday morning', go:'e3s7'} ]
+},
+
+e3s7:{
+ html:(st)=> st.flags.breakfast_shop_known ? `
+  <p>Friday, 7:40 a.m. You turn into the alley for your egg pancake, already tasting it.</p>
+  <p>The shop's metal door is only half open. No griddle sound. No smell of batter.</p>
+  <p>Boss Lin is crouched on the doorstep with an old radio in pieces around him — the radio that has played behind his counter every morning, probably since before you were born. He pokes at it with a screwdriver, and his face says the radio is winning.</p>
+  <p>You stand there. Out of habit, you wait for the system — for the soft green box, the quest name, the points.</p>
+  <p>Nothing comes.</p>
+  <p>No quest. No ${vb('reward','reward')}. The morning is just a morning, and an old man can't fix his radio in it.</p>
+  <p>You think: <i>if this shop closes, where do I get breakfast?</i> You think: <i>I just fixed a fan. My hands still remember.</i></p>
+  <p>Neither thought is noble. Both are true.</p>
+  <p>You crouch down next to him. "Boss, let me look."</p>` : `
+  <p>Friday, 11:50 p.m. You stop at the convenience store on the way home, the way you have a thousand times.</p>
+  <p>Kiwi is at the counter, fighting a losing war with a box of expiring rice balls — store rules say they go in the trash at midnight, every one of them.</p>
+  <p>You stand there. Out of habit, you wait for the system — for the soft green box, the quest name, the points.</p>
+  <p>Nothing comes. The system, apparently, does not consider rice balls its department.</p>
+  <p>"Ten minutes left," Kiwi says, deadpan, sliding one across the counter. "Help me out. You'd be doing the planet a favor."</p>
+  <p>You buy two more. The three of you — you, Kiwi, and the doomed rice balls — share a strange, small midnight ceremony at the counter. Kiwi tells you which flavors are actually good. The list is short and brutally honest.</p>`,
+ choices:(st)=> st.flags.breakfast_shop_known ?
+   [ {t:'The radio', go:'e3s8'} ] :
+   [ {t:'Midnight passes', go:'e3s8'} ]
+},
+
+e3s8:{
+ html:(st)=> st.flags.breakfast_shop_known ? `
+  <p>The radio is older than it looks, and it looks old. But the videos at 2 a.m. covered stranger machines than this, and your hands have started to trust themselves.</p>
+  <p>Inside, a connection has come loose — one tired joint, after thirty years of morning music. You hold it steady. You ask Boss Lin for tape, and he produces, from somewhere, exactly the right kind.</p>
+  <p>The radio crackles. Then it sings — some old song, mid-chorus, as if it had been singing the whole time and just needed someone to listen.</p>
+  <p>Boss Lin doesn't thank you. He looks at the radio for a moment, then at you, then turns and fires up the griddle without a word.</p>
+  <p>The next morning, there is an extra egg in your pancake. You didn't order it. You don't pay for it. It is simply there — and it is there every morning after.</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Off the Clock',[
+    ['flair','"No quest. No points. You did it anyway."'],
+    ['pts','+0 points']
+  ])}
+  <p>The biggest rewards in this city, you are starting to learn, never show up on the panel.</p>` : `
+  <p>At midnight Kiwi sweeps the last unsold rice balls into the bin with a small funeral nod, and you head home with your three.</p>
+  <p>The next night, when you stop by, there is a rice ball waiting on the counter before you even reach it — the good flavor, the one from the top of the brutally honest list.</p>
+  <p>"On me," Kiwi says, not looking up from the register. "Planet-saver discount."</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Off the Clock',[
+    ['flair','"No quest. No points. You did it anyway."'],
+    ['pts','+0 points']
+  ])}
+  <p>The biggest rewards in this city, you are starting to learn, never show up on the panel.</p>`,
+ onEnter:()=>{ grant('off_the_clock'); if(state.flags.breakfast_shop_known) state.flags.helped_boss_lin = true; },
+ choices:[ {t:'Saturday. The third quest.', go:'e3s9'} ]
+},
+
+e3s9:{
+ html:()=>`
+  <p class="quiet">SATURDAY, 10:00 A.M.</p>
+  <p>The lock is gone. Quest three opens like a door.</p>
+  ${sysBox('📦 SIDE QUEST — GOLD TIER','The Box',[
+    ['flair','Pick up: '+vb('locker','locker')+' 17, Gushan '+vb('Ferry','ferry')+' '+vb('Pier','pier')+'.'],
+    ['flair','Deliver to: an address on Cijin. Before sunset.'],
+    ['flair','Payment: NT$2,000'],
+    ['flair','Task rating: '+vb('HARMLESS','harmless')]
+  ])}
+  <p><i>Task rating.</i></p>
+  <p>You stop on that line. You have never seen a task rating before. And a rating only exists if the thing it rates can vary.</p>
+  <p class="beat">Which means somewhere in this system, there are tasks that are not harmless.</p>
+  <p>You file that thought away with the others, take the MRT to Gushan, and find locker 17 in the corner of the ferry building, breathing in the smell of sea and engine oil.</p>
+  <p>The system feeds you the code. The locker clicks open.</p>`,
+ choices:[ {t:'Look inside', go:'e3s10'} ]
+},
+
+e3s10:{
+ html:()=>`
+  <p>Inside sits an old cookie ${vb('tin')} — the round kind, red and gold, the pattern worn soft by years of hands. It is tied shut with brown ${vb('rope')}, knotted twice, carefully.</p>
+  <p>You lift it. Lighter than it looks. Something inside shifts with a papery whisper.</p>
+  <p>No sender name. No note. Just an address on the lid, written small, and a ferry to catch.</p>
+  <p>You buy your token and walk onto the boat with the scooters and the bicycles and the Saturday families, the tin under your arm like a secret you haven't read yet.</p>`,
+ choices:[ {t:'Cross the water', go:'e3s11'} ]
+},
+
+e3s11:{
+ html:()=>`
+  <p>The ferry pulls out, and Kaohsiung opens up behind you.</p>
+  <p>You stand at the rail of the upper ${vb('deck')}. The harbor water is green-grey and busy, folding into white ${vb('foam')} along the hull. Container ships sit in the distance like sleeping buildings. The wind is full of salt, and it gets into everything — your hair, your jacket, the small serious conversations of children pointing at waves.</p>
+  <p>Ten minutes, shore to shore. It feels longer, the good kind of longer.</p>
+  <p>On your map, in the corner of your eye, the fog over Cijin is dissolving as the island comes closer — as if the boat itself were wiping the world clean.</p>
+  <p>The ferry bumps home. Scooters start around you like a small thunderstorm.</p>
+  <p>You step onto Cijin.</p>`,
+ onEnter:()=>{ if(!state.map_unlocked.includes('cijin')) state.map_unlocked.push('cijin'); },
+ choices:[ {t:'Find the address', go:'e3s12'} ]
+},
+
+e3s12:{
+ html:()=>`
+  <p>The address leads you away from the beach crowds and the seafood streets, into the back lanes where the island keeps its real life — laundry overhead, temple smoke, old walls patched with five colors of cement.</p>
+  <p>Halfway there, you feel it: the rope has loosened. One knot has worked itself free, and the ${vb('lid')} of the tin sits slightly, invitingly open.</p>
+  <p>You stop in the empty lane.</p>
+  <p>Two thousand dollars, for carrying a box across the water. No sender. No name. <i>Task rating: harmless.</i> Says who?</p>
+  <p>Nobody would know. One ${vb('peek')}. The lane is empty, and the lid is right there.</p>`,
+ choices:[
+   {t:'Retie the rope. It\'s not yours to open.', go:'e3s13a'},
+   {t:'Look. You\'re carrying it — you have a right to know.', go:'e3s13b'}
+ ]
+},
+
+e3s13a:{
+ html:()=>`
+  <p>You pull the rope tight and retie the knot, double, the way it was.</p>
+  <p>Whatever is in there belongs to whoever is waiting for it. Some boxes are not questions. Some boxes are just boxes that need to arrive.</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Not Yours to Open',[
+    ['flair','"Some boxes are not questions."'],
+    ['pts','+0 points']
+  ])}
+  <p class="quiet">Another zero. Your collection of zeros is becoming the most valuable thing you own.</p>`,
+ onEnter:()=>{ grant('not_yours'); },
+ choices:[ {t:'Deliver it', go:'e3s14'} ]
+},
+
+e3s13b:{
+ html:()=>`
+  <p>You lift the lid.</p>
+  <p>Photographs. A whole tin of them — black and white at the bottom, faded color on top, all of one place: an old house with a courtyard, and a ${vb('longan')} tree growing through every decade of pictures. A family stands in front of it again and again, changing sizes, changing decades, the tree growing while the grown-ups grey.</p>
+  <p>On the back of the top photo, someone has written a date and a few small words — the year, and something about the day the house was finished. The writing is in small, careful ${vb('strokes')}, the kind a person uses when they know the paper will outlive them.</p>
+  <p>You stand in the lane for a long moment, holding sixty years of someone's life in a cookie tin.</p>
+  <p>Then you put the lid back, and tie the rope, double. Your hands do it slowly. The two thousand dollars feels different in your head now — smaller, somehow, and heavier.</p>
+  <p>The system says nothing. Some weights it lets you carry yourself.</p>`,
+ onEnter:()=>{ state.flags.box_opened = true; },
+ choices:[ {t:'Deliver it', go:'e3s14'} ]
+},
+
+e3s14:{
+ html:()=>`
+  <p>The address is a thin old apartment block two lanes from the water, the kind with a steep stair and a different potted plant on every step.</p>
+  <p>You knock. Shuffling inside. The door opens on an old man — small, neat, a cardigan despite the heat. Old Mr. Hong, says the name by the doorbell.</p>
+  <p>He sees the tin under your arm, and his hands, resting on the door frame, ${vb('tremble','trembled')} once.</p>
+  <p>"It came," he says. Not to you, exactly. To the tin.</p>
+  <p>He invites you in before you can refuse, sits you down, and unties the rope with the slow care of a man defusing something precious. The lid comes off. The photographs look up at him.</p>
+  <p>He is quiet for a long time.</p>`,
+ choices:[ {t:'Wait', go:'e3s15'} ]
+},
+
+e3s15:{
+ html:()=>`
+  <p>"Our old house," he says at last, turning the photos one by one. "Sea-sand concrete. They ${vb('demolished','demolished')} the whole row, years ago. Everything went — except a neighbor took the photos, and then the neighbor moved, and then…" He waves a hand at the long journey of the tin. "And then, today, you."</p>
+  <p>He turns another photo and stops.</p>
+  <p>The longan tree fills the frame, heavy with fruit, a ladder leaning against it and children mid-climb.</p>
+  <p class="beat">"My father planted it," he says. And nothing else, for a while.</p>
+  <p>You sit with him in the kind of silence that doesn't need fixing. Through the window, ferry horns. Somewhere below, the sea doing what it has always done.</p>`,
+ choices:[ {t:'One more photo', go:'e3s16'} ]
+},
+
+e3s16:{
+ onEnter:()=>{ state.flags.photo_noticed = true; },
+ html:()=>`
+  <p>He keeps turning photos, narrating some, passing others in silence, and you are half lost in the rhythm of it when one photo crosses the table and something in the background catches you by the throat.</p>
+  <p>A brick wall, at the edge of the frame, behind a row of drying nets. And on the brick — blurred by distance, tilted by the camera, faded by sixty years of being a photograph —</p>
+  <p>a painted shape.</p>
+  <p>Your heart skips half a beat. You lean in, but the photo is already turning, already gone under the next one, and Old Mr. Hong is saying something about a typhoon year, and the moment closes like water.</p>
+  <p>It couldn't be. The photo is decades old. Decades before you. Decades before any of this.</p>
+  <p>You don't ask. You file the shape away, next to the other things you cannot explain — and the file is getting thick.</p>`,
+ choices:[ {t:'Take your leave', go:'e3s17'} ]
+},
+
+e3s17:{
+ html:()=>`
+  <p>When you stand to go, Old Mr. Hong tries to press money into your hand. You refuse — the job is paid, truthfully — and he gives up faster than the fourth-floor auntie did, which surprises you, until he disappears into the kitchen and returns with a plastic bag of ${vb('dried fish','dried')}, home-made, tied with the same brown rope as the tin.</p>
+  <p>This, you understand, is not optional.</p>
+  <p>"Come back when the longans are sweet," he says at the door, which makes no sense — the tree is decades gone — and perfect sense.</p>
+  <p>You walk back toward the ferry in the late gold light, dried fish in one hand, the island warm around you.</p>
+  ${sysBox('✅ SIDE QUEST COMPLETE','The Box · NT$2,000 paid',[
+    ['flair','⚠ Note: The previous '+vb('courier','courier')+' failed to complete this task.']
+  ])}
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Crossing',[
+    ['flair','"Over the water, before sunset."'],
+    ['pts','+25 · +20']
+  ])}`,
+ onEnter:()=>{ pay('e3_box',25); earn('e3_box_nt',2000); grant('crossing'); state.flags.courier_warning_seen = true; },
+ choices:[ {t:'Read that note again', go:'e3s18'} ]
+},
+
+e3s18:{
+ html:()=>`
+  <p>You stop in the middle of the lane and read it again.</p>
+  <p class="beat">The previous courier failed to complete this task.</p>
+  <p>Previous. Courier.</p>
+  <p>The tin has been trying to reach Old Mr. Hong for longer than today. Someone else held it before you — someone with a floating green panel and a quest box and a sunset deadline. Someone the system hired, the way it hired you.</p>
+  <p>And that someone <i>failed.</i> How do you fail to carry a cookie tin across a harbor?</p>
+  <p>You look back at the apartment block. The light is on in Old Mr. Hong's window, warm and small. You think of the wall in Yancheng. You think of a painted shape in a sixty-year-old photograph.</p>
+  <p>"Who was it?" you ask the air. "What happened to them?"</p>
+  <p>The system, which counts everything, answers nothing.</p>`,
+ choices:[ {t:'The ferry home', go:'e3s19'} ]
+},
+
+e3s19:{
+ html:(st)=>`
+  <p class="quiet">SUNDAY, 10:30 P.M.</p>
+  <p>You open the panel before bed, and it has been waiting for you with ceremony again.</p>
+  ${sysBox('⬆️ LEVEL 3','Points: 220+',[
+    ['flair','"Most people never ask what their hands can do."']
+  ])}
+  <div class="panel">
+    <h3>PLAYER</h3>
+    <div class="row"><span>Level</span><span>3</span></div>
+    <div class="row"><span>Points</span><span>${st.points}</span></div>
+    <div class="row"><span>Money</span><span>NT$${st.money.toLocaleString()}</span></div>
+    <div class="row"><span>Next level</span><span>360</span></div>
+  </div>
+  <p>NT$2,950 this month, from a fan, a guitar, and a ferry ride. It will not change your life.</p>
+  <p>But you look at the number and find you are not really thinking about the money. You are thinking: this month, you fixed two machines. You let go of 1,247 days. You crossed the water. You put a tree back in an old man's hands.</p>
+  <p>The money is the scoreboard. It was never the prize.</p>`,
+ onEnter:()=>{ state.level = 3; },
+ choices:[ {t:'One last look at the quest history', go:'e3s20'} ]
+},
+
+e3s20:{
+ html:()=>`
+  <p>Before you sleep, a thought sends you into a corner of the panel you have never opened: the quest history. Every task since the beginning, stacked like receipts.</p>
+  <p>You scroll down, past the week, past Yancheng, past the guard and the alley, all the way to the bottom — to <i>A Different Road</i>, your first quest, the morning the world changed by three minutes.</p>
+  <p>And there, underneath it — <i>before</i> it — sits one more line. Folded. Grey.</p>
+  ${sysBox('🗂 QUEST HISTORY','[ Records before activation ]',[
+    ['flair','1 entry — locked.']
+  ],'fail')}
+  <p>Before activation.</p>
+  <p>Before the convenience store. Before the first floating words. Before, as far as you knew, there was any system at all —</p>
+  <p class="beat">something happened. And the system wrote it down.</p>
+  <p>You tap the line. Locked. You tap it again, because that has always worked so well.</p>
+  <p>Locked.</p>
+  <p>You lie in the dark a long time that night, doing a new kind of math — not points, not levels. Just one question, over and over:</p>
+  <p class="beat big">What does this system know about you that you don't?</p>`,
+ choices:[ {t:'EPISODE COMPLETE — open the Menu', go:'end3'} ]
+},
+
+end3:{
+ html:(st)=>{
+   function achGroup(ep){
+     let h='';
+     Object.keys(ACH).filter(id=>ACH[id].ep===ep).forEach(id=>{
+       const a=ACH[id]; const got=st.achievements.includes(id);
+       h += '<div class="row"><span>'+
+         (got ? '🏆 <span class="ach-name">'+a.name+'</span><span class="ach-desc">'+a.desc+'</span>'
+              : '<span class="lock">🔒 ???</span>')+
+         '</span><span>'+(got ? (a.pts>0?'+'+a.pts:'—') : '')+'</span></div>';
+     });
+     return h;
+   }
+   const cnt=(ep)=>[st.achievements.filter(id=>ACH[id].ep===ep).length, Object.keys(ACH).filter(id=>ACH[id].ep===ep).length];
+   const [c3,t3]=cnt(3), [c2,t2]=cnt(2), [c1,t1]=cnt(1);
+   return `
+  <p class="quiet">EPISODE 3 — SIDE QUEST</p>
+  ${sysBox('✅ EPISODE COMPLETE','Side Quest',[['flair','"The money is the scoreboard. It was never the prize."']])}
+  <div class="panel">
+    <h3>PLAYER</h3>
+    <div class="row"><span>Level</span><span>${st.level}</span></div>
+    <div class="row"><span>Points</span><span>${st.points}</span></div>
+    <div class="row"><span>Money</span><span>NT$${st.money.toLocaleString()}</span></div>
+    <div class="row"><span>Next level</span><span>360</span></div>
+    <div class="row"><span>Map</span><span>20% explored</span></div>
+    <div class="row"><span class="goldtxt">???</span><span class="goldtxt">[ Locked ]</span></div>
+  </div>
+  <div class="panel ach-list">
+    <h3>EPISODE 3 ACHIEVEMENTS (${c3}/${t3})</h3>
+    ${achGroup(3)}
+  </div>
+  <div class="panel ach-list">
+    <h3>EPISODE 2 ACHIEVEMENTS (${c2}/${t2})</h3>
+    ${achGroup(2)}
+  </div>
+  <div class="panel ach-list">
+    <h3>EPISODE 1 ACHIEVEMENTS (${c1}/${t1})</h3>
+    ${achGroup(1)}
+  </div>
+  <p class="quiet">Missing some? Different choices, different badges. The locker is still there…</p>
+  <hr class="sep">
+  <div class="panel">
+    <h3>SAVE</h3>
+    <p style="font-family:inherit;font-size:.8rem;opacity:.8;margin:0 0 8px;">
+      Your progress saves automatically on this device.${storageOK?'':' (Saving is not available here — use Export to keep your progress.)'}
+      Export a save code to keep it safe or move to another device.</p>
+    <div class="btn-line">
+      <button class="choice" id="btnExport3">Export save</button>
+      <button class="choice" id="btnImport3">Import save</button>
+    </div>
+    <textarea class="savebox" id="saveBox3" placeholder="Your save code appears here. Or paste a code and press Import." spellcheck="false"></textarea>
+  </div>`;
+ },
+ choices:[
+   {t:'Back to title', go:'__title'}
+ ],
+ onRender:()=>{
+   const box = document.getElementById('saveBox3');
+   document.getElementById('btnExport3').onclick = ()=>{
+     box.value = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+     box.select();
+   };
+   document.getElementById('btnImport3').onclick = ()=>{
      try{
        const sv = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
        if(typeof sv.version !== 'number') throw 0;
