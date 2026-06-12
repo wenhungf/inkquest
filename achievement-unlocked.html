@@ -318,7 +318,53 @@ const VOCAB = {
   deck:{en:'the open floor of a boat', zh:'甲板'},
   foam:{en:'the white part on top of waves', zh:'浪花、泡沫'},
   lid:{en:'the top cover of a box or pot', zh:'蓋子'},
-  peek:{en:'to look at something quickly and secretly', zh:'偷看'}
+  peek:{en:'to look at something quickly and secretly', zh:'偷看'},
+  guaranteed:{en:'promised for sure', zh:'保證的'},
+  pile:{en:'many things on top of each other', zh:'一疊、一堆'},
+  rent_notice:{en:'a letter that says it is time to pay for your home', zh:'房租繳費通知'},
+  est:{en:'short for "estimated" — a careful guess', zh:'預估'},
+  buried:{en:'hidden deep, like under the ground', zh:'被埋藏的'},
+  balcony:{en:'a small open floor outside a window, above the ground', zh:'陽台'},
+  argue:{en:'to say no and fight with words', zh:'爭論'},
+  paid_off:{en:'finally brought a good result', zh:'（努力）終於有了回報'},
+  side_hustler:{en:'a person who does small extra jobs for money', zh:'做副業的人'},
+  handy:{en:'good at fixing things with your hands', zh:'手巧的'},
+  embarrassed:{en:'feeling silly in front of others', zh:'感到尷尬的'},
+  rolls_on:{en:'keeps going forward', zh:'繼續前進'},
+  borrowed:{en:'used for a short time, then given back', zh:'借來的'},
+  exist:{en:'to be real', zh:'存在'},
+  griddle:{en:'a wide flat metal surface for cooking', zh:'煎台'},
+  batter:{en:'a soft mix of flour, egg and water for cooking', zh:'麵糊'},
+  crouched:{en:'sitting low on bent legs', zh:'蹲著'},
+  screwdriver:{en:'a tool for turning screws', zh:'螺絲起子'},
+  noble:{en:'good and unselfish, like a hero', zh:'高尚的'},
+  joint:{en:'a place where two parts connect', zh:'接點、接合處'},
+  electrical_tape:{en:'special tape used on wires', zh:'絕緣膠帶'},
+  crackle:{en:'to make small sharp sounds, like fire', zh:'發出劈啪聲'},
+  mid_chorus:{en:'in the middle of the main part of a song', zh:'副歌唱到一半'},
+  knotted:{en:'tied with knots', zh:'打了結的'},
+  shifts:{en:'moves a little', zh:'移動、滑動'},
+  rail:{en:'a long bar you hold for safety', zh:'欄杆、扶手'},
+  hull:{en:'the body of a boat', zh:'船身'},
+  container_ships:{en:'huge ships that carry big metal boxes of goods', zh:'貨櫃船'},
+  steep:{en:'going up almost straight; hard to climb', zh:'陡的'},
+  shuffling:{en:'walking slowly without lifting the feet much', zh:'拖著腳走'},
+  cardigan:{en:'a soft jacket made of wool, with buttons', zh:'開襟毛衣'},
+  defusing:{en:'making a dangerous thing safe, very carefully', zh:'拆除引信；小心處理'},
+  outlive:{en:'to live longer than someone or something', zh:'活得比⋯久'},
+  horn:{en:'the part of a boat or car that makes a loud warning sound', zh:'喇叭、汽笛'},
+  narrating:{en:'telling the story of something', zh:'講述'},
+  throat:{en:'the front of your neck, inside', zh:'喉嚨'},
+  take_your_leave:{en:'to say goodbye and go (a polite, old way to say it)', zh:'告辭'},
+  apartment_block:{en:'a building with many homes inside', zh:'公寓大樓'},
+  stacked:{en:'placed on top of each other', zh:'疊起來的'},
+  activation:{en:'the moment something is turned on', zh:'啟動'},
+  off_the_clock:{en:'not during work time; not part of the job', zh:'下班時間的、非職務的'},
+  expiring:{en:'reaching the last day it can be sold or used', zh:'即將過期的'},
+  deadpan:{en:'with a completely serious face, while joking', zh:'面無表情地（搞笑）'},
+  funeral:{en:'the ceremony when someone has died', zh:'葬禮'},
+  brutally:{en:'in a way that is hard and hurts, without being soft', zh:'殘酷地'},
+  register:{en:'the machine at a counter that holds money', zh:'收銀機'}
 };
 function tipTxt(k){ return VOCAB[k].en + '<br><span style="opacity:.75">'+VOCAB[k].zh+'</span>'; }
 function vb(word, key){
@@ -1219,13 +1265,13 @@ e3s1:{
   <p>Saturday, 8:30 a.m. You wake up before the alarm again. This is who you are now, apparently.</p>
   <p>The panel is waiting, and this morning it has grown a new tab.</p>
   ${sysBox('💰 SIDE QUESTS — UNLOCKED','Real tasks. Real money.',[
-    ['flair',vb('Payment','payment')+' guaranteed by the system.'],
+    ['flair',vb('Payment','payment')+' '+vb('guaranteed','guaranteed')+' by the system.'],
     ['flair','⚠ Side quests are '+vb('optional','optional')+'.']
   ])}
   <p>You read it twice. Then a third time.</p>
   <p>Points are one thing. Points are made of light. But money? Money comes from somewhere. Money has a bank account behind it, and bank accounts have names.</p>
   <p><i>Guaranteed by the system.</i> Guaranteed how? By whom?</p>
-  <p>You hold the question up to the light, turn it around… and then your eyes drift to the pile of mail on your desk. The rent notice. Last month's credit card bill. The washing machine that makes a new dying sound every week.</p>
+  <p>You hold the question up to the light, turn it around… and then your eyes drift to the ${vb('pile')} of mail on your desk. The ${vb('rent notice','rent_notice')}. Last month's credit card bill. The washing machine that makes a new dying sound every week.</p>
   <p>The question loses.</p>`,
  choices:[ {t:'Open the quest list', go:'e3s2'} ]
 },
@@ -1235,7 +1281,7 @@ e3s2:{
   <p>Three quests sit in the new tab.</p>
   ${sysBox('💰 SIDE QUESTS','Available',[
     ['flair','① Fix a '+vb('neighbor','neighbor')+"'s electric fan · NT$150"],
-    ['flair','② Sell three things you no longer use · NT$800 (est.)'],
+    ['flair','② Sell three things you no longer use · NT$800 ('+vb('est.','est')+')'],
     ['flair','③ '+vb('Delivery','deliver')+' to Cijin · NT$2,000'],
     ['flair','　 [ Locked — complete 2 side quests first ]']
   ])}
@@ -1256,7 +1302,7 @@ e3s3:{
   <p>"You can fix it?" she asks, doubtful, holding the door half open.</p>
   <p><i>No,</i> you think. <i>Absolutely not. I have never fixed a fan in my life.</i></p>
   <p>You open your mouth to say so, and the system interrupts.</p>
-  ${sysBox('💡 SKILL CHECK','Buried Skills',[
+  ${sysBox('💡 SKILL CHECK',vb('Buried','buried')+' Skills',[
     ['flair','You have watched 47 '+vb('repair','repair')+' videos at 2 a.m. instead of sleeping.'],
     ['flair','You know more than you think.']
   ])}
@@ -1268,21 +1314,21 @@ e3s3:{
 
 e3s4:{
  html:()=>`
-  <p>You take the fan apart on her balcony, slow and careful, photographing every step like the videos taught you. The inside is a museum of ${vb('dust')}. You clean the motor. You check the wiring. And there — a blackened ${vb('fuse')}, dead as Monday morning.</p>
+  <p>You take the fan apart on her ${vb('balcony')}, slow and careful, photographing every step like the videos taught you. The inside is a museum of ${vb('dust')}. You clean the motor. You check the wiring. And there — a blackened ${vb('fuse')}, dead as Monday morning.</p>
   <p>The hardware store downstairs has a new one for thirty dollars.</p>
   <p>You put everything back, plug it in, and press the switch.</p>
   <p>The fan turns. Then it turns faster. The auntie makes a sound like she has just seen a magic trick, which, to be fair, is roughly how you feel too.</p>
-  <p>She presses NT$150 into your hand and refuses to take no. Then she adds two ${vb('mangoes','mango')} on top, which were not part of the deal, and closes the door before you can argue.</p>
+  <p>She presses NT$150 into your hand and refuses to take no. Then she adds two ${vb('mangoes','mango')} on top, which were not part of the deal, and closes the door before you can ${vb('argue')}.</p>
   ${sysBox('✅ SIDE QUEST COMPLETE','The Fan',[['pts','NT$150 paid · +10 points']])}
-  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Side Hustler',[
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED',vb('Side Hustler','side_hustler'),[
     ['flair','"First job done. First money earned."'],
     ['pts','+10']
   ])}
-  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Handy',[
-    ['flair','"47 videos at 2 a.m. finally paid off."'],
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED',vb('Handy','handy'),[
+    ['flair','"47 videos at 2 a.m. finally '+vb('paid off','paid_off')+'."'],
     ['pts','+5']
   ])}
-  <p>The system doesn't give you new skills, you realize, walking home with warm mangoes. It shows you the ones you buried.</p>`,
+  <p>The system doesn't give you new skills, you realize, walking home with warm mangoes. It shows you the ones you ${vb('buried')}.</p>`,
  onEnter:()=>{ pay('e3_fan',10); earn('e3_fan_nt',150); grant('side_hustler'); grant('handy'); },
  choices:[ {t:'Sunday: the selling', go:'e3s5'} ]
 },
@@ -1292,7 +1338,7 @@ e3s5:{
   <p>Sunday afternoon, you stand in the middle of your apartment and look at your life as if you were a stranger to it.</p>
   <p>The system helps. Above each thing you own, a small grey label floats — not a price. A date.</p>
   <p class="beat">LAST USED.</p>
-  <p>The ${vb('guitar')} in the corner: <b>1,247 days ago.</b> The running shoes, bought in a January full of plans: <b>two runs, 980 days ago.</b> A box of university ${vb('textbooks','textbook')}: a date so old the label seems embarrassed to show it.</p>
+  <p>The ${vb('guitar')} in the corner: <b>1,247 days ago.</b> The running shoes, bought in a January full of plans: <b>two runs, 980 days ago.</b> A box of university ${vb('textbooks','textbook')}: a date so old the label seems ${vb('embarrassed')} to show it.</p>
   <p>A month ago, those numbers would have hurt. Today you just look at them, the way you looked at 41%, and let them be true.</p>
   <p>You photograph the guitar, the shoes, half the books. You write honest descriptions. <i>${vb('Second-hand','second_hand')}. Barely used. Needs someone better than me.</i></p>
   <p>By Thursday they are all gone, carried off by strangers who wanted them more. The ${vb('transfers','transfer')} land one by one: NT$800 total.</p>
@@ -1309,8 +1355,8 @@ e3s5:{
 e3s6:{
  html:()=>`
   <p class="quiet">MONDAY — THURSDAY</p>
-  <p>The daily quests keep their rhythm underneath everything, steady as a heartbeat. A new lunch here, a borrowed staircase there, thirty minutes in places you keep being surprised exist.</p>
-  <p>The points climb. The lock on quest number three ticks down: <i>one more side quest</i>… then, Thursday evening, it quietly stops saying anything at all.</p>
+  <p>The week ${vb('rolls on','rolls_on')}. The daily quests keep their rhythm underneath everything, steady as a heartbeat. A new lunch here, a ${vb('borrowed')} staircase there, thirty minutes in places you keep being surprised ${vb('exist')}.</p>
+  <p>The points climb. And when the last transfer lands on Thursday, the lock on quest number three quietly disappears. Gold tier, open, waiting — but a NT$2,000 delivery across the water deserves a whole free day, not a tired weeknight. <i>Saturday,</i> you promise it. <i>Saturday.</i></p>
   <p>Almost ready. But first, Friday morning has a different plan for you.</p>`,
  onEnter:()=>{ pay('e3_week',35); },
  choices:[ {t:'Friday morning', go:'e3s7'} ]
@@ -1319,20 +1365,20 @@ e3s6:{
 e3s7:{
  html:(st)=> st.flags.breakfast_shop_known ? `
   <p>Friday, 7:40 a.m. You turn into the alley for your egg pancake, already tasting it.</p>
-  <p>The shop's metal door is only half open. No griddle sound. No smell of batter.</p>
-  <p>Boss Lin is crouched on the doorstep with an old radio in pieces around him — the radio that has played behind his counter every morning, probably since before you were born. He pokes at it with a screwdriver, and his face says the radio is winning.</p>
+  <p>The shop's metal door is only half open. No ${vb('griddle')} sound. No smell of ${vb('batter')}.</p>
+  <p>Boss Lin is ${vb('crouched')} on the doorstep with an old radio in pieces around him — the radio that has played behind his counter every morning, probably since before you were born. He pokes at it with a ${vb('screwdriver')}, and his face says the radio is winning.</p>
   <p>You stand there. Out of habit, you wait for the system — for the soft green box, the quest name, the points.</p>
   <p>Nothing comes.</p>
-  <p>No quest. No ${vb('reward','reward')}. The morning is just a morning, and an old man can't fix his radio in it.</p>
-  <p>You think: <i>if this shop closes, where do I get breakfast?</i> You think: <i>I just fixed a fan. My hands still remember.</i></p>
-  <p>Neither thought is noble. Both are true.</p>
+  <p>No quest. No ${vb('reward','reward')}. The morning is just a morning, and an old man can't fix his radio.</p>
+  <p>You think: <i>as long as that radio is winning, nobody is making my breakfast.</i> You think: <i>I just fixed a fan. My hands still remember.</i></p>
+  <p>Neither thought is ${vb('noble')}. Both are true.</p>
   <p>You crouch down next to him. "Boss, let me look."</p>` : `
   <p>Friday, 11:50 p.m. You stop at the convenience store on the way home, the way you have a thousand times.</p>
-  <p>Kiwi is at the counter, fighting a losing war with a box of expiring rice balls — store rules say they go in the trash at midnight, every one of them.</p>
+  <p>Kiwi is at the counter, fighting a losing war with a box of ${vb('expiring')} rice balls — store rules say they go in the trash at midnight, every one of them.</p>
   <p>You stand there. Out of habit, you wait for the system — for the soft green box, the quest name, the points.</p>
   <p>Nothing comes. The system, apparently, does not consider rice balls its department.</p>
-  <p>"Ten minutes left," Kiwi says, deadpan, sliding one across the counter. "Help me out. You'd be doing the planet a favor."</p>
-  <p>You buy two more. The three of you — you, Kiwi, and the doomed rice balls — share a strange, small midnight ceremony at the counter. Kiwi tells you which flavors are actually good. The list is short and brutally honest.</p>`,
+  <p>"Ten minutes left," Kiwi says, ${vb('deadpan')}, sliding one across the counter. "Help me out. You'd be doing the planet a favor."</p>
+  <p>You buy two more. The three of you — you, Kiwi, and the doomed rice balls — share a strange, small midnight ceremony at the counter. Kiwi tells you which flavors are actually good. The list is short and ${vb('brutally')} honest.</p>`,
  choices:(st)=> st.flags.breakfast_shop_known ?
    [ {t:'The radio', go:'e3s8'} ] :
    [ {t:'Midnight passes', go:'e3s8'} ]
@@ -1341,19 +1387,19 @@ e3s7:{
 e3s8:{
  html:(st)=> st.flags.breakfast_shop_known ? `
   <p>The radio is older than it looks, and it looks old. But the videos at 2 a.m. covered stranger machines than this, and your hands have started to trust themselves.</p>
-  <p>Inside, a connection has come loose — one tired joint, after thirty years of morning music. You hold it steady. You ask Boss Lin for tape, and he produces, from somewhere, exactly the right kind.</p>
-  <p>The radio crackles. Then it sings — some old song, mid-chorus, as if it had been singing the whole time and just needed someone to listen.</p>
+  <p>Inside, a connection has come loose — one tired ${vb('joint')}, after thirty years of morning music. You hold it steady. You ask Boss Lin for ${vb('electrical tape','electrical_tape')}, and he produces, from somewhere, exactly the right kind.</p>
+  <p>The radio ${vb('crackles','crackle')}. Then it sings — some old song, ${vb('mid-chorus','mid_chorus')}, as if it had been singing the whole time and just needed someone to listen.</p>
   <p>Boss Lin doesn't thank you. He looks at the radio for a moment, then at you, then turns and fires up the griddle without a word.</p>
   <p>The next morning, there is an extra egg in your pancake. You didn't order it. You don't pay for it. It is simply there — and it is there every morning after.</p>
-  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Off the Clock',[
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED',vb('Off the Clock','off_the_clock'),[
     ['flair','"No quest. No points. You did it anyway."'],
     ['pts','+0 points']
   ])}
   <p>The biggest rewards in this city, you are starting to learn, never show up on the panel.</p>` : `
-  <p>At midnight Kiwi sweeps the last unsold rice balls into the bin with a small funeral nod, and you head home with your three.</p>
+  <p>At midnight Kiwi sweeps the last unsold rice balls into the bin with a small ${vb('funeral')} nod, and you head home with your three.</p>
   <p>The next night, when you stop by, there is a rice ball waiting on the counter before you even reach it — the good flavor, the one from the top of the brutally honest list.</p>
-  <p>"On me," Kiwi says, not looking up from the register. "Planet-saver discount."</p>
-  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Off the Clock',[
+  <p>"On me," Kiwi says, not looking up from the ${vb('register')}. "Planet-saver discount."</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED',vb('Off the Clock','off_the_clock'),[
     ['flair','"No quest. No points. You did it anyway."'],
     ['pts','+0 points']
   ])}
@@ -1382,8 +1428,8 @@ e3s9:{
 
 e3s10:{
  html:()=>`
-  <p>Inside sits an old cookie ${vb('tin')} — the round kind, red and gold, the pattern worn soft by years of hands. It is tied shut with brown ${vb('rope')}, knotted twice, carefully.</p>
-  <p>You lift it. Lighter than it looks. Something inside shifts with a papery whisper.</p>
+  <p>Inside sits an old cookie ${vb('tin')} — the round kind, red and gold, the pattern worn soft by years of hands. It is tied shut with brown ${vb('rope')}, ${vb('knotted')} twice, carefully.</p>
+  <p>You lift it. Lighter than it looks. Something inside ${vb('shifts')} with a papery whisper.</p>
   <p>No sender name. No note. Just an address on the lid, written small, and a ferry to catch.</p>
   <p>You buy your token and walk onto the boat with the scooters and the bicycles and the Saturday families, the tin under your arm like a secret you haven't read yet.</p>`,
  choices:[ {t:'Cross the water', go:'e3s11'} ]
@@ -1392,9 +1438,9 @@ e3s10:{
 e3s11:{
  html:()=>`
   <p>The ferry pulls out, and Kaohsiung opens up behind you.</p>
-  <p>You stand at the rail of the upper ${vb('deck')}. The harbor water is green-grey and busy, folding into white ${vb('foam')} along the hull. Container ships sit in the distance like sleeping buildings. The wind is full of salt, and it gets into everything — your hair, your jacket, the small serious conversations of children pointing at waves.</p>
+  <p>You stand at the ${vb('rail')} of the upper ${vb('deck')}. The harbor water is green-grey and busy, folding into white ${vb('foam')} along the ${vb('hull')}. ${vb('Container ships','container_ships')} sit in the distance like sleeping buildings. The wind is full of salt, and it gets into everything — your hair, your jacket, the small serious conversations of children pointing at waves.</p>
   <p>Ten minutes, shore to shore. It feels longer, the good kind of longer.</p>
-  <p>On your map, in the corner of your eye, the fog over Cijin is dissolving as the island comes closer — as if the boat itself were wiping the world clean.</p>
+  <p>On your map, in the corner of your eye, the fog over Cijin is dissolving as the island comes closer — as if the boat itself were ${vb('wiping')} the world clean.</p>
   <p>The ferry bumps home. Scooters start around you like a small thunderstorm.</p>
   <p>You step onto Cijin.</p>`,
  onEnter:()=>{ if(!state.map_unlocked.includes('cijin')) state.map_unlocked.push('cijin'); },
@@ -1403,7 +1449,7 @@ e3s11:{
 
 e3s12:{
  html:()=>`
-  <p>The address leads you away from the beach crowds and the seafood streets, into the back lanes where the island keeps its real life — laundry overhead, temple smoke, old walls patched with five colors of cement.</p>
+  <p>The address leads you away from the beach crowds and the seafood streets, into the back lanes where the island keeps its real life — laundry drying on every ${vb('balcony')}, temple smoke, old walls patched with five colors of cement.</p>
   <p>Halfway there, you feel it: the rope has loosened. One knot has worked itself free, and the ${vb('lid')} of the tin sits slightly, invitingly open.</p>
   <p>You stop in the empty lane.</p>
   <p>Two thousand dollars, for carrying a box across the water. No sender. No name. <i>Task rating: harmless.</i> Says who?</p>
@@ -1431,7 +1477,7 @@ e3s13b:{
  html:()=>`
   <p>You lift the lid.</p>
   <p>Photographs. A whole tin of them — black and white at the bottom, faded color on top, all of one place: an old house with a courtyard, and a ${vb('longan')} tree growing through every decade of pictures. A family stands in front of it again and again, changing sizes, changing decades, the tree growing while the grown-ups grey.</p>
-  <p>On the back of the top photo, someone has written a date and a few small words — the year, and something about the day the house was finished. The writing is in small, careful ${vb('strokes')}, the kind a person uses when they know the paper will outlive them.</p>
+  <p>On the back of the top photo, someone has written a date and a few small words — the year, and something about the day the house was finished. The writing is in small, careful ${vb('strokes')}, the kind a person uses when they know the paper will ${vb('outlive')} them.</p>
   <p>You stand in the lane for a long moment, holding sixty years of someone's life in a cookie tin.</p>
   <p>Then you put the lid back, and tie the rope, double. Your hands do it slowly. The two thousand dollars feels different in your head now — smaller, somehow, and heavier.</p>
   <p>The system says nothing. Some weights it lets you carry yourself.</p>`,
@@ -1441,11 +1487,11 @@ e3s13b:{
 
 e3s14:{
  html:()=>`
-  <p>The address is a thin old apartment block two lanes from the water, the kind with a steep stair and a different potted plant on every step.</p>
-  <p>You knock. Shuffling inside. The door opens on an old man — small, neat, a cardigan despite the heat. Old Mr. Hong, says the name by the doorbell.</p>
+  <p>The address is a thin old ${vb('apartment block','apartment_block')} two lanes from the water, the kind with a ${vb('steep')} stair and a different potted plant on every step.</p>
+  <p>You knock. ${vb('Shuffling','shuffling')} inside. The door opens on an old man — small, neat, a ${vb('cardigan')} despite the heat. Old Mr. Hong, says the name by the doorbell.</p>
   <p>He sees the tin under your arm, and his hands, resting on the door frame, ${vb('tremble','trembled')} once.</p>
   <p>"It came," he says. Not to you, exactly. To the tin.</p>
-  <p>He invites you in before you can refuse, sits you down, and unties the rope with the slow care of a man defusing something precious. The lid comes off. The photographs look up at him.</p>
+  <p>He invites you in before you can refuse, sits you down, and unties the rope with the slow care of a man ${vb('defusing')} something precious. The lid comes off. The photographs look up at him.</p>
   <p>He is quiet for a long time.</p>`,
  choices:[ {t:'Wait', go:'e3s15'} ]
 },
@@ -1456,14 +1502,14 @@ e3s15:{
   <p>He turns another photo and stops.</p>
   <p>The longan tree fills the frame, heavy with fruit, a ladder leaning against it and children mid-climb.</p>
   <p class="beat">"My father planted it," he says. And nothing else, for a while.</p>
-  <p>You sit with him in the kind of silence that doesn't need fixing. Through the window, ferry horns. Somewhere below, the sea doing what it has always done.</p>`,
+  <p>You sit with him in the kind of silence that doesn't need fixing. Through the window, a ferry blows its ${vb('horn')}. Somewhere below, the sea is doing what it has always done.</p>`,
  choices:[ {t:'One more photo', go:'e3s16'} ]
 },
 
 e3s16:{
  onEnter:()=>{ state.flags.photo_noticed = true; },
  html:()=>`
-  <p>He keeps turning photos, narrating some, passing others in silence, and you are half lost in the rhythm of it when one photo crosses the table and something in the background catches you by the throat.</p>
+  <p>He keeps turning photos, ${vb('narrating')} some, passing others in silence, and you are half lost in the rhythm of it when one photo crosses the table and something in the background catches you by the ${vb('throat')}.</p>
   <p>A brick wall, at the edge of the frame, behind a row of drying nets. And on the brick — blurred by distance, tilted by the camera, faded by sixty years of being a photograph —</p>
   <p>a painted shape.</p>
   <p>Your heart skips half a beat. You lean in, but the photo is already turning, already gone under the next one, and Old Mr. Hong is saying something about a typhoon year, and the moment closes like water.</p>
@@ -1474,16 +1520,17 @@ e3s16:{
 
 e3s17:{
  html:()=>`
-  <p>When you stand to go, Old Mr. Hong tries to press money into your hand. You refuse — the job is paid, truthfully — and he gives up faster than the fourth-floor auntie did, which surprises you, until he disappears into the kitchen and returns with a plastic bag of ${vb('dried fish','dried')}, home-made, tied with the same brown rope as the tin.</p>
+  <p>When you stand to ${vb('take your leave','take_your_leave')}, Old Mr. Hong tries to press money into your hand. You refuse — the job is paid, truthfully — and he gives up faster than the fourth-floor auntie did, which surprises you, until he disappears into the kitchen and returns with a plastic bag of ${vb('dried fish','dried')}, home-made, tied with the same brown rope as the tin.</p>
   <p>This, you understand, is not optional.</p>
-  <p>"Come back when the longans are sweet," he says at the door, which makes no sense — the tree is decades gone — and perfect sense.</p>
+  <p>"Come back when the ${vb('longans','longan')} are sweet," he says at the door, which makes no sense — the tree is decades gone — and perfect sense.</p>
   <p>You walk back toward the ferry in the late gold light, dried fish in one hand, the island warm around you.</p>
-  ${sysBox('✅ SIDE QUEST COMPLETE','The Box · NT$2,000 paid',[
+  ${sysBox('✅ SIDE QUEST COMPLETE','The Box',[
+    ['pts','NT$2,000 paid · +25 points'],
     ['flair','⚠ Note: The previous '+vb('courier','courier')+' failed to complete this task.']
   ])}
   ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Crossing',[
     ['flair','"Over the water, before sunset."'],
-    ['pts','+25 · +20']
+    ['pts','+20']
   ])}`,
  onEnter:()=>{ pay('e3_box',25); earn('e3_box_nt',2000); grant('crossing'); state.flags.courier_warning_seen = true; },
  choices:[ {t:'Read that note again', go:'e3s18'} ]
@@ -1525,13 +1572,13 @@ e3s19:{
 
 e3s20:{
  html:()=>`
-  <p>Before you sleep, a thought sends you into a corner of the panel you have never opened: the quest history. Every task since the beginning, stacked like receipts.</p>
+  <p>Before you sleep, a thought sends you into a corner of the panel you have never opened: the quest history. Every task since the beginning, ${vb('stacked')} like receipts.</p>
   <p>You scroll down, past the week, past Yancheng, past the guard and the alley, all the way to the bottom — to <i>A Different Road</i>, your first quest, the morning the world changed by three minutes.</p>
   <p>And there, underneath it — <i>before</i> it — sits one more line. Folded. Grey.</p>
   ${sysBox('🗂 QUEST HISTORY','[ Records before activation ]',[
     ['flair','1 entry — locked.']
   ],'fail')}
-  <p>Before activation.</p>
+  <p>Before ${vb('activation')}.</p>
   <p>Before the convenience store. Before the first floating words. Before, as far as you knew, there was any system at all —</p>
   <p class="beat">something happened. And the system wrote it down.</p>
   <p>You tap the line. Locked. You tap it again, because that has always worked so well.</p>
