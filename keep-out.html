@@ -115,7 +115,7 @@
   button.ch:hover, button.ch:focus-visible { background: #1a2532; outline: none; }
   button.ch:focus-visible { border-color: #67d9a6; }
   button.ch.locked { border-left-color: #3a4654; color: #5d6874; cursor: default; }
-  .title-screen { text-align: center; padding-top: 9vh; }
+  .title-screen { text-align: center; padding-top: 5vh; }
   .brand {
     font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: #6b7682;
@@ -128,7 +128,38 @@
     letter-spacing: 0.06em;
     color: #eef3f0;
     text-shadow: 0 0 30px rgba(103,217,166,0.35);
-    margin-bottom: 6px;
+    margin-bottom: 10px;
+  }
+  .spiral-stage { width: 200px; height: 200px; margin: 0 auto 14px; }
+  .spiral-stage svg { width: 100%; height: 100%; display: block; }
+  .spin {
+    transform-origin: 100px 100px;
+    animation: ko-spin 7s linear infinite;
+  }
+  @keyframes ko-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .arm {
+    fill: none; stroke: url(#armGrad); stroke-width: 2; stroke-linecap: round;
+    stroke-dasharray: 240;
+    animation: ko-draw 2.8s ease-in infinite;
+  }
+  @keyframes ko-draw {
+    0%   { stroke-dashoffset: 240; opacity: 0; }
+    25%  { opacity: 0.95; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
+  .core { transform-origin: 100px 100px; animation: ko-core 2.8s ease-in-out infinite; }
+  @keyframes ko-core {
+    0%, 100% { transform: scale(0.9); opacity: 0.85; }
+    50%      { transform: scale(1.35); opacity: 1; }
+  }
+  .halo { transform-origin: 100px 100px; animation: ko-halo 2.8s ease-in-out infinite; }
+  @keyframes ko-halo {
+    0%, 100% { transform: scale(0.8); opacity: 0.18; }
+    50%      { transform: scale(1.25); opacity: 0.4; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .spin, .arm, .core, .halo { animation: none; }
+    .arm { stroke-dashoffset: 0; opacity: 0.5; }
   }
   .subtitle { color: #9aa6b2; font-style: italic; margin-bottom: 8px; }
   .level-badge {
@@ -401,6 +432,7 @@ var sections = {
     var html = '<div class="title-screen">' +
       '<div class="brand">InkQuest presents</div>' +
       '<h1 class="kotitle">KEEP OUT</h1>' +
+      '<div class="spiral-stage" id="spiralStage"></div>' +
       '<div class="subtitle">Episode 1 \u00b7 The Cheap Room</div>' +
       '<div class="level-badge">ENGLISH \u00b7 A2\u2013B1</div>' +
       '<div class="wardline"></div>' +
@@ -703,7 +735,7 @@ var sections = {
 
 /* ============ auto-linker ============ */
 var TERMS = Object.keys(VOCAB);
-var SKIP_CLASSES = ['cast', 'libcard', 'endhead', 'seclabel', 'quiet', 'choices', 'brand', 'kotitle', 'level-badge', 'subtitle', 'wardline'];
+var SKIP_CLASSES = ['cast', 'libcard', 'endhead', 'seclabel', 'quiet', 'choices', 'brand', 'kotitle', 'level-badge', 'subtitle', 'wardline', 'spiral-stage'];
 
 function isLetter(ch) { return ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z'; }
 
@@ -788,6 +820,50 @@ function renderBar() {
   shieldView.textContent = state.barrier ? '\ud83d\udee1\ufe0f ' + state.barrier : '';
 }
 
+function buildSpiral() {
+  var stage = document.getElementById('spiralStage');
+  if (!stage) return;
+  var ARM_COUNT = 7, CX = 100, CY = 100, turns = 1.15, rMax = 88, steps = 60;
+  var d = '';
+  for (var i = 0; i <= steps; i++) {
+    var t = i / steps;
+    var angle = t * turns * Math.PI * 2;
+    var r = rMax * (1 - t);
+    var x = CX + Math.cos(angle) * r;
+    var y = CY + Math.sin(angle) * r;
+    d += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1) + ' ';
+  }
+  d = d.trim();
+  var arms = '';
+  for (var j = 0; j < ARM_COUNT; j++) {
+    var rot = (360 / ARM_COUNT) * j;
+    var delay = (j * (2.8 / ARM_COUNT)).toFixed(2);
+    arms += '<path class="arm" d="' + d + '" transform="rotate(' + rot + ' ' + CX + ' ' + CY + ')" style="animation-delay:' + delay + 's"/>';
+  }
+  stage.innerHTML =
+    '<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Glowing spiral arms drawing into a central point">' +
+      '<defs>' +
+        '<linearGradient id="armGrad" x1="0%" y1="0%" x2="100%" y2="0%">' +
+          '<stop offset="0%" stop-color="#67d9a6" stop-opacity="0"/>' +
+          '<stop offset="55%" stop-color="#67d9a6" stop-opacity="0.35"/>' +
+          '<stop offset="100%" stop-color="#aef0d0" stop-opacity="1"/>' +
+        '</linearGradient>' +
+        '<radialGradient id="coreGrad">' +
+          '<stop offset="0%" stop-color="#eafff3"/>' +
+          '<stop offset="60%" stop-color="#aef0d0"/>' +
+          '<stop offset="100%" stop-color="#67d9a6"/>' +
+        '</radialGradient>' +
+        '<radialGradient id="haloGrad">' +
+          '<stop offset="0%" stop-color="#67d9a6" stop-opacity="0.6"/>' +
+          '<stop offset="100%" stop-color="#67d9a6" stop-opacity="0"/>' +
+        '</radialGradient>' +
+      '</defs>' +
+      '<g class="spin">' + arms + '</g>' +
+      '<circle class="halo" cx="100" cy="100" r="26" fill="url(#haloGrad)"/>' +
+      '<circle class="core" cx="100" cy="100" r="5" fill="url(#coreGrad)"/>' +
+    '</svg>';
+}
+
 function render() {
   closeTip();
   var sec = sections[cur]();
@@ -798,6 +874,7 @@ function render() {
   html += '<div class="choices" id="choices"></div>';
   wrap.innerHTML = html;
   linkify();
+  if (cur === 'title') buildSpiral();
   var box = document.getElementById('choices');
   sec.choices.forEach(function (c) {
     var b = document.createElement('button');
