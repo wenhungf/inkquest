@@ -119,19 +119,22 @@
   .brand {
     font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: #6b7682;
-    margin-bottom: 30px;
+    margin-bottom: 12px;
   }
+  body.title-mode #bar { display: none; }
   h1.kotitle {
     font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-weight: 800;
     font-size: clamp(46px, 13vw, 72px);
+    line-height: 1;
     letter-spacing: 0.06em;
     color: #eef3f0;
     text-shadow: 0 0 30px rgba(103,217,166,0.35);
-    margin-bottom: 10px;
+    margin: 0 0 10px;
   }
-  .spiral-stage { width: 200px; height: 200px; margin: 0 auto 14px; }
-  .spiral-stage svg { width: 100%; height: 100%; display: block; }
+  .spiral-stage { position: relative; width: 200px; height: 200px; margin: 0 auto 14px; }
+  .spiral-stage svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .spiral-stage .fx-layer { pointer-events: none; }
   .spin {
     transform-origin: 100px 100px;
     animation: ko-spin 7s linear infinite;
@@ -160,6 +163,7 @@
   @media (prefers-reduced-motion: reduce) {
     .spin, .arm, .core, .halo { animation: none; }
     .arm { stroke-dashoffset: 0; opacity: 0.5; }
+    .fx-layer { display: none; }
   }
   .subtitle { color: #9aa6b2; font-style: italic; margin-bottom: 8px; }
   .level-badge {
@@ -432,7 +436,7 @@ var sections = {
     var html = '<div class="title-screen">' +
       '<div class="brand">InkQuest presents</div>' +
       '<h1 class="kotitle">KEEP OUT</h1>' +
-      '<div class="spiral-stage" id="spiralStage"></div>' +
+      '<div class="spiral-stage"><svg id="spiralSvg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"></svg><svg id="fxLayer" class="fx-layer" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg></div>' +
       '<div class="subtitle">Episode 1 \u00b7 The Cheap Room</div>' +
       '<div class="level-badge">ENGLISH \u00b7 A2\u2013B1</div>' +
       '<div class="wardline"></div>' +
@@ -820,48 +824,139 @@ function renderBar() {
   shieldView.textContent = state.barrier ? '\ud83d\udee1\ufe0f ' + state.barrier : '';
 }
 
+/* ============ title-screen animation: spiral ward + mosquitoes ============ */
+var SCX = 100, SCY = 100;          /* spiral/fx coordinate center */
+var WARD_R = 60;                   /* radius at which a mosquito is repelled */
+var fxLayer = null;
+var mozzie = null;
+var fxRAF = null;
+var fxLast = 0;
+var fxSpawnTimer = 0;
+var fxNextSpawn = 0.6;
+
+function srand(a, b) { return a + Math.random() * (b - a); }
+
 function buildSpiral() {
-  var stage = document.getElementById('spiralStage');
-  if (!stage) return;
-  var ARM_COUNT = 7, CX = 100, CY = 100, turns = 1.15, rMax = 88, steps = 60;
-  var d = '';
+  var svg = document.getElementById('spiralSvg');
+  if (!svg) return;
+  var ARM_COUNT = 7, turns = 1.15, rMax = 88, steps = 60, d = '';
   for (var i = 0; i <= steps; i++) {
-    var t = i / steps;
-    var angle = t * turns * Math.PI * 2;
-    var r = rMax * (1 - t);
-    var x = CX + Math.cos(angle) * r;
-    var y = CY + Math.sin(angle) * r;
-    d += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1) + ' ';
+    var t = i / steps, angle = t * turns * Math.PI * 2, r = rMax * (1 - t);
+    d += (i === 0 ? 'M' : 'L') + (SCX + Math.cos(angle) * r).toFixed(1) + ' ' + (SCY + Math.sin(angle) * r).toFixed(1) + ' ';
   }
   d = d.trim();
   var arms = '';
   for (var j = 0; j < ARM_COUNT; j++) {
-    var rot = (360 / ARM_COUNT) * j;
-    var delay = (j * (2.8 / ARM_COUNT)).toFixed(2);
-    arms += '<path class="arm" d="' + d + '" transform="rotate(' + rot + ' ' + CX + ' ' + CY + ')" style="animation-delay:' + delay + 's"/>';
+    arms += '<path class="arm" d="' + d + '" transform="rotate(' + (360 / ARM_COUNT) * j + ' ' + SCX + ' ' + SCY + ')" style="animation-delay:' + (j * 2.8 / ARM_COUNT).toFixed(2) + 's"/>';
   }
-  stage.innerHTML =
-    '<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Glowing spiral arms drawing into a central point">' +
-      '<defs>' +
-        '<linearGradient id="armGrad" x1="0%" y1="0%" x2="100%" y2="0%">' +
-          '<stop offset="0%" stop-color="#67d9a6" stop-opacity="0"/>' +
-          '<stop offset="55%" stop-color="#67d9a6" stop-opacity="0.35"/>' +
-          '<stop offset="100%" stop-color="#aef0d0" stop-opacity="1"/>' +
-        '</linearGradient>' +
-        '<radialGradient id="coreGrad">' +
-          '<stop offset="0%" stop-color="#eafff3"/>' +
-          '<stop offset="60%" stop-color="#aef0d0"/>' +
-          '<stop offset="100%" stop-color="#67d9a6"/>' +
-        '</radialGradient>' +
-        '<radialGradient id="haloGrad">' +
-          '<stop offset="0%" stop-color="#67d9a6" stop-opacity="0.6"/>' +
-          '<stop offset="100%" stop-color="#67d9a6" stop-opacity="0"/>' +
-        '</radialGradient>' +
-      '</defs>' +
-      '<g class="spin">' + arms + '</g>' +
-      '<circle class="halo" cx="100" cy="100" r="26" fill="url(#haloGrad)"/>' +
-      '<circle class="core" cx="100" cy="100" r="5" fill="url(#coreGrad)"/>' +
-    '</svg>';
+  svg.innerHTML =
+    '<defs>' +
+      '<linearGradient id="armGrad" x1="0%" y1="0%" x2="100%" y2="0%">' +
+        '<stop offset="0%" stop-color="#67d9a6" stop-opacity="0"/>' +
+        '<stop offset="55%" stop-color="#67d9a6" stop-opacity="0.35"/>' +
+        '<stop offset="100%" stop-color="#aef0d0" stop-opacity="1"/>' +
+      '</linearGradient>' +
+      '<radialGradient id="coreGrad"><stop offset="0%" stop-color="#eafff3"/><stop offset="60%" stop-color="#aef0d0"/><stop offset="100%" stop-color="#67d9a6"/></radialGradient>' +
+      '<radialGradient id="haloGrad"><stop offset="0%" stop-color="#67d9a6" stop-opacity="0.6"/><stop offset="100%" stop-color="#67d9a6" stop-opacity="0"/></radialGradient>' +
+    '</defs>' +
+    '<g class="spin">' + arms + '</g>' +
+    '<circle class="halo" cx="100" cy="100" r="26" fill="url(#haloGrad)"/>' +
+    '<circle class="core" cx="100" cy="100" r="5" fill="url(#coreGrad)"/>';
+
+  /* start the mosquito loop */
+  fxLayer = document.getElementById('fxLayer');
+  mozzie = null; fxLast = 0; fxSpawnTimer = 0; fxNextSpawn = srand(0.4, 1.0);
+  if (fxRAF) cancelAnimationFrame(fxRAF);
+  fxRAF = requestAnimationFrame(fxStep);
+}
+
+function stopSpiral() {
+  if (fxRAF) { cancelAnimationFrame(fxRAF); fxRAF = null; }
+  mozzie = null;
+  if (fxLayer) { fxLayer.innerHTML = ''; fxLayer = null; }
+}
+
+function spawnMozzie() {
+  var entryAngle = srand(0, Math.PI * 2), spawnDist = 140;
+  var x = SCX + Math.cos(entryAngle) * spawnDist;
+  var y = SCY + Math.sin(entryAngle) * spawnDist;
+  var toCenter = Math.atan2(SCY - y, SCX - x) + srand(-0.4, 0.4);
+  var speed = srand(46, 64);
+  mozzie = {
+    x: x, y: y,
+    vx: Math.cos(toCenter) * speed, vy: Math.sin(toCenter) * speed,
+    phase: srand(0, Math.PI * 2), freq: srand(14, 20), amp: srand(26, 40),
+    state: 'approach', age: 0,
+    el: document.createElementNS('http://www.w3.org/2000/svg', 'g')
+  };
+  mozzie.el.innerHTML =
+    '<g opacity="0.9">' +
+      '<line x1="-3" y1="-2" x2="3" y2="2" stroke="#cdd6df" stroke-width="0.9" stroke-linecap="round"/>' +
+      '<line x1="-3" y1="2" x2="3" y2="-2" stroke="#cdd6df" stroke-width="0.9" stroke-linecap="round"/>' +
+      '<ellipse cx="0" cy="0" rx="2.6" ry="1.3" fill="#e9e4d6"/>' +
+      '<line x1="2" y1="0" x2="5.5" y2="0" stroke="#e9e4d6" stroke-width="0.8" stroke-linecap="round"/>' +
+    '</g>';
+  if (fxLayer) fxLayer.appendChild(mozzie.el);
+}
+
+function pingWard(nx, ny) {
+  if (!fxLayer) return;
+  var px = SCX + nx * WARD_R, py = SCY + ny * WARD_R;
+  var ping = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  ping.setAttribute('cx', px.toFixed(1));
+  ping.setAttribute('cy', py.toFixed(1));
+  ping.setAttribute('r', '2');
+  ping.setAttribute('fill', '#aef0d0');
+  fxLayer.appendChild(ping);
+  var start = null;
+  function grow(t) {
+    if (!fxLayer || !ping.parentNode) return;
+    if (!start) start = t;
+    var p = (t - start) / 360;
+    if (p >= 1) { if (ping.parentNode) ping.parentNode.removeChild(ping); return; }
+    ping.setAttribute('r', (2 + p * 12).toFixed(1));
+    ping.setAttribute('opacity', (1 - p).toFixed(2));
+    requestAnimationFrame(grow);
+  }
+  requestAnimationFrame(grow);
+}
+
+function fxStep(ts) {
+  if (cur !== 'title') { stopSpiral(); return; }   /* safety: never run off the title screen */
+  if (!fxLast) fxLast = ts;
+  var dt = Math.min((ts - fxLast) / 1000, 0.05);
+  fxLast = ts;
+
+  if (!mozzie) {
+    fxSpawnTimer += dt;
+    if (fxSpawnTimer >= fxNextSpawn) { fxSpawnTimer = 0; spawnMozzie(); }
+  } else {
+    var m = mozzie;
+    m.age += dt;
+    m.x += m.vx * dt; m.y += m.vy * dt;
+    var ang = Math.atan2(m.vy, m.vx), perp = ang + Math.PI / 2;
+    var wig = Math.sin(m.age * m.freq + m.phase) * m.amp * dt;
+    m.x += Math.cos(perp) * wig; m.y += Math.sin(perp) * wig;
+
+    var dx = m.x - SCX, dy = m.y - SCY, dist = Math.sqrt(dx * dx + dy * dy);
+    if (m.state === 'approach' && dist <= WARD_R) {
+      var nx = dx / dist, ny = dy / dist, dot = m.vx * nx + m.vy * ny;
+      m.vx = (m.vx - 2 * dot * nx) * 1.7;
+      m.vy = (m.vy - 2 * dot * ny) * 1.7;
+      m.x = SCX + nx * (WARD_R + 1); m.y = SCY + ny * (WARD_R + 1);
+      m.amp *= 0.4; m.state = 'repelled';
+      pingWard(nx, ny);
+    }
+    var deg = Math.atan2(m.vy, m.vx) * 180 / Math.PI;
+    var fade = (m.state === 'repelled') ? Math.max(0, 1 - (dist - WARD_R) / 90) : 1;
+    m.el.setAttribute('transform', 'translate(' + m.x.toFixed(1) + ' ' + m.y.toFixed(1) + ') rotate(' + deg.toFixed(0) + ')');
+    m.el.setAttribute('opacity', fade.toFixed(2));
+    if (dist > 150) {
+      if (m.el.parentNode) m.el.parentNode.removeChild(m.el);
+      mozzie = null; fxNextSpawn = srand(0.5, 1.6);
+    }
+  }
+  fxRAF = requestAnimationFrame(fxStep);
 }
 
 function render() {
@@ -874,7 +969,13 @@ function render() {
   html += '<div class="choices" id="choices"></div>';
   wrap.innerHTML = html;
   linkify();
-  if (cur === 'title') buildSpiral();
+  if (cur === 'title') {
+    document.body.classList.add('title-mode');
+    buildSpiral();
+  } else {
+    document.body.classList.remove('title-mode');
+    stopSpiral();
+  }
   var box = document.getElementById('choices');
   sec.choices.forEach(function (c) {
     var b = document.createElement('button');
