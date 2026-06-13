@@ -18,7 +18,6 @@
     font-size: 17px;
     min-height: 100vh;
   }
-  /* ---------- status bar ---------- */
   #bar {
     position: sticky; top: 0; z-index: 50;
     display: flex; justify-content: space-between; align-items: center;
@@ -33,7 +32,6 @@
   #bar .stats { display: flex; gap: 14px; letter-spacing: 0.04em; text-transform: none; font-size: 13px; }
   #bar .money { color: #e0a458; font-variant-numeric: tabular-nums; }
   #bar .shield { color: #67d9a6; }
-  /* ---------- layout ---------- */
   #wrap { max-width: 620px; margin: 0 auto; padding: 28px 22px 80px; }
   .seclabel {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -78,10 +76,7 @@
     from { text-shadow: 0 0 8px rgba(103,217,166,0.5); }
     to   { text-shadow: 0 0 22px rgba(103,217,166,0.95); }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .cast { animation: none; }
-  }
-  /* ---------- vocab ---------- */
+  @media (prefers-reduced-motion: reduce) { .cast { animation: none; } }
   .vb {
     border-bottom: 1px dotted #e0a458;
     color: #f0d9ad;
@@ -103,7 +98,6 @@
     display: none;
   }
   #tip .zh { color: #e0a458; margin-top: 2px; display: block; }
-  /* ---------- choices ---------- */
   .choices { margin-top: 2em; display: flex; flex-direction: column; gap: 12px; }
   button.ch {
     font-family: Georgia, serif;
@@ -120,10 +114,7 @@
   }
   button.ch:hover, button.ch:focus-visible { background: #1a2532; outline: none; }
   button.ch:focus-visible { border-color: #67d9a6; }
-  button.ch.locked {
-    border-left-color: #3a4654; color: #5d6874; cursor: default;
-  }
-  /* ---------- title & end screens ---------- */
+  button.ch.locked { border-left-color: #3a4654; color: #5d6874; cursor: default; }
   .title-screen { text-align: center; padding-top: 9vh; }
   .brand {
     font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -169,14 +160,12 @@
     font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
     color: #8b96a3; margin: 28px 0 12px;
   }
-  /* ---------- footer ---------- */
   footer {
     max-width: 620px; margin: 0 auto; padding: 24px 22px 48px;
     font-family: -apple-system, system-ui, sans-serif;
     font-size: 12px; color: #51606e; text-align: center;
   }
   footer a { color: #6b7f93; }
-  /* ---------- modal ---------- */
   #overlay {
     position: fixed; inset: 0; z-index: 200;
     background: rgba(5,8,12,0.75);
@@ -223,91 +212,222 @@
 <script>
 'use strict';
 
-/* ============ vocab helper ============ */
-function v(word, def, zh) {
-  return '<span class="vb" data-d="' + def + '" data-z="' + zh + '">' + word + '</span>';
-}
+/* ============ vocabulary dictionary ============ */
+/* key (lowercase) -> [English definition, Traditional Chinese].
+   The auto-linker wraps the FIRST unseen occurrence (in reading order)
+   of each key per episode. Phrases are matched before their parts. */
+var VOCAB = {
+  'cultivation': ['the practice of training body and mind to gain magic power', '\u4fee\u7149'],
+  'tribulation': ['heaven\u2019s final test of lightning', '\u5929\u52ab'],
+  'bolt': ['a sudden line of lightning', '\u4e00\u9053\u9583\u96fb'],
+  'robe': ['a long, loose piece of clothing', '\u9577\u888d'],
+  'ascension': ['rising from the human world to the immortal world', '\u98db\u5347'],
+  'spirit stones': ['the money of the cultivation world', '\u9748\u77f3'],
+  'converting': ['changing money from one kind to another', '\u63db\u7b97'],
+  'immortal coins': ['the local money after conversion', '\u4ed9\u5e63'],
+  'immortal': ['a being of the magic world; one who never dies', '\u4ed9\u4eba\uff1b\u4e0d\u6b7b\u7684'],
+  'currency': ['the money used in a place', '\u8ca8\u5e63'],
+  'coins': ['round metal money', '\u786c\u5e63'],
+  'realm': ['a world or kingdom', '\u754c\uff1b\u570b\u5ea6'],
+  'tongues': ['languages', '\u8a9e\u8a00'],
+  'beasts': ['large wild animals', '\u91ce\u7378'],
+  'sect': ['a group who train in magic together', '\u9580\u6d3e'],
+  'tin': ['a cheap, thin metal', '\u9435\u76ae\uff1b\u932b'],
+  'roast': ['to cook with strong heat', '\u70e4'],
+  'meditated': ['sat quietly to train the mind', '\u6253\u5750\uff1b\u51a5\u60f3'],
+  'volcano': ['a mountain that throws out fire and hot rock', '\u706b\u5c71'],
+  'fortune': ['a large amount of money', '\u8ca1\u5bcc'],
+  'window screen': ['a net on a window that stops insects', '\u7d17\u7a97'],
+  'landlord': ['the person who owns the room you rent', '\u623f\u6771'],
+  'rent': ['the money you pay each month for a room', '\u623f\u79df'],
+  'deposit': ['money paid first, returned when you leave', '\u62bc\u91d1'],
+  'haggle': ['to argue about a price to make it lower', '\u6bba\u50f9'],
+  'sword form': ['a set of sword movements', '\u528d\u5f0f'],
+  'sword': ['a long, sharp metal weapon', '\u528d'],
+  'pill fire': ['the magic fire used to make medicine pills', '\u4e39\u706b'],
+  'mountain gate': ['the front gate of a sect', '\u5c71\u9580'],
+  'herbs': ['plants used as medicine', '\u8349\u85e5'],
+  'rust': ['the brown stuff that forms on old metal', '\u92b9'],
+  'crack': ['a thin break, or a sudden sharp sound', '\u88c2\u7e2b\uff1b\u5288\u556a\u8072'],
+  'evidence': ['facts that prove something', '\u8b49\u64da'],
+  'praises': ['says good things about', '\u7a31\u8b9a'],
+  'tenants': ['people who rent and live in a place', '\u623f\u5ba2\uff08\u8907\u6578\uff09'],
+  'tenant': ['a person who rents and lives in a room', '\u623f\u5ba2'],
+  'contract': ['the paper you sign to agree to rent', '\u5408\u7d04'],
+  'deserves': ['should get what is fair', '\u61c9\u5f97'],
+  'feather': ['the light, soft thing on a bird', '\u7fbd\u6bdb'],
+  'strokes': ['the lines made when writing', '\u7b46\u756b'],
+  'ginseng': ['a root used as strong medicine', '\u4eba\u53c3'],
+  'receipt': ['a small paper that shows you paid', '\u6536\u64da'],
+  'leaks': ['lets water in through a hole', '\u6f0f\u6c34'],
+  'healer': ['a person who heals the sick', '\u91ab\u8005'],
+  'prepaid card': ['a card you pay first, then use the phone', '\u9810\u4ed8\u5361'],
+  'brick': ['a hard block (here, the phone)', '\u78da\u584a'],
+  'jade': ['a green precious stone', '\u7389'],
+  'slab': ['a flat, thick piece', '\u677f\uff1b\u584a'],
+  'assistant': ['a helper; here, a talking phone program', '\u52a9\u7406'],
+  'sass': ['rude but funny talk', '\u55c6\u8fa3\u7684\u53e3\u6c23'],
+  'cultivator': ['a person who trains in magic', '\u4fee\u7149\u8005'],
+  'mortal': ['an ordinary person who will die', '\u51e1\u4eba'],
+  'mattress': ['the soft thing you sleep on', '\u5e8a\u588a'],
+  'bedding': ['sheets and covers for a bed', '\u5be2\u5177'],
+  'slippers': ['soft shoes for inside the house', '\u62d6\u978b'],
+  'clicks': ['makes small, sharp sounds', '\u767c\u51fa\u5580\u5580\u8072'],
+  'cockroach': ['a brown house insect; fast, hated', '\u87d1\u8782'],
+  'feelers': ['the long, thin parts on an insect\u2019s head', '\u89f8\u89d2'],
+  'gourmet': ['a person who loves fine food', '\u7f8e\u98df\u5bb6'],
+  'demon wolves': ['evil magic wolves', '\u5996\u72fc'],
+  'qi': ['the energy of the world that cultivators use', '\u6c23'],
+  'strike': ['a hit; an attempt to hit', '\u4e00\u64ca\uff1b\u653b\u64ca'],
+  'soul': ['the spirit inside a person', '\u9748\u9b42'],
+  'newcomer': ['a person who just arrived', '\u65b0\u4f86\u7684\u4eba'],
+  'dao heart': ['a cultivator\u2019s inner will and calm', '\u9053\u5fc3'],
+  'cracks': ['breaks a little', '\u88c2\u958b'],
+  'porcelain': ['fine white pottery; breaks easily', '\u74f7\u5668'],
+  'seals': ['hand shapes used to cast magic', '\u624b\u5370\uff08\u7d50\u5370\uff09'],
+  'textbook form': ['the standard, by-the-book way', '\u6559\u79d1\u66f8\u5f0f\u7684\u62db\u5f0f'],
+  'cast': ['to perform magic', '\u65bd\u6cd5'],
+  'grand dwelling ward': ['a top-level home protection spell', '\u5927\u578b\u5c45\u6240\u7d50\u754c'],
+  'ward': ['a magic wall made of rules that blocks things', '\u7d50\u754c'],
+  'blooms': ['opens like a flower', '\u7dbb\u653e'],
+  'mid-flight': ['in the middle of flying', '\u98db\u884c\u9014\u4e2d'],
+  'dignity': ['self-respect; pride', '\u5c0a\u56b4'],
+  'victory': ['a win', '\u52dd\u5229'],
+  'divine sense': ['a cultivator\u2019s mind-power used to sense things', '\u795e\u8b58'],
+  'thread': ['a very thin line', '\u7d30\u7dda'],
+  'wire': ['a thin metal line that carries electricity', '\u96fb\u7dda'],
+  'define': ['to say exactly what something is', '\u5b9a\u7fa9'],
+  'suffocated': ['died from no air', '\u7a92\u606f'],
+  'masterpiece': ['a perfect work', '\u9245\u4f5c'],
+  'mosquitoes': ['small flying insects that drink blood at night', '\u868a\u5b50'],
+  'sealed': ['closed in; trapped inside', '\u5c01\u4f4f\uff1b\u56f0\u4f4f'],
+  'patched': ['fixed with a small cover', '\u88dc\u904e\u7684'],
+  'peeled': ['pulled back at the edge', '\u525d\u958b'],
+  'tore': ['ripped (past of tear)', '\u6495\u958b'],
+  'tame': ['to make wild things obey', '\u99b4\u670d'],
+  'whine': ['a high, thin sound', '\u5c16\u7d30\u7684\u8072\u97f3'],
+  'cross-legged': ['sitting with the legs folded', '\u76e4\u817f'],
+  'smallest hour': ['the deep middle of the night', '\u6df1\u591c\uff08\u6700\u5bc2\u975c\u6642\uff09'],
+  'clap': ['to hit your hands together', '\u62cd\uff08\u624b\uff09'],
+  'ankle': ['the joint between foot and leg', '\u8173\u8e1d'],
+  'itchy': ['when your skin wants you to scratch it', '\u7662\u7684'],
+  'celebrate': ['to be happy about a win', '\u6176\u795d'],
+  'to your name': ['that you own (idiom)', '\u540d\u4e0b\u64c1\u6709\u7684'],
+  'on fire': ['burning; here, very itchy', '\u71d2\u707c\uff08\u9019\u88e1\u6307\u5f88\u7662\uff09'],
+  'isolation': ['being completely alone, cut off', '\u9694\u7d55'],
+  'convenience store': ['a small shop open all hours', '\u4fbf\u5229\u5546\u5e97'],
+  'tomb': ['a place where the dead are kept', '\u58b3\u5893'],
+  'weapons': ['tools made to fight', '\u6b66\u5668'],
+  'pouring': ['flowing out fast', '\u6e67\u51fa\uff1b\u50be\u7009'],
+  'blessing': ['a gift of good fortune', '\u795d\u798f'],
+  'chimes': ['rings softly', '\u53ee\u5679\u4f5c\u97ff'],
+  'announcing': ['telling everyone', '\u5ba3\u544a'],
+  'shelves': ['flat boards that hold goods', '\u67b6\u5b50'],
+  'treasure': ['valuable things', '\u5bf6\u7269'],
+  'fragrant': ['smelling good', '\u82b3\u9999\u7684'],
+  'steamed buns': ['soft bread cooked over hot water', '\u5305\u5b50'],
+  'mosquito coil': ['a green spiral you burn to keep mosquitoes away', '\u868a\u9999'],
+  'swatter': ['a racket-shaped tool for killing mosquitoes', '\u96fb\u868a\u62cd'],
+  'racket': ['a bat with strings (here, the swatter)', '\u7403\u62cd\uff08\u9019\u88e1\u6307\u96fb\u868a\u62cd\uff09'],
+  'strung': ['fitted with strings or wires', '\u88dd\u4e0a\u7dda\u7684'],
+  'chewing gum': ['a soft sweet you chew but do not swallow', '\u53e3\u9999\u7cd6'],
+  'thunderbolt': ['a flash of lightning with thunder', '\u96f7\u9706\uff1b\u9739\u9742'],
+  'spiral': ['a curl that winds around', '\u87ba\u65cb'],
+  'obeys': ['does what it is told', '\u670d\u5f9e'],
+  'reach': ['to stretch out to touch or get something', '\u4f38\u624b\u53bb\u62ff\uff1b\u63a2\u53d6'],
+  'sparks': ['tiny bits of fire or electric light', '\u706b\u82b1'],
+  'wyrm-kin': ['dragon-like creatures (here, insects, jokingly)', '\u9f8d\u985e\uff1b\u87f2\u8c78\uff08\u6232\u7a31\uff09'],
+  'volumes': ['books', '\u5377\uff1b\u518a'],
+  'carapace': ['the hard shell of an insect', '\u7532\u6bbc'],
+  'divine-sense': ['mind-power used to sense things', '\u795e\u8b58'],
+  'sect master': ['the leader of a sect', '\u638c\u9580'],
+  'dawn': ['the first light of morning', '\u9ece\u660e'],
+  'sand': ['here: dry and tired (eyes like sand)', '\uff08\u773c\u775b\uff09\u4e7e\u6f80'],
+  'dough': ['a soft mix of flour and water for bread', '\u9eb5\u5718'],
+  'demon tide': ['a flood of attacking demons', '\u5996\u6f6e'],
+  'mosquito net': ['a net that keeps mosquitoes off a bed', '\u868a\u5e33'],
+  'humble': ['simple and not proud', '\u8b19\u5351\u7684'],
+  'refine': ['to improve and make finer', '\u7cbe\u7149\uff1b\u63d0\u7149'],
+  'building': ['a structure with walls and a roof', '\u5efa\u7bc9\u7269'],
+  'security guard': ['a person whose job is to guard a building', '\u4fdd\u5168'],
+  'night shift': ['work hours during the night', '\u591c\u73ed'],
+  'very still': ['not moving at all', '\u5b8c\u5168\u4e0d\u52d5'],
+  'glare': ['to look angrily', '\u77aa'],
+  'overqualified': ['having more skill than a job needs', '\u8cc7\u6b77\u904e\u9ad8'],
+  'r\u00e9sum\u00e9': ['a paper listing your work and skills', '\u5c65\u6b77'],
+  'bare hands': ['using only the hands, no tools', '\u5f92\u624b'],
+  'bare-hand': ['using only the hands, no tools', '\u5f92\u624b\u7684'],
+  'technique': ['a skilled way of doing something', '\u6280\u5de7'],
+  'intact': ['whole; not broken', '\u5b8c\u6574\u7121\u640d'],
+  'pilgrim': ['a person who travels to a holy place', '\u671d\u8056\u8005'],
+  'blinks on': ['(a light) suddenly turns on', '\uff08\u71c8\uff09\u4eae\u8d77'],
+  'blinks': ['opens and closes the eyes quickly', '\u7728\u773c'],
+  'mid-turn': ['in the middle of turning', '\u8f49\u5230\u4e00\u534a'],
+  'posture': ['the way you hold your body', '\u59ff\u614b'],
+  'deny': ['to say no; to not allow', '\u62d2\u7d55'],
+  'personality': ['the character that makes someone who they are', '\u500b\u6027'],
+  'squeezing': ['pressing something tightly', '\u64e0\u58d3'],
+  'silence': ['complete quiet; no sound', '\u5bc2\u975c']
+};
 
 /* ============ state ============ */
-var SAVE_KEY = 'inkquest_keepout_ep1_v1';
+var SAVE_KEY = 'inkquest_keepout_ep1_v2';
 function defaultState() {
-  return { v: 1, money: 50000, barrier: '', flags: {} };
+  return { v: 2, money: 50000, rent: 8500, barrier: '', flags: {}, seen: {} };
 }
 var state = defaultState();
 var cur = 'title';
 
 function save() {
-  try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify({ v: 1, cur: cur, state: state }));
-  } catch (e) { /* private mode: play without saving */ }
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify({ v: 2, cur: cur, state: state })); }
+  catch (e) { }
 }
 function loadSave() {
   try {
     var raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return null;
-    var data = JSON.parse(raw);
-    if (data && data.v === 1 && data.cur && data.state) return data;
+    var d = JSON.parse(raw);
+    if (d && d.v === 2 && d.cur && d.state) return d;
   } catch (e) { }
   return null;
 }
-function clearSave() {
-  try { localStorage.removeItem(SAVE_KEY); } catch (e) { }
-}
-
-/* ============ shared vocab snippets ============ */
-var W = {
-  ward: function () { return v('ward', 'a magic wall made of rules that blocks things', '結界'); },
-  landlord: function () { return v('landlord', 'the person who owns the room you rent', '房東'); },
-  rent: function () { return v('rent', 'the money you pay every month for a room', '房租'); },
-  deposit: function () { return v('deposit', 'money you pay first and get back when you leave', '押金'); },
-  contract: function () { return v('contract', 'the paper you sign when you agree to rent', '合約'); },
-  receipt: function () { return v('receipt', 'a small paper that shows you paid', '收據'); }
-};
+function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) { } }
 
 /* ============ sections ============ */
 var sections = {
 
-  /* ---------- title ---------- */
-  title: function (s) {
+  title: function () {
     var hasSave = !!loadSave();
     var html = '<div class="title-screen">' +
       '<div class="brand">InkQuest presents</div>' +
       '<h1 class="kotitle">KEEP OUT</h1>' +
-      '<div class="subtitle">Episode 1 · The Cheap Room</div>' +
-      '<div class="level-badge">ENGLISH · A2</div>' +
+      '<div class="subtitle">Episode 1 \u00b7 The Cheap Room</div>' +
+      '<div class="level-badge">ENGLISH \u00b7 A2\u2013B1</div>' +
       '<div class="wardline"></div>' +
       '<p class="quiet" style="margin-bottom:34px;">A cultivation master. A rooftop room in Taipei.<br>And the first war of his new life.</p>' +
       '</div>';
     var choices = [{ t: 'Begin', to: 'e1s1', fx: function () { state = defaultState(); } }];
-    if (hasSave) {
-      choices.push({ t: 'Continue', to: '__continue__' });
-    }
+    if (hasSave) choices.push({ t: 'Continue', to: '__continue__' });
     return { label: '', time: '', html: html, choices: choices };
   },
 
-  /* ---------- 1 · the last bolt ---------- */
-  e1s1: function (s) {
+  e1s1: function () {
     var html =
-      '<p>The ninth bolt of ' + v('tribulation', 'the final test of lightning from heaven', '天劫') + ' lightning dies in the clouds above you. Smoke rises from your robe. Your hair stands up like an angry cat.</p>' +
-      '<p>Three hundred years of training. Nine bolts of heaven\u2019s anger. And you are still standing.</p>' +
+      '<p>The ninth bolt of tribulation lightning dies in the clouds above you. Smoke rises from your robe. Your hair stands up like an angry cat.</p>' +
+      '<p>Three hundred years of cultivation. Nine bolts of heaven\u2019s anger. And you are still standing.</p>' +
       '<p>You won.</p>' +
       '<p>A bright voice speaks inside your head.</p>' +
-      '<div class="ai">Congratulations, Host! ' + v('Ascension', 'rising from the human world to the immortal world', '飛升') + ' complete. Reward: 5,000,000 high-grade ' + v('spirit stones', 'the money of the cultivation world', '靈石') + '.</div>' +
+      '<div class="ai">Congratulations, Host! Ascension complete. Reward: 5,000,000 high-grade spirit stones.</div>' +
       '<p>\u201cFive million\u2014\u201d you whisper.</p>' +
       '<div class="ai">Auto-converting to local immortal currency\u2026 Done! 50,000 immortal coins. All tasks complete. Goodbye, Host. May we meet again!</div>' +
       '<p>\u201cWait. Converting? At what rate? Who set the\u2014\u201d</p>' +
       '<p>The voice is gone. The sky opens. Light takes you.</p>' +
       '<p class="beat">Somewhere between worlds, you do the math. Five million to fifty thousand. One hundred to one. You have been robbed, and the shop has already closed.</p>';
-    return {
-      label: 'Section 1 · The Last Bolt',
-      time: 'THE OLD WORLD — THE LAST DAY',
-      html: html,
-      choices: [{ t: 'Open your eyes.', to: 'e1s2' }]
-    };
+    return { label: 'Section 1 \u00b7 The Last Bolt', time: 'THE OLD WORLD \u2014 THE LAST DAY', html: html,
+      choices: [{ t: 'Open your eyes.', to: 'e1s2' }] };
   },
 
-  /* ---------- 2 · the hot realm ---------- */
-  e1s2: function (s) {
+  e1s2: function () {
     var html =
       '<p>Heat hits you like an open oven.</p>' +
       '<p>You stand in a narrow lane between tall buildings. The air is wet and heavy. Below the noise of a thousand metal beasts, you hear water dripping from white boxes on every wall. Towers of glass climb into the sky. Far above them, a metal bird crosses the clouds without moving its wings.</p>' +
@@ -315,139 +435,89 @@ var sections = {
       '<p>It is louder than you expected. And much, much hotter.</p>' +
       '<p>Three hours later \u2014 you do not wish to talk about those three hours \u2014 you stand in front of a paper sign taped to a metal door:</p>' +
       '<p class="beat">ROOM FOR RENT \u00b7 ROOFTOP \u00b7 CHEAP</p>' +
-      '<p>You can read it. Ascension opens all tongues to the ascended \u2014 every child in your old sect knew that. What ascension does not give you is a place to sleep.</p>' +
-      '<p><em>Cheap.</em> You have 50,000 immortal coins and a whole new world. You climb the stairs.</p>';
-    return {
-      label: 'Section 2 · The Hot Realm',
-      time: 'DAY 1 · 14:07 · TAIPEI',
-      html: html,
-      choices: [{ t: 'Knock on the rooftop door.', to: 'e1s3' }]
-    };
+      '<p>You can read it. Ascension opens all tongues to the ascended \u2014 every child in your old sect knew that. What it does not give you is a place to sleep.</p>' +
+      '<p>You have 50,000 immortal coins and a whole new world. You climb the stairs.</p>';
+    return { label: 'Section 2 \u00b7 The Hot Realm', time: 'DAY 1 \u00b7 14:07 \u00b7 TAIPEI', html: html,
+      choices: [{ t: 'Knock on the rooftop door.', to: 'e1s3' }] };
   },
 
-  /* ---------- 3 · the room on the roof ---------- */
-  e1s3: function (s) {
+  e1s3: function () {
     var html =
-      '<p>The ' + W.landlord() + ' is a small woman with fast eyes and a ring of keys. \u201cMrs. Lin,\u201d she says, and that is the whole introduction.</p>' +
-      '<p>The room sits on the roof like a metal box that someone forgot. One room. A tin roof. One window with a ' + v('window screen', 'a net on a window that stops insects', '紗窗') + '. A toilet behind a plastic door. An old air conditioner hangs on the wall like a tired animal.</p>' +
+      '<p>The landlord is a small woman with fast eyes and a ring of keys. \u201cMrs. Lin,\u201d she says, and that is the whole introduction.</p>' +
+      '<p>The room sits on the roof like a metal box that someone forgot. One room. A tin roof. One window with a window screen. A toilet behind a plastic door. An old air conditioner hangs on the wall like a tired animal.</p>' +
       '<p>\u201cIt works when it wants to,\u201d Mrs. Lin says, following your eyes.</p>' +
       '<p>Inside, the heat could roast tea leaves. You once meditated inside a volcano for forty-nine days, so you nod politely.</p>' +
-      '<p>\u201c' + v('Rent', 'the money you pay every month for a room', '房租') + ' is 8,500 a month,\u201d she says. \u201c' + v('Deposit', 'money you pay first and get back when you leave', '押金') + ' is two months. First month up front. You pay today, you sleep here today.\u201d</p>' +
+      '<p>\u201cRent is 8,500 a month,\u201d she says. \u201cDeposit is two months. First month up front. You pay today, you sleep here today.\u201d</p>' +
       '<p>You count in your head. 25,500 coins. Half your fortune, gone in one breath.</p>';
-    return {
-      label: 'Section 3 · The Room on the Roof',
-      time: 'DAY 1 · 16:40',
-      html: html,
+    return { label: 'Section 3 \u00b7 The Room on the Roof', time: 'DAY 1 \u00b7 16:40', html: html,
       choices: [
-        {
-          t: '\u201cToo expensive. The roof is rust and the screen has a hole.\u201d — Haggle like a market grandmaster.',
-          to: 'e1s3a',
-          fx: function () { state.flags.haggled = true; state.flags.hasFan = true; }
-        },
-        {
-          t: '\u201cI will take it.\u201d — You are rich. Probably.',
-          to: 'e1s3b'
-        },
-        {
-          t: '\u201cWhy is it so cheap?\u201d',
-          to: 'e1s3c',
-          fx: function () { state.flags.tenant_hook_early = true; }
-        }
-      ]
-    };
+        { t: '\u201cToo expensive. The roof is rust and the screen has a hole.\u201d \u2014 Haggle like a market grandmaster.', to: 'e1s3a',
+          fx: function () { state.flags.haggled = true; state.flags.hasFan = true; } },
+        { t: '\u201cI will take it.\u201d \u2014 You are rich. Probably.', to: 'e1s3b' },
+        { t: '\u201cWhy is it so cheap?\u201d', to: 'e1s3c', fx: function () { state.flags.tenant_hook_early = true; } }
+      ] };
   },
 
-  e1s3a: function (s) {
+  e1s3a: function () {
     var html =
       '<p>Three hundred years in a sect teaches you three arts: the sword, the pill fire, and the market war outside the mountain gate, where old women sell herbs and take no prisoners.</p>' +
-      '<p>You point at the rust on the roof. You point at the crack above the door. You touch the wall and show her the paint on your finger like evidence of a crime.</p>' +
+      '<p>So you haggle. You point at the rust on the roof. You point at the crack above the door. You touch the wall and show her the paint on your finger like evidence of a crime.</p>' +
       '<p>Mrs. Lin fights well. She praises the view. She praises the \u201cnatural air flow,\u201d which is a hole. For six minutes the lane below hears two masters at work.</p>' +
       '<p>\u201cEight thousand,\u201d she says at last. \u201cFinal. And take the fan in the corner. The last tenant left it.\u201d</p>' +
       '<p>An old electric fan stands by the wall, dusty but whole. You bow, very slightly. She nods, very slightly. Respect.</p>';
-    return {
-      label: 'Section 3 · continued',
-      time: '',
-      html: html,
-      choices: [{
-        t: 'Sign and pay. (Rent 8,000 + deposit 16,000)',
-        to: 'e1s4',
-        fx: function () { state.money -= 24000; }
-      }]
-    };
+    return { label: 'Section 3 \u00b7 continued', time: '', html: html,
+      choices: [{ t: 'Sign and pay. (Rent 8,000 + deposit 16,000)', to: 'e1s4',
+        fx: function () { state.money -= 24000; state.rent = 8000; } }] };
   },
 
-  e1s3b: function (s) {
+  e1s3b: function () {
     var html =
       '<p>\u201cI will take it,\u201d you say.</p>' +
       '<p>Mrs. Lin blinks. Nobody says yes that fast. Not to this room. Not in this heat.</p>' +
-      '<p>She looks at you again, head to toe \u2014 the strange old-style clothes, the calm face, the posture of a man who has stood guard for a century. Rich, she decides. Or strange. Or both. Both make fine tenants.</p>' +
+      '<p>She looks at you again, head to toe \u2014 the strange old clothes, the calm face, the posture of a man who has stood guard for a century. Rich, she decides. Or strange. Or both. Both make fine tenants.</p>' +
       '<p>\u201cGood,\u201d she says, already pulling papers from her bag. \u201cI like a fast decision. Slow people\u2026\u201d</p>' +
       '<p>She does not finish the sentence. You will learn that she rarely does.</p>';
-    return {
-      label: 'Section 3 · continued',
-      time: '',
-      html: html,
-      choices: [{
-        t: 'Sign and pay. (Rent 8,500 + deposit 17,000)',
-        to: 'e1s4',
-        fx: function () { state.money -= 25500; }
-      }]
-    };
+    return { label: 'Section 3 \u00b7 continued', time: '', html: html,
+      choices: [{ t: 'Sign and pay. (Rent 8,500 + deposit 17,000)', to: 'e1s4',
+        fx: function () { state.money -= 25500; state.rent = 8500; } }] };
   },
 
-  e1s3c: function (s) {
+  e1s3c: function () {
     var html =
       '<p>\u201cWhy is it so cheap?\u201d</p>' +
       '<p>Mrs. Lin\u2019s eyes slide to the window. Just for a moment.</p>' +
       '<p>\u201cTop floor is hot,\u201d she says. \u201cRain is loud. Young people have no patience. The last tenant\u2026 left quickly.\u201d</p>' +
       '<p>She does not finish the sentence. She watches you instead, the way a chess player watches the board after a quiet move.</p>' +
-      '<p>On the window, you notice it now: the screen has a small hole, ' + v('patched', 'fixed with tape or cloth', '修補過的') + ' with clear tape. The tape hangs open, peeled back, like a small door someone forced.</p>' +
+      '<p>On the window, you notice it now: the screen has a small hole, patched with clear tape. The tape hangs open, peeled back, like a small door someone forced.</p>' +
       '<p>\u201cSo,\u201d Mrs. Lin says. \u201cYou want it or not?\u201d</p>';
-    return {
-      label: 'Section 3 · continued',
-      time: '',
-      html: html,
-      choices: [{
-        t: 'Sign and pay. (Rent 8,500 + deposit 17,000)',
-        to: 'e1s4',
-        fx: function () { state.money -= 25500; }
-      }]
-    };
+    return { label: 'Section 3 \u00b7 continued', time: '', html: html,
+      choices: [{ t: 'Sign and pay. (Rent 8,500 + deposit 17,000)', to: 'e1s4',
+        fx: function () { state.money -= 25500; state.rent = 8500; } }] };
   },
 
-  /* ---------- 4 · ink and money ---------- */
-  e1s4: function (s) {
+  e1s4: function () {
     var paid = state.flags.haggled ? '24,000' : '25,500';
     var html =
-      '<p>The ' + W.contract() + ' is two pages. You read every word, because a man who signs without reading deserves what he gets \u2014 your first master taught you that, one hour before he sold you to the sect.</p>' +
+      '<p>The contract is two pages. You read every word, because a man who signs without reading deserves what he gets \u2014 your first master taught you that, one hour before he sold you to the sect.</p>' +
       '<p>You sign your name. The pen is light as a feather and the strokes come out like a sword form. Mrs. Lin turns the paper sideways. \u201c\u2026Is that a name?\u201d</p>' +
       '<p>Then you count out ' + paid + ' coins into her hand. The money leaves your fingers one paper at a time. Once, you handed a thousand-year ginseng to your master with less pain than this.</p>' +
-      '<p>Mrs. Lin writes you a ' + W.receipt() + ', folds it twice, and gives the rules: no fire on the roof, no noise after midnight, garbage goes down at seven.</p>' +
-      '<p>Then she points at you with the folded receipt.</p>' +
-      '<p>\u201cYou need a phone. If the roof ' + v('leaks', 'when water gets in through a hole', '漏水') + ', how do I call you? Buy a phone. Today.\u201d</p>' +
+      '<p>Mrs. Lin writes you a receipt, folds it twice, and gives the rules: no fire on the roof, no noise after midnight, garbage goes down at seven.</p>' +
+      '<p>Then she points at you with the folded receipt. \u201cYou need a phone. If the roof leaks, how do I call you? Buy a phone. Today.\u201d</p>' +
       '<p>\u201cThe roof leaks?\u201d you ask.</p>' +
       '<p>\u201cBuy a phone,\u201d she repeats, and is already halfway down the stairs.</p>';
-    return {
-      label: 'Section 4 · Ink and Money',
-      time: 'DAY 1 · 17:15',
-      html: html,
-      choices: [{
-        t: 'Go find this \u201cphone.\u201d (Phone 11,900 + prepaid card 488)',
-        to: 'e1s5',
-        fx: function () { state.money -= 12388; }
-      }]
-    };
+    return { label: 'Section 4 \u00b7 Ink and Money', time: 'DAY 1 \u00b7 17:15', html: html,
+      choices: [{ t: 'Go find this \u201cphone.\u201d (Phone 11,900 + prepaid card 488)', to: 'e1s5',
+        fx: function () { state.money -= 12388; } }] };
   },
 
-  /* ---------- 5 · the talking brick ---------- */
-  e1s5: function (s) {
+  e1s5: function () {
     var fanLine = state.flags.hasFan
-      ? '<p>At a bright, cold store the size of a sect hall, you buy the things a mortal life needs: a folding ' + v('mattress', 'the soft thing you sleep on', '床墊') + ', thin summer bedding, ' + v('slippers', 'soft shoes for inside the house', '拖鞋') + ', soap, a tower of instant noodles. The fan, at least, is free \u2014 a gift from a war well fought.</p>'
-      : '<p>At a bright, cold store the size of a sect hall, you buy the things a mortal life needs: a folding ' + v('mattress', 'the soft thing you sleep on', '床墊') + ', thin summer bedding, ' + v('slippers', 'soft shoes for inside the house', '拖鞋') + ', soap, a tower of instant noodles \u2014 and an electric fan, because the room on the roof is an oven with a window.</p>';
+      ? '<p>At a bright, cold store the size of a sect hall, you buy what a mortal life needs: a folding mattress, thin summer bedding, slippers, soap, a tower of instant noodles. The fan, at least, is free \u2014 a gift from a war well fought.</p>'
+      : '<p>At a bright, cold store the size of a sect hall, you buy what a mortal life needs: a folding mattress, thin summer bedding, slippers, soap, a tower of instant noodles \u2014 and an electric fan, because the room on the roof is an oven with a window.</p>';
     var html =
-      '<p>The phone shop glows white like a healer\u2019s hall. A young clerk sells you \u201ca basic one\u201d \u2014 11,900 coins \u2014 and a ' + v('prepaid card', 'a card you pay first, then use the phone', '預付卡') + ' for 488 more.</p>' +
+      '<p>The phone shop glows white like a healer\u2019s hall. A young clerk sells you \u201ca basic one\u201d \u2014 11,900 coins \u2014 and a prepaid card for 488 more.</p>' +
       '<p>You hold the black glass brick in your palm. It is lighter than a low-grade jade slab and ten times the price.</p>' +
-      '<p>The screen wakes and asks you to choose an ' + v('assistant', 'a helper; here, a talking program in the phone', '助理') + ' personality. A long list scrolls past. Your finger picks one at random.</p>' +
+      '<p>The screen wakes and asks you to choose an assistant personality. A long list scrolls past. Your finger picks one at random.</p>' +
       '<p class="beat">BOBA \u2014 50% sugar \u00b7 200% sass</p>' +
       '<p>The phone speaks.</p>' +
       '<div class="ai">Hi! I\u2019m Boba. Let\u2019s set up your\u2014</div>' +
@@ -457,28 +527,20 @@ var sections = {
       '<div class="ai">Sir, I am an AI assistant. Please stop squeezing me. Your battery is at 100%. Your social skills, somewhat lower.</div>' +
       '<p>Same voice. Same sweetness. Same knife under the sugar.</p>' +
       '<p>Systems do not come back. Every cultivator knows this. A system finishes its task and is gone forever, like youth, like your 24,000 coins. And yet\u2014</p>' +
-      '<div class="ai">Do you want to finish setup, or do you want to keep scaring the staff?</div>' +
+      '<div class="ai">Do you want to finish setup, or keep scaring the staff?</div>' +
       fanLine +
-      '<p>The sun goes down somewhere behind the towers. You carry your whole new life up six floors.</p>';
-    return {
-      label: 'Section 5 · The Talking Brick',
-      time: 'DAY 1 · 18:50',
-      html: html,
-      choices: [{
-        t: 'Carry it all home.',
-        to: 'e1s6',
-        fx: function () { state.money -= (state.flags.hasFan ? 6196 : 7486); }
-      }]
-    };
+      '<p>The sun goes down behind the towers. You carry your whole new life up six floors.</p>';
+    return { label: 'Section 5 \u00b7 The Talking Brick', time: 'DAY 1 \u00b7 18:50', html: html,
+      choices: [{ t: 'Carry it all home.', to: 'e1s6',
+        fx: function () { state.money -= (state.flags.hasFan ? 6196 : 7486); } }] };
   },
 
-  /* ---------- 6 · the first war ---------- */
-  e1s6: function (s) {
+  e1s6: function () {
     var html =
       '<p>Night. The tin roof clicks as it cools, like a slow clock. The heat does not leave; it just sits down and makes itself comfortable.</p>' +
       '<p>You lie on the new mattress and listen to your kingdom. The hum of the city below. Water moving in a pipe inside the wall. Far away, a dog with opinions.</p>' +
       '<p>Then, from the corner: <em>tk\u2026 tk\u2026 tk.</em></p>' +
-      '<p>On the wall, in the weak light from the window, a ' + v('cockroach', 'a brown insect that lives in houses; fast, hated', '蟑螂') + '. Big as a thumb. Its feelers taste the air, slowly, like a gourmet.</p>' +
+      '<p>On the wall, in the weak light from the window, a cockroach. Big as a thumb. Its feelers taste the air, slowly, like a gourmet.</p>' +
       '<p>You have killed demon wolves with your palm. You have cut a river in half, once, mostly by accident. But you respect local tradition \u2014 and your qi is precious in this thin-aired realm. You take the slipper.</p>' +
       '<p>First strike: miss. It runs half a meter and stops.</p>' +
       '<p>Second strike: it does not run.</p>' +
@@ -491,224 +553,229 @@ var sections = {
       '<p>Jade light blooms from the floor and closes over you like a quiet sea. The cockroach hits the light mid-flight \u2014 <em>tok</em> \u2014 drops, and walks away with what dignity it has left.</p>' +
       '<p>Silence. Victory.</p>' +
       '<p>For three seconds.</p>';
-    return {
-      label: 'Section 6 · The First War',
-      time: 'DAY 1 · 23:58',
-      html: html,
-      choices: [{ t: 'Three seconds later.', to: 'e1s7' }]
-    };
+    return { label: 'Section 6 \u00b7 The First War', time: 'DAY 1 \u00b7 23:58', html: html,
+      choices: [{ t: 'Three seconds later.', to: 'e1s7' }] };
   },
 
-  /* ---------- 7 · the dark ---------- */
-  e1s7: function (s) {
+  e1s7: function () {
     var html =
       '<p>The lamp above your bed dies.</p>' +
       '<p>The fan at the foot of the mattress stops mid-turn.</p>' +
       '<p>On the floor, Boba\u2019s voice cuts off in the middle of a word.</p>' +
       '<div class="ai">Sir, I detec\u2014</div>' +
       '<p>Dark. Quiet. The heat, which never left, smiles and moves closer.</p>' +
-      '<p>You check the ' + W.ward() + '. The ward is perfect. Of course it is perfect. The Grand Dwelling Ward blocks lightning-type energy. It blocks all divine sense from passing in or out. Standard. Textbook. Page one.</p>' +
-      '<p>The textbook never met a lamp that drinks lightning from a ' + v('wire', 'a thin metal line that carries electricity', '電線') + ' in the wall. It never met whatever invisible thread feeds a talking brick.</p>' +
-      '<p>You test the air. Air still flows through the ward \u2014 air is air in any world. The thin, weak spirit ' + v('qi', 'the energy of the world that cultivators use', '氣') + ' of this realm still flows too. Good. You would hate to explain to anyone that you suffocated inside your own masterpiece.</p>' +
+      '<p>You check the ward. The ward is perfect. Of course it is perfect. The Grand Dwelling Ward blocks lightning-type energy. It blocks all divine sense from passing in or out. Standard. Textbook. Page one.</p>' +
+      '<p>The textbook never met a lamp that drinks lightning from a wire in the wall. It never met whatever invisible thread feeds a talking brick.</p>' +
+      '<p>You test the air. Air still flows through the ward \u2014 air is air in any world. The thin, weak spirit qi of this realm still flows too. Good. You would hate to explain to anyone that you suffocated inside your own masterpiece.</p>' +
       '<p>So you reach for the lightning in the wire, to write one small rule: <em>this may pass.</em> A ward is a list of rules, and the master of the ward writes the list.</p>' +
-      '<p class="beat">But to write the rule, you must ' + v('define', 'to say exactly what something is', '定義') + ' the thing. And you reach, and you find\u2026 nothing. Tame lightning? A river of sparks that lives in walls and obeys mortals? You do not know what it is. And a ward cannot hold what its master cannot name.</p>' +
+      '<p class="beat">But to write the rule, you must define the thing. And you reach, and you find\u2026 nothing. Tame lightning? A river of sparks that lives in walls and obeys mortals? You do not know what it is. And a ward cannot hold what its master cannot name.</p>' +
       '<p>Three hundred years of dignity make a small, ugly sound somewhere inside you.</p>' +
       '<p>Then, by your ear: <em>nnnnnnng.</em></p>' +
-      '<p>Two thin singers. Two ' + v('mosquitoes', 'small flying insects that drink blood at night', '蚊子') + '. <em>Inside</em> the ward. You sealed them in \u2014 with the only warm, blood-filled, mortal-smelling dinner on this roof.</p>' +
-      '<p>And one more thing, in the weak city light through the window. The screen. The small hole, patched with tape. The tape peeled open like a little door. The hole is old.</p>' +
-      '<p>Someone fought this war before you. Someone patched, and something tore it open again.</p>';
-    return {
-      label: 'Section 7 · The Dark',
-      time: 'DAY 2 · 00:01',
-      html: html,
+      '<p>Two thin singers. Two mosquitoes. <em>Inside</em> the ward. You sealed them in \u2014 with the only warm, blood-filled, mortal-smelling dinner on this roof.</p>' +
+      '<p>And one more thing, in the weak city light through the window. The screen. The small hole, patched with tape. The tape peeled open like a little door. The hole is old. Someone fought this war before you. Someone patched, and something tore it open again.</p>';
+    return { label: 'Section 7 \u00b7 The Dark', time: 'DAY 2 \u00b7 00:01', html: html,
       choices: [
-        {
-          t: 'Hold the ward. Hunt them in the dark with your bare hands. You have endured worse. Probably.',
-          to: 'e1s8a',
-          fx: function () { state.flags.route = 'a'; }
-        },
-        {
-          t: 'Drop the ward. The city outside never sleeps \u2014 somewhere, it sells weapons.',
-          to: 'e1s8b',
-          fx: function () { state.flags.route = 'b'; }
-        },
-        {
-          t: 'The ward is not wrong. The rules are. Rewrite them. Now.',
-          to: 'e1s8c',
-          fx: function () { state.flags.route = 'c'; }
-        }
-      ]
-    };
+        { t: 'Hold the ward. Hunt them in the dark with your bare hands. You have endured worse. Probably.', to: 'e1s8a',
+          fx: function () { state.flags.route = 'a'; } },
+        { t: 'Drop the ward. The city outside never sleeps \u2014 somewhere, it sells weapons.', to: 'e1s8b',
+          fx: function () { state.flags.route = 'b'; } },
+        { t: 'The ward is not wrong. The rules are. Rewrite them. Now.', to: 'e1s8c',
+          fx: function () { state.flags.route = 'c'; } }
+      ] };
   },
 
-  /* ---------- 8a · the hunter in the dark ---------- */
-  e1s8a: function (s) {
+  e1s8a: function () {
     var html =
-      '<p>You sit cross-legged in the dark and listen, the way your master taught you to listen for a sword in the fog. Breath slow. Mind empty. Sweat running down your back like a small, personal river, because the fan is dead and the ward holds the night\u2019s heat in with you.</p>' +
-      '<p>The whine comes. Left ear.</p>' +
-      '<p>You strike.</p>' +
-      '<p>You hit your own face.</p>' +
+      '<p>You sit cross-legged in the dark and listen, the way your master taught you to listen for a sword in the fog. No ward, no slipper worth the swing \u2014 only your bare hands. Breath slow. Mind empty. Sweat running down your back like a small, personal river, because the fan is dead and the ward holds the night\u2019s heat in with you.</p>' +
+      '<p>The whine comes. Left ear. You strike. You hit your own face.</p>' +
       '<p>The whine returns, right ear, lower, slower \u2014 wiser. Somewhere out there in the dark, half a meter away, your enemy is learning faster than you are.</p>' +
       '<p>The night goes long. You stop counting your misses around the fourth. The heat thickens. The city hums outside your jade wall like a party you were not invited to.</p>' +
       '<p>And then, deep in the smallest hour, your mind finally goes truly quiet \u2014 and the fog-sword lesson works. You hear the wings turn. You clap, once, into the dark.</p>' +
-      '<p>Silence.</p>' +
-      '<p>It is the smallest victory of your three hundred years, and one of the most satisfying.</p>' +
-      '<p>The second one drinks from your ankle while you celebrate. By dawn your ankle is ' + v('itchy', 'when your skin wants you to scratch it', '癢的') + ' and your eyes are sand, and you have learned tonight\u2019s lesson, which is bigger than mosquitoes:</p>' +
+      '<p>Silence. It is the smallest victory of your three hundred years, and one of the most satisfying.</p>' +
+      '<p>The second one drinks from your ankle while you celebrate. By dawn your ankle is itchy and your eyes are sand, and you have learned tonight\u2019s lesson, which is bigger than mosquitoes:</p>' +
       '<p class="beat">A ward that seals the world out seals you in. No light. No wind. No talking brick. No city. In this realm, total isolation is not safety. It is losing slowly, in the heat, with one mosquito.</p>';
-    return {
-      label: 'Section 8 · The Hunter in the Dark',
-      time: 'DAY 2 · 00:14 — 05:50',
-      html: html,
-      choices: [{ t: 'Dawn.', to: 'e1s9' }]
-    };
+    return { label: 'Section 8 \u00b7 The Hunter in the Dark', time: 'DAY 2 \u00b7 00:14 \u2014 05:50', html: html,
+      choices: [{ t: 'Dawn.', to: 'e1s9' }] };
   },
 
-  /* ---------- 8b · the pilgrimage ---------- */
-  e1s8b: function (s) {
+  e1s8b: function () {
     var html =
       '<p>You release the ward.</p>' +
       '<p>The lamp blinks on. The fan wakes mid-turn, as if nothing happened. On the floor, Boba returns in the middle of the same word.</p>' +
       '<div class="ai">\u2014ting a signal problem. Sir? Did you put me in a tomb?</div>' +
       '<p>\u201cLater,\u201d you say, stepping into your slippers. \u201cWhere does this city sell weapons at this hour?\u201d</p>' +
       '<div class="ai">Define \u201cweapons.\u201d Wait. Don\u2019t. There\u2019s a convenience store two minutes away. It\u2019s open. It\u2019s always open.</div>' +
-      '<p>The lane at two in the morning is warm and orange under the street lights. And at the corner stands a small temple of light \u2014 glass walls, white glow, cold air pouring from the door like a blessing. A bell chimes twice as you enter, announcing you to no one.</p>' +
+      '<p>The lane at two in the morning is warm and orange under the street lights. At the corner stands a small temple of light \u2014 glass walls, white glow, cold air pouring from the door like a blessing. A bell chimes twice as you enter, announcing you to no one.</p>' +
       '<p>You walk the shelves like treasure rooms. Cold tea in a hundred bottles. Eggs swimming in dark, fragrant soup. Steamed buns sleeping behind warm glass. A whole realm that never closes its eyes.</p>' +
-      '<p>You buy a ' + v('mosquito coil', 'a green spiral you burn; the smoke keeps mosquitoes away', '蚊香') + ', and a thing the clerk calls an electric mosquito ' + v('swatter', 'a racket-shaped tool for killing mosquitoes', '電蚊拍') + ' \u2014 a racket strung with metal wires, 249 coins, hanging next to the chewing gum.</p>' +
-      '<p>Outside, in the lane, you press the button on the handle and touch the wires with the tip of a leaf.</p>' +
-      '<p>Blue light snaps between the wires with a sound you know very, very well.</p>' +
-      '<p class="beat">Thunder.</p>' +
-      '<p>You stand still in the orange lane, holding the racket with both hands now.</p>' +
-      '<p>The mortals of this realm caught thunder. They tamed it. They taught it to live in walls and lamps and talking bricks \u2014 and they put it in a toy, and they sell it for 249 coins, next to the chewing gum.</p>' +
+      '<p>You buy a mosquito coil, and a thing the clerk calls an electric mosquito swatter \u2014 a racket strung with metal wires, 249 coins, hanging next to the chewing gum.</p>' +
+      '<p>Outside, in the lane, you press the button on the handle and touch the wires with the tip of a leaf. Blue light snaps between the wires with a crack you know very, very well.</p>' +
+      '<p class="beat">Thunderbolt.</p>' +
+      '<p>You stand still in the orange lane, holding the racket with both hands now. The mortals of this realm caught the thunderbolt. They tamed it. They taught it to live in walls and lamps and talking bricks \u2014 and they put it in a toy, and they sell it for 249 coins, next to the chewing gum.</p>' +
       '<div class="ai">It\u2019s for mosquitoes, sir. Please don\u2019t bow to it.</div>' +
       '<p>Back on the roof, you light the coil. Thin white smoke draws slow circles in the lamplight. You sleep without the ward, guarded by smoke and tame thunder, the racket resting on your chest like a sword.</p>';
-    return {
-      label: 'Section 8 · The Pilgrimage',
-      time: 'DAY 2 · 02:03',
-      html: html,
-      choices: [{
-        t: 'Sleep. Dawn comes fast.',
-        to: 'e1s9',
-        fx: function () { state.money -= 337; state.flags.thunder_seed = true; }
-      }]
-    };
+    return { label: 'Section 8 \u00b7 The Pilgrimage', time: 'DAY 2 \u00b7 02:03', html: html,
+      choices: [{ t: 'Sleep. Dawn comes fast.', to: 'e1s9',
+        fx: function () { state.money -= 337; state.flags.thunder_seed = true; } }] };
   },
 
-  /* ---------- 8c · the rewrite ---------- */
-  e1s8c: function (s) {
+  e1s8c: function () {
     var html =
       '<p>You sit in the dark, in the heat, with two mosquitoes singing war songs around your head, and you open the heart of the ward.</p>' +
-      '<p>A wall is stupid, your first teacher said. A ward is a list of rules about what may not pass \u2014 and the master writes the list.</p>' +
-      '<p>So write. One new rule: <em>the lightning in the wire may pass.</em></p>' +
+      '<p>A wall is stupid, your first teacher said. A ward is a list of rules about what may not pass \u2014 and the master writes the list. So write. One new rule: <em>the lightning in the wire may pass.</em></p>' +
       '<p>The ward asks \u2014 not in words, wards have no words \u2014 the only question a ward ever asks: <em>define it.</em></p>' +
       '<p>You reach. Lightning that is not angry? Thunder that lives in a wall? A river of\u2026 of what? You hold nothing. The rule dies unwritten, because you cannot define what you do not understand, and tonight you understand <em>nothing about this world.</em></p>' +
-      '<p>Three hundred years of dignity make a small, ugly sound.</p>' +
-      '<p>Then \u2014 wait.</p>' +
+      '<p>Three hundred years of dignity make a small, ugly sound. Then \u2014 wait.</p>' +
       '<p>You cannot name the lightning. Fine. But insects?</p>' +
       '<p><em>Insects you know.</em> Your sect classified the lesser wyrm-kin in nine volumes, and you, in one long boring winter, wrote two of them. Carapace, wing, feeler, six legs or eight or a hundred \u2014 you can define an insect asleep, upside down, poisoned.</p>' +
-      '<p>So you stop repairing the great ward. You let it fall \u2014 all of it, the lightning-blocks, the divine-sense walls, three hundred years of textbook \u2014 and from the pieces you raise something small, humble, and perfect.</p>' +
+      '<p>So you stop repairing the great ward. You let it fall \u2014 the lightning-blocks, the divine-sense walls, three hundred years of textbook \u2014 and from the pieces you raise something small, humble, and perfect.</p>' +
       '<p class="beat">One rule. One bed. INSECTS: DENY.</p>' +
       '<p>The lamp blinks on \u2014 the new ward touches no wire. The fan wakes mid-turn. Boba returns in the middle of the same word.</p>' +
       '<div class="ai">\u2014nal lost. Sir? Did we die?</div>' +
       '<p>By your ear: <em>nnn\u2014 tink.</em> A tiny singer bounces off jade light. A pause. Then the second, stubborn: <em>tink.</em></p>' +
       '<p>You lie down inside the strongest mosquito net in two worlds, and you sleep like a sect master.</p>';
-    return {
-      label: 'Section 8 · The Rewrite',
-      time: 'DAY 2 · 00:30',
-      html: html,
-      choices: [{
-        t: 'Sleep. You have earned it twice.',
-        to: 'e1s9',
-        fx: function () { state.flags.dignity = true; }
-      }]
-    };
+    return { label: 'Section 8 \u00b7 The Rewrite', time: 'DAY 2 \u00b7 00:30', html: html,
+      choices: [{ t: 'Sleep. You have earned it twice.', to: 'e1s9',
+        fx: function () { state.flags.dignity = true; } }] };
   },
 
-  /* ---------- 9 · dawn ---------- */
-  e1s9: function (s) {
-    var opener = '';
+  e1s9: function () {
+    var opener;
     if (state.flags.route === 'a') {
       opener = '<p>Morning light finds you cross-legged, red-eyed, one mosquito to your name and one ankle on fire. You drop the great ward \u2014 light, wind, and city pour back in like old friends \u2014 and in the grey morning you build the real answer, the one the long night taught you.</p>';
     } else if (state.flags.route === 'b') {
-      opener = '<p>You wake at dawn. The coil has burned down to a spiral of grey ash. The racket of tame thunder is still on your chest. Good mortal weapons \u2014 but a grandmaster does not borrow forever. You sit up and build the real answer.</p>';
+      opener = '<p>You wake at dawn. The coil has burned to a spiral of grey ash. The racket of tame thunder is still on your chest. Good mortal weapons \u2014 but a grandmaster does not borrow forever. You sit up and build the real answer.</p>';
     } else {
       opener = '<p>You wake rested, inside a soft jade glow, to the sound of a city starting its engines. The small ward held all night and drank almost nothing. Now, in the morning light, you refine it one final turn.</p>';
     }
     var html =
       opener +
       '<p>One rule, written clean: <em>insects \u2014 deny.</em> One space, the size of a bed. It touches no wire. It blocks no light, no wind, no voice, no city. It costs so little that the thin qi of this realm can feed it forever.</p>' +
-      '<p>Below, the realm wakes up. Metal beasts cough and clear their throats in the lanes. Somewhere downstairs, oil meets dough, and the smell of fried bread sticks climbs six floors without losing strength.</p>' +
+      '<p>Below, the realm wakes up. Metal beasts cough and clear their throats in the lanes. Somewhere downstairs, oil meets dough, and the smell of fried bread climbs six floors without losing strength.</p>' +
       '<p>You inspect your work the way you once inspected a mountain-gate ward before a demon tide: slowly, twice, with your hands behind your back.</p>' +
       '<p>It is a mosquito net.</p>' +
       '<p class="beat">It is the strongest mosquito net in two worlds.</p>' +
       '<p>Three hundred years, nine bolts of heaven, and this is the first thing you have built in the immortal realm. You find, to your own surprise, that you are satisfied. It is small. It is humble. It is <em>good work.</em></p>';
-    return {
-      label: 'Section 9 · Dawn',
-      time: 'DAY 2 · 06:12',
-      html: html,
-      choices: [{
-        t: 'Morning report.',
-        to: 'e1s10',
-        fx: function () {
-          state.barrier = 'Mosquito Net · Lv.1';
-        }
-      }]
-    };
+    return { label: 'Section 9 \u00b7 Dawn', time: 'DAY 2 \u00b7 06:12', html: html,
+      choices: [{ t: 'Morning report.', to: 'e1s10', fx: function () { state.barrier = 'Mosquito Net \u00b7 Lv.1'; } }] };
   },
 
-  /* ---------- 10 · morning report ---------- */
-  e1s10: function (s) {
+  e1s10: function () {
     var money = state.money.toLocaleString('en-US');
-    var achList = [];
-    achList.push({ icon: '\ud83d\udee1\ufe0f', name: 'The Strongest Mosquito Net in Two Worlds', desc: 'Build a perfect ward. Then make it humble.' });
-    achList.push({ icon: '\ud83e\udeb3', name: 'Defeated by the Flying Kind', desc: 'Learn what every soul on this island already knows.' });
-    if (state.flags.haggled) {
-      achList.push({ icon: '\ud83e\udde7', name: 'Market Grandmaster', desc: 'Win 500 coins and one fan with words alone.' });
-    }
-    if (state.flags.route === 'a') {
-      achList.push({ icon: '\ud83d\udc4f', name: 'Bare-Hand Technique', desc: 'One clap. One kill. Five misses. We only count the clap.' });
-    } else if (state.flags.route === 'b') {
-      achList.push({ icon: '\ud83c\udfea', name: 'Midnight Pilgrim', desc: 'Discover the temple that never closes.' });
-    } else if (state.flags.route === 'c') {
-      achList.push({ icon: '\ud83e\uddd8', name: 'Three Hundred Years of Dignity (Intact)', desc: 'Solve it the master\u2019s way: by giving up the master\u2019s way.' });
-    }
-    if (state.flags.tenant_hook_early) {
-      achList.push({ icon: '\ud83d\udd0d', name: 'The Unfinished Sentence', desc: 'Ask the question Mrs. Lin did not answer.' });
-    }
+    var rent = state.rent.toLocaleString('en-US');
+    var ach = [];
+    ach.push(['\ud83d\udee1\ufe0f', 'The Strongest Mosquito Net in Two Worlds', 'Build a perfect ward. Then make it humble.']);
+    ach.push(['\ud83e\udeb3', 'Defeated by the Flying Kind', 'Learn what every soul on this island already knows.']);
+    if (state.flags.haggled) ach.push(['\ud83e\udde7', 'Market Grandmaster', 'Win 500 coins and one fan with words alone.']);
+    if (state.flags.route === 'a') ach.push(['\ud83d\udc4f', 'Bare-Hand Technique', 'One clap. One kill. Five misses. We only count the clap.']);
+    else if (state.flags.route === 'b') ach.push(['\ud83c\udfea', 'Midnight Pilgrim', 'Discover the temple that never closes.']);
+    else if (state.flags.route === 'c') ach.push(['\ud83e\uddd8', 'Three Hundred Years of Dignity (Intact)', 'Solve it the master\u2019s way: by giving up the master\u2019s way.']);
+    if (state.flags.tenant_hook_early) ach.push(['\ud83d\udd0d', 'The Unfinished Sentence', 'Ask the question Mrs. Lin did not answer.']);
     var achHtml = '';
-    for (var i = 0; i < achList.length; i++) {
-      achHtml += '<div class="ach"><span class="name">' + achList[i].icon + ' ' + achList[i].name + '</span><br><span class="desc">' + achList[i].desc + '</span></div>';
+    for (var i = 0; i < ach.length; i++) {
+      achHtml += '<div class="ach"><span class="name">' + ach[i][0] + ' ' + ach[i][1] + '</span><br><span class="desc">' + ach[i][2] + '</span></div>';
     }
     var html =
       '<p>At 07:30 exactly, the talking brick clears a throat it does not have.</p>' +
       '<div class="ai">Good morning, sir. Your report.<br><br>' +
       'Funds: NT$' + money + '.<br>' +
-      'Rent due in 30 days: NT$8,500.<br><br>' +
+      'Rent due in 30 days: NT$' + rent + '.<br><br>' +
       'I did the math twice. It did not improve.</div>' +
       '<p>You look at the numbers. The numbers look back, unafraid.</p>' +
-      '<div class="ai">Conclusion: you need a job. Here \u2014 \u201cBuilding ' + v('security guard', 'a person whose job is to guard a building', '保全') + '. ' + v('Night shift', 'working hours during the night', '夜班') + '. NT$32,000 a month. No experience needed.\u201d<br><br>' +
+      '<div class="ai">Conclusion: you need a job. Here \u2014 \u201cBuilding security guard. Night shift. NT$32,000 a month. No experience needed.\u201d<br><br>' +
       'You stand very still for long periods and glare at things. Sir, you are overqualified.</div>' +
       '<p>You read the words again. <em>Security guard.</em> A person this realm pays \u2014 every month, in coins \u2014 to keep things out.</p>' +
       '<p>\u201cThis realm posts guarding missions,\u201d you say slowly.</p>' +
       '<div class="ai">It\u2019s a job, sir.</div>' +
       '<p>\u201cThree hundred years,\u201d you tell the ceiling, \u201cand the immortal realm wants me to guard a door.\u201d</p>' +
       '<div class="ai">For NT$32,000. Should I send your r\u00e9sum\u00e9? It\u2019s one line long, and I wrote it, so it\u2019s excellent.</div>' +
-      '<p>Morning wind moves through the window \u2014 and the tape on the old screen hole lifts and falls, open like a small door. Whatever tore it open is still out there. You will ask Mrs. Lin about the last tenant.</p>' +
-      '<p>Later.</p>' +
+      '<p>Morning wind moves through the window \u2014 and the tape on the old screen hole lifts and falls, open like a small door. Whatever tore it open is still out there. You will ask Mrs. Lin about the last tenant. Later.</p>' +
       '<div class="endhead">Episode 1 Complete</div>' +
       achHtml +
-      '<div class="endhead">Definition Library · v0.1</div>' +
+      '<div class="endhead">Definition Library \u00b7 v0.1</div>' +
       '<div class="libcard">RULE 01 \u2014 INSECTS: DENY<br>RANGE \u2014 ONE BED<br><br>UNDEFINED: tame lightning \u00b7 the invisible thread \u00b7 this entire world</div>';
-    return {
-      label: 'Section 10 · Morning Report',
-      time: 'DAY 2 · 07:30',
-      html: html,
+    return { label: 'Section 10 \u00b7 Morning Report', time: 'DAY 2 \u00b7 07:30', html: html,
       choices: [
-        { t: 'EPISODE 2 — THE NIGHT SHIFT · Coming soon', to: '__locked__' },
+        { t: 'EPISODE 2 \u2014 THE NIGHT SHIFT \u00b7 Coming soon', to: '__locked__' },
         { t: 'Play Episode 1 again', to: '__restart__' }
-      ]
-    };
+      ] };
   }
 };
+
+/* ============ auto-linker ============ */
+var TERMS = Object.keys(VOCAB);
+var SKIP_CLASSES = ['cast', 'libcard', 'endhead', 'seclabel', 'quiet', 'choices', 'brand', 'kotitle', 'level-badge', 'subtitle', 'wardline'];
+
+function isLetter(ch) { return ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z'; }
+
+function ciFind(text, term, from) {
+  var lt = text.toLowerCase(), lterm = term.toLowerCase();
+  var idx = lt.indexOf(lterm, from);
+  while (idx !== -1) {
+    var before = idx > 0 ? text.charAt(idx - 1) : '';
+    var after = (idx + term.length < text.length) ? text.charAt(idx + term.length) : '';
+    if (!isLetter(before) && !isLetter(after)) return idx;
+    idx = lt.indexOf(lterm, idx + 1);
+  }
+  return -1;
+}
+
+function skipNode(node) {
+  var p = node.parentNode;
+  while (p && p.id !== 'wrap') {
+    if (p.tagName === 'BUTTON') return true;
+    if (p.classList) {
+      for (var i = 0; i < SKIP_CLASSES.length; i++) {
+        if (p.classList.contains(SKIP_CLASSES[i])) return true;
+      }
+      if (p.classList.contains('vb')) return true;
+    }
+    p = p.parentNode;
+  }
+  return false;
+}
+
+function processTextNode(node) {
+  var text = node.nodeValue;
+  if (!text || !/[A-Za-z]/.test(text)) return;
+  var bestIdx = -1, bestTerm = null;
+  for (var i = 0; i < TERMS.length; i++) {
+    var term = TERMS[i];
+    if (state.seen[term]) continue;
+    var idx = ciFind(text, term, 0);
+    if (idx === -1) continue;
+    if (bestIdx === -1 || idx < bestIdx || (idx === bestIdx && term.length > bestTerm.length)) {
+      bestIdx = idx; bestTerm = term;
+    }
+  }
+  if (bestTerm === null) return;
+  var matchText = text.substr(bestIdx, bestTerm.length);
+  var pre = text.slice(0, bestIdx);
+  var post = text.slice(bestIdx + bestTerm.length);
+  var span = document.createElement('span');
+  span.className = 'vb';
+  span.setAttribute('data-d', VOCAB[bestTerm][0]);
+  span.setAttribute('data-z', VOCAB[bestTerm][1]);
+  span.textContent = matchText;
+  var parent = node.parentNode;
+  if (pre) parent.insertBefore(document.createTextNode(pre), node);
+  parent.insertBefore(span, node);
+  var postNode = document.createTextNode(post);
+  parent.insertBefore(postNode, node);
+  parent.removeChild(node);
+  state.seen[bestTerm] = 1;
+  processTextNode(postNode);
+}
+
+function linkify() {
+  if (cur === 'title') return;
+  var walker = document.createTreeWalker(wrap, NodeFilter.SHOW_TEXT, null, false);
+  var nodes = [];
+  var n;
+  while ((n = walker.nextNode())) nodes.push(n);
+  for (var i = 0; i < nodes.length; i++) {
+    if (nodes[i].parentNode && !skipNode(nodes[i])) processTextNode(nodes[i]);
+  }
+}
 
 /* ============ engine ============ */
 var wrap = document.getElementById('wrap');
@@ -716,24 +783,21 @@ var moneyView = document.getElementById('moneyView');
 var shieldView = document.getElementById('shieldView');
 
 function renderBar() {
-  if (cur === 'title') {
-    moneyView.textContent = '';
-    shieldView.textContent = '';
-    return;
-  }
+  if (cur === 'title') { moneyView.textContent = ''; shieldView.textContent = ''; return; }
   moneyView.textContent = '\ud83d\udcb0 NT$' + state.money.toLocaleString('en-US');
   shieldView.textContent = state.barrier ? '\ud83d\udee1\ufe0f ' + state.barrier : '';
 }
 
 function render() {
   closeTip();
-  var sec = sections[cur](state);
+  var sec = sections[cur]();
   var html = '';
   if (sec.label) html += '<div class="seclabel">' + sec.label + '</div>';
   if (sec.time) html += '<div class="quiet stamp">' + sec.time + '</div>';
   html += sec.html;
   html += '<div class="choices" id="choices"></div>';
   wrap.innerHTML = html;
+  linkify();
   var box = document.getElementById('choices');
   sec.choices.forEach(function (c) {
     var b = document.createElement('button');
@@ -744,7 +808,7 @@ function render() {
       if (c.to === '__restart__') { askRestart(); return; }
       if (c.to === '__continue__') {
         var data = loadSave();
-        if (data) { state = data.state; cur = data.cur; renderBar(); render(); }
+        if (data) { state = data.state; if (!state.seen) state.seen = {}; cur = data.cur; renderBar(); render(); }
         return;
       }
       if (c.fx) c.fx();
@@ -756,20 +820,12 @@ function render() {
   window.scrollTo(0, 0);
 }
 
-function goto_(id) {
-  cur = id;
-  save();
-  render();
-}
+function goto_(id) { cur = id; save(); render(); }
 
 /* ============ tooltip ============ */
 var tip = document.getElementById('tip');
 var openVb = null;
-
-function closeTip() {
-  tip.style.display = 'none';
-  openVb = null;
-}
+function closeTip() { tip.style.display = 'none'; openVb = null; }
 
 document.addEventListener('click', function (e) {
   var t = e.target;
@@ -782,13 +838,11 @@ document.addEventListener('click', function (e) {
     tip.style.top = '0px';
     requestAnimationFrame(function () {
       var r = t.getBoundingClientRect();
-      var tw = tip.offsetWidth;
-      var th = tip.offsetHeight;
-      var pad = 10;
+      var tw = tip.offsetWidth, th = tip.offsetHeight, pad = 10;
       var x = r.left + r.width / 2 - tw / 2;
       x = Math.max(pad, Math.min(x, window.innerWidth - tw - pad));
       var y = r.top - th - 8;
-      if (y < pad) y = r.bottom + 8; /* flip below when near top */
+      if (y < pad) y = r.bottom + 8;
       tip.style.left = (x + window.scrollX) + 'px';
       tip.style.top = (y + window.scrollY) + 'px';
     });
@@ -800,9 +854,7 @@ document.addEventListener('click', function (e) {
 /* ============ restart modal ============ */
 var overlay = document.getElementById('overlay');
 function askRestart() { overlay.style.display = 'flex'; }
-document.getElementById('mCancel').addEventListener('click', function () {
-  overlay.style.display = 'none';
-});
+document.getElementById('mCancel').addEventListener('click', function () { overlay.style.display = 'none'; });
 document.getElementById('mOk').addEventListener('click', function () {
   overlay.style.display = 'none';
   clearSave();
@@ -810,10 +862,7 @@ document.getElementById('mOk').addEventListener('click', function () {
   cur = 'title';
   render();
 });
-document.getElementById('restartLink').addEventListener('click', function (e) {
-  e.preventDefault();
-  askRestart();
-});
+document.getElementById('restartLink').addEventListener('click', function (e) { e.preventDefault(); askRestart(); });
 
 /* ============ boot ============ */
 render();
