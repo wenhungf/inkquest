@@ -138,6 +138,101 @@
   .btn-line{ display:flex; gap:10px; }
   .btn-line .choice{ flex:1; }
   hr.sep{ border:none; border-top:1px solid var(--line); margin:2em 0; }
+
+  /* ===== animated city-lights logo ===== */
+  /* ---------- the animated logo ---------- */
+  .logo-stage{
+    width:100%; max-width:440px; margin:18px auto 6px;
+    aspect-ratio: 440 / 150;
+  }
+  .logo-stage svg{ width:100%; height:100%; display:block; }
+
+  /* city baseline + skyline strokes start grey, get lit by the sweep */
+  .sky line, .sky path, .sky rect, .sky circle{
+    stroke:#39434b;          /* grey, dormant */
+    stroke-width:2;
+    fill:none;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
+
+  /* children inside a lit group inherit the group's animated stroke */
+  .sky g.lit line, .sky g.lit rect, .sky g.lit circle, .sky g.lit path{
+    stroke: inherit;
+  }
+
+  /* the sweep bar */
+  .sweep{
+    fill:url(#sweepGrad);
+    opacity:.9;
+  }
+
+  /* star badges pop in after their building lights */
+  .star{
+    fill:var(--hud);
+    opacity:0;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .caption{
+    font-family:ui-monospace,Menlo,monospace;
+    font-size:.7rem; letter-spacing:.16em; color:var(--dim);
+    margin-top:4px;
+  }
+  .controls{ margin-top:26px; }
+  .controls button{
+    background:transparent; color:var(--paper);
+    border:1px solid var(--line); border-radius:8px;
+    font-family:inherit; font-size:.9rem;
+    padding:9px 16px; margin:0 6px; cursor:pointer;
+  }
+  .controls button:hover{ border-color:var(--hud-dim); }
+  .note{ font-size:.74rem; color:var(--dim); margin-top:18px; line-height:1.6; }
+
+  /* ===== TIMING =====
+     Total loop = 13s.
+     0–2.4s  sweep travels across (0–18.5%)
+     ~9.7s   city lit and held green
+     10.4–11s fade back to grey (80–84.6%)
+     11–13s  FULL GREY HOLD (~2s) before the next sweep
+  */
+  .anim .sweep      { animation: sweepMove 13s linear infinite; }
+  .anim .lit        { animation: litPulse 13s linear infinite; }
+  .anim .star       { animation: starPop 13s linear infinite; }
+
+  @keyframes sweepMove{
+    0%    { transform: translateX(-90px); opacity:0; }
+    1.5%  { opacity:.9; }
+    16.5% { transform: translateX(470px); opacity:.9; }
+    19%   { transform: translateX(520px); opacity:0; }
+    100%  { transform: translateX(520px); opacity:0; }
+  }
+
+  /* lit: light on as the sweep passes, hold green, fade to grey by 84.6%,
+     then stay grey through the ~2s quiet until the loop resets */
+  @keyframes litPulse{
+    0%, 7.9%   { stroke:#39434b; }        /* stay grey until the sweep has passed */
+    9.2%       { stroke:var(--hud); }      /* then snap on, just behind the sweep */
+    80%        { stroke:var(--hud); }      /* hold lit */
+    84.6%      { stroke:#39434b; }         /* fade to grey */
+    100%       { stroke:#39434b; }         /* FULL GREY HOLD ~2s */
+  }
+
+  @keyframes starPop{
+    0%, 8%     { opacity:0; transform: scale(.4); }
+    12%        { opacity:1; transform: scale(1.25); }
+    15%        { opacity:1; transform: scale(1); }
+    80%        { opacity:1; transform: scale(1); }
+    84.6%      { opacity:0; transform: scale(.4); }   /* vanish WITH the buildings */
+    100%       { opacity:0; transform: scale(.4); }   /* stay gone through grey hold */
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .anim .sweep, .anim .lit, .anim .star{ animation:none; }
+    .anim .lit{ stroke:var(--hud); }
+    .anim .star{ opacity:1; }
+  }
 </style>
 </head>
 <body>
@@ -2379,6 +2474,110 @@ function renderTitle(){
   <div class="title-wrap">
     <div class="title-eyebrow">AN INKQUEST GAMEBOOK</div>
     <h1 class="gametitle">ACHIEVEMENT UNLOCKED</h1>
+    <div class="logo-stage">
+      <svg id="logo" class="anim" viewBox="0 0 440 150" xmlns="http://www.w3.org/2000/svg" aria-label="A grey city skyline lights up green, one building at a time">
+      <defs>
+        <linearGradient id="sweepGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0"   stop-color="#4ee6a8" stop-opacity="0"/>
+          <stop offset="0.5" stop-color="#4ee6a8" stop-opacity="0.5"/>
+          <stop offset="1"   stop-color="#4ee6a8" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+
+      <!-- ground line -->
+      <g class="sky">
+        <!-- ground line -->
+        <line class="lit" x1="18.0" y1="122" x2="52.2" y2="122" style="animation-delay:-0.432s"/>
+        <line class="lit" x1="51.2" y1="122" x2="85.8" y2="122" style="animation-delay:-0.303s"/>
+        <line class="lit" x1="84.8" y1="122" x2="119.5" y2="122" style="animation-delay:-0.174s"/>
+        <line class="lit" x1="118.5" y1="122" x2="153.2" y2="122" style="animation-delay:-0.045s"/>
+        <line class="lit" x1="152.2" y1="122" x2="186.8" y2="122" style="animation-delay:-12.916s"/>
+        <line class="lit" x1="185.8" y1="122" x2="220.5" y2="122" style="animation-delay:-12.787s"/>
+        <line class="lit" x1="219.5" y1="122" x2="254.2" y2="122" style="animation-delay:-12.658s"/>
+        <line class="lit" x1="253.2" y1="122" x2="287.8" y2="122" style="animation-delay:-12.529s"/>
+        <line class="lit" x1="286.8" y1="122" x2="321.5" y2="122" style="animation-delay:-12.400s"/>
+        <line class="lit" x1="320.5" y1="122" x2="355.2" y2="122" style="animation-delay:-12.271s"/>
+        <line class="lit" x1="354.2" y1="122" x2="388.8" y2="122" style="animation-delay:-12.142s"/>
+        <line class="lit" x1="387.8" y1="122" x2="422.5" y2="122" style="animation-delay:-12.013s"/>
+
+        <!-- far-left low row houses -->
+        <rect class="lit" x="30"  y="98"  width="20" height="24" style="animation-delay:-0.366s"/>
+        <rect class="lit" x="52"  y="104" width="16" height="18" style="animation-delay:-0.297s"/>
+        <rect class="lit" x="70"  y="86"  width="20" height="36" style="animation-delay:-0.182s"/>
+
+        <!-- KAOHSIUNG HARBOR GANTRY CRANE 1 (detailed: legs, boom, trolley, hook) -->
+        <g class="lit" style="animation-delay:-0.182s">
+          <!-- A-frame legs -->
+          <line x1="100" y1="122" x2="108" y2="64"/>
+          <line x1="124" y1="122" x2="116" y2="64"/>
+          <line x1="106" y1="96"  x2="118" y2="96"/>   <!-- leg crossbar -->
+          <!-- top tower -->
+          <line x1="108" y1="64"  x2="116" y2="64"/>
+          <line x1="112" y1="64"  x2="112" y2="52"/>   <!-- mast -->
+          <!-- horizontal boom + counter-boom -->
+          <line x1="86"  y1="58"  x2="158" y2="58"/>
+          <line x1="112" y1="52"  x2="86"  y2="58"/>   <!-- stay cable back -->
+          <line x1="112" y1="52"  x2="158" y2="58"/>   <!-- stay cable front -->
+          <!-- trolley + hanging hook -->
+          <line x1="140" y1="58"  x2="140" y2="78"/>
+          <line x1="136" y1="78"  x2="144" y2="78"/>
+        </g>
+
+        <!-- GANTRY CRANE 2 (smaller, behind) -->
+        <g class="lit" style="animation-delay:-12.991s">
+          <line x1="150" y1="122" x2="156" y2="74"/>
+          <line x1="170" y1="122" x2="164" y2="74"/>
+          <line x1="156" y1="74"  x2="164" y2="74"/>
+          <line x1="160" y1="74"  x2="160" y2="66"/>
+          <line x1="140" y1="70"  x2="190" y2="70"/>
+          <line x1="160" y1="66"  x2="140" y2="70"/>
+          <line x1="160" y1="66"  x2="190" y2="70"/>
+        </g>
+
+        <!-- mid low cluster -->
+        <rect class="lit" x="196" y="90"  width="22" height="32" style="animation-delay:-12.715s"/>
+        <rect class="lit" x="222" y="78"  width="18" height="44" style="animation-delay:-12.92s"/>
+
+        <!-- 85 SKY TOWER (user's authoritative path, unchanged; placed via transform) -->
+        <g class="lit" style="animation-delay:-12.78s" transform="translate(204.025 1.565) scale(0.37)">
+          <path d="M 238.0,325.5 L 96.5,325.0 L 96.5,306.0 L 103.5,305.0 L 103.5,278.0 L 114.5,277.0 L 114.5,156.0 L 121.0,154.5 L 133.0,159.5 L 134.0,164.5 L 146.5,164.0 L 146.5,45.0 L 158.0,42.5 L 163.5,36.0 L 167.0,17.5 L 169.5,19.0 L 170.5,34.0 L 175.5,41.0 L 188.5,45.0 L 188.5,164.0 L 201.0,164.5 L 203.0,159.5 L 214.0,154.5 L 220.5,155.0 L 220.5,277.0 L 231.5,278.0 L 231.5,305.0 L 238.5,306.0 Z M 162,190 L 173,190 L 173,245 L 178,250 L 178,287 L 157,287 L 157,250 L 162,245 Z" fill-rule="evenodd" vector-effect="non-scaling-stroke"/>
+        </g>
+
+        <!-- right cluster -->
+        <rect class="lit" x="300" y="84"  width="20" height="38" style="animation-delay:-12.324s"/>
+        <rect class="lit" x="324" y="96"  width="22" height="26" style="animation-delay:-12.225s"/>
+        <rect class="lit" x="350" y="88"  width="16" height="34" style="animation-delay:-12.056s"/>
+
+        <!-- KAOHSIUNG GIANT FERRIS WHEEL (detailed: rim, hub, spokes, support) -->
+        <g class="lit" style="animation-delay:-12.056s">
+          <circle cx="394" cy="92" r="20"/>
+          <circle cx="394" cy="92" r="3"/>
+          <!-- spokes -->
+          <line x1="394" y1="92" x2="394" y2="72"/>
+          <line x1="394" y1="92" x2="414" y2="92"/>
+          <line x1="394" y1="92" x2="394" y2="112"/>
+          <line x1="394" y1="92" x2="374" y2="92"/>
+          <line x1="394" y1="92" x2="408" y2="78"/>
+          <line x1="394" y1="92" x2="408" y2="106"/>
+          <line x1="394" y1="92" x2="380" y2="106"/>
+          <line x1="394" y1="92" x2="380" y2="78"/>
+          <!-- support legs to ground -->
+          <line x1="394" y1="92" x2="384" y2="122"/>
+          <line x1="394" y1="92" x2="404" y2="122"/>
+        </g>
+      </g>
+
+      <!-- achievement stars that pop above lit landmarks -->
+      <g>
+        <path class="star" d="M112 38 l2.4 5 5.4 .8 -3.9 3.8 .9 5.4 -4.8-2.5 -4.8 2.5 .9-5.4 -3.9-3.8 5.4-.8z" style="animation-delay:-0.167s"/>
+        <path class="star" d="M266 2.0 l2.4 5 5.4 .8 -3.9 3.8 .9 5.4 -4.8-2.5 -4.8 2.5 .9-5.4 -3.9-3.8 5.4-.8z" style="animation-delay:-12.546s"/>
+        <path class="star" d="M394 58 l2.4 5 5.4 .8 -3.9 3.8 .9 5.4 -4.8-2.5 -4.8 2.5 .9-5.4 -3.9-3.8 5.4-.8z" style="animation-delay:-12.056s"/>
+      </g>
+
+      <!-- the sweep bar travels left to right -->
+      <rect class="sweep" x="-50" y="0" width="100" height="150"/>
+    </svg>
+    </div>
     <div class="blurb">
       <p>Same office. Same coffee. Same road — for five years.</p>
       <p class="sysline">🏆 ACHIEVEMENT UNLOCKED</p>

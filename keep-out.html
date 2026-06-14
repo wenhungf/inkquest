@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>Keep Out | InkQuest</title>
+<title>Keep Out — Episode 1: The Cheap Room | InkQuest</title>
 <style>
   html, body {
     background: #0b1016 !important;
@@ -30,6 +30,8 @@
     color: #8b96a3;
   }
   #bar .stats { display: flex; gap: 14px; letter-spacing: 0.04em; text-transform: none; font-size: 13px; }
+  #bar .bar-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 62%; }
+  #bar .bar-title .ep { color: #cdd6df; text-transform: none; letter-spacing: 0.02em; }
   #bar .money { color: #e0a458; font-variant-numeric: tabular-nums; }
   #bar .shield { color: #67d9a6; }
   #wrap { max-width: 620px; margin: 0 auto; padding: 28px 22px 80px; }
@@ -222,7 +224,7 @@
 </head>
 <body>
 <div id="bar">
-  <span>Keep Out · EP1</span>
+  <span class="bar-title" id="barTitle"></span>
   <span class="stats">
     <span class="money" id="moneyView"></span>
     <span class="shield" id="shieldView"></span>
@@ -816,9 +818,14 @@ function linkify() {
 var wrap = document.getElementById('wrap');
 var moneyView = document.getElementById('moneyView');
 var shieldView = document.getElementById('shieldView');
+var barTitle = document.getElementById('barTitle');
+
+/* Episode metadata. Future episodes add an entry; the banner reads from here. */
+var EPISODE = { num: 1, title: 'The Cheap Room' };
 
 function renderBar() {
   if (cur === 'title') { moneyView.textContent = ''; shieldView.textContent = ''; return; }
+  barTitle.innerHTML = 'EP' + EPISODE.num + ' <span class="ep">' + EPISODE.title + '</span>';
   moneyView.textContent = '\ud83d\udcb0 NT$' + state.money.toLocaleString('en-US');
   shieldView.textContent = state.barrier ? '\ud83d\udee1\ufe0f ' + state.barrier : '';
 }
