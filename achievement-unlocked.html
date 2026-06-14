@@ -150,7 +150,7 @@
    ===================================================== */
 
 const SAVE_KEY = 'au_save';
-const SAVE_VERSION = 3;
+const SAVE_VERSION = 4;
 
 function freshState(){
   return {
@@ -160,11 +160,13 @@ function freshState(){
     points: 0,
     money: 0,
     level: 1,
+    stamina: 100,
     skills: [],
     achievements: [],
     flags: {},
     map_unlocked: ['commute_route'],
-    failCount: 0
+    failCount: 0,
+    epStart: {}
   };
 }
 
@@ -184,6 +186,28 @@ function loadSave(){
 function save(){
   try{ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
   catch(e){ storageOK = false; }
+}
+function snapshotEpisode(n){
+  // store a deep copy of state at the moment this episode begins (minus the snapshots themselves)
+  try{
+    const copy = JSON.parse(JSON.stringify(state));
+    delete copy.epStart;
+    state.epStart = state.epStart || {};
+    state.epStart[n] = copy;
+    save();
+  }catch(e){}
+}
+function replayEpisode(n, firstSection){
+  // restore the snapshot for episode n, then jump to its first section
+  try{
+    const snap = state.epStart && state.epStart[n];
+    if(!snap){ go(firstSection); return; }
+    const keepSnaps = state.epStart;
+    state = JSON.parse(JSON.stringify(snap));
+    state.epStart = keepSnaps; // preserve all snapshots across replays
+    save();
+  }catch(e){}
+  go(firstSection);
 }
 function wipeSave(){
   try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
@@ -207,7 +231,13 @@ const ACH = {
   letting_go:    { ep:3, name:'Letting Go', pts:0, desc:'1,247 days. You let it find new hands.' },
   off_the_clock: { ep:3, name:'Off the Clock', pts:0, desc:'No quest. No points. You did it anyway.' },
   not_yours:     { ep:3, name:'Not Yours to Open', pts:0, desc:'Some boxes are not questions.' },
-  crossing:      { ep:3, name:'Crossing', pts:20, desc:'Over the water, before sunset.' }
+  crossing:      { ep:3, name:'Crossing', pts:20, desc:'Over the water, before sunset.' },
+  level_five:    { ep:4, name:'Level 5', pts:0, desc:'The map opened. So did you.' },
+  unbroken:      { ep:4, name:'Unbroken', pts:30, desc:'Five links. Not one missed.' },
+  local_knowledge:{ ep:99, name:'Local Knowledge', pts:0, desc:"Sam's lane. Six minutes. Earned weeks ago." },
+  long_way_up:   { ep:4, name:'The Long Way Up', pts:5, desc:'You chose the steep stairs. The hard way up.' },
+  just_watch:    { ep:4, name:'Just Watch', pts:0, desc:'The whole task was to stop.' },
+  the_warning:   { ep:4, name:'The Warning', pts:0, desc:'Someone left it on a wall. For you.' }
 };
 function grant(id){
   if(!state.achievements.includes(id)){
@@ -364,7 +394,65 @@ const VOCAB = {
   deadpan:{en:'with a completely serious face, while joking', zh:'面無表情地（搞笑）'},
   funeral:{en:'the ceremony when someone has died', zh:'葬禮'},
   brutally:{en:'in a way that is hard and hurts, without being soft', zh:'殘酷地'},
-  register:{en:'the machine at a counter that holds money', zh:'收銀機'}
+  register:{en:'the machine at a counter that holds money', zh:'收銀機'},
+  chain:{en:'things joined together in a line, one after another', zh:'鏈、連鎖'},
+  link:{en:'one part of a chain', zh:'環節'},
+  stamina:{en:'the energy to keep going for a long time', zh:'體力、耐力'},
+  deadline:{en:'the latest time you can finish something', zh:'截止時間'},
+  sprint:{en:'to run as fast as you can for a short time', zh:'衝刺'},
+  gate:{en:'a door in a fence or wall, or where you board a boat', zh:'閘門、登船口'},
+  slope:{en:'ground that goes up or down', zh:'斜坡'},
+  coordinate:{en:'a number that shows an exact place on a map', zh:'座標'},
+  scribbled:{en:'written fast and messily', zh:'潦草寫的'},
+  warning:{en:'words that tell you about danger', zh:'警告'},
+  pagoda:{en:'a tall tower with many floors, common at temples', zh:'塔、寶塔'},
+  seawall:{en:'a strong wall that holds back the sea', zh:'海堤、防波堤'},
+  update:{en:'a new version with changes', zh:'更新'},
+  winded:{en:'out of breath', zh:'上氣不接下氣'},
+  purge:{en:'to clean out something bad', zh:'清除、淨化'},
+  ails:{en:'troubles or sicknesses', zh:'病痛、煩惱'},
+  jaws:{en:'the mouth and teeth of an animal', zh:'顎、嘴'},
+  scales:{en:'the small hard plates on a fish or dragon', zh:'鱗片'},
+  reborn:{en:'born again; made new', zh:'重生'},
+  return_to:{en:'to go back to a place or state', zh:'回到、回歸'},
+  stripes:{en:'long lines of color, like on a tiger', zh:'條紋'},
+  waves:{en:'moving walls of water on the sea', zh:'波浪'},
+  invaders:{en:'enemies who come to attack a place', zh:'入侵者'},
+  greet:{en:'to meet and welcome', zh:'迎接'},
+  brave:{en:'not afraid of danger', zh:'勇敢的'},
+  meek:{en:'quiet and easily frightened', zh:'膽小溫順的'},
+  carves:{en:'cuts a shape into something hard', zh:'雕、鑿'},
+  shatter:{en:'to break into many pieces', zh:'粉碎'},
+  claim:{en:'to take something as your own', zh:'奪取、取得'},
+  sparks:{en:'tiny bright flashes of light', zh:'火花、亮光'},
+  peak:{en:'the top of a mountain', zh:'山峰、山頂'},
+  claimed:{en:'taken as your own', zh:'被占有的'},
+  chase:{en:'to run after something', zh:'追逐'},
+  ventured:{en:'went somewhere risky', zh:'冒險前往'},
+  verandas:{en:'open covered porches along a building', zh:'陽台、走廊'},
+  turn_your_back:{en:'to face away from something', zh:'背對'},
+  glowed:{en:'gave off a warm soft light', zh:'發出光芒'},
+  carved:{en:'cut into a shape', zh:'鑿成、雕成'},
+  baking:{en:'becoming very hot, like in an oven', zh:'曝曬、炙烤'},
+  cannons:{en:'big heavy guns from old times', zh:'大砲'},
+  mounts:{en:'stands that hold something in place', zh:'砲架、底座'},
+  shaded:{en:'out of the sun; in shadow', zh:'有遮蔭的'},
+  courtyard:{en:'an open space inside or beside a building', zh:'庭院'},
+  backtrack:{en:'to go back the way you came', zh:'折返、走回頭路'},
+  throat:{en:'a narrow passage, like the inside of a neck', zh:'（狹長的）通道、咽喉'},
+  unseen:{en:'not seen; hidden', zh:'不被看見的'},
+  scratches:{en:'rubs or scrapes lightly and keeps bothering', zh:'搔、抓（使人在意）'},
+  fort:{en:'a strong building made for defense in war', zh:'堡壘、砲台'},
+  tucked:{en:'placed neatly in a small or hidden spot', zh:'藏放於、塞在'},
+  blur:{en:'something you cannot see clearly because it moves fast', zh:'模糊一片'},
+  consulate:{en:'the office of one country inside another country', zh:'領事館'},
+  headland:{en:'a piece of land that reaches out into the sea', zh:'海岬'},
+  cranes:{en:'tall machines that lift heavy things at a port', zh:'起重機'},
+  bronze:{en:'a brown-gold metal color', zh:'青銅色'},
+  granted:{en:'given or allowed', zh:'給予、准予'},
+  stiff:{en:'hard to move; not soft or loose', zh:'僵硬的'},
+  stretch:{en:'a length of road or land', zh:'一段（路、地）'},
+  scrawl:{en:'fast, messy handwriting', zh:'潦草字跡'}
 };
 function tipTxt(k){ return VOCAB[k].en + '<br><span style="opacity:.75">'+VOCAB[k].zh+'</span>'; }
 function vb(word, key){
@@ -387,6 +475,7 @@ const SECTIONS = {
 /* ---------- ACT I · the grey days ---------- */
 
 s1:{
+ onEnter:()=>{ if(!state.epStart[1]) snapshotEpisode(1); },
  html:()=>`
   <p class="quiet">EPISODE 1 — ${vb('TUTORIAL','tutorial')}</p>
   <p>It is 11:42 p.m. You are still at your desk.</p>
@@ -434,7 +523,7 @@ s5:{
   <p>You tap your card. <i>Beep.</i></p>
   <p>And then you see it.</p>
   <p>Words. In the air. Right in front of you.</p>
-  ${sysBox('🏆 ACHIEVEMENT UNLOCKED',vb('Overtime','overtime')+' '+vb('Streak','streak')+': Day 14',[['pts','+1 point']])}
+  ${sysBox('🏆 '+vb('ACHIEVEMENT','achievement')+' UNLOCKED',vb('Overtime','overtime')+' '+vb('Streak','streak')+': Day 14',[['pts','+1 point']])}
   <p>You look at the clerk. The clerk looks at you.</p>
   <p>"…Do you see that?" you ask.</p>
   <p>"See what?"</p>`,
@@ -756,6 +845,7 @@ end:{
  },
  choices:[
    {t:'▶ Continue to Episode 2', go:'e2s1'},
+   {t:'↻ Replay Episode 1', go:'__replay1'},
    {t:'Back to title', go:'__title'}
  ],
  onRender:()=>{
@@ -781,7 +871,7 @@ end:{
    ===================================================== */
 
 e2s1:{
- onEnter:()=>{ state.episode = 2; },
+ onEnter:()=>{ state.episode = 2; snapshotEpisode(2); },
  html:()=>`
   <p class="quiet">EPISODE 2 — ${vb('DAILY','daily')} QUESTS</p>
   <p>Monday, 6:58 a.m.</p>
@@ -917,12 +1007,13 @@ e2s7:{
     ['flair','You know it now. Use it.'],
     ['pts','+1']
   ])}
-  <p>You walk into the lobby. Sam is at the desk, same as 2,400 mornings before.</p>
-  <p>"Morning, Sam."</p>
+  <p>Your chance comes that evening. Leaving work, you cross the lobby just as Sam arrives to start the night shift, settling in behind the desk for the long quiet hours.</p>
+  <p>"Evening, Sam."</p>
   <p>Sam looks up — and for half a second, the tired eyes are not tired at all.</p>
-  <p>"Morning."</p>
-  <p>Nod number 2,401. The first one with a name on it.</p>
-  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','2,401',[['flair','"This time, with a name."'],['pts','+1']])}` : `
+  <p>"Evening."</p>
+  <p>Exchange number 2,401. The first one with a name on it.</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','2,401',[['flair','"This time, with a name."'],['pts','+1']])}
+  <p>You linger a moment at the desk. A name is a door. You could knock once more, or let it be.</p>` : `
   <p class="quiet">WEDNESDAY</p>
   <p>The system has noticed your easy-mode choice on Monday. Wednesday's quest arrives with a very specific address.</p>
   ${sysBox('📋 QUEST — WEDNESDAY','The Person at the Desk',[
@@ -934,7 +1025,8 @@ e2s7:{
   <p>You read the number twice. The system has a talent for math that hurts.</p>`,
  onEnter:()=>{ if(state.flags.guard_name_known){ if(!state.achievements.includes('ach_2401')){ grant('ach_2401'); } } },
  choices:(st)=> st.flags.guard_name_known ?
-   [ {t:'Thursday', go:'e2s13'} ] :
+   [ {t:'Stay. Talk a little more.', go:'e2s11a'},
+     {t:'Let it be for today.', go:'e2s13'} ] :
    [ {t:'After work. The lobby.', go:'e2s8'} ]
 },
 
@@ -955,11 +1047,13 @@ e2s9:{
   <p>And then, quieter, almost to the desk itself:</p>
   <p class="beat">"Five years. You are the first one to ask."</p>
   <p>Something in your chest goes very ${vb('still','still_adj')}.</p>
+  <p>Two thousand four hundred nods, and this is the first exchange with a name on it. Number 2,401.</p>
   ${sysBox('✅ QUEST COMPLETE','The Person at the Desk',[['pts','+20']])}
   ${sysBox('🏆 ACHIEVEMENT UNLOCKED','The Person at the Desk',[
     ['flair','"2,400 times. You finally asked."']
-  ])}`,
- onEnter:()=>{ pay('e2_guard',20); grant('person_at_desk'); state.flags.guard_name_known = true; },
+  ])}
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','2,401',[['flair','"This time, with a name."'],['pts','+1']])}`,
+ onEnter:()=>{ pay('e2_guard',20); grant('person_at_desk'); grant('ach_2401'); state.flags.guard_name_known = true; },
  choices:[
    {t:'"Thank you, Sam." Leave it there.', go:'e2s11b'},
    {t:'Stay. Talk a little more.', go:'e2s11a'}
@@ -974,7 +1068,7 @@ e2s11a:{
   <p>People don't look. You know a system that agrees.</p>
   <p>You ${vb('file the lane away','file_away')}. Somehow you are sure it will matter someday.</p>`,
  onEnter:()=>{ state.flags.guard_story = true; },
- choices:[ {t:'Home', go:'e2s12'} ]
+ choices:[ {t:'Home', go:'e2s13'} ]
 },
 
 e2s11b:{
@@ -982,20 +1076,7 @@ e2s11b:{
   <p>"Thank you, Sam," you say. "Good night."</p>
   <p>"Good night."</p>
   <p>Two more words than the last 2,400 exchanges. It is enough. Some doors you open slowly.</p>`,
- choices:[ {t:'Home', go:'e2s12'} ]
-},
-
-e2s12:{
- html:()=>`
-  <p class="quiet">THURSDAY, 8:51 A.M.</p>
-  <p>You walk into the lobby. Sam is at the desk.</p>
-  <p>"Morning, Sam."</p>
-  <p>Sam looks up — and for half a second, the tired eyes are not tired at all.</p>
-  <p>"Morning."</p>
-  <p>Nod number 2,401. The first one with a name on it.</p>
-  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','2,401',[['flair','"This time, with a name."'],['pts','+1']])}`,
- onEnter:()=>{ grant('ach_2401'); },
- choices:[ {t:'Thursday, Friday', go:'e2s13'} ]
+ choices:[ {t:'Home', go:'e2s13'} ]
 },
 
 e2s13:{
@@ -1073,6 +1154,7 @@ e2s19:{
   <p>The marked spot is around the side, in a narrow gap between the warehouse and the sea wall. You squeeze in, the system pings — three lights down — and you turn to leave.</p>
   <p>That is when you see it.</p>
   <p>On the brick, at shoulder height: ${vb('spray paint','spray_paint')}.</p>
+  <p>${vb('Graffiti','graffiti')} is not rare in a harbor city. This is not that.</p>
   <p>A ${vb('trophy')}. <i>The</i> trophy — the exact ${vb('icon')} that floats in your vision every time you unlock an achievement. The same shape. The same proportions. Painted on a real wall, by a real hand, ${vb('faded')} by real rain.</p>
   <p>You reach out and touch it. The paint is dry. It has been dry for a long time.</p>
   <p>The system, which has an opinion about everything, says nothing at all.</p>
@@ -1233,6 +1315,7 @@ end2:{
  },
  choices:[
    {t:'▶ Continue to Episode 3', go:'e3s1'},
+   {t:'↻ Replay Episode 2', go:'__replay2'},
    {t:'Back to title', go:'__title'}
  ],
  onRender:()=>{
@@ -1258,7 +1341,7 @@ end2:{
    ===================================================== */
 
 e3s1:{
- onEnter:()=>{ state.episode = 3; },
+ onEnter:()=>{ state.episode = 3; snapshotEpisode(3); },
  html:()=>`
   <p class="quiet">EPISODE 3 — SIDE QUEST</p>
   <p>Saturday, 8:30 a.m. You wake up before the alarm again. This is who you are now, apparently.</p>
@@ -1641,6 +1724,8 @@ end3:{
   </div>`;
  },
  choices:[
+   {t:'▶ Continue to Episode 4', go:'e4s1'},
+   {t:'↻ Replay Episode 3', go:'__replay3'},
    {t:'Back to title', go:'__title'}
  ],
  onRender:()=>{
@@ -1659,6 +1744,560 @@ end3:{
      }catch(e){ box.value = 'That code did not work. Check it and try again.'; }
    };
  }
+},
+
+/* =====================================================
+   EPISODE 4 — LEVEL UP
+   ===================================================== */
+
+e4s1:{
+ onEnter:()=>{ state.episode = 4; snapshotEpisode(4); state.level = 5; grant('level_five'); },
+ html:()=>`
+  <p class="quiet">EPISODE 4 — LEVEL UP</p>
+  <p>Two weeks pass, and they are good weeks.</p>
+  <p>The daily quests roll on. A new street, a new lunch, a new thirty minutes — the points climb past three hundred, past four. The question about the locked record still sits in the back of your mind, but it sits quietly, like a stone in a pocket. You carry it. You live around it.</p>
+  <p>Then, late on a Friday night, the panel does something it has never done.</p>
+  ${sysBox('⬆️ LEVEL 5','520 points reached',[
+    ['flair','Major '+vb('update','update')+' available.'],
+    ['flair','Restart the panel?']
+  ])}
+  <p>Restart? The panel has always just… been there. You did not know it could turn off.</p>
+  <p>You think the word. "Restart."</p>
+  <p>And the whole thing goes dark.</p>`,
+ choices:[ {t:'Wait in the dark', go:'e4s2'} ]
+},
+
+e4s2:{
+ html:()=>`
+  <p>For three full seconds there is nothing. No panel, no green, no quests. Just your dark bedroom ceiling, the way it looked for five years before any of this.</p>
+  <p>Then it comes back — and it comes back <i>bigger.</i></p>
+  <p>The new panel is wider, brighter, sharper. There are fields you have never seen. And one of them is moving, a soft bar filling itself to the top.</p>
+  ${sysBox('🆕 PANEL v5.0','Now showing:',[
+    ['flair','▸ '+vb('Stamina','stamina')+' — your energy for the day'],
+    ['flair','▸ Full city map'],
+    ['flair','▸ New quest type: CHAIN']
+  ])}
+  <p>The system adds, almost as an afterthought:</p>
+  ${sysBox('💬 SYSTEM','One note.',[
+    ['flair',"You're not the person who got "+vb('winded','winded')+' on the stairs three weeks ago.']
+  ])}
+  <p>You think about those eleven flights of stairs you climbed a few weeks ago, how your legs complained all afternoon. You climbed stairs yesterday without even noticing. Huh.</p>`,
+ choices:[ {t:'Open the new map', go:'e4s3'} ]
+},
+
+e4s3:{
+ html:()=>`
+  <p>The map unfolds — and you actually sit up in bed.</p>
+  <p>It is the whole city. All of Kaohsiung, lit and open: the harbor, the mountain, the long coast, Cijin like a finger of land holding the bay. Three weeks ago this map was a fingernail. Now it is everything.</p>
+  <p>Almost everything.</p>
+  <p>Far to the south, one small patch of fog refuses to lift. And inside it, that same gold light, patient as the first night you saw it.</p>
+  <p>You tap it, the way you always do.</p>
+  ${sysBox('❓ ???','[ Locked ]',[
+    ['flair','Level required: ???'],
+    ['flair','Closer.']
+  ],'gold')}
+  <p class="beat">Closer.</p>
+  <p>That word is new. In three weeks of tapping that gold point, the system has never said anything but the locked message. Tonight it added one word.</p>
+  <p>You are getting closer to it. By leveling up, you realize, you are walking toward that gold light — one quest at a time.</p>`,
+ choices:[ {t:'Sleep. Big day tomorrow somehow.', go:'e4s4'} ]
+},
+
+e4s4:{
+ html:()=>`
+  <p>You do not know why tomorrow feels big. The system has not said anything. But you sleep the way you used to sleep before exams as a kid — that thin, electric sleep, half excitement, half waiting.</p>
+  <p>Saturday morning, you find out why.</p>
+  ${sysBox('🔗 QUEST CHAIN','THE CITY RUN',[
+    ['flair','5 '+vb('links','link')+'. One day. Sunset '+vb('deadline','deadline')+'.'],
+    ['flair','Each link unlocks the next.'],
+    ['flair','Miss one, the '+vb('chain','chain')+' breaks.'],
+    ['pts','+100 + ???']
+  ])}
+  <p>A chain. Five links, and you can only see the first one — the rest are locked boxes, waiting. One day to do all five. Sunset to finish.</p>
+  <p>Your stamina bar is full. The whole city is open. For the first time, all of Kaohsiung is yours to move through.</p>
+  <p>The first link appears.</p>`,
+ onEnter:()=>{ state.flags.chain_perfect = true; },
+ choices:[ {t:'Read link one', go:'e4s5'} ]
+},
+
+e4s5:{
+ html:()=>`
+  ${sysBox('🔗 LINK 1 of 5','Lotus Pond, Zuoying',[
+    ['flair','Find the mark at the Dragon and Tiger '+vb('Pagodas','pagoda')+'.'],
+    ['flair','Each link hides its clue in how the place itself works.'],
+    ['flair','Read the place, and the mark appears. Guess, and you lose time.']
+  ])}
+  <p>So that is the rule of the chain: every link is a place, and every place is a small test. <i>Read it right, and the mark shows itself. Read it wrong, and you waste minutes you may need before sunset.</i></p>
+  <p>You take the train north as the city wakes up. By the time you reach the Lotus Pond, the morning light is doing something golden to the water, and the two towers — the Dragon and Tiger ${vb('Pagodas','pagoda')} — stand out over the green, bright and curling, waiting.</p>`,
+ onEnter:()=>{ state.flags.chain_perfect = true; },
+ choices:[ {t:'Go to the pagodas', go:'e4s6'} ]
+},
+
+e4s6:{
+ html:()=>`
+  <p>You walk the bridge toward the towers, looking for a mark. Nothing on the railings. Nothing on the steps. Just the two great open mouths — the Dragon's and the Tiger's — each one a doorway in, each one a doorway out.</p>
+  <p>A small worn sign stands where the path splits, the kind of sign nobody reads. You read it.</p>
+  ${sysBox('🐉 THE OLD WAY','carved into the stone',[['flair','"'+vb('Purge','purge')+' your '+vb('ails','ails')+' in the '+vb('jaws','jaws')+' of '+vb('scales','scales')+';'],['flair',vb('Return','return_to')+' to light, '+vb('reborn','reborn')+' through '+vb('stripes','stripes')+'."']])}
+  <p>The Tiger's mouth is right in front of you, closer, easier; a tiger is the fierce one, the guardian, surely a fine way to start. The Dragon's mouth is a few steps further along the bridge. You have to pick one to enter.</p>`,
+ choices:[
+   {t:'Enter the Dragon\u2019s mouth.', go:'e4s6_dragon'},
+   {t:'Enter the Tiger\u2019s mouth.', go:'e4s6_tiger'}
+ ]
+},
+
+e4s6_dragon:{
+ html:()=>`
+  <p>You walk the extra steps to the Dragon's mouth and enter there.</p>
+  <p>The moment your foot crosses into the Dragon's mouth, the green mark blooms on the inner wall, bright and sure. You walk the curving path through the belly of the tower and out through the Tiger's mouth, the way the city has done it for a hundred years, and the system pings — warm, approving.</p>
+  ${sysBox('✅ LINK 1 COMPLETE','Read correctly',[
+    ['flair',vb('Stamina','stamina')+' \u221210 \u00b7 +15 (you feel good)'],
+    ['flair','Clean. Link 2 unlocked.']
+  ])}
+  <p>The chain's lesson lands: the marks are not random. They hide in the way each place already works. Read the place, find the mark.</p>`,
+ onEnter:()=>{ state.stamina = 105; },
+ choices:[ {t:'A second mark?', go:'e4s7'} ]
+},
+
+e4s6_tiger:{
+ onEnter:()=>{ state.flags.chain_perfect = false; },
+ html:()=>`
+  <p>The Tiger is closer, so you duck in there — and a small green glow flickers deep inside, then <i>fades,</i> like the system is shaking its head.</p>
+  <p>Wrong way. The sign told you: the dragon takes you <i>in.</i> You entered through the tiger and ran the whole thing backward. The mark will not show itself to someone who walks against the old order.</p>
+  ${sysBox('\u26a0 STUMBLE','You read the place wrong.',[
+    ['flair','The chain holds \u2014 but a clean run is no longer possible.'],
+    ['flair','Walk back. Enter through the Dragon, the right way.']
+  ],'fail')}
+  <p>You backtrack, losing a few minutes you may want later, and enter the Dragon's mouth properly. This time the mark blooms at once.</p>`,
+ choices:[ {t:'A second mark?', go:'e4s7' } ]
+},
+
+e4s7:{
+ html:()=>`
+  <p>With link one done, the system murmurs something extra — quieter, optional.</p>
+  ${sysBox('\u2728 BONUS MARK','Somewhere around the pond',[
+    ['flair','A hidden mark waits nearby. Find it for a '+vb('stamina','stamina')+' boost.'],
+    ['flair','But it will cost you time. The day is long; the sun still moves.']
+  ])}
+  <p>A choice. It is still early, and your legs are fresh, but the chain has a sunset at the end of it. Spend five, ten minutes hunting a bonus now to bank some energy — or save the time and trust your legs to last?</p>`,
+ choices:[
+   {t:'Hunt the bonus mark. Bank some energy.', go:'e4s7_bonus'},
+   {t:'Skip it. Keep your time.', go:'e4s8'}
+ ]
+},
+
+e4s7_bonus:{
+ onEnter:()=>{ state.stamina = Math.min(130, state.stamina + 20); state.flags.e4_banked = true; },
+ html:()=>`
+  <p>You circle the pond, reading the place the way the towers taught you, and find the bonus mark tucked behind a stone lion that has watched the water for longer than anyone remembers. The system pings, pleased.</p>
+  ${sysBox('\u2728 BONUS FOUND','Stamina banked',[
+    ['flair',vb('Stamina','stamina')+' +20 \u00b7 you have a buffer now'],
+    ['flair','Time spent: about ten minutes.']
+  ])}
+  <p>Ten minutes gone, but your legs have a cushion for whatever the day throws at them. You hope it was the right call. You will find out.</p>`,
+ choices:[ {t:'On to link two', go:'e4s8'} ]
+},
+
+e4s8:{
+ html:()=>`
+  ${sysBox('\ud83d\udd17 LINK 2 of 5','Cijin \u2014 the old fort',[
+    ['flair','The mark is on the island. Sunset is moving.'],
+    ['flair','Get yourself to the Gushan ferry. How is up to you.']
+  ])}
+  <p>The mark for link two is across the water, on Cijin. First you have to get from the Lotus Pond down to the Gushan ferry pier — a real distance, and the day's clock is already ticking.</p>
+  <p>Three ways to make the trip. You weigh them in your head:</p>
+  ${sysBox('\ud83d\ude95 YOUR OPTIONS','Time \u00b7 money \u00b7 risk',[
+    ['flair','TAXI \u2014 about 20 min if the roads are clear. Costs the most. Could hit traffic.'],
+    ['flair','BUS \u2014 about 35 min, if one comes soon. Cheap. Steady.'],
+    ['flair','MRT + shared bike \u2014 about 48 min. Cheapest. No surprises.']
+  ])}`,
+ choices:[
+   {t:'Taxi. Gamble on a clear road.', go:'e4s8_taxi'},
+   {t:'Bus. The middle path.', go:'e4s8_bus'},
+   {t:'MRT and a YouBike. Slow and sure.', go:'e4s8_mrt'}
+ ]
+},
+
+e4s8_taxi:{
+ onEnter:()=>{ state.money -= 250; state.flags.e4_time = 'fast'; },
+ html:()=>`
+  <p>You flag a taxi. The driver knows the back roads, the meter ticks up, and the harbor slides past the window. Twenty minutes, clean — the gamble pays off, no traffic today. It cost you a few hundred dollars you will feel later, but you are at the ferry pier with the most precious thing of all in your pocket: <i>time.</i></p>
+  <p>The boat is loading.</p>`,
+ choices:[ {t:'Board the ferry', go:'e4s9'} ]
+},
+
+e4s8_bus:{
+ onEnter:()=>{ state.flags.e4_time = 'mid'; },
+ html:()=>`
+  <p>The bus comes within a few minutes — lucky — and you settle by the window for the ride south. Thirty-five minutes, steady and cheap, the city rolling by in no particular hurry. Not the fastest, not the slowest. A fair trade.</p>
+  <p>You reach the pier with enough time, if not a lot of it. The boat is loading.</p>`,
+ choices:[ {t:'Board the ferry', go:'e4s9'} ]
+},
+
+e4s8_mrt:{
+ onEnter:()=>{ state.stamina = Math.max(10, state.stamina - 8); state.flags.e4_time = 'slow'; },
+ html:()=>`
+  <p>You take the sure thing: a shared bike from the Lotus Pond to the nearest MRT station, then the train south, then a short walk from the station to the ferry pier. Forty-eight minutes, the cheapest way, and not a single surprise — but the clock has moved more than you would like, and your legs did some of the work the engine could have done.</p>
+  <p>You reach the pier. The boat is loading.</p>`,
+ choices:[ {t:'Board the ferry', go:'e4s9'} ]
+},
+
+e4s9:{
+ html:()=>`
+  <p>This is not the slow crossing from before. No standing at the rail watching the foam. The ferry has barely touched the Cijin ${vb('gate','gate')} before you are moving, the chain pulling you forward.</p>
+  <p>You run for the old ${vb('fort')} on the hill. Halfway there, at the edge of the harbor wall, you catch a glimpse of someone feeding the stray cats — small, neat, a familiar cardigan despite the heat.</p>
+  <p>Old Mr. Hong. He does not see you. You do not have time to stop.</p>
+  <p class="quiet">Next time, you promise. You are collecting a lot of those promises.</p>`,
+ choices:[ {t:'Reach the fort', go:'e4s10'} ]
+},
+
+e4s10:{
+ html:()=>`
+  <p>The old fort sits at the top of the hill, its thick walls facing out to sea. You look for the mark — but the fort is large, and there is no glow in sight. Read the place.</p>
+  ${sysBox('\ud83d\udd0d THE FORT','carved by the gate',[
+    ['flair','"The '+vb('waves','waves')+' bring '+vb('invaders','invaders')+' that iron balls '+vb('greet','greet')+';'],
+    ['flair','Stand with the '+vb('brave','brave')+', not with the '+vb('meek','meek')+'."']
+  ])}
+  <p>You stand in the middle of the old fort and turn in a slow circle, the riddle going round with you.</p>
+  <p>Behind you, inland, the shaded courtyard and the barracks — where the soldiers ate and slept and waited, the warm heart of the place, out of the wind. Ahead, the outer wall facing the sea, baking in the sun, where the old cannons still sit on their mounts, pointed out at the open water the way they have been for more than a hundred years.</p>`,
+ choices:[
+   {t:'The seaward wall, where the cannons faced.', go:'e4s10_sea'},
+   {t:'The shaded courtyard inside.', go:'e4s10_in'}
+ ]
+},
+
+e4s10_sea:{
+ html:()=>`
+  <p>You walk out to the seaward wall, to the old cannons still pointing at the horizon, and look out at the open water the way the fort always has. The mark blooms on the stone the moment you reach the edge.</p>
+  ${sysBox('\u2705 LINK 2 COMPLETE','Read correctly',[
+    ['flair',vb('Stamina','stamina')+' \u221215 \u00b7 +20'],
+    ['flair','Clean. Link 3 unlocked.']
+  ])}`,
+ onEnter:()=>{ state.stamina = Math.min(130, state.stamina + 5); },
+ choices:[ {t:'Link three', go:'e4s11'} ]
+},
+
+e4s10_in:{
+ onEnter:()=>{ state.flags.chain_perfect = false; },
+ html:()=>`
+  <p>You head inland, into the shaded courtyard, and search the cool stone walls. Nothing. No glow, no ping. A fort does not keep its meaning in its courtyard — it keeps it at the wall that faces the threat.</p>
+  ${sysBox('\u26a0 STUMBLE','You read the place wrong.',[
+    ['flair','The chain holds \u2014 but a clean run is no longer possible.'],
+    ['flair','Try the seaward wall, where the cannons faced.']
+  ],'fail')}
+  <p>You backtrack out to the seaward gun positions, into the wind, and there the mark waits — where it was always going to be. You lost minutes. You move on.</p>`,
+ choices:[ {t:'Link three', go:'e4s11'} ]
+},
+
+e4s11:{
+ html:()=>`
+  ${sysBox('\ud83d\udd17 LINK 3 of 5','The Star Tunnel',[
+    ['flair','Cijin\u2019s old tunnel, '+vb('carved','carved')+' through the hill by the sea.'],
+    ['flair','"Who '+vb('carves','carves')+' through stone to hide in the dark?'],
+    ['flair',vb('Shatter','shatter')+' the mountain to '+vb('claim','claim')+' the sea\'s '+vb('sparks','sparks')+'."']
+  ])}
+  <p>Not far from the fort, the old Star Tunnel runs straight through the rock — a long dark throat in the hillside, cut long ago so soldiers and supplies could pass through the hill unseen, safe from the guns of ships at sea. You step inside, and the daylight drops away behind you.</p>
+  <p>The dark goes on. Painted stars glow faintly on the ceiling, and they are lovely — the kind of thing you are clearly meant to stop and admire, the reason the place has its name. But the riddle ${vb('scratches','scratches')} at you: <i>Who ${vb('carves','carves')} through stone to hide in the dark?</i></p>
+  <p>You could slow down here under the stars and search properly. Or keep walking, into more dark, toward whatever is at the far end.</p>`,
+ choices:[
+   {t:'Search the dark walls for the mark.', go:'e4s11_walls'},
+   {t:'Walk all the way through, to the far opening.', go:'e4s11_end'}
+ ]
+},
+
+e4s11_walls:{
+ onEnter:()=>{ state.flags.chain_perfect = false; },
+ html:()=>`
+  <p>You slow down in the middle of the tunnel, scanning the dark walls, the painted stars, the damp stone. Nothing answers. The mark is not in the dark.</p>
+  ${sysBox('\u26a0 STUMBLE','You read the place wrong.',[
+    ['flair','The chain holds \u2014 but a clean run is no longer possible.'],
+    ['flair','A tunnel is not made for its middle. Keep walking.']
+  ],'fail')}
+  <p>You walk on, and the dark begins to thin, and ahead a circle of blue light grows — and you understand. You lost time in the middle of the dark. You move toward the end.</p>`,
+ choices:[ {t:'To the far opening', go:'e4s11_end'} ]
+},
+
+e4s11_end:{
+ html:()=>`
+  <p>You walk the whole length of the dark, and then the tunnel opens — all at once — onto the sea.</p>
+  <p>That is what the tunnel is <i>for:</i> not the dark, but the light at the end of it. A wide blue bay, framed by black rock, the open water bright after the long shadow. The mark blooms on the tunnel mouth, glowing against the daylight.</p>
+  ${sysBox('\u2705 LINK 3 COMPLETE','Read correctly',[
+    ['flair',vb('Stamina','stamina')+' \u221210 \u00b7 +15'],
+    ['flair','Clean. Link 4 unlocked.']
+  ])}
+  <p>You stand for one breath at the bright end of the dark. Then you turn back for the ferry. There is still a harbor to cross, and a hill to climb.</p>`,
+ onEnter:()=>{ state.stamina = Math.min(130, state.stamina + 5); },
+ choices:[ {t:'Back across the water', go:'e4s12'} ]
+},
+
+e4s12:{
+ html:()=>`
+  <p>The ferry back passes in a ${vb('blur')} — a quick crossing, the city growing in front of you instead of behind. No time for the rail today.</p>
+  <p>On the mainland side, you cross the short curved footbridge over the Gushan fishing port — small fishing boats below, nets drying, the water close enough to smell. Out past the harbor's narrow mouth, far away, the big ${vb('cranes')} of the real port stand against the sky; but here, over the little fishing harbor, everything is quiet and close. On the far side, a gentle uphill road leads you to the foot of the British ${vb('Consulate','consulate')}.</p>
+  ${sysBox('\ud83d\udd17 LINK 4 of 5','The British Consulate',[
+    ['flair','The mark is up at the consulate, on the '+vb('headland','headland')+'.'],
+    ['flair','But there are two ways up from here.']
+  ])}
+  <p>You reach a fork at the base. A steep stone staircase climbs straight up the hillside — fast, but hard on legs that have already done a lot today. Beside it, a gentler path winds up the slope the long way — easier, but it will cost you time, and the sun is lower now.</p>`,
+ choices:[
+   {t:'The steep stairs. Save time, spend legs.', go:'e4s13_steep'},
+   {t:'The gentle path. Save legs, spend time.', go:'e4s13_gentle'}
+ ]
+},
+
+e4s13_steep:{
+ onEnter:()=>{ state.stamina = Math.max(8, state.stamina - 35); state.flags.e4_climb = 'steep'; grant('long_way_up'); },
+ html:(st)=>`
+  <p>You take the stairs — the steep, direct climb, the hard way up.</p>
+  <p>It is honest work. Your legs are tired from the long day, and the steps keep coming. Halfway up, a small old voice says <i>stop, sit, you have done enough today.</i> You do not stop. You shorten your steps, the way the late-night videos taught you, and climb one stair at a time. By the top you are ${vb('winded','winded')} and grinning, the harbor dropping away beneath you, wider and bluer with every step.</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','The Long Way Up',[
+    ['flair','"You chose the steep stairs. The hard way up."'],
+    ['pts','+5']
+  ])}
+  <p>You reach the top with time still on your side.</p>`,
+ choices:[ {t:'Find the mark', go:'e4s14'} ]
+},
+
+e4s13_gentle:{
+ onEnter:()=>{ state.stamina = Math.max(8, state.stamina - 12); state.flags.e4_climb = 'gentle'; },
+ html:()=>`
+  <p>You take the gentle path, winding up the green slope the long way. Your legs thank you — it is an easy grade, shaded in places, and you reach the top with energy to spare.</p>
+  <p>But the climb ate time, and when you look west the sun has dropped noticeably. The dusk is closer than you would like. You will want to keep moving after this.</p>`,
+ choices:[ {t:'Find the mark', go:'e4s14'} ]
+},
+
+e4s14:{
+ html:()=>`
+  <p>The consulate stands at the top of the headland, red brick and arched ${vb('verandas','verandas')}, looking out over the harbor mouth. No mark in the garden. No mark on the steps. Read the place.</p>
+  ${sysBox('\ud83d\udd0d THE CONSULATE','Read it.',[
+    ['flair','"No '+vb('peak','peak')+' was '+vb('claimed','claimed')+' to '+vb('chase','chase')+' the view;'],
+    ['flair','They built to watch who '+vb('ventured','ventured')+' through."']
+  ])}
+  <p>You walk up into the old brick building. Inside, cool rooms full of glass cases, old photographs, a little souvenir shop — a hundred small things asking to be looked at. Outside, a long veranda runs along the edge of the headland, with benches and a low rail and a lot of empty sky.</p>
+  <p>The marks have hidden indoors before. But the riddle is still in your ear: <i>they built to see one thing.</i></p>`,
+ choices:[
+   {t:'The lookout, facing the harbor mouth.', go:'e4s14_look'},
+   {t:'Search the rooms and garden.', go:'e4s14_rooms'}
+ ]
+},
+
+e4s14_look:{
+ html:()=>`
+  <p>You step out onto the veranda and walk to the rail, where the whole narrow mouth of the harbor opens below you — every ship that ever came or went, framed in one view. The mark blooms on the stone rail the moment you look out.</p>
+  ${sysBox('\u2705 LINK 4 COMPLETE','Read correctly',[
+    ['flair','Clean. Final link unlocked.']
+  ])}`,
+ choices:[ {t:'The last link', go:'e4s15'} ]
+},
+
+e4s14_rooms:{
+ onEnter:()=>{ state.flags.chain_perfect = false; },
+ html:()=>`
+  <p>You wander the brick rooms and the garden, looking. Nothing glows. This building never cared about its rooms — it was built to watch the harbor mouth, and that is where its meaning sits.</p>
+  ${sysBox('\u26a0 STUMBLE','You read the place wrong.',[
+    ['flair','The chain holds \u2014 but a clean run is no longer possible.'],
+    ['flair','Go to the lookout. Face the harbor mouth.']
+  ],'fail')}
+  <p>You step out to the lookout, face the water, and the mark is there — where it was always waiting. You move on, the sun lower with every minute.</p>`,
+ choices:[ {t:'The last link', go:'e4s15'} ]
+},
+
+e4s15:{
+ html:()=>`
+  <p>You come back down off the headland and walk a short stretch toward the university, and there it is: the long curve of the Sizihwan ${vb('seawall','seawall')}, the place the whole city calls, simply, the sea wall. The sun is leaning low and gold over the water.</p>
+  <p>The final link appears. You read it, then read it again, because it cannot be that simple.</p>
+  ${sysBox('\ud83d\udd17 LINK 5 of 5','The sea wall',[
+    ['flair','"'+vb('Turn your back','turn_your_back')+' upon the road;'],
+    ['flair','Face the sea where sunsets '+vb('glowed','glowed')+'."'],
+    ['flair','Then stop looking for marks \u2014 and just look.']
+  ])}
+  <p>The wall is long, and people sit all along it, facing every which way — some toward the water, some with their backs to it, looking instead at the university's pool and running track across the road behind. There is an open bench right beside you, facing inland. Your legs vote for it loudly.</p>
+  <p>But the riddle waits, quiet: <i>the thing everyone here came to see.</i></p>`,
+ choices:[
+   {t:'Find a spot on the wall facing the open sea.', go:'e4s15_sea'},
+   {t:'Drop onto the first open bench. You\u2019re exhausted.', go:'e4s15_bench'}
+ ]
+},
+
+e4s15_bench:{
+ onEnter:()=>{ state.flags.chain_perfect = false; },
+ html:()=>`
+  <p>You collapse onto the first bench you see, facing back toward the road and the city. You wait for the mark. Nothing comes.</p>
+  ${sysBox('\u26a0 STUMBLE','You read the place wrong.',[
+    ['flair','The chain holds \u2014 but a clean run is no longer possible.'],
+    ['flair','Face where the sun goes. That is the whole point.']
+  ],'fail')}
+  <p>You get up, cross to the seaward side of the wall, and find a place looking straight out at the water — where the sun is going down. That, of course, is where the place wanted you all along.</p>`,
+ choices:[ {t:'Sit. Watch.', go:'e4s16'} ]
+},
+
+e4s15_sea:{
+ html:()=>`
+  <p>You find a place on the seaward side of the wall, facing straight out at the open water where the sun is sinking. You sit. The mark blooms softly on the concrete beside you — and then, having shown itself, it fades, as if to say: <i>you found it; now you can stop looking.</i></p>`,
+ choices:[ {t:'Just look', go:'e4s16'} ]
+},
+
+e4s16:{
+ html:(st)=>`
+  <p>So you do. You stop looking for marks, and you just look.</p>
+  <p>The sun touches the sea. The water goes from blue to ${vb('bronze')} to a soft burning orange, and the whole harbor — the ${vb('cranes')}, the ships, the far green hills — holds still inside the light. You think of the person who sat at a desk at 11:42 p.m. and could not remember the last time they laughed. That person could not have imagined this.</p>
+  <p>You give the evening your full attention. All of it.</p>
+  <p>The chain closes around you, soft and complete.</p>
+  ${sysBox('\u2705 QUEST CHAIN COMPLETE','THE CITY RUN',[
+    ['flair','5 of 5 links.'],
+    ['pts','+100']
+  ])}
+  ${sysBox('\ud83c\udfc6 ACHIEVEMENT UNLOCKED','Just Watch',[
+    ['flair','"The whole task was to stop."'],
+    ['pts','+0 points']
+  ])}
+  ${st.flags.chain_perfect ? sysBox('\ud83c\udfc6 ACHIEVEMENT UNLOCKED','Unbroken',[
+    ['flair','"Five links. Every place, read right. A clean run."'],
+    ['pts','+30']
+  ]) : `<p class="quiet">No "Unbroken" badge today. Somewhere back there you read a place wrong — a tower, a fort, a tunnel, a wall — and the clean run slipped away. The chain still closed. It just wasn't perfect. Next time, maybe.</p>`}
+  <p>You do not look at the points right away. For once the number can wait, because you are busy doing the thing the number is only a record of — sitting on a warm sea wall, fully inside one orange minute of your one life.</p>
+  <p>When you finally check Completion Vision, almost as an afterthought, you already know what it will say.</p>
+  <p class="beat big">TODAY: 100%</p>`,
+ onEnter:()=>{ pay('e4_chain',100); grant('just_watch'); if(state.flags.chain_perfect) grant('unbroken'); state.stamina = 100; },
+ choices:[ {t:'The +??? reward', go:'e4s17'} ]
+},
+
+e4s17:{
+ html:()=>`
+  <p>The sun is half gone now, the sky bleeding pink into grey. And as the last light goes, the chain gives up its hidden reward — the <i>+???</i> that has been waiting since this morning.</p>
+  <p>It is not points.</p>
+  ${sysBox('🎁 CHAIN REWARD','Access granted',[
+    ['flair','Access '+vb('granted','granted')+'.'],
+    ['flair','The chain\'s true reward is not a number. It is a place.']
+  ])}
+  <p>A new mark lights up on your map — not the gold point, which still waits in its fog to the south, but a quiet <b>silver</b> mark, close by, just along the coast from where you sit.</p>
+  <p>The system wants you to go there. After a whole day of running, it has one more place to show you.</p>
+  <p>You get up off the seawall, legs ${vb('stiff')}, and follow the silver mark into the blue evening.</p>`,
+ choices:[ {t:'Follow the silver mark', go:'e4s18'} ]
+},
+
+e4s18:{
+ html:()=>`
+  <p>The mark leads you off the main path, down a quiet ${vb('stretch')} of coast where the streetlights have not all come on yet. To a wall.</p>
+  <p>Just an old concrete wall, facing the sea. And on it, painted at shoulder height—</p>
+  <p>the trophy.</p>
+  <p>The same shape that blooms in your vision every time you unlock something. The same one on the warehouse wall in Yancheng. The same one, you are suddenly certain, in the corner of a sixty-year-old photograph in an old man's apartment.</p>
+  <p>The same hand. You know it now, the way you know handwriting.</p>
+  <p>But this time, the words next to it are not covered. This time they are right there, ${vb('scribbled','scribbled')} fast and hard, pressed deep into the paint like the writer was in a hurry, or afraid:</p>`,
+ choices:[ {t:'Read the words', go:'e4s19'} ]
+},
+
+e4s19:{
+ html:()=>`
+  <p>Five words. All capitals. Underlined twice.</p>
+  ${sysBox('🧱 ON THE WALL','( not from the system )',[
+    ['flair','DON\'T TAKE THE GOLD QUEST.']
+  ],'gold')}
+  <p>You stand very still in the dark.</p>
+  <p>The gold quest. The gold point, deep in the fog to the south, that you have tapped a hundred times. The one the system keeps locked behind a level you do not yet have. The one it told you, just last night, you are getting <i>closer</i> to.</p>
+  <p>All this time you thought the gold point was the prize. The top of the mountain. The reason for all of it.</p>
+  <p>And here, on a wall by the sea, in handwriting that is not the system's neat green but a real human ${vb('scrawl')} — someone who came before you, someone who painted these trophies all over the city, someone who reached a high enough level to <i>find</i> this gold quest—</p>
+  <p class="beat">left a ${vb('warning','warning')} for whoever comes next.</p>
+  <p>Don't.</p>`,
+ onEnter:()=>{ state.flags.warning_seen = true; grant('the_warning'); },
+ choices:[ {t:'Ask the system', go:'e4s20'} ]
+},
+
+e4s20:{
+ html:()=>`
+  <p>"What is the gold quest?" you ask the evening air. "Who wrote this? What happens if I take it?"</p>
+  <p>The system, which gives you points for trying new lunches and counts the nods of security guards, which knows your completion percentage going back five years —</p>
+  <p>says nothing at all.</p>
+  <p>Its silence has a shape tonight. Not the patient silence of <i>the road will still be there tomorrow.</i> A different silence. The silence of a door that someone, somewhere, decided not to open for you.</p>
+  <p>You take a photo of the wall. The trophy. The five words. You do not know what you will do with it. You just know you do not want to lose it.</p>`,
+ choices:[ {t:'Go home', go:'e4s21'} ]
+},
+
+e4s21:{
+ html:()=>`
+  <p>You walk home through the warm dark, and for the first time since the convenience store, you open no quests, check no map, chase no points. You just walk, carrying two things in your pockets that do not fit together:</p>
+  <p>A locked record from <i>before</i> the system found you.</p>
+  <p>And a warning, painted by a stranger, telling you not to reach the one thing the system is leading you toward.</p>
+  <p>The day was perfect. 100%. Level 5. The whole city open. And somehow you are walking home with more questions than you woke up with.</p>`,
+ choices:[ {t:'Home. The gold point.', go:'e4s22'} ]
+},
+
+e4s22:{
+ html:(st)=>`
+  <p>In bed, you open the panel one last time. Level 5 sits there, solid and earned. The city glows, all of it yours now — except that one stubborn patch of fog in the south.</p>
+  <p>You tap the gold point. You already know what it will say.</p>
+  ${sysBox('❓ ???','[ Locked ]',[
+    ['flair','Level required: ???'],
+    ['flair','Closer.']
+  ],'gold')}
+  <p>Closer. You are level 5 now, and climbing. Every quest, every link, every new street walks you one step nearer to that gold light.</p>
+  <p>And someone painted five hard words on a wall to stop you.</p>
+  <p>You lie in the dark, and the old question — <i>what will tomorrow's quest be?</i> — has changed shape. Tonight the question is quieter, and colder, and you are not sure you want the answer:</p>
+  <p class="beat big">What is waiting in the gold?</p>`,
+ choices:[ {t:'EPISODE COMPLETE — open the Menu', go:'end4'} ]
+},
+
+end4:{
+ html:(st)=>{
+   function achGroup(ep){
+     let h='';
+     Object.keys(ACH).filter(id=>ACH[id].ep===ep).forEach(id=>{
+       const a=ACH[id]; const got=st.achievements.includes(id);
+       h += '<div class="row"><span>'+
+         (got ? '🏆 <span class="ach-name">'+a.name+'</span><span class="ach-desc">'+a.desc+'</span>'
+              : '<span class="lock">🔒 ???</span>')+
+         '</span><span>'+(got ? (a.pts>0?'+'+a.pts:'—') : '')+'</span></div>';
+     });
+     return h;
+   }
+   const cnt=(ep)=>[st.achievements.filter(id=>ACH[id].ep===ep).length, Object.keys(ACH).filter(id=>ACH[id].ep===ep).length];
+   const [c4,t4]=cnt(4),[c3,t3]=cnt(3),[c2,t2]=cnt(2),[c1,t1]=cnt(1);
+   return `
+  <p class="quiet">EPISODE 4 — LEVEL UP</p>
+  ${sysBox('✅ EPISODE COMPLETE','Level Up',[['flair','"What is waiting in the gold?"']])}
+  <div class="panel">
+    <h3>PLAYER</h3>
+    <div class="row"><span>Level</span><span>${st.level}</span></div>
+    <div class="row"><span>Points</span><span>${st.points}</span></div>
+    <div class="row"><span>Money</span><span>NT$${st.money.toLocaleString()}</span></div>
+    <div class="row"><span>Next level</span><span>700</span></div>
+    <div class="row"><span>Map</span><span>City unlocked · fog remains in the south</span></div>
+    <div class="row"><span class="goldtxt">GOLD ???</span><span class="goldtxt">Closer.</span></div>
+  </div>
+  <div class="panel ach-list"><h3>EPISODE 4 ACHIEVEMENTS (${c4}/${t4})</h3>${achGroup(4)}</div>
+  <div class="panel ach-list"><h3>EPISODE 3 ACHIEVEMENTS (${c3}/${t3})</h3>${achGroup(3)}</div>
+  <div class="panel ach-list"><h3>EPISODE 2 ACHIEVEMENTS (${c2}/${t2})</h3>${achGroup(2)}</div>
+  <div class="panel ach-list"><h3>EPISODE 1 ACHIEVEMENTS (${c1}/${t1})</h3>${achGroup(1)}</div>
+  <p class="quiet">Missing some? Different choices, different badges.</p>
+  <hr class="sep">
+  <div class="panel">
+    <h3>SAVE</h3>
+    <p style="font-family:inherit;font-size:.8rem;opacity:.8;margin:0 0 8px;">
+      Your progress saves automatically on this device.${storageOK?'':' (Saving is not available here — use Export to keep your progress.)'}
+      Export a save code to keep it safe or move to another device.</p>
+    <div class="btn-line">
+      <button class="choice" id="btnExport4">Export save</button>
+      <button class="choice" id="btnImport4">Import save</button>
+    </div>
+    <textarea class="savebox" id="saveBox4" placeholder="Your save code appears here. Or paste a code and press Import." spellcheck="false"></textarea>
+  </div>`;
+ },
+ choices:[
+   {t:'↻ Replay Episode 4', go:'__replay4'},
+   {t:'Back to title', go:'__title'}
+ ],
+ onRender:()=>{
+   const box = document.getElementById('saveBox4');
+   document.getElementById('btnExport4').onclick = ()=>{
+     box.value = btoa(unescape(encodeURIComponent(JSON.stringify(state)))); box.select();
+   };
+   document.getElementById('btnImport4').onclick = ()=>{
+     try{
+       const sv = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
+       if(typeof sv.version !== 'number') throw 0;
+       state = Object.assign(freshState(), sv); save();
+       box.value = 'Save imported ✓';
+     }catch(e){ box.value = 'That code did not work. Check it and try again.'; }
+   };
+ }
 }
 };
 
@@ -1670,11 +2309,14 @@ const app = document.getElementById('app');
 function go(id){
   if(id==='__title'){ renderTitle(); return; }
   if(id==='__replay'){
-    const keep = state; /* replay resets EP1 progress */
     state = freshState();
     save();
     go('s1'); return;
   }
+  if(id==='__replay1'){ replayEpisode(1,'s1'); return; }
+  if(id==='__replay2'){ replayEpisode(2,'e2s1'); return; }
+  if(id==='__replay3'){ replayEpisode(3,'e3s1'); return; }
+  if(id==='__replay4'){ replayEpisode(4,'e4s1'); return; }
   const sec = SECTIONS[id];
   if(!sec) return;
   state.section = id;
@@ -1737,7 +2379,6 @@ function renderTitle(){
   <div class="title-wrap">
     <div class="title-eyebrow">AN INKQUEST GAMEBOOK</div>
     <h1 class="gametitle">ACHIEVEMENT UNLOCKED</h1>
-    <div class="ep-label">EPISODE 1 · TUTORIAL</div>
     <div class="blurb">
       <p>Same office. Same coffee. Same road — for five years.</p>
       <p class="sysline">🏆 ACHIEVEMENT UNLOCKED</p>
