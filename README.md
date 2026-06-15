@@ -1,6 +1,6 @@
 # InkQuest
 
-*Every quest begins with a word.*
+*Every quest begins with a story.*
 
 InkQuest creates interactive gamebooks for English language learners — branching stories you play in the browser, graded to CEFR levels, with optional vocabulary tips that never get in the way of the story.
 
