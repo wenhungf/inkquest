@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Buen Camino — Spanish on the Road | InkQuest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  html, body {
+    background: #0f1722 !important;
+    color-scheme: dark;
+  }
+  :root {
+    --camino-blue: #274698;        /* deep royal blue from the official waymark */
+    --camino-blue-bright: #6f93d6; /* lighter tint of the same hue, legible on dark bg */
+    --camino-gold: #e3c04a;        /* gold from the waymark */
+    --camino-gold-soft: #f0d9ab;
+    --ink: #e6ecf3;
+    --ink-soft: #b3c1d1;
+    --ink-quiet: #7184a0;
+    --panel: #16212f;
+    --panel-line: #28384a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+    color: var(--ink);
+    line-height: 1.75;
+    font-size: 18px;
+    min-height: 100vh;
+  }
+  /* ---------- top bar / HUD ---------- */
+  #bar {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 16px;
+    background: rgba(15,23,34,0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--panel-line);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-quiet);
+  }
+  #bar .stats { display: flex; gap: 16px; letter-spacing: 0.04em; text-transform: none; font-size: 13px; align-items: center; }
+  #bar .bar-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 50%; }
+  #bar .bar-title .ep { color: var(--ink-soft); text-transform: none; letter-spacing: 0.02em; }
+  #bar .km { color: var(--camino-gold); font-variant-numeric: tabular-nums; }
+  #bar .words { color: var(--camino-blue-bright); font-variant-numeric: tabular-nums; cursor: pointer; user-select: none; }
+  #bar .words:hover { color: #6fb0e6; }
+  #wrap { max-width: 640px; margin: 0 auto; padding: 30px 22px 90px; }
+  /* ---------- section furniture ---------- */
+  .seclabel {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--camino-blue-bright); margin-bottom: 4px;
+  }
+  .quiet {
+    color: var(--ink-quiet); font-size: 0.84em;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    letter-spacing: 0.08em;
+  }
+  .stamp { margin-bottom: 24px; }
+  p { margin-bottom: 1.1em; }
+  .beat {
+    margin: 1.4em 0; padding-left: 14px;
+    border-left: 2px solid var(--camino-blue);
+    color: #f2f6fb;
+    font-style: italic;
+  }
+  /* spoken foreign lines read as italic, slightly warm so "another language" registers */
+  .es-line { font-style: italic; color: #f3e7c8; }
+  /* ---------- English vocab (Camino blue — the scaffold) ---------- */
+  .vb {
+    border-bottom: 1px dotted #5478c8;
+    color: #9fb8e6;
+    cursor: pointer;
+  }
+  /* ---------- Spanish vocab (Camino gold — the lesson) ---------- */
+  .es {
+    border-bottom: 2px dotted var(--camino-gold);
+    color: #f1cd72;
+    cursor: pointer;
+    font-style: italic;
+  }
+  /* ---------- tooltip ---------- */
+  #tip {
+    position: absolute; z-index: 100;
+    width: max-content;
+    max-width: min(320px, 84vw);
+    white-space: normal;
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 13.5px; line-height: 1.5;
+    color: var(--ink);
+    box-shadow: 0 8px 26px rgba(0,0,0,0.55);
+    display: none;
+  }
+  /* English tooltip: blue accent */
+  #tip.en-tip { border-color: var(--camino-blue); }
+  #tip .zh { color: var(--camino-gold); margin-top: 2px; display: block; }
+  /* Spanish tooltip: gold accent, richer layout */
+  #tip.es-tip { border-color: var(--camino-gold); }
+  #tip .es-head { font-family: 'Fraunces', serif; font-weight: 600; font-size: 16px; color: var(--camino-gold); }
+  #tip .es-pron { color: var(--ink-quiet); font-size: 12.5px; letter-spacing: 0.04em; margin-bottom: 5px; }
+  #tip .es-def { color: var(--ink); }
+  #tip .es-zh { color: var(--camino-gold-soft); }
+  #tip .es-note { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--panel-line); color: var(--ink-soft); font-size: 12.5px; font-style: italic; }
+  /* ---------- choices ---------- */
+  .choices { margin-top: 2em; display: flex; flex-direction: column; gap: 12px; }
+  button.ch {
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px; line-height: 1.5;
+    text-align: left;
+    color: var(--ink);
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-left: 3px solid var(--camino-blue);
+    border-radius: 8px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  button.ch:hover, button.ch:focus-visible { background: #1d2c3d; border-left-color: var(--camino-gold); outline: none; }
+  button.ch:focus-visible { border-color: var(--camino-gold); }
+  button.ch.locked { border-left-color: var(--panel-line); color: var(--ink-quiet); cursor: default; }
+  button.ch .ce { color: var(--camino-gold); font-style: italic; }
+  /* ---------- title screen ---------- */
+  .title-screen { text-align: center; padding-top: 6vh; }
+  .brand {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink-quiet);
+    margin-bottom: 14px;
+  }
+  body.title-mode #bar { display: none; }
+  h1.bctitle {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: clamp(44px, 12vw, 70px);
+    line-height: 0.98;
+    letter-spacing: 0.01em;
+    color: #3a5cb8;
+    margin: 0 0 8px;
+  }
+  h1.bctitle .es-accent { color: var(--camino-gold); }
+  .shell-stage { width: 156px; height: 156px; margin: 0 auto 20px; }
+  .shell-stage svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .subtitle { color: var(--ink-soft); font-style: italic; margin-bottom: 8px; font-size: 19px; }
+  .level-badge {
+    display: inline-block;
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 11px; letter-spacing: 0.2em;
+    color: var(--camino-gold); border: 1px solid var(--camino-gold); border-radius: 99px;
+    padding: 4px 14px; margin-bottom: 36px;
+  }
+  .tagline { color: var(--ink-quiet); }
+  .caminoline {
+    height: 1px; max-width: 220px; margin: 0 auto 36px;
+    background: linear-gradient(90deg, transparent, var(--camino-gold), transparent);
+  }
+  .fineprint {
+    max-width: 460px; margin: 40px auto 0;
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 11px; line-height: 1.6; letter-spacing: 0.01em;
+    color: #5d6f87;
+  }
+  .fineprint b { color: #74859e; font-weight: 600; }
+  /* shell: gentle, slow fade + scale-in. Animate the SVG element, NOT the
+     inner group (which carries the rotate transform), so they don't conflict. */
+  .shell-stage svg {
+    display: block;
+    transform-origin: 50% 60%;
+    opacity: 0; transform: scale(0.72);
+    animation: shellin 1.6s cubic-bezier(0.2,0.7,0.25,1) forwards;
+  }
+  @keyframes shellin { to { opacity: 1; transform: scale(1); } }
+  @media (prefers-reduced-motion: reduce) { .shell-stage svg { animation: none; opacity: 1; transform: scale(1); } }
+  /* ---------- end-of-episode log card ---------- */
+  .logcard {
+    background: rgba(47,111,176,0.07); border: 1px solid var(--camino-blue); border-radius: 10px;
+    padding: 18px; margin: 24px 0;
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+  .logcard .lhead {
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--camino-gold); margin-bottom: 12px;
+  }
+  .logcard .lstat { font-size: 14px; color: var(--ink-soft); margin-bottom: 3px; }
+  .logcard .lstat b { color: var(--ink); font-weight: 600; }
+  .logcard .lwords { margin-top: 14px; display: flex; flex-direction: column; gap: 7px; }
+  .logcard .lw { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+  .logcard .lw .es-word { font-family: 'Fraunces', serif; font-weight: 600; color: var(--camino-gold); font-size: 15px; }
+  .logcard .lw .es-pron { color: var(--ink-quiet); font-size: 12px; }
+  .logcard .lw .es-gloss { color: var(--ink-soft); font-size: 13px; }
+  /* ---------- vocab panel (Mi Vocabulario) ---------- */
+  #vocabOverlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(6,11,18,0.72);
+    display: none; align-items: flex-end; justify-content: center;
+  }
+  #vocabOverlay.open { display: flex; }
+  #vocabPanel {
+    width: 100%; max-width: 640px; max-height: 86vh;
+    background: var(--panel); border-top: 1px solid var(--camino-gold);
+    border-radius: 14px 14px 0 0;
+    display: flex; flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+  #vocabPanel .vp-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 18px 12px; border-bottom: 1px solid var(--panel-line);
+  }
+  #vocabPanel .vp-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: 19px; color: var(--camino-gold); }
+  #vocabPanel .vp-count { color: var(--ink-quiet); font-size: 13px; margin-left: 8px; }
+  #vocabPanel .vp-actions { display: flex; gap: 8px; align-items: center; position: relative; }
+  #vocabPanel button.vp-btn {
+    font-family: -apple-system, system-ui, sans-serif; font-size: 13px;
+    color: var(--ink); background: #1d2c3d; border: 1px solid var(--panel-line);
+    border-radius: 7px; padding: 7px 12px; cursor: pointer;
+  }
+  #vocabPanel button.vp-btn:hover { background: #24374b; }
+  #vocabPanel .vp-menu {
+    position: absolute; top: 40px; right: 38px;
+    background: #1d2c3d; border: 1px solid var(--panel-line); border-radius: 8px;
+    overflow: hidden; display: none; box-shadow: 0 8px 22px rgba(0,0,0,0.5);
+  }
+  #vocabPanel .vp-menu.open { display: block; }
+  #vocabPanel .vp-menu button {
+    display: block; width: 100%; text-align: left;
+    font-family: -apple-system, system-ui, sans-serif; font-size: 13px;
+    color: var(--ink); background: none; border: none; padding: 10px 16px; cursor: pointer; white-space: nowrap;
+  }
+  #vocabPanel .vp-menu button:hover { background: #28384a; }
+  #vocabPanel .vp-close { color: var(--ink-quiet); font-size: 20px; line-height: 1; background: none; border: none; cursor: pointer; padding: 4px 8px; }
+  #vocabPanel .vp-body { overflow-y: auto; padding: 8px 18px 22px; }
+  #vocabPanel .vp-empty { color: var(--ink-quiet); font-style: italic; padding: 28px 0; text-align: center; }
+  #vocabPanel .vp-row { padding: 11px 0; border-bottom: 1px solid var(--panel-line); }
+  #vocabPanel .vp-row .r1 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+  #vocabPanel .vp-row .r-es { font-family: 'Fraunces', serif; font-weight: 600; font-size: 16px; color: var(--camino-gold); }
+  #vocabPanel .vp-row .r-pron { color: var(--ink-quiet); font-size: 12.5px; }
+  #vocabPanel .vp-row .r-ep { margin-left: auto; color: var(--ink-quiet); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+  #vocabPanel .vp-row .r2 { color: var(--ink-soft); font-size: 13.5px; margin-top: 2px; }
+  #vocabPanel .vp-row .r2 .r-zh { color: var(--camino-gold-soft); }
+  .vp-toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--camino-blue); color: #eaf4ff; font-family: -apple-system, system-ui, sans-serif;
+    font-size: 13px; padding: 9px 18px; border-radius: 99px; z-index: 300;
+    opacity: 0; transition: opacity 0.25s; pointer-events: none;
+  }
+  .vp-toast.show { opacity: 1; }
+  /* hidden textarea fallback for copy */
+  #copyFallback { position: fixed; left: -9999px; top: 0; }
+  footer { max-width: 640px; margin: 0 auto; padding: 0 22px 40px; }
+  footer .restart {
+    font-family: -apple-system, system-ui, sans-serif; font-size: 12px;
+    color: var(--ink-quiet); text-decoration: none; letter-spacing: 0.08em;
+  }
+  footer .restart:hover { color: var(--ink-soft); }
+  /* ---------- restart confirm ---------- */
+  #confirmOverlay {
+    position: fixed; inset: 0; z-index: 250;
+    background: rgba(6,11,18,0.74);
+    display: none; align-items: center; justify-content: center; padding: 24px;
+  }
+  #confirmOverlay.open { display: flex; }
+  #confirmBox {
+    width: 100%; max-width: 360px;
+    background: var(--panel); border: 1px solid var(--panel-line); border-radius: 12px;
+    padding: 22px; font-family: -apple-system, system-ui, sans-serif;
+  }
+  #confirmBox .cf-msg { color: var(--ink); font-size: 15px; line-height: 1.55; margin-bottom: 18px; }
+  #confirmBox .cf-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  #confirmBox .cf-btn {
+    font-family: -apple-system, system-ui, sans-serif; font-size: 14px;
+    border-radius: 8px; padding: 9px 16px; cursor: pointer; border: 1px solid var(--panel-line);
+  }
+  #confirmBox .cf-cancel { background: #1d2c3d; color: var(--ink); }
+  #confirmBox .cf-cancel:hover { background: #24374b; }
+  #confirmBox .cf-ok { background: #7a3b1e; color: #ffe8d8; border-color: #9a4f2a; }
+  #confirmBox .cf-ok:hover { background: #8f4824; }
+</style>
+</head>
+<body class="title-mode">
+
+<div id="bar">
+  <div class="bar-title" id="barTitle"></div>
+  <div class="stats">
+    <span class="km" id="kmView"></span>
+    <span class="words" id="wordsView" title="Mi Vocabulario"></span>
+  </div>
+</div>
+
+<div id="wrap"></div>
+
+<footer><a href="#" class="restart" id="replayLink">Replay episode</a><span class="fsep" id="footSep"> &middot; </span><a href="#" class="restart" id="restartLink">Start over</a></footer>
+
+<div id="tip"></div>
+
+<!-- Mi Vocabulario panel -->
+<div id="vocabOverlay">
+  <div id="vocabPanel" role="dialog" aria-label="Mi Vocabulario">
+    <div class="vp-head">
+      <div><span class="vp-title">Mi Vocabulario</span><span class="vp-count" id="vpCount"></span></div>
+      <div class="vp-actions">
+        <button class="vp-btn" id="vpCopy">Copy</button>
+        <button class="vp-btn" id="vpDownload">Download ▾</button>
+        <div class="vp-menu" id="vpMenu">
+          <button data-fmt="txt">Download .txt</button>
+          <button data-fmt="csv">Download .csv (Anki)</button>
+        </div>
+        <button class="vp-close" id="vpClose" aria-label="Close">×</button>
+      </div>
+    </div>
+    <div class="vp-body" id="vpBody"></div>
+  </div>
+</div>
+<div class="vp-toast" id="vpToast"></div>
+<textarea id="copyFallback" readonly></textarea>
+
+<!-- restart confirm -->
+<div id="confirmOverlay">
+  <div id="confirmBox" role="dialog" aria-label="Confirm">
+    <p class="cf-msg" id="cfMsg">Start the whole Camino over from the beginning? Your progress and every word you&rsquo;ve collected will be cleared.</p>
+    <div class="cf-actions">
+      <button class="cf-btn cf-cancel" id="cfCancel">Keep walking</button>
+      <button class="cf-btn cf-ok" id="cfOk">Restart</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =================================================================
+   BUEN CAMINO — InkQuest
+   Series engine, Episode 1. Single file; future episodes append
+   sections to the `sections` object and words to the dictionaries.
+   ================================================================= */
+
+var SAVE_KEY = 'inkquest_buencamino_v1';
+
+/* ============ English vocabulary (amber, scaffold) ============ */
+/* [definition, 中文] — first unseen occurrence per playthrough is linked */
+var VOCAB = {
+  'pilgrim': ['a person who travels a long way to a holy place', '\u671d\u8056\u8005'],
+  'blister': ['a small painful bubble on the skin, often from walking', '\u6c34\u6ce1'],
+  'cobblestones': ['small round stones used to pave old streets', '\u9375\u77f3\u8def\u9762'],
+  'backpack': ['a bag carried on the back', '\u80cc\u5305'],
+  'dawn': ['the first light of the morning', '\u9ece\u660e'],
+  'counter': ['the long flat table where you pay or are served', '\u6ab3\u53f0'],
+  'horizon': ['the line where the land meets the sky', '\u5730\u5e73\u7dda'],
+  'lane': ['a narrow road or path', '\u5c0f\u5df7'],
+  'marker': ['a sign or stone that shows distance or direction', '\u6a19\u8a8c\uff1b\u91cc\u7a0b\u78d1'],
+  'sturdy': ['strong and not easily broken', '\u7d50\u5be6\u7684'],
+  'pharmacy': ['a shop where you buy medicine', '\u85e5\u5c40'],
+  'gesture': ['a movement of the hand to show meaning', '\u624b\u52e2'],
+  'soles': ['the bottoms of your feet or shoes', '\u8173\u5e95\uff1b\u978b\u5e95'],
+  'reservoir': ['a large store of something, kept for later use', '\u5132\u5099\uff1b\u6c34\u5eab'],
+  'awkward': ['not smooth or comfortable; clumsy', '\u5c37\u5c2c\u7684'],
+  'warehouse': ['a large building for storing goods', '\u5009\u5eab'],
+  'floodplain': ['flat low land beside a river that floods', '\u6cdb\u6feb\u5e73\u539f\uff1b\u6cb3\u6ee9'],
+  'bullring': ['a round arena built for bullfights', '\u9b25\u725b\u5834'],
+  'octopus': ['a soft sea animal with eight arms', '\u7ae0\u9b5a'],
+  'stork': ['a tall white bird with long legs that nests on roofs and poles', '\u9d1b\u9ce5'],
+  'dyke': ['a long raised bank built to hold back a river', '\u5824\u9632'],
+  'vineyard': ['a field where grapes are grown for wine', '\u8461\u8404\u5712'],
+  'eucalyptus': ['a tall, fast-growing tree with a strong smell', '\u6850\u6a39']
+};
+
+/* ============ Spanish vocabulary (green, the lesson) ============ */
+/* key: { en, zh, pron, note } — pron is simplified syllables, STRESS in caps */
+var ES_VOCAB = {
+  'buenos d\u00edas':   { en: 'good morning', zh: '\u65e9\u5b89', pron: 'BWEH-nos DEE-as', note: null },
+  'gracias':            { en: 'thank you', zh: '\u8b1d\u8b1d', pron: 'GRAH-syas', note: 'The one word every traveler learns first. You already knew it. You just said it to the wrong country.' },
+  'perd\u00f3n':         { en: 'excuse me / sorry', zh: '\u4e0d\u597d\u610f\u601d\uff1b\u62b1\u6b49', pron: 'pehr-DON', note: 'Works for bumping into someone AND for interrupting. One word, two jobs.' },
+  'no hablo espa\u00f1ol': { en: "I don't speak Spanish", zh: '\u6211\u4e0d\u6703\u8aaa\u897f\u73ed\u7259\u6587', pron: 'noh AH-bloh es-pah-NYOL', note: 'The most useful sentence you own right now. Said with confidence, it is itself a little bit of Spanish \u2014 which rather undercuts the message.' },
+  '\u00bfhabla ingl\u00e9s?': { en: 'do you speak English?', zh: '\u4f60\u6703\u8aaa\u82f1\u6587\u55ce\uff1f', pron: 'AH-blah een-GLES', note: 'The answer is often "un poco" (a little), which can mean anything from fluent to three words.' },
+  'lo siento':          { en: "I'm sorry", zh: '\u5c0d\u4e0d\u8d77', pron: 'loh SYEN-toh', note: 'Literally "I feel it." Spanish apologies are about feeling, not fault.' },
+  'ampolla':            { en: 'blister', zh: '\u6c34\u6ce1', pron: 'ahm-POH-yah', note: 'Remember this one. Your feet are about to make it the most important word of the week.' },
+  'una':                { en: 'one / a (feminine)', zh: '\u4e00\u500b\uff08\u9670\u6027\uff09', pron: 'OO-nah', note: 'Spanish nouns have a gender. Una for "feminine" words, un for "masculine." Nobody can fully explain why a pharmacy is feminine. It just is.' },
+  'farmacia':           { en: 'pharmacy', zh: '\u85e5\u5c40', pron: 'far-MAH-syah', note: 'Look for the green cross glowing over the door. It is the same all over Spain and Portugal.' },
+  'buen camino':        { en: 'good journey / safe travels', zh: '\u4e00\u8def\u9806\u98a8', pron: 'bwehn kah-MEE-noh', note: 'The one greeting of the Camino. Said to every pilgrim you pass, by every pilgrim who passes you, at six in the morning when you can barely speak. Learn it. Live it.' },
+  /* ---- Episode 2 ---- */
+  'pollo':              { en: 'chicken', zh: '\u96de\u8089', pron: 'POH-yoh', note: 'A famous trap. In Portugal the Spanish "pollo" sounds like the Portuguese "polvo" \u2014 which is octopus. Order confidently, receive tentacles.' },
+  'una cerveza':        { en: 'a beer', zh: '\u4e00\u676f\u5564\u9152', pron: 'OO-nah ser-VEH-sah', note: 'After a long hot stage, statistically the first full sentence most pilgrims say correctly without thinking.' },
+  'la cuenta':          { en: 'the check / the bill', zh: '\u8cea\u55ae\uff0f\u5e33\u55ae', pron: 'lah KWEN-tah', note: 'Catch the waiter\u2019s eye and say it, or mime signing the air. Both work. The mime is universal; the words are better.' },
+  '\u00bfd\u00f3nde est\u00e1?':   { en: 'where is...?', zh: '\u2026\u5728\u54ea\u88e1\uff1f', pron: 'DON-deh es-TAH', note: 'Point at the thing or the name on your map and say it. The answer will be too fast. That is what the next phrase is for.' },
+  'no entiendo':        { en: "I don't understand", zh: '\u6211\u807d\u4e0d\u61c2', pron: 'noh ehn-TYEN-doh', note: 'No shame in it. The honest pilgrim says this forty times a day and keeps walking.' },
+  'm\u00e1s despacio':     { en: 'more slowly', zh: '\u8bf7\u6162\u4e00\u9ede', pron: 'mahs des-PAH-syoh', note: 'Marcos\u2019s gift. Glue it to "no entiendo" and people slow down every time. Possibly the single most useful thing you learn all week.' },
+  'todo recto':         { en: 'straight ahead', zh: '\u76f4\u8d70', pron: 'TOH-doh REK-toh', note: 'One of the four words that get you across Spain. The others are left, right, and "where is the bathroom."' },
+  'a la derecha':       { en: 'to the right', zh: '\u5f80\u53f3', pron: 'ah lah deh-REH-chah', note: null },
+  'a la izquierda':     { en: 'to the left', zh: '\u5f80\u5de6', pron: 'ah lah ees-KYEHR-dah', note: 'The longer word is always the one for left. Nobody can explain it. Nobody needs to.' }
+};
+
+/* ordered list of Spanish keys, longest first, so phrases match before their parts */
+var ES_TERMS = Object.keys(ES_VOCAB).sort(function (a, b) { return b.length - a.length; });
+var TERMS = Object.keys(VOCAB);
+
+var SKIP_CLASSES = ['seclabel', 'quiet', 'stamp', 'logcard', 'es-note'];
+
+/* ============ episode metadata ============ */
+var TOTAL_KM = 610;
+/* km_start / km_end are cumulative distances on the 610 km route.
+   Per-episode distances anchored to real Central-route stage data:
+   EP1 Lisbon->Alpriate 22; EP2 Alpriate->Vila Franca->Azambuja->Santarem +67 = 89. */
+var EPISODES = {
+  1: { title: 'The First Step Hurts', km_start: 0,  km_end: 22, next: 'Hungry and Lost' },
+  2: { title: 'Hungry and Lost',      km_start: 22, km_end: 89, next: 'The Blisters Speak Spanish' }
+};
+/* mutable "current episode" view the HUD / linker read from */
+var EPISODE = { num: 1, title: EPISODES[1].title, total_km: TOTAL_KM };
+function epOf(id) { var m = /^e(\d+)s|^e(\d+)end/.exec(id); return m ? +(m[1] || m[2]) : EPISODE.num; }
+function setEpisode(id) {
+  var n = epOf(id);
+  if (EPISODES[n]) { EPISODE.num = n; EPISODE.title = EPISODES[n].title; }
+}
+
+/* ============ state ============ */
+function defaultState() {
+  return {
+    v: 1,
+    km: 0,
+    flags: {},
+    seenEn: {},               /* English words already linked this playthrough */
+    esSeen: {},               /* Spanish keys the player has OPENED (tapped) */
+    esEncountered: {},        /* Spanish keys that have been rendered on screen */
+    esFirstEp: {},            /* Spanish key -> episode number first encountered */
+    npcs_collected: 0,        /* deeply-known companions (Sofia + each invested NPC) */
+    times_misunderstood: 0    /* comedy fails; colors later narration */
+  };
+}
+var state = defaultState();
+var cur = 'title';
+
+/* Per-episode snapshots of the FULL state, captured the first time the player
+   enters an episode. Kept outside `state` so a snapshot never contains itself.
+   Lets the player replay an episode from its start while keeping everything they
+   carried INTO it (vocabulary, companions, kilometers). */
+var episodeSnapshots = {};
+function snapshotState() { return JSON.parse(JSON.stringify(state)); }
+function snapshotIfEpisodeStart(id) {
+  var m = /^e(\d+)s1$/.exec(id);   /* only the first section of an episode */
+  if (!m) return;
+  /* Always refresh on a FORWARD entry (reached via goto_). Replaying an episode
+     restores via render(), never goto_, so an active replay never overwrites its
+     own checkpoint. This keeps the checkpoint matching the latest real entry. */
+  episodeSnapshots[+m[1]] = snapshotState();
+  save();
+}
+
+/* Derive companion count from flags (idempotent; safe across saves made before
+   the counter existed). Sofia is the one auto-counted tutorial NPC; every other
+   named companion must be actively invested in. */
+var KNOWN_FLAGS = ['met_sofia', 'marcos_known', 'concha_known', 'joaquim_known',
+                   'bram_known', 'pilar_known', 'elena_known', 'tomas_known'];
+function recountNpcs() {
+  var n = 0;
+  for (var i = 0; i < KNOWN_FLAGS.length; i++) if (state.flags[KNOWN_FLAGS[i]]) n++;
+  state.npcs_collected = n;
+}
+
+function save() {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify({ v: 1, cur: cur, state: state, snapshots: episodeSnapshots })); }
+  catch (e) {}
+}
+function loadSave() {
+  try {
+    var raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return null;
+    var d = JSON.parse(raw);
+    if (d && d.v === 1 && d.cur && d.state) return d;
+  } catch (e) {}
+  return null;
+}
+function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
+
+/* ============ sections ============ */
+var sections = {
+
+  title: function () {
+    var hasSave = !!loadSave();
+    var shell =
+      '<div class="shell-stage"><svg viewBox="30.6 37.5 253.4 234.1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g class="shell-fig" transform="rotate(-90 157.3500 154.5000)"><path d="m 47.44753,87.559559 c 1.05738,2.57696 3.11387,7.83538 4.56999,11.685379 1.45612,3.850002 2.11744,5.819682 3.99467,10.000002 1.87723,4.18032 2.5885,10.13943 -1.55051,22.5 -4.139,12.36055 -4.18502,12.47746 -4.57594,25.67153 -0.39091,13.19407 0.36046,17.51825 5.41258,28.27521 5.05212,10.75696 2.11009,18.55804 -4.42993,32.95303 -6.54002,14.39499 -3.21354,10.84827 2.04397,16.01531 5.25751,5.16704 5.58833,5.35 6.85815,4.29615 1.26982,-1.05385 4.02227,-7.31072 9.21587,-21.71124 5.19359,-14.40052 5.02941,-14.36735 7.11329,-15.16701 2.08388,-0.79966 7.15495,6.12204 15.98466,20.16701 8.8297,14.04497 12.27522,19.475 14.21583,22.5 1.94061,3.025 1.09456,1.62734 5.72798,9 4.63342,7.37266 13.50394,20.76555 14.99404,22 1.4901,1.23445 2.26869,1.48656 12.40676,1.18913 10.13807,-0.29743 13.96788,-2.19169 12.23177,-5.43564 -1.73611,-3.24395 -11.36794,-14.98973 -18.98677,-23.25349 -7.61883,-8.26376 -36.45652,-41.30745 -38.11858,-44.04233 -1.66206,-2.73488 0.77242,-4.63375 3.11232,-3.40061 2.3399,1.23314 2.38338,1.27358 2.85736,1.84264 0.47398,0.56906 37.95334,32.00467 49.54486,41.6003 11.59152,9.59563 8.2347,6.85832 12.39357,10.3518 4.15886,3.49349 6.5077,5.46699 9.72611,8.16907 3.21841,2.70208 4.55657,5.20678 13.69647,0.4632 9.13991,-4.74358 13.63899,-7.5555 13.63899,-8.99804 0,-1.44253 -23.75019,-17.18278 -36.5,-25.00803 -12.74981,-7.82525 -11.95446,-7.37217 -17.5,-10.97952 -5.54554,-3.60734 -21.25846,-13.62045 -31.5,-20.00946 -10.24153,-6.389 -11.5,-6.62966 -11.5,-9.5357 0,-2.90604 11.6227,1.99038 27,10.12269 15.3773,8.13231 20.6,10.7947 30.5,15.90854 9.9,5.11384 22.275,11.55892 27.5,14.32241 5.225,2.76349 15.98635,8.27906 18.44669,9.51354 2.46034,1.23448 5.78098,5.08142 8.9467,4.48903 3.16572,-0.59239 4.53225,-5.00596 6.25137,-6.90477 1.71913,-1.89881 5.96385,-6.37493 7.46709,-9.14504 1.50324,-2.77011 -11.21861,-9.94275 -27.61185,-15.77575 -16.39323,-5.833 -19.2,-6.85798 -28,-10.0213 -8.8,-3.16332 -20.725,-7.42896 -26.5,-9.47923 -5.775,-2.05027 -11.75734,-4.23168 -13.2941,-4.84761 -1.53676,-0.61593 -4.01175,-1.41067 -5.5,-1.76611 -1.48825,-0.35544 -3.15441,-0.92152 -3.70259,-1.25798 -0.54818,-0.33646 -2.36978,-1.10831 -7.90954,-3.11174 -5.53976,-2.00342 -9.62512,-5.36865 -7.87764,-7.11613 1.74747,-1.74747 5.22836,-0.58659 27.78387,5.5842 22.55551,6.1708 30.65948,8.35753 35.5,9.55858 4.84052,1.20105 10.92218,2.73409 25.5,6.8485 14.57782,4.11442 41.45455,11.35627 42.87896,10.80967 1.42442,-0.5466 6.13282,-10.76609 7.04232,-15.90576 0.90951,-5.13967 -9.39578,-5.75933 -29.42127,-8.85905 -20.0255,-3.09972 -14.40001,-2.24394 -15.50001,-2.43253 -1.1,-0.18859 -5.63515,-0.89556 -15.5,-2.39537 -9.86484,-1.4998 -30.83759,-4.83973 -57.5,-9.14511 -26.66242,-4.30538 -19.09469,-4.45771 -17.66415,-6.71411 1.43054,-2.2564 24.12607,0.15471 62.66415,2.72292 38.53808,2.56821 52.11251,3.43504 60.50001,3.97966 8.3875,0.54462 25.27853,4.11233 30.50001,1.98044 5.22149,-2.13189 0.20447,-0.22815 2.18592,-2.43922 1.98145,-2.21106 3.22592,-19.17979 0.50927,-22.39974 -2.71665,-3.21995 -6.79387,-1.67594 -23.6952,-0.57109 -16.90133,1.10485 -27.4,1.90401 -34.00001,2.47339 -6.6,0.56938 -23.025,1.71985 -36.5,2.55659 -13.475,0.83674 -26.525,1.70789 -29,1.93588 -2.475,0.22799 -9.45,0.69173 -15.5,1.03055 -6.05,0.33882 -11.09175,0.63445 -13.08831,1.03535 -1.99656,0.4009 -6.25209,-2.05735 -4.78395,-3.54804 1.46813,-1.49069 9.9809,-3.1631 20.87226,-4.97015 10.89136,-1.80705 13.125,-2.22661 14.5,-2.5146 1.375,-0.28799 8.125,-1.45482 15,-2.59296 6.875,-1.13814 17.45,-2.91452 23.5,-3.9475 6.05,-1.03298 17.525,-2.96993 25.5,-4.30434 7.97501,-1.33441 19.22501,-3.22278 25.00001,-4.19638 5.775,-0.9736 10.66449,-1.8972 11.68224,-2.68312 1.01775,-0.78592 -0.63355,-7.70354 -3.64765,-14.04026 -3.0141,-6.33672 -5.25205,-6.42092 -9.30307,-5.40883 -4.05102,1.0121 -18.62282,4.95623 -24.23153,6.52105 -5.6087,1.56482 -11.95,3.31978 -18,4.99032 -6.05,1.67054 -13.25,3.69075 -16,4.48936 -2.75,0.79861 -9.00185,2.52532 -24,6.54779 -14.99815,4.02248 -28.03976,7.6594 -34.87194,9.7498 -6.83218,2.0904 -7.62806,0.84795 -7.62806,-0.98443 0,-1.83238 5.84935,-4.23482 9,-5.14532 3.15065,-0.9105 3.85,-1.32792 5.5,-2.06792 1.65,-0.74 13.8,-5.20897 27,-9.93105 13.2,-4.72208 24.9,-9.00851 26,-9.5254 1.1,-0.51689 7.06045,-2.76167 24.5,-9.0403 17.43957,-6.278631 27.00001,-10.449941 27.00001,-11.990501 0,-1.54056 -10.71122,-16.64832 -12.13424,-17.5278 -1.42302,-0.87947 -14.60918,5.2895 -41.86577,18.10647 -27.25659,12.816971 -41.37035,20.318971 -54,27.378191 -12.62965,7.05923 -16.22471,8.33002 -16.96275,7.14606 -0.73804,-1.18396 -0.74936,-1.70455 -0.38049,-2.30139 0.36887,-0.59684 30.06847,-20.31396 36.34324,-24.248321 6.27477,-3.93436 5.975,-3.77103 9,-5.69785 3.025,-1.92682 2.74485,-1.79682 23,-14.34249 20.25515,-12.54566 27.74292,-21.05389 21.06169,-24.42656 -6.68122,-3.37267 -9.68307,-4.48774 -11.05535,-5.02864 -1.37228,-0.5409 -2.35704,-2.37081 -4.9901,-1.96691 -2.63305,0.4039 -5.98714,4.84039 -8.25812,6.6764 -2.27098,1.83601 -8.48312,6.95602 -8.75812,7.29779 -0.275,0.34177 -7.25,6.14125 -15.5,12.88775 -8.25,6.7465 -17.25,14.18974 -20,16.54055 -2.75,2.35081 -8.08103,6.78823 -16.20609,13.418061 -8.12506,6.62983 -13.29391,9.82611 -13.29391,8.57404 0,-1.25206 6.128,-9.2253 8.18444,-11.567422 2.05644,-2.342119 3.66556,-4.339689 5.31556,-6.420459 1.65,-2.08077 3.00363,-3.78774 17,-21.23758 13.99637,-17.44983 26.68777,-33.09834 26.16955,-34.70472 -0.51822,-1.60638 -7.57517,-3.67815 -16.02404,-3.31411 -8.44887,0.36404 -6.90116,-2.12333 -20.11214,17.31411 -13.21098,19.43744 -22.82476,33.34506 -23.78775,34.52074 -0.96299,1.17568 -4.3684,6.12391 -8.18513,11.75 -3.81673,5.626091 -7.55218,10.229261 -8.30102,10.229261 -0.74883,0 -1.94797,-1.4625 -2.66474,-3.25 -0.71677,-1.7875 -1.64337,-4.12034 -6.09329,-15.506231 -4.44992,-11.3859 -6.87657,-15.91218 -10.68509,-14.09602 -3.80852,1.81616 -9.81635,6.90109 -9.81635,7.50576 0,0.60467 0.86511,2.58415 1.92249,5.16111 z" fill="#e3c04a"/></g></svg></div>';
+    var html = '<div class="title-screen">' +
+      '<div class="brand">InkQuest presents</div>' +
+      shell +
+      '<h1 class="bctitle">Buen <span class="es-accent">Camino</span></h1>' +
+      '<div class="subtitle">Spanish on the Road</div>' +
+      '<div class="level-badge">ENGLISH A2\u2013B1 &middot; LEARN SPANISH</div>' +
+      '<div class="caminoline"></div>' +
+      '<p class="tagline" style="margin-bottom:34px;">610 kilometers to Santiago.<br>You don\u2019t speak a word of Spanish.<br>Yet.</p>' +
+      '</div>';
+    var choices = [{ t: 'Begin the Camino', to: 'e1s1', fx: function () { state = defaultState(); } }];
+    if (hasSave) choices.push({ t: 'Continue', to: '__continue__' });
+    return { label: '', time: '', html: html, choices: choices };
+  },
+
+  /* ---------- EP1 ---------- */
+
+  e1s1: function () {
+    var html =
+      '<p>The bells of Lisbon are still asleep.</p>' +
+      '<p>You stand in a narrow lane in the Alfama, the old quarter, in the dark before dawn, in front of a small church with a worn stone face \u2014 the Igreja de Santiago. It is shut, as it almost always is. But beside the door there is a small placard, and the placard says, in Portuguese, that the Camino begins here. Below it, painted low on the wall, the first yellow arrow. It points downhill, toward the river.</p>' +
+      '<p>Your boots are new. Your backpack is heavy. Everything you own for the next month is on your back, and it is already pulling at your shoulders.</p>' +
+      '<p>Six hundred and ten kilometers to Santiago. You try not to think about the number. You think about the number.</p>' +
+      '<p class="beat">You do not know why you are here. Or you do, and you are not ready to say it. Either way, the arrow points the way, and your feet are pointed the same way.</p>';
+    return {
+      label: 'Section 1 \u00b7 The Yellow Arrow',
+      time: 'LISBON \u2014 BEFORE DAWN, DAY 1',
+      html: html,
+      choices: [{ t: 'Follow the arrow downhill.', to: 'e1s2' }]
+    };
+  },
+
+  e1s2: function () {
+    var html =
+      '<p>You follow the arrow down the hill, and four hundred meters later the lane opens out in front of the S\u00e9 \u2014 the old cathedral, two stone towers against the brightening sky. This is where the Camino properly announces itself: the first real waymarks, and the place pilgrims come to have their credential stamped before they leave the city. The cathedral isn\u2019t open yet. You\u2019ll carry an unstamped credential for now.</p>' +
+      '<p>Three streets later you find a caf\u00e9 with its lights on. A small miracle. You are not awake enough to walk, let alone walk to Spain.</p>' +
+      '<p>The woman behind the counter slides a tiny cup of coffee toward you and says something warm and quick.</p>' +
+      '<p class="es-line">\u201cBom dia.\u201d</p>' +
+      '<p>Your tired brain reaches for a reply, grabs the first foreign word in the drawer, and throws it.</p>' +
+      '<p class="es-line">\u201cGracias,\u201d you say.</p>' +
+      '<p>She blinks. Then she laughs \u2014 not unkindly. She points at the door, the way you came, the long road ahead, and then taps her chest.</p>' +
+      '<p class="es-line">\u201cPortugu\u00eas,\u201d she says, gently. \u201cAqui, obrigado. Espanhol \u2014 l\u00e1.\u201d She points north. <em>There.</em></p>' +
+      '<p>You have been in the country for one coffee and you have already thanked it in the wrong language. \u201cLo siento,\u201d you manage \u2014 <em>sorry</em> \u2014 dredging up one more word from somewhere. She waves it away, still smiling. The Camino has not officially begun and you are already losing. You are also, somehow, already learning.</p>';
+    return {
+      label: 'Section 2 \u00b7 The Wrong Language',
+      time: 'LISBON \u2014 FIRST LIGHT',
+      html: html,
+      choices: [
+        { t: 'Drink the coffee. Say nothing else you might regret.', to: 'e1s3' }
+      ]
+    };
+  },
+
+  e1s3: function () {
+    var html =
+      '<p>By the time the sun is up you are out past the edge of the old town, following yellow arrows along the river. The city thins. The noise falls away. And then, on a long quiet stretch, there is someone ahead of you.</p>' +
+      '<p>A woman in her sixties, two walking poles clicking on the path, a backpack worn pale at the straps. She walks like someone who has done this many times and stopped being impressed by it.</p>' +
+      '<p>She slows so you can catch up. \u201cBuenos d\u00edas,\u201d she says \u2014 the first real Spanish anyone has aimed at you. She looks you over \u2014 the bright new boots, the too-full backpack \u2014 and her mouth twitches.</p>' +
+      '<p class="es-line">\u201cPrimera vez,\u201d she says. <em>First time.</em> It is not a question.</p>' +
+      '<p>\u201cThat obvious?\u201d you say.</p>' +
+      '<p>She points at your boots and shakes her head slowly, the way a doctor looks at an X-ray.</p>';
+    return {
+      label: 'Section 3 \u00b7 Sofia',
+      time: 'OUT OF LISBON \u2014 MORNING',
+      html: html,
+      choices: [
+        { t: 'Try the phrase you practiced: <span class="ce">\u201c\u00bfHabla ingl\u00e9s?\u201d</span>', to: 'e1s4', fx: function () { state.flags.asked_english = 1; } },
+        { t: 'Try Spanish. Point at yourself: \u201cNo \u2026 espa\u00f1ol.\u201d', to: 'e1s4', fx: function () { state.flags.tried_first_spanish = 1; } }
+      ]
+    };
+  },
+
+  e1s4: function () {
+    var triedEs = !!state.flags.tried_first_spanish;
+    var html =
+      (triedEs
+        ? '<p>You point at yourself and offer the only words you can find: <span class="es-line">\u201cNo \u2026 espa\u00f1ol.\u201d</span></p>' +
+          '<p>It is barely a sentence. It is barely two words. But the woman\u2019s whole face changes \u2014 she lights up, delighted, as if you have done something clever.</p>' +
+          '<p class="es-line">\u201c\u00a1Eso! No hablo espa\u00f1ol,\u201d she says, finishing it for you, slowly, so you can hear every piece. <em>I don\u2019t speak Spanish.</em></p>'
+        : '<p>\u201c\u00bfHabla ingl\u00e9s?\u201d you try \u2014 the phrase you practiced on the plane, hoping it sounds less broken out loud than it did in your head. \u201cDo you speak English?\u201d</p>' +
+          '<p>The woman tips her hand side to side. <span class="es-line">\u201cUn poco. A little.\u201d</span> Then she decides that a little English is not what this morning is for, and switches the lesson around.</p>' +
+          '<p class="es-line">\u201cFirst word,\u201d she says. \u201cNo hablo espa\u00f1ol.\u201d <em>I don\u2019t speak Spanish.</em> Say it.</p>') +
+      '<p>You say it. Badly. She makes you say it again, and this time it is less bad.</p>' +
+      '<p>\u201cSofia,\u201d she says, tapping her chest. \u201cSalamanca. Four times, this road.\u201d She holds up four fingers, then waves them at the horizon as if six hundred kilometers were nothing, were weather, were a thing that simply happened to a person.</p>' +
+      '<p>\u201cToday I teach you three things,\u201d Sofia says. \u201cThen you are not a baby on the Camino. You are only a child.\u201d</p>';
+    return {
+      label: 'Section 4 \u00b7 Three Things',
+      time: 'WALKING WITH SOFIA',
+      html: html,
+      choices: [{ t: '\u201cThree things. Okay.\u201d', to: 'e1s5', fx: function () { state.flags.met_sofia = 1; } }]
+    };
+  },
+
+  e1s5: function () {
+    var html =
+      '<p>\u201cOne,\u201d Sofia says, holding up a finger. \u201cBuen camino. You say it to everyone. Everyone says it to you. It means \u2014\u201d she searches for the English \u2014 \u201cgood road. Good journey. Have a good walk and do not die.\u201d</p>' +
+      '<p class="es-line">\u201cBuen camino,\u201d you try.</p>' +
+      '<p>\u201cTwo. Gracias. You already know this one. You used it on a Portuguese woman this morning, yes?\u201d</p>' +
+      '<p>You did not tell her that. You decide not to ask how she knows.</p>' +
+      '<p>\u201cThree. Perd\u00f3n. Sorry, excuse me, my fault, move please, I am a tourist. One word. It does everything.\u201d She pats your shoulder. \u201cWith these three, you can cross Spain. Badly. But you can cross it.\u201d</p>';
+    return {
+      label: 'Section 5 \u00b7 The First Three Words',
+      time: 'WALKING WITH SOFIA',
+      html: html,
+      choices: [{ t: 'Repeat all three, under your breath, like a spell.', to: 'e1s6' }]
+    };
+  },
+
+  e1s6: function () {
+    var html =
+      '<p>By late morning your feet have an opinion, and the opinion is rage.</p>' +
+      '<p>Something is wrong inside your right boot \u2014 a hot, raw spot at the back of your heel that gets worse with every step. You have just reached Sacav\u00e9m, the last real town before the path heads off into the fields, when Sofia watches you start to limp and steers you toward a bench.</p>' +
+      '<p>\u201cAh,\u201d she says, with the grim satisfaction of a prophet proven right. \u201cThe boots. I told the boots.\u201d She did not, in fact, tell the boots anything, but you let it go.</p>' +
+      '<p>\u201cYou have a \u2014\u201d she searches again, then gives up on English and uses the real word \u2014 <span class="es-line">\u201campolla.\u201d</span> She points at her own heel. \u201cBlister. You need una farmacia. Here, in the town \u2014 after this, nothing for ten kilometers. Go now.\u201d She points down the street, where a green cross glows over a doorway.</p>' +
+      '<p>\u201cI walk slow today,\u201d she says, which is a lie told kindly \u2014 she will be far ahead within the hour. \u201cYou go. Buy for the ampolla. And remember \u2014\u201d she taps her heel again, then her mouth. <em>Say the word. Don\u2019t point. Try.</em></p>';
+    return {
+      label: 'Section 6 \u00b7 Ampolla',
+      time: 'SACAV\u00c9M \u2014 LATE MORNING',
+      html: html,
+      choices: [{ t: 'Walk to the green cross.', to: 'e1s7' }]
+    };
+  },
+
+  e1s7: function () {
+    var html =
+      '<p>The pharmacy is cool and clean and smells of soap. A man in a white coat looks up. \u201cBom dia,\u201d he says \u2014 Portuguese again; you are not in Spain yet, and the lesson with Sofia has muddled the two languages into one hopeful soup in your head.</p>' +
+      '<p>He waits. You open your mouth. Here is the whole test of your first day: one word, the word Sofia gave you, sitting somewhere just behind your teeth.</p>';
+    return {
+      label: 'Section 7 \u00b7 The Green Cross',
+      time: 'THE PHARMACY',
+      html: html,
+      choices: [
+        { t: 'Say the word: <span class="ce">\u201cAmpolla?\u201d</span> Point at your heel.', to: 'e1s8a', fx: function () { state.flags.said_ampolla = 1; } },
+        { t: 'Lose your nerve. Just point at your foot and wince.', to: 'e1s8b' }
+      ]
+    };
+  },
+
+  e1s8a: function () {
+    var html =
+      '<p>\u201cAmpolla,\u201d you say, and point at your heel.</p>' +
+      '<p>The word is close enough. The man\u2019s face clears at once \u2014 <em>ah, this one</em> \u2014 and he is already turning to a shelf. He comes back with a small box of blister plasters and a tube of something, and explains the whole thing in fast, kind Portuguese of which you understand approximately none.</p>' +
+      '<p>But you understood the important part, which happened before he said anything: you said a word in a language you do not speak, and a stranger understood you, and the world gave you what you needed.</p>' +
+      '<p class="beat">It is a small thing. A blister, a plaster, a word. But you walked into a shop with one word and walked out with the right answer, and somewhere under the pain in your heel, something in you stands up a little straighter.</p>';
+    return {
+      label: 'Section 8 \u00b7 One Word',
+      time: 'THE PHARMACY',
+      html: html,
+      choices: [{ t: 'Pay. Say \u201cobrigado\u201d this time \u2014 you\u2019re learning.', to: 'e1s9' }]
+    };
+  },
+
+  e1s8b: function () {
+    var html =
+      '<p>The word is right there. You lose it anyway. You point at your foot and make a small pained face, and then \u2014 because that does not feel like enough \u2014 you point at it again, harder, as if the second point will carry the meaning the first one couldn\u2019t.</p>' +
+      '<p>It takes a while. There is a confusing detour where the man brings you something for an insect bite. But you get there in the end, the two of you, through pointing and patience, and you walk out with the right box.</p>' +
+      '<p class="beat">Pointing works. It will always work, a little. But you stood in a shop with a word in your pocket and didn\u2019t spend it \u2014 and you make yourself a small, quiet promise: next time, you try the word. Even badly. <em>Especially</em> badly.</p>';
+    return {
+      label: 'Section 8 \u00b7 Next Time',
+      time: 'THE PHARMACY',
+      html: html,
+      choices: [{ t: 'Pay. Nod your thanks and step back into the heat.', to: 'e1s9' }]
+    };
+  },
+
+  e1s9: function () {
+    var saidIt = !!state.flags.said_ampolla;
+    var html =
+      '<p>Outside, you sit on a step and do the surgery: clean the heel, peel the plaster, press it down. The relief is instant and slightly religious.</p>' +
+      '<p>The morning had been all city and river \u2014 the modern glass of the Parque das Na\u00e7\u00f5es, the long promenade beside the Tejo, the great white span of the Vasco da Gama bridge stretching out across the water until it simply vanished into haze. You walked under it and kept going.</p>' +
+      '<p>But the afternoon is different. After the little town of Sacav\u00e9m the path leaves the river and the noise behind, and there is suddenly nothing \u2014 just a dirt track running north through open fields, olive trees, the odd almond tree, the odd farm dog. Kilometers of it. No caf\u00e9, no shade, no sound but your own boots and the wind moving through dry grass. It is not pretty, exactly. It is just quiet, and long, and yours.</p>' +
+      (saidIt
+        ? '<p>Every so often you catch yourself mouthing the word. <span class="es-line">Ampolla. Ampolla.</span> Your first piece of treasure. You are keeping it.</p>'
+        : '<p>Every so often you catch yourself thinking the word you didn\u2019t say. <span class="es-line">Ampolla.</span> You\u2019ll say it next time. You\u2019re keeping it for next time.</p>') +
+      '<p>Late in the day, the fields give way to a small village, and there is the place where you will sleep. A simple room. A bottom bunk. You have walked your first day and your body has questions for management.</p>';
+    return {
+      label: 'Section 9 \u00b7 The First Day Ends',
+      time: 'TO ALPRIATE \u2014 EVENING, DAY 1',
+      html: html,
+      choices: [{ t: 'Lie down. Let the day land on you.', to: 'e1s10' }]
+    };
+  },
+
+  e1s10: function () {
+    var html =
+      '<p>You lie on the bunk and listen to other pilgrims come in, drop their packs, groan in three or four languages. The international sound of feet that hurt.</p>' +
+      '<p>Twenty-two kilometers today. Six hundred to go. The number is absurd. The number is fine. You are too tired to be afraid of the number.</p>' +
+      '<p>Somewhere in the dark, half asleep, you realize you are practicing. Running the words past your lips like worry beads. <span class="es-line">Buen camino. Gracias. Perd\u00f3n. Ampolla.</span> A pilgrim\u2019s first vocabulary: a greeting, a thank-you, an apology, and the word for the thing that hurts.</p>' +
+      '<p class="beat">It is, you think, just before sleep takes you, a fairly honest summary of what a person actually needs.</p>';
+    return {
+      label: 'Section 10 \u00b7 Worry Beads',
+      time: 'ALPRIATE \u2014 NIGHT',
+      html: html,
+      choices: [{ t: 'Sleep.', to: 'e1end' }]
+    };
+  },
+
+  e1end: function () {
+    /* episode-end log card built from words actually encountered this playthrough */
+    var html =
+      '<p style="text-align:center;font-family:\'Fraunces\',serif;font-size:24px;color:#a9e8cc;margin:10px 0 4px;">Buen camino.</p>' +
+      '<p style="text-align:center;" class="quiet">END OF EPISODE 1</p>' +
+      buildLogCard(1) +
+      '<p style="text-align:center;margin-top:18px;" class="quiet">Episode 2 \u2014 <em>Hungry and Lost</em>.<br>Three days along the river. A lunch order that goes spectacularly wrong.</p>';
+    return {
+      label: '',
+      time: '',
+      html: html,
+      choices: [
+        { t: 'Continue to Episode 2 \u2192', to: 'e2s1' },
+        { t: 'Replay Episode 1', to: '__replay__' },
+        { t: 'Open Mi Vocabulario', to: '__vocab__' },
+        { t: 'Start over from the beginning', to: '__restart__' }
+      ]
+    };
+  },
+
+  /* ===================== EPISODE 2 \u2014 Hungry and Lost ===================== */
+
+  e2s1: function () {
+    var html =
+      '<p>The alarm is set for six. You wake at five-forty, which is worse, because now you are awake to feel your legs.</p>' +
+      '<p>Day one put twenty-two kilometers into them and went home. They stayed. Your right heel, where the blister lives, has its own heartbeat now. You sit on the edge of the bunk and have a frank talk with your feet. Your feet do not negotiate.</p>' +
+      '<p>Outside, Alpriate is gray and damp and smells of woodsmoke. A dog barks once, for form\u2019s sake. The yellow arrow on the wall points north \u2014 the way it pointed yesterday, the way it will point for a month.</p>' +
+      '<p class="beat">You lace the boots. North is north. The feet, outvoted, come along.</p>';
+    return {
+      label: 'Section 1 \u00b7 The Second Morning',
+      time: 'ALPRIATE \u2014 DAWN, DAY 2',
+      html: html,
+      choices: [{ t: 'Walk. The river is somewhere ahead.', to: 'e2s2' }]
+    };
+  },
+
+  e2s2: function () {
+    var html =
+      '<p>For an hour the path drags you past warehouses and the back ends of towns \u2014 Alverca, Alhandra, names you forget as you pass them. Then, in Alhandra, the road hands you to the river, and everything improves at once.</p>' +
+      '<p>A flat paved walk follows the Tejo north. Old men fish from the bank. The river is wide and brown and patient, and the early sun lies across it in one long bright sheet. On the far side spreads the floodplain \u2014 the <em>lez\u00edria</em>, flat green pasture that drowns every winter and dries every spring \u2014 running out to a line of low hills. Out in the grass, black bulls stand around like they own the place. In this corner of Portugal, they more or less do.</p>' +
+      '<p>By late morning the path lifts you up into Vila Franca de Xira, past the bullring the town is famous for, into a square with cafes on three sides. Your stomach, silent since yesterday, files a formal complaint.</p>' +
+      '<p>You pick a small place with a paper menu taped to the window and sit down before your legs can vote on it.</p>';
+    return {
+      label: 'Section 2 \u00b7 Along the Tejo',
+      time: 'TO VILA FRANCA DE XIRA \u2014 MORNING',
+      html: html,
+      choices: [{ t: 'Order lunch. You know exactly one food word \u2014 use it.', to: 'e2s3' }]
+    };
+  },
+
+  e2s3: function () {
+    var html =
+      '<p>The waiter is quick and kind and has no English, which is fine, because you have prepared for this. You know exactly one food word in Spanish. Everyone does. You say it with the calm of someone who has ordered chicken a thousand times.</p>' +
+      '<p class="es-line">\u201cPollo,\u201d you say, and point somewhere safe in the middle of the menu.</p>' +
+      '<p>He nods. He writes nothing \u2014 a bad sign you fail to read \u2014 and goes.</p>' +
+      '<p>What he brings, some minutes later, is purple.</p>' +
+      '<p>It sits in a glossy coil on the plate. It has suckers. It has, you count, more arms than anything on a lunch plate has any business having. It is, whatever else it is, <em>emphatically not chicken.</em></p>' +
+      '<p>You look at the plate. You look at the menu. You look up, and at the next table a man is watching you with the open joy of someone whose own lunch has just gotten better.</p>';
+    return {
+      label: 'Section 3 \u00b7 Pollo',
+      time: 'VILA FRANCA DE XIRA \u2014 LUNCH',
+      html: html,
+      choices: [{ t: 'Ask the table\u2019s one witness what, exactly, this is.', to: 'e2s4', fx: function () { state.flags.chicken_incident = 1; } }]
+    };
+  },
+
+  e2s4: function () {
+    var html =
+      '<p>\u201cPolvo,\u201d the man says, grinning, pointing at your plate. \u201cYou said <em>pollo</em>. In Spanish, chicken. But here \u2014\u201d he taps the table, meaning <em>Portugal</em> \u2014 \u201chere it sounds like <em>polvo</em>. And <em>polvo</em> is\u2026\u201d He wiggles his fingers, all of them, like a small sea creature saying hello.</p>' +
+      '<p>\u201cOctopus,\u201d you say.</p>' +
+      '<p>\u201cOctopus.\u201d He is delighted by this. \u201cMarcos. From Brazil. I also walk since Lisbon.\u201d His Spanish has a soft Portuguese music to it, half the words sliding into the next, and you catch maybe six in ten \u2014 but six in ten, you are learning, is plenty.</p>' +
+      '<p>He sees your face doing the math on every fast sentence and holds up a hand. \u201cListen. One thing. The only thing you need.\u201d He says it slowly, like handing over a key: <span class="es-line">\u201cPerd\u00f3n, no entiendo. \u00bfPuede repetir m\u00e1s despacio?\u201d</span> Sorry, I don\u2019t understand. Can you say it again, more slowly?</p>' +
+      '<p>\u201cYou say this,\u201d Marcos tells you, \u201cand people slow down. Every time. For six hundred kilometers.\u201d He makes you repeat it. You butcher the last word. He makes you say it again. The second time is less of a crime.</p>' +
+      '<p>He nudges his bread basket toward your tragic octopus. \u201cEat. Is good, actually. Then \u2014 you walk with me today? Or alone? Both are fine on the Camino. But the octopus is better with company.\u201d</p>';
+    return {
+      label: 'Section 4 \u00b7 Marcos',
+      time: 'VILA FRANCA DE XIRA \u2014 LUNCH',
+      html: html,
+      choices: [
+        { t: 'Walk with Marcos. The day\u2019s better with a translator who finds you funny.', to: 'e2s5a', fx: function () { state.flags.marcos_known = 1; recountNpcs(); } },
+        { t: 'Thank him, keep the phrase, walk your own pace.', to: 'e2s5b' }
+      ]
+    };
+  },
+
+  e2s5a: function () {
+    var html =
+      '<p>You spend the afternoon the way you spend most good afternoons on the Camino: walking a little, sitting a lot, saying less than you expect to. Marcos talks enough for both of you, in his sliding Spanish, and somewhere in it he lets a thing slip \u2014 that he is walking to prove something to someone. He does not say what. He does not say who. He changes the subject to cheese.</p>' +
+      '<p>When you finally want a real dinner, the town has other ideas. The good restaurant shuts at three, between lunch and dinner, the way every kitchen in this country seems to. <em>Of course it does.</em> So you buy bread and a wedge of cheese from a shop and carry it down to the river.</p>' +
+      '<p>You sit on a low wall above the Tejo and eat with your hands while the sun goes down behind the <em>lez\u00edria</em>. The water turns the color of the inside of a peach. Neither of you says anything for a long time. There is nothing that needs saying.</p>' +
+      '<p class="beat">You came on this trip carrying a question you would not say out loud. Tonight, with bread in your hand and a near-stranger beside you and a river going gold, the question is quiet. Not answered. Just quiet. That, it turns out, is worth a great deal.</p>';
+    return {
+      label: 'Section 5 \u00b7 The Wall at Sunset',
+      time: 'VILA FRANCA DE XIRA \u2014 EVENING',
+      html: html,
+      choices: [{ t: 'Sleep. Tomorrow the river lets go of you.', to: 'e2s6' }]
+    };
+  },
+
+  e2s5b: function () {
+    var html =
+      '<p>\u201cGracias, Marcos,\u201d you say, and you mean all of it \u2014 the phrase, the octopus, the company at exactly the length you wanted it. He tips an invisible hat, shoulders his pack, and is gone up the road within the hour. He walks faster than you. Most people do.</p>' +
+      '<p>When you want a real dinner, the town has other ideas. The good restaurant shuts at three, between lunch and dinner, the way every kitchen in this country seems to. <em>Of course it does.</em> So you buy bread and a wedge of cheese from a shop and carry it down to the river.</p>' +
+      '<p>You sit on a low wall above the Tejo, alone, and eat with your hands while the sun goes down behind the <em>lez\u00edria</em>. The water turns the color of the inside of a peach. Nobody says anything, because nobody is there, and the silence is exactly as good. The Camino hands this same evening to everyone who walks it. Company is optional. The wall, the bread, the gold river \u2014 those come free.</p>' +
+      '<p class="beat">You came on this trip carrying a question you would not say out loud. Tonight, with bread in your hand and a river going gold, the question is quiet. Not answered. Just quiet. That, it turns out, is worth a great deal.</p>';
+    return {
+      label: 'Section 5 \u00b7 The Wall at Sunset',
+      time: 'VILA FRANCA DE XIRA \u2014 EVENING',
+      html: html,
+      choices: [{ t: 'Sleep. Tomorrow the river lets go of you.', to: 'e2s6' }]
+    };
+  },
+
+  e2s6: function () {
+    var withMarcos = !!state.flags.marcos_known;
+    var html =
+      '<p>The river charm lasts exactly as long as the gardens at the edge of Vila Franca. Then the arrows hand you to the N-1, the old national road, and the day goes gray.</p>' +
+      '<p>For kilometers \u2014 and then more kilometers \u2014 you walk the shoulder of a highway through an industrial park: warehouse after warehouse, truck after truck, wide hot edges and no shade anywhere. It is not dangerous. It is just long, and ugly, and exactly the kind of place where the yellow arrows go shy.</p>' +
+      '<p>Sure enough, past a supermarket and a roundabout, the arrows vanish. You stop at a junction with three possible roads and no painted clue on any of them' +
+      (withMarcos ? ', and Marcos turns a slow circle beside you, equally lost. \u201cThis,\u201d he announces, \u201cis a test.\u201d' : '.') + '</p>' +
+      '<p>A woman is locking up a cafe nearby. You walk over, point at the name on your map, and try the words you have: <span class="es-line">\u201c\u00bfD\u00f3nde est\u00e1?\u201d</span> Where is it?</p>' +
+      '<p>What comes back is a wall of fast, warm Portuguese with a few Spanish words bobbing in it, plus one enormous sweep of the arm that could mean <em>that way</em>, <em>over there</em>, or <em>the sea is also lovely this time of year.</em> But one phrase she says twice, pointing hard each time: <span class="es-line">\u201cA la derecha.\u201d</span> To the right. Though that same arm, you could swear, also swung once toward <span class="es-line">a la izquierda</span> \u2014 left \u2014 which is exactly the kind of help that helps nobody.</p>' +
+      '<p>You try your new magic words \u2014 <span class="es-line">\u201cM\u00e1s despacio, por favor\u201d</span> \u2014 and she does slow down, and it does help, a little. <em>A la derecha.</em> Right. Probably.' +
+      (withMarcos ? ' Marcos shrugs. \u201cShe said right. I think. Maybe left. Let\u2019s go find out.\u201d' : '') + '</p>';
+    return {
+      label: 'Section 6 \u00b7 The Industrial Mile',
+      time: 'TO AZAMBUJA \u2014 DAY 3',
+      html: html,
+      choices: [{ t: 'Walk on, watching for the next sign.', to: 'e2s7' }]
+    };
+  },
+
+  e2s7: function () {
+    var html =
+      '<p>A kilometer later the road forks, and at the fork stands a battered sign:</p>' +
+      '<p style="text-align:center;font-family:-apple-system,system-ui,sans-serif;font-size:15px;letter-spacing:0.03em;line-height:2;color:#f0d9ab;">' +
+      '\u2192 <span class="es-line">Todo recto</span> &middot; 3 km<br>' +
+      '\u2192 <span class="es-line">A la derecha</span> &middot; 1,2 km</p>' +
+      '<p>The woman said <span class="es-line">a la derecha</span>. The sign offers <span class="es-line">a la derecha</span> \u2014 to the right \u2014 at just over a kilometer, and <span class="es-line">todo recto</span> \u2014 straight ahead \u2014 at three. One of these matches what you were told. The other is longer, and a guess.</p>';
+    return {
+      label: 'Section 7 \u00b7 The Fork',
+      time: 'SOMEWHERE OFF THE N-1',
+      html: html,
+      choices: [
+        { t: 'Go right \u2014 <span class="ce">a la derecha</span>, like she said.', to: 'e2s7win' },
+        { t: 'Go straight \u2014 <span class="ce">todo recto</span>; the bigger road must be the way.', to: 'e2s7lost', fx: function () { state.times_misunderstood = (state.times_misunderstood || 0) + 1; } }
+      ]
+    };
+  },
+
+  e2s7win: function () {
+    var html =
+      '<p>You go right.</p>' +
+      '<p>A kilometer on, the yellow arrows come back like old friends, painted fresh on a fence post, and you feel a small ridiculous glow \u2014 the pride of a person who just understood a stranger in a language they barely speak.</p>' +
+      '<p>A stork watches you from a vast untidy nest on a power pole, somehow dignified about the whole arrangement. You nod at it. It does not nod back. Fair enough.</p>';
+    return {
+      label: 'Section 8 \u00b7 Right',
+      time: 'THE RIGHT ROAD',
+      html: html,
+      choices: [{ t: 'Walk on to Azambuja.', to: 'e2s8' }]
+    };
+  },
+
+  e2s7lost: function () {
+    var html =
+      '<p>You take the bigger road, because bigger feels safer, and for fifteen good minutes you make excellent time in entirely the wrong direction.</p>' +
+      '<p>The road ends at a gate. Behind the gate, a field of horses lifts their heads to consider you \u2014 lean, glossy, faintly unimpressed. A boy on a bicycle stops, takes in your shell and your poles and your obvious wrongness, and points back the way you came. <span class="es-line">\u201cA la derecha,\u201d</span> he says, with the patience of a child who has redirected many lost pilgrims. <em>Right.</em> Back there. Exactly where the woman told you.</p>' +
+      '<p class="beat">No harm done. You lost twenty minutes and gained a field of horses and a small lesson in trusting the person who actually lives here. You double back, and this time you go right.</p>';
+    return {
+      label: 'Section 8 \u00b7 The Long Way',
+      time: 'THE WRONG ROAD',
+      html: html,
+      choices: [{ t: 'Walk on to Azambuja.', to: 'e2s8' }]
+    };
+  },
+
+  e2s8: function () {
+    var withMarcos = !!state.flags.marcos_known;
+    var html =
+      '<p>Azambuja arrives the way a lot of Camino towns arrive after a hard road: not beautiful, exactly, but yours, because you walked to it. A working town, all shops and traffic and ordinary life carrying on without you.</p>' +
+      (withMarcos
+        ? '<p>Marcos finds a cafe with cold beer and orders before you can speak. <span class="es-line">\u201cDos cervezas,\u201d</span> he tells the waiter, then catches himself and turns it into a lesson. \u201cYou. Say it. <span class="es-line">Una cerveza.</span>\u201d You say it. Of all the Spanish you have attempted today, it is the sentence your mouth was born to make.</p>'
+        : '<p>You find a cafe with cold beer and, after a whole day of pointing and guessing, decide to try the words on purpose. <span class="es-line">\u201cUna cerveza, por favor.\u201d</span> The waiter nods and brings it without a flicker, as if you had asked correctly \u2014 which, you realize with a small jolt, you did.</p>') +
+      '<p>When the bill comes you even manage <span class="es-line">\u201cla cuenta\u201d</span> \u2014 the check \u2014 with a confidence that would horrify a real Spanish speaker and pleases you enormously.</p>' +
+      '<p>Day three. Fifty-seven kilometers behind you. Your feet have stopped filing complaints and started, quietly, presenting invoices.</p>';
+    return {
+      label: 'Section 9 \u00b7 Azambuja',
+      time: 'AZAMBUJA \u2014 EVENING, DAY 3',
+      html: html,
+      choices: [{ t: 'Sleep. Tomorrow is the long one.', to: 'e2s9' }]
+    };
+  },
+
+  e2s9: function () {
+    var withMarcos = !!state.flags.marcos_known;
+    var html =
+      '<p>You cross the railway tracks out of Azambuja, and the world changes its mind about you.</p>' +
+      '<p>The gray road becomes a dyke \u2014 a long raised bank running beside the Tejo, flat and broad and quiet, with benches set along it as if someone, once, wanted pilgrims to be happy. River on your right. On your left the <em>lez\u00edria</em> again: vineyards, horse farms, the odd black bull in a green field thinking long slow thoughts. Storks on every second pole.</p>' +
+      '<p>After yesterday\u2019s highway it is something close to heaven, and it goes on for hours.</p>' +
+      '<p>Then the villages thin out and stop. Past a hamlet called Porto Muge a sign warns, in effect, that there is nothing \u2014 no cafe, no shop, no shade \u2014 for the next thirteen kilometers, and it is not lying. The path becomes a wide dirt farm road between vineyards and horse fields, and the sun settles onto the back of your neck and stays there.</p>' +
+      (withMarcos
+        ? '<p>Your stomach remembers the octopus, which it did not finish, with something close to regret. Marcos, up ahead, breaks into song \u2014 something Brazilian, all open vowels \u2014 and appears to need neither food nor water nor sense.</p>'
+        : '<p>Your stomach remembers the octopus, which it did not finish, with something close to regret. There is no one to complain to out here but the bulls, and the bulls have heard it all before.</p>') +
+      '<p class="beat">This is the part nobody photographs: the long empty middle, hot and plain and endless, where the only thing to do is set one boot in front of the other and let the kilometers come. It is also, you are beginning to suspect, the part that does the actual work.</p>';
+    return {
+      label: 'Section 10 \u00b7 The Dyke',
+      time: 'TO SANTAR\u00c9M \u2014 DAY 4',
+      html: html,
+      choices: [{ t: 'Keep walking. Santar\u00e9m is on a hill, somewhere ahead.', to: 'e2s10' }]
+    };
+  },
+
+  e2s10: function () {
+    var html =
+      '<p>You see Santar\u00e9m long before you reach it: a town stacked on a hill above the river, the way old towns sat where they could watch trouble coming.</p>' +
+      '<p>Then you have to climb it. The path leaves the flat and tips up a long stone lane \u2014 the worst possible end to a thirty-two-kilometer day, and the only way in. You climb on legs with nothing left, one step, one word, one step. <span class="es-line">M\u00e1s despacio,</span> you tell yourself, and laugh, because there is no one to slow down for now but you.</p>' +
+      '<p>At the top the town opens into a garden inside old castle walls \u2014 the Porta do Sol, the Gate of the Sun \u2014 and the whole valley you just crossed drops away beneath you. The Tejo. The <em>lez\u00edria</em>. The thin green thread of the dyke you walked all morning, tiny now. The light is going gold again, the way it did over the river two nights back.</p>' +
+      '<p>On a wall by the garden a tile marks the way out of town for tomorrow: the <em>Porta de Santiago</em>. The Gate of Santiago. The road carries the same name as the place you are walking toward, and it has carried it for a thousand years, and it will carry it long after your blisters heal.</p>' +
+      '<p class="beat">You sit on the wall and do not do the math on how far is left. You did that yesterday. Today you just watch the river you beat on foot, and let the hill hold you up.</p>';
+    return {
+      label: 'Section 11 \u00b7 The Gate of Santiago',
+      time: 'SANTAR\u00c9M \u2014 LATE AFTERNOON, DAY 4',
+      html: html,
+      choices: [{ t: 'Find the albergue. Get off your feet.', to: 'e2s11' }]
+    };
+  },
+
+  e2s11: function () {
+    var withMarcos = !!state.flags.marcos_known;
+    var html =
+      (withMarcos
+        ? '<p>In the albergue kitchen, Marcos spreads the route across his phone, and you both lean in to see what comes next.</p>'
+        : '<p>In the albergue, a paper map hangs by the door, soft and furred at the folds from a hundred pilgrims\u2019 hands. You lean in to see what comes next.</p>') +
+      '<p>What comes next is a lot. Goleg\u00e3, then Tomar with its great castle, then a long hard climb up to Coimbra. And after Coimbra \u2014 days. Days and days of eucalyptus forest, pale and tall and endless, all the way north before Porto so much as appears. And Porto is not Spain. Spain is a river crossing far beyond it, where the language you have been mauling for four days finally turns into the language on the signs.</p>' +
+      '<p>You have walked about ninety kilometers. You look at the five hundred-odd the road still has in store, every one of them ready to break you, and the thing that comes up your throat is not a sob. It is a laugh. You laugh, because the alternative is crying, and because, against all sense, there is nowhere else you would rather be.</p>' +
+      (withMarcos
+        ? '<p>Later, in the dark of the dormitory, lights out and the day finally letting go of you, Marcos\u2019s voice drifts over from the next bunk. \u201cTomorrow,\u201d he says. \u201cMore octopus.\u201d \u201cNo,\u201d you whisper back. \u201cNo m\u00e1s pollo.\u201d He laughs hard enough that someone two beds down tells you both, in international sign language, to be quiet.</p>'
+        : '<p>You step back and leave the map hanging where it was, and stand a moment in the quiet \u2014 the only pilgrim awake, ninety kilometers into a thing you still cannot explain to yourself. Tomorrow: Goleg\u00e3. The day after that: everything else.</p>') +
+      '<p class="beat">You do not feel brave. You feel tired, and a little ridiculous, and strangely, stubbornly happy. Somewhere north of here, a cathedral you cannot picture is waiting. You will get there one bad lunch at a time.</p>';
+    return {
+      label: 'Section 12 \u00b7 The Map',
+      time: 'SANTAR\u00c9M \u2014 NIGHT',
+      html: html,
+      choices: [{ t: 'Sleep. The eucalyptus can wait.', to: 'e2end' }]
+    };
+  },
+
+  e2end: function () {
+    var html =
+      '<p style="text-align:center;font-family:\'Fraunces\',serif;font-size:24px;color:#a9e8cc;margin:10px 0 4px;">Buen camino.</p>' +
+      '<p style="text-align:center;" class="quiet">END OF EPISODE 2</p>' +
+      buildLogCard(2) +
+      '<p style="text-align:center;margin-top:18px;" class="quiet">Episode 3 \u2014 <em>The Blisters Speak Spanish</em> \u2014 coming soon.<br>Tap your word count any time to review every word you\u2019ve carried this far.</p>';
+    return {
+      label: '',
+      time: '',
+      html: html,
+      choices: [
+        { t: 'Replay Episode 2', to: '__replay__' },
+        { t: 'Open Mi Vocabulario', to: '__vocab__' },
+        { t: 'Start over from the beginning', to: '__restart__' }
+      ]
+    };
+  }
+
+};
+
+/* ============ episode-end log card ============ */
+/* Track 1 souvenir: only the Spanish words FIRST met in this episode, plus
+   the episode's own distance. ep defaults to the current episode. */
+function buildLogCard(ep) {
+  ep = ep || EPISODE.num;
+  var meta = EPISODES[ep] || { km_start: 0, km_end: state.km };
+  var enc = [], seenCount = 0;
+  Object.keys(state.esEncountered).forEach(function (k) {
+    if ((state.esFirstEp[k] || 1) !== ep) return;
+    if (!ES_VOCAB[k]) return;
+    enc.push(k);
+    if (state.esSeen[k]) seenCount++;
+  });
+  var rows = enc.map(function (k) {
+    var e = ES_VOCAB[k];
+    return '<div class="lw"><span class="es-word">' + k + '</span>' +
+           '<span class="es-pron">[' + e.pron + ']</span>' +
+           '<span class="es-gloss">' + e.en + ' \u00b7 ' + e.zh + '</span></div>';
+  }).join('');
+  var kmThis = meta.km_end - meta.km_start;
+  return '<div class="logcard">' +
+    '<div class="lhead">Camino Log \u00b7 EP' + ep + ' Complete</div>' +
+    '<div class="lstat">km walked this episode: <b>' + kmThis + '</b></div>' +
+    '<div class="lstat">total km: <b>' + meta.km_end + ' / ' + TOTAL_KM + '</b></div>' +
+    '<div class="lstat">Spanish words met: <b>' + enc.length + '</b> \u00b7 opened: <b>' + seenCount + '</b></div>' +
+    '<div class="lwords">' + rows + '</div>' +
+    '</div>';
+}
+
+/* ============ vocab linking ============ */
+function ciFind(haystack, needle, from) {
+  return haystack.toLowerCase().indexOf(needle.toLowerCase(), from);
+}
+
+function skipNode(node) {
+  var p = node.parentNode;
+  while (p && p.id !== 'wrap') {
+    if (p.tagName === 'BUTTON') return true;
+    if (p.classList) {
+      for (var i = 0; i < SKIP_CLASSES.length; i++) {
+        if (p.classList.contains(SKIP_CLASSES[i])) return true;
+      }
+      if (p.classList.contains('vb') || p.classList.contains('es')) return true;
+    }
+    p = p.parentNode;
+  }
+  return false;
+}
+
+/* Spanish: link EVERY occurrence of a known phrase inside .es-line / <em> Spanish.
+   Strategy: we mark Spanish terms wherever they appear in text, regardless of "seen",
+   so repeated exposure is reinforced (per design: every occurrence EP1-3). */
+function processTextNodeES(node) {
+  var text = node.nodeValue;
+  if (!text) return false;
+  var bestIdx = -1, bestTerm = null;
+  for (var i = 0; i < ES_TERMS.length; i++) {
+    var term = ES_TERMS[i];
+    var idx = ciFind(text, term, 0);
+    if (idx === -1) continue;
+    if (bestIdx === -1 || idx < bestIdx || (idx === bestIdx && term.length > bestTerm.length)) {
+      bestIdx = idx; bestTerm = term;
+    }
+  }
+  if (bestTerm === null) return false;
+  var matchText = text.substr(bestIdx, bestTerm.length);
+  var pre = text.slice(0, bestIdx);
+  var post = text.slice(bestIdx + bestTerm.length);
+  var e = ES_VOCAB[bestTerm];
+  var span = document.createElement('span');
+  span.className = 'es';
+  span.setAttribute('data-es', bestTerm);
+  span.textContent = matchText;
+  var parent = node.parentNode;
+  if (pre) parent.insertBefore(document.createTextNode(pre), node);
+  parent.insertBefore(span, node);
+  var postNode = document.createTextNode(post);
+  parent.insertBefore(postNode, node);
+  parent.removeChild(node);
+  /* mark as encountered (rendered) this playthrough */
+  if (!state.esEncountered[bestTerm]) {
+    state.esEncountered[bestTerm] = 1;
+    if (!state.esFirstEp[bestTerm]) state.esFirstEp[bestTerm] = EPISODE.num;
+  }
+  processTextNodeES(postNode);
+  return true;
+}
+
+/* English: first unseen occurrence per playthrough (scaffold behavior) */
+function processTextNodeEN(node) {
+  var text = node.nodeValue;
+  if (!text || !/[A-Za-z]/.test(text)) return;
+  var bestIdx = -1, bestTerm = null;
+  for (var i = 0; i < TERMS.length; i++) {
+    var term = TERMS[i];
+    if (state.seenEn[term]) continue;
+    var idx = ciFind(text, term, 0);
+    if (idx === -1) continue;
+    if (bestIdx === -1 || idx < bestIdx || (idx === bestIdx && term.length > bestTerm.length)) {
+      bestIdx = idx; bestTerm = term;
+    }
+  }
+  if (bestTerm === null) return;
+  var matchText = text.substr(bestIdx, bestTerm.length);
+  var pre = text.slice(0, bestIdx);
+  var post = text.slice(bestIdx + bestTerm.length);
+  var span = document.createElement('span');
+  span.className = 'vb';
+  span.setAttribute('data-d', VOCAB[bestTerm][0]);
+  span.setAttribute('data-z', VOCAB[bestTerm][1]);
+  span.textContent = matchText;
+  var parent = node.parentNode;
+  if (pre) parent.insertBefore(document.createTextNode(pre), node);
+  parent.insertBefore(span, node);
+  var postNode = document.createTextNode(post);
+  parent.insertBefore(postNode, node);
+  parent.removeChild(node);
+  state.seenEn[bestTerm] = 1;
+  processTextNodeEN(postNode);
+}
+
+function collectTextNodes() {
+  var walker = document.createTreeWalker(wrap, NodeFilter.SHOW_TEXT, null, false);
+  var nodes = [], n;
+  while ((n = walker.nextNode())) nodes.push(n);
+  return nodes;
+}
+
+function linkify() {
+  if (cur === 'title') return;
+  /* Spanish first (so multi-word ES phrases claim their text before EN words inside them) */
+  var nodes = collectTextNodes();
+  for (var i = 0; i < nodes.length; i++) {
+    if (nodes[i].parentNode && !skipNode(nodes[i])) processTextNodeES(nodes[i]);
+  }
+  /* then English on whatever text remains */
+  nodes = collectTextNodes();
+  for (var j = 0; j < nodes.length; j++) {
+    if (nodes[j].parentNode && !skipNode(nodes[j])) processTextNodeEN(nodes[j]);
+  }
+}
+
+/* ============ engine ============ */
+var wrap = document.getElementById('wrap');
+var kmView = document.getElementById('kmView');
+var wordsView = document.getElementById('wordsView');
+var barTitle = document.getElementById('barTitle');
+
+function renderBar() {
+  if (cur === 'title') { kmView.textContent = ''; wordsView.textContent = ''; return; }
+  barTitle.innerHTML = 'EP' + EPISODE.num + ' <span class="ep">' + EPISODE.title + '</span>';
+  kmView.textContent = '\ud83d\udccd ' + state.km + ' / ' + EPISODE.total_km;
+  wordsView.textContent = '\ud83d\udde3 ' + Object.keys(state.esSeen).length;
+}
+
+function render() {
+  closeTip();
+  if (cur !== 'title') setEpisode(cur);
+  var sec = sections[cur]();
+  var html = '';
+  if (sec.label) html += '<div class="seclabel">' + sec.label + '</div>';
+  if (sec.time) html += '<div class="quiet stamp">' + sec.time + '</div>';
+  html += sec.html;
+  html += '<div class="choices" id="choices"></div>';
+  wrap.innerHTML = html;
+  linkify();
+  if (cur === 'title') document.body.classList.add('title-mode');
+  else document.body.classList.remove('title-mode');
+  var rl = document.getElementById('replayLink'), fs = document.getElementById('footSep');
+  if (rl) rl.style.display = (cur === 'title') ? 'none' : '';
+  if (fs) fs.style.display = (cur === 'title') ? 'none' : '';
+  var box = document.getElementById('choices');
+  sec.choices.forEach(function (c) {
+    var b = document.createElement('button');
+    b.className = 'ch' + (c.to === '__locked__' ? ' locked' : '');
+    b.innerHTML = c.t;
+    b.addEventListener('click', function () {
+      if (c.to === '__locked__') return;
+      if (c.to === '__restart__') { askRestart(); return; }
+      if (c.to === '__vocab__') { openVocab(); return; }
+      if (c.to === '__continue__') {
+        var data = loadSave();
+        if (data) { state = migrate(data.state); episodeSnapshots = data.snapshots || {}; cur = data.cur; renderBar(); render(); }
+        return;
+      }
+      if (c.to === '__replay__') { askReplay(epOf(cur)); return; }
+      if (c.fx) c.fx();
+      /* advance km at the right beats of EP1 */
+      if (cur === 'e1s1') {} /* set km on arrival sections below via goto */
+      goto_(c.to);
+    });
+    box.appendChild(b);
+  });
+  renderBar();
+  if (cur === 'title') {
+    attachShellReplay();
+    var fine = document.createElement('p');
+    fine.className = 'fineprint';
+    fine.innerHTML = '<b>A work of fiction.</b> The towns, distances, and waymarks of the Camino Portugu\u00eas Central route have been researched with care, but this is a story, not a guidebook \u2014 small errors are inevitable, and some details have been bent to serve the tale. Please don\u2019t plan a real pilgrimage from a gamebook. Carry a proper guide, an up-to-date map, and good boots. <em>Buen camino.</em>';
+    wrap.appendChild(fine);
+  }
+  window.scrollTo(0, 0);
+}
+
+/* tap the logo to replay its fade-in (everyone wants to) */
+function attachShellReplay() {
+  var stage = document.querySelector('.shell-stage');
+  if (!stage) return;
+  var svg = stage.querySelector('svg');
+  if (!svg) return;
+  stage.style.cursor = 'pointer';
+  stage.setAttribute('title', 'Tap to replay');
+  stage.addEventListener('click', function () {
+    /* Restart the CSS animation. SVG elements have no offsetWidth, so force
+       the reflow on the HTML container (stage), which does. Then set an
+       explicit inline animation so it definitely re-triggers in every engine. */
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    svg.style.animation = 'none';
+    void stage.offsetWidth;          /* reflow on an HTML element */
+    svg.style.animation = 'shellin 1.6s cubic-bezier(0.2,0.7,0.25,1) forwards';
+  });
+}
+
+/* simple km progression: bump when reaching key sections */
+var KM_AT = {
+  e1s3: 5, e1s6: 13, e1s9: 20, e1s10: 22, e1end: 22,
+  /* EP2: Alpriate 22 -> Vila Franca 37 -> Azambuja 57 -> Santarem 89 */
+  e2s1: 22, e2s2: 37, e2s3: 37, e2s4: 37, e2s5a: 37, e2s5b: 37,
+  e2s6: 47, e2s7: 52, e2s7win: 52, e2s7lost: 52, e2s8: 57,
+  e2s9: 73, e2s10: 89, e2s11: 89, e2end: 89
+};
+function goto_(id) {
+  snapshotIfEpisodeStart(id);   /* capture episode start before anything advances */
+  cur = id;
+  if (KM_AT[id] && state.km < KM_AT[id]) state.km = KM_AT[id];
+  save();
+  render();
+}
+
+function migrate(s) {
+  /* fill any missing fields for forward-compat */
+  var d = defaultState();
+  for (var k in d) if (!(k in s)) s[k] = d[k];
+  return s;
+}
+
+/* ============ tooltip ============ */
+var tip = document.getElementById('tip');
+var openVb = null;
+
+function closeTip() { tip.style.display = 'none'; tip.className = ''; openVb = null; }
+
+function positionTip(target) {
+  requestAnimationFrame(function () {
+    var r = target.getBoundingClientRect();
+    var tw = tip.offsetWidth, th = tip.offsetHeight, pad = 10;
+    var x = r.left + r.width / 2 - tw / 2;
+    x = Math.max(pad, Math.min(x, window.innerWidth - tw - pad));
+    var y = r.top - th - 8;
+    if (y < pad) y = r.bottom + 8;
+    tip.style.left = (x + window.scrollX) + 'px';
+    tip.style.top = (y + window.scrollY) + 'px';
+  });
+}
+
+document.addEventListener('click', function (e) {
+  var t = e.target;
+  if (t.classList && t.classList.contains('vb')) {
+    if (openVb === t) { closeTip(); return; }
+    openVb = t;
+    tip.className = 'en-tip';
+    tip.innerHTML = t.getAttribute('data-d') + '<span class="zh">' + t.getAttribute('data-z') + '</span>';
+    tip.style.display = 'block';
+    tip.style.left = '0px'; tip.style.top = '0px';
+    positionTip(t);
+  } else if (t.classList && t.classList.contains('es')) {
+    if (openVb === t) { closeTip(); return; }
+    openVb = t;
+    var key = t.getAttribute('data-es');
+    var v = ES_VOCAB[key];
+    /* record as opened (the metric that feeds Cada Palabra + the panel) */
+    if (v && !state.esSeen[key]) { state.esSeen[key] = 1; save(); renderBar(); }
+    var noteHtml = (v && v.note) ? '<div class="es-note">' + v.note + '</div>' : '';
+    tip.className = 'es-tip';
+    tip.innerHTML =
+      '<div class="es-head">' + key + '</div>' +
+      '<div class="es-pron">[' + (v ? v.pron : '') + ']</div>' +
+      '<div class="es-def">' + (v ? v.en : '') + ' <span class="es-zh">\u00b7 ' + (v ? v.zh : '') + '</span></div>' +
+      noteHtml;
+    tip.style.display = 'block';
+    tip.style.left = '0px'; tip.style.top = '0px';
+    positionTip(t);
+  } else if (!tip.contains(t)) {
+    closeTip();
+  }
+});
+
+/* ============ Mi Vocabulario panel ============ */
+var vocabOverlay = document.getElementById('vocabOverlay');
+var vpBody = document.getElementById('vpBody');
+var vpCount = document.getElementById('vpCount');
+var vpMenu = document.getElementById('vpMenu');
+var vpToast = document.getElementById('vpToast');
+
+function vocabRows() {
+  /* show words the player has OPENED, ordered by episode then alphabetically */
+  var keys = Object.keys(state.esSeen);
+  keys.sort(function (a, b) {
+    var ea = state.esFirstEp[a] || 99, eb = state.esFirstEp[b] || 99;
+    if (ea !== eb) return ea - eb;
+    return a.localeCompare(b);
+  });
+  return keys.map(function (k) {
+    var e = ES_VOCAB[k] || { en: '', zh: '', pron: '' };
+    return { es: k, pron: e.pron, en: e.en, zh: e.zh, ep: state.esFirstEp[k] || EPISODE.num };
+  });
+}
+
+function openVocab() {
+  var rows = vocabRows();
+  vpCount.textContent = rows.length ? '\u00b7 ' + rows.length + ' words' : '';
+  if (!rows.length) {
+    vpBody.innerHTML = '<div class="vp-empty">No words yet. Tap the <span style="color:#a9e8cc;">green Spanish words</span> in the story to collect them here.</div>';
+  } else {
+    vpBody.innerHTML = rows.map(function (r) {
+      return '<div class="vp-row">' +
+        '<div class="r1"><span class="r-es">' + r.es + '</span>' +
+        '<span class="r-pron">[' + r.pron + ']</span>' +
+        '<span class="r-ep">EP' + r.ep + '</span></div>' +
+        '<div class="r2">' + r.en + ' <span class="r-zh">\u00b7 ' + r.zh + '</span></div>' +
+        '</div>';
+    }).join('');
+  }
+  vpMenu.classList.remove('open');
+  vocabOverlay.classList.add('open');
+}
+function closeVocab() { vocabOverlay.classList.remove('open'); vpMenu.classList.remove('open'); }
+
+document.getElementById('wordsView').addEventListener('click', openVocab);
+document.getElementById('vpClose').addEventListener('click', closeVocab);
+vocabOverlay.addEventListener('click', function (e) { if (e.target === vocabOverlay) closeVocab(); });
+
+/* ---- export builders (pure functions) ---- */
+function toTxt(rows) {
+  var lines = rows.map(function (r) {
+    return r.es + '  [' + r.pron + ']  ' + r.en + '  \u00b7  ' + r.zh + '  (EP' + r.ep + ')';
+  });
+  return 'Buen Camino \u2014 Mi Vocabulario\n' + new Array(34).join('=') + '\n' + lines.join('\n') + '\n';
+}
+function csvCell(s) { return '"' + String(s).replace(/"/g, '""') + '"'; }
+function toCsv(rows) {
+  var head = ['spanish', 'pronunciation', 'english', 'chinese', 'episode'].map(csvCell).join(',');
+  var body = rows.map(function (r) {
+    return [r.es, r.pron, r.en, r.zh, 'EP' + r.ep].map(csvCell).join(',');
+  }).join('\n');
+  /* UTF-8 BOM so Excel reads accents + 中文 */
+  return '\ufeff' + head + '\n' + body + '\n';
+}
+
+function showToast(msg) {
+  vpToast.textContent = msg;
+  vpToast.classList.add('show');
+  setTimeout(function () { vpToast.classList.remove('show'); }, 1700);
+}
+
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(
+      function () { showToast('Copied to clipboard'); },
+      function () { copyFallback(text); }
+    );
+  } else {
+    copyFallback(text);
+  }
+}
+function copyFallback(text) {
+  var ta = document.getElementById('copyFallback');
+  ta.value = text; ta.style.left = '0'; ta.style.top = '0';
+  ta.select();
+  try { document.execCommand('copy'); showToast('Copied to clipboard'); }
+  catch (e) { showToast('Select the text to copy'); }
+  ta.style.left = '-9999px';
+}
+
+function downloadFile(text, filename, mime) {
+  try {
+    var blob = new Blob([text], { type: mime });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    showToast('Downloaded ' + filename);
+  } catch (e) {
+    /* WebView fallback: drop text into the copy box for manual save */
+    copyFallback(text);
+    showToast('Download blocked \u2014 text copied instead');
+  }
+}
+
+document.getElementById('vpCopy').addEventListener('click', function () {
+  var rows = vocabRows();
+  if (!rows.length) { showToast('No words yet'); return; }
+  copyText(toTxt(rows));
+});
+document.getElementById('vpDownload').addEventListener('click', function (e) {
+  e.stopPropagation();
+  vpMenu.classList.toggle('open');
+});
+vpMenu.addEventListener('click', function (e) {
+  var fmt = e.target.getAttribute('data-fmt');
+  if (!fmt) return;
+  var rows = vocabRows();
+  if (!rows.length) { showToast('No words yet'); vpMenu.classList.remove('open'); return; }
+  if (fmt === 'txt') downloadFile(toTxt(rows), 'mi-vocabulario.txt', 'text/plain;charset=utf-8');
+  else downloadFile(toCsv(rows), 'mi-vocabulario.csv', 'text/csv;charset=utf-8');
+  vpMenu.classList.remove('open');
+});
+
+/* ============ confirm dialog (restart / replay) ============ */
+/* in-page confirm; browser confirm() is blocked in sandboxes */
+var confirmOverlay = document.getElementById('confirmOverlay');
+var cfMsg = document.getElementById('cfMsg');
+var cfOkBtn = document.getElementById('cfOk');
+var pendingConfirm = null;
+
+function showConfirm(msg, okLabel, onOk) {
+  cfMsg.innerHTML = msg;
+  cfOkBtn.textContent = okLabel;
+  pendingConfirm = onOk;
+  confirmOverlay.classList.add('open');
+}
+function closeConfirm() { confirmOverlay.classList.remove('open'); pendingConfirm = null; }
+
+function askRestart() {
+  showConfirm('Start the whole Camino over from the beginning? Your progress and every word you&rsquo;ve collected will be cleared.', 'Restart', doRestart);
+}
+function doRestart() {
+  clearSave();
+  state = defaultState();
+  episodeSnapshots = {};
+  cur = 'title';
+  closeVocab();
+  closeConfirm();
+  render();
+}
+
+function askReplay(n) {
+  if (!n || !episodeSnapshots[n]) { showToast('No checkpoint for this episode yet'); return; }
+  var title = (EPISODES[n] && EPISODES[n].title) ? '\u201c' + EPISODES[n].title + '\u201d' : 'this episode';
+  showConfirm('Replay Episode ' + n + ' &mdash; ' + title + ' &mdash; from the start? Your progress in this episode resets, but the words and companions you carried <em>into</em> it stay with you.', 'Replay', function () { doReplay(n); });
+}
+function doReplay(n) {
+  if (!episodeSnapshots[n]) { showToast('No checkpoint for this episode yet'); return; }
+  state = migrate(JSON.parse(JSON.stringify(episodeSnapshots[n])));  /* deep copy: keep the snapshot intact */
+  cur = 'e' + n + 's1';
+  closeVocab();
+  closeConfirm();
+  save();
+  render();
+}
+
+document.getElementById('cfCancel').addEventListener('click', closeConfirm);
+cfOkBtn.addEventListener('click', function () { var fn = pendingConfirm; closeConfirm(); if (fn) fn(); });
+confirmOverlay.addEventListener('click', function (e) { if (e.target === confirmOverlay) closeConfirm(); });
+document.getElementById('restartLink').addEventListener('click', function (e) { e.preventDefault(); askRestart(); });
+document.getElementById('replayLink').addEventListener('click', function (e) { e.preventDefault(); if (cur === 'title') return; askReplay(epOf(cur)); });
+
+/* ============ boot ============ */
+render();
+</script>
+<noscript><div style="padding:40px;text-align:center;">This gamebook needs JavaScript to run.</div></noscript>
+</body>
+</html>
