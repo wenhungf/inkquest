@@ -10,7 +10,7 @@ No installs, no sign-ups. Pick a story, make your choices, see where they lead.
 
 | Title | Level | Genre |
 |-------|-------|-------|
-| *Achievement Unlocked* | A2–B1 | Modern real-life system adventure · EP1–EP3 available |
+| *Achievement Unlocked* | A2–B1 | Modern real-life system adventure · EP1–EP5 available |
 | *Keep Out* | A2–B1 | Cultivation isekai · a master, a rooftop room, a whole new world 🚧 |
 | *Buen Camino* | EN A2–B1 · ES A1 | Bilingual road journey · English + Spanish on the Camino 🚧 |
 | *The Lost Phone* | A1–A2 | Modern mystery · a café, a phone, a stranger's life |
