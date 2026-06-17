@@ -245,7 +245,7 @@
    ===================================================== */
 
 const SAVE_KEY = 'au_save';
-const SAVE_VERSION = 4;
+const SAVE_VERSION = 5;
 
 function freshState(){
   return {
@@ -275,7 +275,9 @@ function loadSave(){
     const s = JSON.parse(raw);
     if(typeof s.version !== 'number') return null;
     /* future migrations go here: if(s.version < 2){...} */
-    return Object.assign(freshState(), s);
+    const merged = Object.assign(freshState(), s);
+    if(typeof merged.version !== 'number' || merged.version < SAVE_VERSION) merged.version = SAVE_VERSION; /* v4->v5: EP5 adds flags only, no structural change */
+    return merged;
   }catch(e){ storageOK = false; return null; }
 }
 function save(){
@@ -329,10 +331,14 @@ const ACH = {
   crossing:      { ep:3, name:'Crossing', pts:20, desc:'Over the water, before sunset.' },
   level_five:    { ep:4, name:'Level 5', pts:0, desc:'The map opened. So did you.' },
   unbroken:      { ep:4, name:'Unbroken', pts:30, desc:'Five links. Not one missed.' },
-  local_knowledge:{ ep:99, name:'Local Knowledge', pts:0, desc:"Sam's lane. Six minutes. Earned weeks ago." },
+  local_knowledge:{ ep:5, name:'Local Knowledge', pts:0, desc:"Sam's lane. Six minutes. Earned weeks ago." },
   long_way_up:   { ep:4, name:'The Long Way Up', pts:5, desc:'You chose the steep stairs. The hard way up.' },
   just_watch:    { ep:4, name:'Just Watch', pts:0, desc:'The whole task was to stop.' },
-  the_warning:   { ep:4, name:'The Warning', pts:0, desc:'Someone left it on a wall. For you.' }
+  the_warning:   { ep:4, name:'The Warning', pts:0, desc:'Someone left it on a wall. For you.' },
+  multiplayer:    { ep:5, name:'Multiplayer', pts:1, desc:'Player Two. You are not the only one.' },
+  mind_the_stall: { ep:5, name:'Mind the Stall', pts:10, desc:'One hour. Two strangers. A sold-out table.' },
+  the_short_count:{ ep:5, name:'The Short Count', pts:0, desc:'A few coins short. You let it slide.' },
+  give_her_room:  { ep:5, name:'Give Her Room', pts:0, desc:'You had the question. You left her the road.' }
 };
 function grant(id){
   if(!state.achievements.includes(id)){
@@ -547,7 +553,17 @@ const VOCAB = {
   granted:{en:'given or allowed', zh:'給予、准予'},
   stiff:{en:'hard to move; not soft or loose', zh:'僵硬的'},
   stretch:{en:'a length of road or land', zh:'一段（路、地）'},
-  scrawl:{en:'fast, messy handwriting', zh:'潦草字跡'}
+  scrawl:{en:'fast, messy handwriting', zh:'潦草字跡'},
+  dome:{en:'a round roof shaped like half a ball', zh:'圓頂、穹頂'},
+  hall:{en:'a big room or wide open space inside a building', zh:'大廳'},
+  browse:{en:'to look at things in a shop with no plan to buy', zh:'隨意逛、看看'},
+  mind:{en:'to look after something for a short time', zh:'看顧、照看'},
+  haggle:{en:'to argue about a price until both sides agree', zh:'討價還價'},
+  change:{en:'the money you get back when you pay too much', zh:'找零、零錢'},
+  customer:{en:'a person who buys things at a shop or stall', zh:'顧客'},
+  restock:{en:'to fill something up again with more goods', zh:'補貨'},
+  tag:{en:'a small label that shows the price', zh:'價格標籤'},
+  flicker:{en:'a quick, small change that is gone in a moment', zh:'一閃、閃動'}
 };
 function tipTxt(k){ return VOCAB[k].en + '<br><span style="opacity:.75">'+VOCAB[k].zh+'</span>'; }
 function vb(word, key){
@@ -2376,6 +2392,7 @@ end4:{
   </div>`;
  },
  choices:[
+   {t:'▶ Continue to Episode 5', go:'e5s1'},
    {t:'↻ Replay Episode 4', go:'__replay4'},
    {t:'Back to title', go:'__title'}
  ],
@@ -2385,6 +2402,267 @@ end4:{
      box.value = btoa(unescape(encodeURIComponent(JSON.stringify(state)))); box.select();
    };
    document.getElementById('btnImport4').onclick = ()=>{
+     try{
+       const sv = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
+       if(typeof sv.version !== 'number') throw 0;
+       state = Object.assign(freshState(), sv); save();
+       box.value = 'Save imported ✓';
+     }catch(e){ box.value = 'That code did not work. Check it and try again.'; }
+   };
+ }
+},
+
+e5s1:{
+ onEnter:()=>{ state.episode = 5; snapshotEpisode(5); state.stamina = 100; grant('local_knowledge'); earn('e5_recent_sidework', 1200); },
+ html:()=>`
+  <p class="quiet">EPISODE 5 — MULTIPLAYER?</p>
+  <p>Tuesday's quest was an old woman at the crossing by the temple, waiting for a light that changed too fast for her. You walked her across. The panel said nothing until you reached the far side. Then it paid you — in points.</p>
+  <p>Wednesday: a phone, face-down and still warm on an MRT seat. You could have just handed it in to the police, the way the quest asked, and left it there. But you did more than that. You snapped a photo and posted it online — the way half of Taiwan would — telling the owner to claim it at the police station. By night the owner had it back.</p>
+  <p>And there were paid ones, too — a few small side jobs that left your account a little fatter than last month. The money was part of why you kept saying yes; you won't pretend it wasn't.</p>
+  <p>The quests ask for more than they used to. Not <i>collect five things.</i> More like: look up, see the person in front of you, do the plain kind thing. It turns out the city is full of small things worth doing — once you start paying attention.</p>
+  <p>This Saturday, the panel wakes you with something simpler.</p>
+  ${sysBox('🗺️ WEEKEND QUEST','Get to Formosa Boulevard — fast',[['flair','Your next quest is waiting at the station.']])}
+  <p>Fast. You know one fast way nobody put on a map: Sam's lane, the shortcut he gave you the night you finally asked his name. Six minutes of hot oil and wet stone and somebody's radio, and it spits you out a block from the circle.</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Local Knowledge',[['flair','"Sam\'s lane. Six minutes."'],['pts','+0 points']])}
+  <p>You take the stairs down. In the round ${vb('hall','hall')} where the red line crosses the orange, the great glass ${vb('dome')} glows overhead, lit from within — water, earth, light, fire. Under it, and down the passages that feed it, a weekend market is winding down. A few tables already stand bare; the rest are still busy, the afternoon crowd in no hurry to leave.</p>`,
+ choices:[ {t:'Down the rows', go:'e5s2'} ]
+},
+
+e5s2:{
+ html:()=>`
+  <p>You let yourself ${vb('browse')} the last tables — old toys, a stack of board games, a rack of clothes — not really shopping. You're doing the thing the system trained into you: noticing.</p>
+  <p>That's how you catch it.</p>
+  <p>A woman by the clothes rack lifts a hand and brushes the air — once, flat, at nothing. Then she stops. Stares at a patch of empty space for half a second, the way you'd reread a line that surprised you.</p>
+  <p>You know that look. You make it yourself, every time a panel no one else can see slides up in front of you.</p>
+  <p class="beat">Yours slides up now.</p>
+  ${sysBox('💬 SYSTEM','Second player detected.',[['flair','Someone close can see the panels too.']])}`,
+ choices:[
+   {t:'Walk over and say something', go:'e5s3', set:{approach:'say'}},
+   {t:'Hang back and watch her', go:'e5s3', set:{approach:'watch'}},
+   {t:'Drift closer, flip through the rack', go:'e5s3', set:{approach:'drift'}}
+ ]
+},
+
+e5s3:{
+ html:(st)=>{
+   const ap=st.flags.approach;
+   const lead = ap==='watch' ? "You hold back and watch her a beat longer."
+              : ap==='drift' ? "You drift in and flip through the rack like a real buyer."
+              : "You step toward her with something half-formed to say.";
+   return `
+  <p>${lead}</p>
+  <p>You don't get the chance. The woman behind the table is suddenly on her feet, phone in one hand. The other closes around your wrist, then the stranger's. Seventy, maybe. Quick eyes. A voice that doesn't wait for an answer.</p>
+  <p>"You two. You look honest." Not a question. "My daughter — the hospital — I have to go <i>now</i>."</p>
+  <p>She's already grabbing her bag. "${vb('Mind','mind')} the stall. One hour. <i>Please.</i>"</p>
+  <p>Fast, over her shoulder: shirts a hundred, the good coats three — ${vb('haggle')} a little if they push — socks three for a hundred — ${vb('change','change')}'s in the box — back stock's under the table — <i>don't sell it cheap.</i></p>
+  <p>And the crowd takes her.</p>
+  ${sysBox('📋 NEW QUEST','Mind the Stall',[['flair','PARTY: You + ??? (LV 9)'],['flair','One hour.']])}
+  <p>The stranger looks at the panel only the two of you can see. Then at you. Dry: "Yours buzzed too. Didn't it."</p>
+  <p>Nobody's watching the table. Somebody should get a grip on it.</p>`;
+ },
+ choices:[
+   {t:'Straighten the table and the rack', go:'e5s4', set:{prep:'tidy'}},
+   {t:'Count the back stock and the cash', go:'e5s4', set:{prep:'count'}}
+ ]
+},
+
+e5s4:{
+ html:(st)=>{
+   const pr=st.flags.prep;
+   const lead = pr==='count'
+     ? "You tip out the cash box and count it down to the last coin. By the time you look up, she's already working the rack, pricing as she goes."
+     : "You square the table — fold the loose shirts, straighten the rack. By the time you look up, she's already into the cash box, counting it down to the last coin.";
+   return `
+  <p>${lead}</p>
+  <p>She moves like she's done this a hundred times. Prices a stranger's jacket in two seconds, sells it in ten. No wasted word. No smile.</p>
+  <p>She's good. She's also somewhere else the whole time, like the ${vb('customer','customer')}s are a list to clear, not people.</p>
+  <p>It dawns on you, slowly: she does this with <i>everything</i>. Every quest the system hands her. All of them, top marks. It has never once crossed her mind to say <i>no</i>.</p>`;
+ },
+ choices:[ {t:'Find your own way to help', go:'e5s5'} ]
+},
+
+e5s5:{
+ onEnter:()=>{ state.stamina = Math.max(20, state.stamina - 15); },
+ html:(st)=>`
+  <p>So you do the part she skips.</p>
+  <p>You meet a man halfway on two shirts, and he leaves happy. You tell a student the green one suits her — last one — and she buys socks she didn't come for. The words arrive before you plan them.</p>
+  ${sysBox('⚡ STAMINA', st.stamina+' / 100', [['flair','−15 · on your feet, no chair, no breaks']])}
+  <p>"Name's Yun," she says, not looking up from the box. She doesn't ask for your name in return, and you don't offer it. Two players, one stall, no need.</p>
+  <p>The last time you sold anything — a guitar, a pair of running shoes, a thousand days of dust — it felt like surgery. This is easy.</p>
+  <p class="beat">When did this get easy?</p>`,
+ choices:[ {t:'Keep the table alive', go:'e5s6'} ]
+},
+
+e5s6:{
+ onEnter:()=>{ state.stamina = Math.max(20, state.stamina - 20); },
+ html:(st)=>`
+  <p>The table thins out. You drop to one knee and drag the suitcase from under it — the back stock, packed tight — pull the little cart out behind it, and ${vb('restock','restock')} the gaps. Not too full. A crammed table kills the buying. A bare one kills it too. You find the line by feel.</p>
+  <p>Yun works the front, fast and flat, and between the two of you the stall stays alive.</p>
+  <p>Your back tells you the thing nobody warns you about a market: standing still all day is the kind of tired that doesn't show.</p>
+  ${sysBox('⚡ STAMINA', st.stamina+' / 100', [['flair','−20 · hauling the back stock']])}`,
+ choices:[ {t:'Back to the front', go:'e5s7'} ]
+},
+
+e5s7:{
+ html:()=>`
+  <p>A kid — eight, maybe nine — circles the table. Wanders off. Comes back. One fist full of coins, the other thumb rubbing a small tin car from the bargain box.</p>
+  <p>He counts the coins. Counts them again. Lays them out on the table. Short by a few.</p>
+  <p>Yun has already turned to a paying customer. By her math, the kid isn't one.</p>
+  <p>He looks at the coins. He looks at the car.</p>`,
+ choices:[
+   {t:'Let him have it for what he\'s got', go:'e5s8', set:{kid_helped:true}},
+   {t:'"Sorry — that one\'s the owner\'s price"', go:'e5s8'}
+ ]
+},
+
+e5s8:{
+ onEnter:()=>{ if(state.flags.kid_helped) grant('the_short_count'); },
+ html:(st)=>`
+  <p>${st.flags.kid_helped ? "You wave the few coins off and slide the car across. He's gone before you can change your mind. You drop a coin of your own in the box to square it — nobody's business but yours." : "You shake your head, gentle. \"That one's hers, not mine to give away.\" The kid nods, too old for his age, and folds the coins back into his pocket."}</p>
+  ${st.flags.kid_helped ? sysBox('🏆 ACHIEVEMENT UNLOCKED','The Short Count',[['flair','"A few coins short. You let it slide."'],['pts','+0 points']]) : ''}
+  <p>The afternoon thins toward closing. You catch the running total on the panel without meaning to — the owner's money, not yours, climbing all day. It feels good to watch a number rise. You remind yourself whose it is.</p>
+  ${sysBox('💰 STALL',"Owner's takings",[['pts','Sold so far &asymp; NT$2,000']])}
+  <p>Then a man in a good shirt lifts something out of the tray that isn't clothes at all.</p>`,
+ choices:[ {t:'See what he\'s holding', go:'e5s9'} ]
+},
+
+e5s9:{
+ html:()=>`
+  <p>A watch. Steel, old, a little scratched, on a worn leather strap. A price ${vb('tag')} written in the owner's own hand.</p>
+  <p>He turns it over once and offers double. Cash. Right now.</p>
+  <p>Your eye does the thing it learned back when the panel first laid a number over everything. The watch reads <i>different</i>. Not a price — a weight. Like it never belonged in that tray with the socks.</p>
+  <p>But she set it out. She wrote the tag. Maybe she needs the money — maybe that's the whole reason she's here on a Saturday, behind a folding table.</p>`,
+ choices:[
+   {t:'Sell it. Good price, clean.', go:'e5s10', set:{watch_sold:true}},
+   {t:'"Sorry. Not this one."', go:'e5s10', set:{watch_sold:false}}
+ ]
+},
+
+e5s10:{
+ html:(st)=>`
+  <p>${st.flags.watch_sold ? "You take the cash and set the watch in his palm. The box is heavier now. Something else is lighter, and not in the good way. You can't name it." : "You lift the watch out of the tray and set it down by her bag, off the table. The man shrugs and buys a belt instead. The weight you couldn't name eases, a little."}</p>
+  ${sysBox('💬 SYSTEM','No data on this one.',[])}
+  <p>Yun watched the whole thing. She doesn't say what she would have done.</p>`,
+ choices:[ {t:'Closing time', go:'e5s11'} ]
+},
+
+e5s11:{
+ onEnter:()=>{ grant('mind_the_stall'); earn('e5_wage', 1360); state.stamina = Math.min(100, state.stamina + 20); },
+ html:(st)=>`
+  <p>She's back in fifty minutes, not sixty. Reads the table in a single look — the gaps where stock used to be, the box heavy with coins.</p>
+  <p>"<i>You</i> two sold all this?"</p>
+  ${sysBox('✅ QUEST COMPLETE','Mind the Stall',[['pts','Sold: NT$3,400']])}
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Mind the Stall',[['flair','"One hour. Two strangers. A sold-out table."'],['pts','+10 points']])}
+  <p>Before you can wave it off, she's counting notes into your hands and Yun's. Eight in every ten, she says — for the trouble. She won't hear no. And Yun, you notice, doesn't argue; she just takes her share and goes quiet, like a sum that finally came out even.</p>
+  ${sysBox('💰 EARNINGS','Your share',[['pts','+NT$1,360']])}
+  <p>${st.flags.watch_sold ? "She looks for something in the tray, doesn't find it, stops for half a beat — then says nothing." : "She finds the watch by her bag, picks it up, and closes her hand around it. Slips it into her coat. She doesn't explain. You don't ask."}</p>
+  <p>She sits the two of you down — her stool, an upturned crate — and hands you each a cold tea from a cooler under the table. You hadn't noticed your legs until now.</p>
+  ${sysBox('⚡ STAMINA', st.stamina+' / 100', [['flair','+20 · sitting down at last, cold tea']])}`,
+ choices:[ {t:'Fold the last of it together', go:'e5s12'} ]
+},
+
+e5s12:{
+ html:()=>`
+  <p>The crowd is thinning. The market is nearly half air now. You and Yun fold the last of the clothes together, easy, tired in the good way.</p>
+  <p>You bring it up — light, half a joke. The gold quest. The locked gold point down south in the fog. The wall by the sea that said <i>don't</i>.</p>
+  <p>Her hands stop. Just for a second. Her face changes — a ${vb('flicker')}, there and gone. She knows exactly what you mean. And she's already a long way off with it, somewhere you can't follow.</p>`,
+ choices:[
+   {t:'Push. Ask what she knows.', go:'e5s13a'},
+   {t:'Let it go. Hand her the last shirt.', go:'e5s13b'}
+ ]
+},
+
+e5s13a:{
+ onEnter:()=>{ state.flags.yun_pressed = true; },
+ html:()=>`
+  <p>"What's down there?" you ask. "You've seen it. Haven't you."</p>
+  <p>"Some quests," she says, "you don't get to hand back." She folds the shirt herself, hard creases, and changes the subject.</p>
+  <p>You got a piece of something. You also watched a door close — a thing she carries by herself, and isn't done carrying.</p>`,
+ choices:[ {t:'Let her be', go:'e5s14'} ]
+},
+
+e5s13b:{
+ onEnter:()=>{ grant('give_her_room'); },
+ html:()=>`
+  <p>You hand her the last shirt and let the question fall.</p>
+  <p>She looks at you a second too long. Something in her face lets go. She nods — like you passed a test she never set.</p>
+  <p>Whatever she's working out, she has to reach it on her own. You can see that much. So you give her the road.</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Give Her Room',[['flair','"You had the question. You left her the road."'],['pts','+0 points']])}`,
+ choices:[ {t:'Walk out together', go:'e5s14'} ]
+},
+
+e5s14:{
+ onEnter:()=>{ grant('multiplayer'); },
+ html:()=>`
+  <p>You climb up out of the hall together. At the top of the stairs she stops.</p>
+  <p>"Yours been loud lately?" she asks. "The system."</p>
+  <p>You nod. It has. A quest every day. Points, levels, the gold point winking a little closer each night.</p>
+  <p>"Mine's been quiet." A beat. "Lately."</p>
+  <p class="beat">And she's gone, into the bright Saturday street.</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Multiplayer',[['flair','"Player Two. You are not the only one."'],['pts','+1 point']])}
+  <p>You look back down the stairs. Below, the great dome holds its light a moment longer — water, earth, light, fire — and you think about Yun saying <i>quiet</i> like the word cost her something.</p>
+  ${sysBox('💬 SYSTEM','…',[])}
+  <p>For once, your panel has nothing to add.</p>`,
+ choices:[ {t:'EPISODE COMPLETE — open the Menu', go:'end5'} ]
+},
+
+end5:{
+ html:(st)=>{
+   function achGroup(ep){
+     let h='';
+     Object.keys(ACH).filter(id=>ACH[id].ep===ep).forEach(id=>{
+       const a=ACH[id]; const got=st.achievements.includes(id);
+       h += '<div class="row"><span>'+
+         (got ? '🏆 <span class="ach-name">'+a.name+'</span><span class="ach-desc">'+a.desc+'</span>'
+              : '<span class="lock">🔒 ???</span>')+
+         '</span><span>'+(got ? (a.pts>0?'+'+a.pts:'—') : '')+'</span></div>';
+     });
+     return h;
+   }
+   const cnt=(ep)=>[st.achievements.filter(id=>ACH[id].ep===ep).length, Object.keys(ACH).filter(id=>ACH[id].ep===ep).length];
+   const [c5,t5]=cnt(5),[c4,t4]=cnt(4),[c3,t3]=cnt(3),[c2,t2]=cnt(2),[c1,t1]=cnt(1);
+   return `
+  <p class="quiet">EPISODE 5 — MULTIPLAYER?</p>
+  ${sysBox('✅ EPISODE COMPLETE','Multiplayer?',[['flair','"Mine\'s been quiet. Lately."']])}
+  <div class="panel">
+    <h3>PLAYER</h3>
+    <div class="row"><span>Level</span><span>${st.level}</span></div>
+    <div class="row"><span>Points</span><span>${st.points}</span></div>
+    <div class="row"><span>Money</span><span>NT$${st.money.toLocaleString()}</span></div>
+    <div class="row"><span>Next level</span><span>700</span></div>
+    <div class="row"><span>Map</span><span>City unlocked · fog remains in the south</span></div>
+    <div class="row"><span>Party</span><span>Yun · LV 9 · gone quiet</span></div>
+    <div class="row"><span class="goldtxt">GOLD ???</span><span class="goldtxt">Closer.</span></div>
+  </div>
+  <div class="panel ach-list"><h3>EPISODE 5 ACHIEVEMENTS (${c5}/${t5})</h3>${achGroup(5)}</div>
+  <div class="panel ach-list"><h3>EPISODE 4 ACHIEVEMENTS (${c4}/${t4})</h3>${achGroup(4)}</div>
+  <div class="panel ach-list"><h3>EPISODE 3 ACHIEVEMENTS (${c3}/${t3})</h3>${achGroup(3)}</div>
+  <div class="panel ach-list"><h3>EPISODE 2 ACHIEVEMENTS (${c2}/${t2})</h3>${achGroup(2)}</div>
+  <div class="panel ach-list"><h3>EPISODE 1 ACHIEVEMENTS (${c1}/${t1})</h3>${achGroup(1)}</div>
+  <p class="quiet">Missing some? Different choices, different badges. Some things the panel never scores at all.</p>
+  <hr class="sep">
+  <div class="panel">
+    <h3>SAVE</h3>
+    <p style="font-family:inherit;font-size:.8rem;opacity:.8;margin:0 0 8px;">
+      Your progress saves automatically on this device.${storageOK?'':' (Saving is not available here — use Export to keep your progress.)'}
+      Export a save code to keep it safe or move to another device.</p>
+    <div class="btn-line">
+      <button class="choice" id="btnExport5">Export save</button>
+      <button class="choice" id="btnImport5">Import save</button>
+    </div>
+    <textarea class="savebox" id="saveBox5" placeholder="Your save code appears here. Or paste a code and press Import." spellcheck="false"></textarea>
+  </div>`;
+ },
+ choices:[
+   {t:'↻ Replay Episode 5', go:'__replay5'},
+   {t:'Back to title', go:'__title'}
+ ],
+ onRender:()=>{
+   const box = document.getElementById('saveBox5');
+   document.getElementById('btnExport5').onclick = ()=>{
+     box.value = btoa(unescape(encodeURIComponent(JSON.stringify(state)))); box.select();
+   };
+   document.getElementById('btnImport5').onclick = ()=>{
      try{
        const sv = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
        if(typeof sv.version !== 'number') throw 0;
@@ -2412,6 +2690,7 @@ function go(id){
   if(id==='__replay2'){ replayEpisode(2,'e2s1'); return; }
   if(id==='__replay3'){ replayEpisode(3,'e3s1'); return; }
   if(id==='__replay4'){ replayEpisode(4,'e4s1'); return; }
+  if(id==='__replay5'){ replayEpisode(5,'e5s1'); return; }
   const sec = SECTIONS[id];
   if(!sec) return;
   state.section = id;
