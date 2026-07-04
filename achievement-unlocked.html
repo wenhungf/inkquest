@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>Achievement Unlocked — Episode 1: Tutorial</title>
+<title>Achievement Unlocked — An InkQuest Gamebook</title>
 <style>
   :root{
     --night:#0e1216;        /* Kaohsiung asphalt at 11 p.m. */
@@ -245,7 +245,7 @@
    ===================================================== */
 
 const SAVE_KEY = 'au_save';
-const SAVE_VERSION = 5;
+const SAVE_VERSION = 6;
 
 function freshState(){
   return {
@@ -338,7 +338,11 @@ const ACH = {
   multiplayer:    { ep:5, name:'Multiplayer', pts:1, desc:'Player Two. You are not the only one.' },
   mind_the_stall: { ep:5, name:'Mind the Stall', pts:10, desc:'One hour. Two strangers. A sold-out table.' },
   the_short_count:{ ep:5, name:'The Short Count', pts:0, desc:'A few coins short. You let it slide.' },
-  give_her_room:  { ep:5, name:'Give Her Room', pts:0, desc:'You had the question. You left her the road.' }
+  give_her_room:  { ep:5, name:'Give Her Room', pts:0, desc:'You had the question. You left her the road.' },
+  the_paint_stays:{ ep:6, name:'The Paint Stays', pts:0, desc:'The light left. The paint did not.' },
+  word_left:      { ep:6, name:'Word Left Behind', pts:0, desc:'One name, half a promise, a folding table.' },
+  unpaid:         { ep:6, name:'Unpaid', pts:0, desc:'No chime. No points. You crossed with her anyway.' },
+  still_here:     { ep:6, name:'Still Here', pts:0, desc:'No system. You got up anyway.' }
 };
 function grant(id){
   if(!state.achievements.includes(id)){
@@ -540,7 +544,6 @@ const VOCAB = {
   shaded:{en:'out of the sun; in shadow', zh:'有遮蔭的'},
   courtyard:{en:'an open space inside or beside a building', zh:'庭院'},
   backtrack:{en:'to go back the way you came', zh:'折返、走回頭路'},
-  throat:{en:'a narrow passage, like the inside of a neck', zh:'（狹長的）通道、咽喉'},
   unseen:{en:'not seen; hidden', zh:'不被看見的'},
   scratches:{en:'rubs or scrapes lightly and keeps bothering', zh:'搔、抓（使人在意）'},
   fort:{en:'a strong building made for defense in war', zh:'堡壘、砲台'},
@@ -563,7 +566,11 @@ const VOCAB = {
   customer:{en:'a person who buys things at a shop or stall', zh:'顧客'},
   restock:{en:'to fill something up again with more goods', zh:'補貨'},
   tag:{en:'a small label that shows the price', zh:'價格標籤'},
-  flicker:{en:'a quick, small change that is gone in a moment', zh:'一閃、閃動'}
+  flicker:{en:'a quick, small change that is gone in a moment', zh:'一閃、閃動'},
+  chime:{en:'a short, soft ringing sound', zh:'叮聲、提示音'},
+  glitch:{en:'a small problem in a machine or program', zh:'小故障'},
+  coupon:{en:'a ticket that gives you a lower price', zh:'折價券、優惠券'},
+  anchor:{en:'a heavy metal hook that holds a ship in place', zh:'錨'}
 };
 function tipTxt(k){ return VOCAB[k].en + '<br><span style="opacity:.75">'+VOCAB[k].zh+'</span>'; }
 function vb(word, key){
@@ -2654,6 +2661,7 @@ end5:{
   </div>`;
  },
  choices:[
+   {t:'▶ Continue to Episode 6', go:'e6s1'},
    {t:'↻ Replay Episode 5', go:'__replay5'},
    {t:'Back to title', go:'__title'}
  ],
@@ -2663,6 +2671,211 @@ end5:{
      box.value = btoa(unescape(encodeURIComponent(JSON.stringify(state)))); box.select();
    };
    document.getElementById('btnImport5').onclick = ()=>{
+     try{
+       const sv = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
+       if(typeof sv.version !== 'number') throw 0;
+       state = Object.assign(freshState(), sv); save();
+       box.value = 'Save imported ✓';
+     }catch(e){ box.value = 'That code did not work. Check it and try again.'; }
+   };
+ }
+},
+
+e6s1:{
+ onEnter:()=>{ state.episode = 6; snapshotEpisode(6); state.stamina = 100; },
+ html:()=>`
+  <p class="quiet">EPISODE 6 — OFFLINE</p>
+  <p>Tuesday starts the way Tuesdays start. The alarm. The shower. The walk past the temple, where the incense is already going and the morning is already warm.</p>
+  <p>The egg-pancake lady sees you coming and starts yours without asking. That still lands somewhere good, every time.</p>
+  <p>Two corners from home, most mornings, the day's quest finds you. A soft ${vb('chime')}. A green box only you can see. <i>Walk a street you've never walked. Ask the guard about his day. Carry something for someone.</i></p>
+  <p>Today: the first corner. The second.</p>
+  <p class="beat">Nothing.</p>
+  <p>You stop at the third corner and stand there like someone waiting for a bus that isn't coming.</p>`,
+ choices:[
+   {t:'Shrug it off — systems hiccup', go:'e6s2', set:{e6_route:'work'}},
+   {t:'Take the long way — give it more corners to find you', go:'e6s2', set:{e6_route:'long'}}
+ ]
+},
+
+e6s2:{
+ html:(st)=>{
+   const lead = st.flags.e6_route==='long'
+     ? "You give it six more corners and one small park. Nothing finds you. You reach the office two minutes before you'd have to explain yourself."
+     : "You put your head down and go to work. Some things fix themselves if you leave them alone. That's what you tell yourself, twice.";
+   return `
+  <p>${lead}</p>
+  <p>The morning crawls. By ten you have looked at the empty corner of your vision more times than you can pass off as thinking. There is nothing there. There keeps being nothing there.</p>
+  <p>After work you walk Sam's lane, because it's yours now, chime or no chime. Six minutes, end to end. The oil, the stone, the radio.</p>
+  <p>At the far end you stop and wait, one beat, two.</p>
+  <p class="beat">The lane worked. The world didn't.</p>`;
+ },
+ choices:[ {t:'Give it a day', go:'e6s3'} ]
+},
+
+e6s3:{
+ onEnter:()=>{ grant('the_paint_stays'); },
+ html:()=>`
+  <p>A ${vb('glitch')}, you tell yourself on the second morning. Systems go down. Systems come back.</p>
+  <p>On the third morning you stop saying glitch.</p>
+  <p>You test it the way you'd test a dead tooth. You stand where the marks used to bloom — the temple gate, the harbor rail. Wall. Just wall. You carry a box up three floors for a stranger, and at the top there is sweat and a thank-you and nothing else.</p>
+  <p>On the fourth evening you ride to Yancheng and find the wall from those early weeks. The sprayed words are still there. <i>DON'T TAKE THE GOLD QUEST.</i> The paint has gone pale and rough at the edges, but it holds.</p>
+  <p>And something in you goes very still, because you finally see the difference. The system drew its marks in light, and the light is gone. This was made by a hand, with a can, on a night when somebody meant it.</p>
+  <p class="beat">The light left. The paint stayed.</p>`,
+ choices:[ {t:'Saturday', go:'e6s4'} ]
+},
+
+e6s4:{
+ html:(st)=>`
+  <p>Saturday you ride to Formosa Boulevard and walk down into the dome's glow like a person visiting the scene of something.</p>
+  <p>The market is there. The stall is there. The owner is there, folding shirts${st.flags.watch_sold ? "" : " — and on her wrist, the steel watch, back where it belongs"}.</p>
+  <p>Her face opens when she sees you. The daughter is fine — a scare, not a sickness — and before you can ask anything she has pressed a cold tea into your hands, because that is apparently a law of her table.</p>
+  <p>"Your friend from that day?" she says, looking past you. "The fast one."</p>
+  <p>"I'm trying to find her."</p>
+  <p>"So call her."</p>
+  <p>"I don't have her number." You turn the tea in your hands. "I don't have her name. One word of it."</p>
+  <p>The owner stops folding. "An hour, side by side," she says, "and you never asked?"</p>
+  <p>You could explain it. Two players, one stall — it didn't seem to matter then. It matters now, and the words just sit there in your mouth, too late to be any use.</p>`,
+ choices:[
+   {t:'"If she comes back — tell her the other one from that day is looking for her"', go:'e6s5', set:{e6_left_word:true}},
+   {t:'"It\'s nothing. Thanks for the tea."', go:'e6s5'}
+ ]
+},
+
+e6s5:{
+ onEnter:()=>{ if(state.flags.e6_left_word) grant('word_left'); },
+ html:(st)=>`
+  <p>${st.flags.e6_left_word ? "The owner nods once, like a stamp coming down. \"If she comes, she'll know.\" It isn't much. You carry it out of the station anyway, careful, the way you'd carry an egg." : "You thank her and go. Halfway up the stairs you almost turn around, and don't."}</p>
+  <p>The light by the temple still changes too fast. You see that from half a block away, because the old woman is there again — same folded shopping cart, same wait, watching the little green man like he's a train she keeps missing.</p>
+  <p>There was a Tuesday when a green box paid you points to walk her across.</p>
+  <p>There is no box now. There are no points. There is a light that will hold for nine seconds, and a woman who needs twelve.</p>`,
+ choices:[
+   {t:'Cross with her', go:'e6s6a'},
+   {t:'Stay where you are', go:'e6s6b'}
+ ]
+},
+
+e6s6a:{
+ onEnter:()=>{ state.flags.e6_helped = true; grant('unpaid'); },
+ html:()=>`
+  <p>You take her arm the way you did before, and you both step off on the green. Nine seconds. You walk the last three on the red, her cart squeaking, one scooter waiting without honking, which in this city counts as a small parade.</p>
+  <p>On the far curb she pats your hand and tells you rain is coming; she can feel it in her knee. Then she is gone down the lane with her cart, and you are standing alone on the corner in the ordinary evening.</p>
+  <p>No chime. No number climbing anywhere. You keep waiting to feel the thing you used to feel.</p>
+  <p>It doesn't come. What comes instead is a question, quiet as a knife going in:</p>
+  <p class="beat">All those weeks — was it her you were helping, or the number?</p>`,
+ choices:[ {t:'Walk', go:'e6s7'} ]
+},
+
+e6s6b:{
+ onEnter:()=>{ state.flags.e6_hesitated = true; },
+ html:()=>`
+  <p>You stand there doing math you hate. Nine seconds of green. Twelve seconds of her. The gap in the middle where you used to get paid.</p>
+  <p>While you're still counting, a kid in a school uniform jogs past you, takes her arm, and walks her across like it's nothing. Ten seconds, door to door. He doesn't look back. He doesn't look proud. It costs him nothing, because nobody ever paid him a point in his life.</p>
+  <p>The light turns green again. Then red. Then green. You are still on the same corner.</p>
+  <p class="beat">The system never taught you to help. It taught you to check the price first. The kid never had a price to check.</p>`,
+ choices:[ {t:'Walk', go:'e6s7'} ]
+},
+
+e6s7:{
+ html:()=>`
+  <p>You don't go home.</p>
+  <p>You go down into the station and ride the orange line west, all the way, because your feet want the end of the line and nothing else in your head has an opinion anymore.</p>
+  <p>The train empties as it goes. By the last station it's you, two students with plastic bags of dinner, and the hum of the rails.</p>
+  <p class="beat">End of the line. You get out.</p>`,
+ choices:[ {t:'The sea wall', go:'e6s8'} ]
+},
+
+e6s8:{
+ html:()=>`
+  <p>The sea wall at night is wind and the sound of water working on stone. Behind the fence at your back, the university pool lies flat and closed. In front of you, the dark water, and far out, the patient lights of cargo ships waiting at ${vb('anchor')} for their turn at the port.</p>
+  <p>The paint is here too. Same hand. Same words, under a real streetlight's orange wash.</p>
+  <p class="beat">DON'T TAKE THE GOLD QUEST.</p>
+  <p>You reach for the map out of habit — the gesture, anyway. There's no map to reach for. For months the south of it wore a fog only you could see, one gold point burning inside like a small flame that never went out. Now the south of the city is just the south of the city.</p>
+  <p>The gold quest is gone with everything else. The warning outlived the thing it was warning about.</p>
+  <p>Except. Someone climbed up here with a can of paint. Someone crossed the harbor to Yancheng and did it again. Someone <i>meant</i> it — and paint doesn't need a system to stay real.</p>
+  <p>It isn't a warm thought. It's just the only one tonight that holds.</p>`,
+ choices:[ {t:'Stand there', go:'e6s9'} ]
+},
+
+e6s9:{
+ html:()=>`
+  <p>Your phone buzzes.</p>
+  <p>It's out of your pocket before you know your hand has moved. Your heart is somewhere up near your collar.</p>
+  <p>Group chat. Someone from the office has shared a hotpot ${vb('coupon')}. Forty percent off, weekdays only.</p>
+  <p>You stand with the phone glowing in your hand and the sea loud below, and you understand, completely, what these months have made of you.</p>`,
+ choices:[
+   {t:'Put it away. Give the water a while.', go:'e6s10', set:{e6_night:'water'}},
+   {t:'Start the long ride home', go:'e6s10', set:{e6_night:'home'}}
+ ]
+},
+
+e6s10:{
+ onEnter:()=>{ grant('still_here'); },
+ html:(st)=>`
+  <p>${st.flags.e6_night==='water' ? "You give the water twenty minutes it doesn't need. The freighter lights don't move. Neither do you. Then the wind finds the gap in your collar, and that decides it." : "The ride home is long and bright and nearly empty, the windows giving you back your own face all the way east."}</p>
+  <p>Past the temple. Up the stairs. Lights off.</p>
+  <p>You used to fall asleep building tomorrow: which street, which quest, how many points to the next level. The ceiling would fill up with plans.</p>
+  <p>Tonight the ceiling is just a ceiling.</p>
+  <p>Tomorrow the alarm will ring, and you will get up, and no box will open, and you will go anyway. That is the whole plan. That is all of it.</p>
+  <p class="beat">The system is gone. The silence stays up with you.</p>`,
+ choices:[ {t:'EPISODE COMPLETE — open the Menu', go:'end6'} ]
+},
+
+end6:{
+ html:(st)=>{
+   function achGroup(ep){
+     let h='';
+     Object.keys(ACH).filter(id=>ACH[id].ep===ep).forEach(id=>{
+       const a=ACH[id]; const got=st.achievements.includes(id);
+       h += '<div class="row"><span>'+
+         (got ? '🏆 <span class="ach-name">'+a.name+'</span><span class="ach-desc">'+a.desc+'</span>'
+              : '<span class="lock">🔒 ???</span>')+
+         '</span><span>'+(got ? (a.pts>0?'+'+a.pts:'—') : '')+'</span></div>';
+     });
+     return h;
+   }
+   const cnt=(ep)=>[st.achievements.filter(id=>ACH[id].ep===ep).length, Object.keys(ACH).filter(id=>ACH[id].ep===ep).length];
+   const [c6,t6]=cnt(6),[c5,t5]=cnt(5),[c4,t4]=cnt(4),[c3,t3]=cnt(3),[c2,t2]=cnt(2),[c1,t1]=cnt(1);
+   return `
+  <p class="quiet">EPISODE 6 — OFFLINE</p>
+  <div class="panel">
+    <h3>PLAYER</h3>
+    <div class="row"><span>Level</span><span>${st.level}</span></div>
+    <div class="row"><span>Points</span><span>${st.points}</span></div>
+    <div class="row"><span>Money</span><span>NT$${st.money.toLocaleString()}</span></div>
+    <div class="row"><span>System</span><span>No signal</span></div>
+    <div class="row"><span>Map</span><span>Dark</span></div>
+    <div class="row"><span>Party</span><span>—</span></div>
+  </div>
+  <div class="panel ach-list"><h3>EPISODE 6 ACHIEVEMENTS (${c6}/${t6})</h3>${achGroup(6)}</div>
+  <div class="panel ach-list"><h3>EPISODE 5 ACHIEVEMENTS (${c5}/${t5})</h3>${achGroup(5)}</div>
+  <div class="panel ach-list"><h3>EPISODE 4 ACHIEVEMENTS (${c4}/${t4})</h3>${achGroup(4)}</div>
+  <div class="panel ach-list"><h3>EPISODE 3 ACHIEVEMENTS (${c3}/${t3})</h3>${achGroup(3)}</div>
+  <div class="panel ach-list"><h3>EPISODE 2 ACHIEVEMENTS (${c2}/${t2})</h3>${achGroup(2)}</div>
+  <div class="panel ach-list"><h3>EPISODE 1 ACHIEVEMENTS (${c1}/${t1})</h3>${achGroup(1)}</div>
+  <p class="quiet">Missing some? Different choices, different badges. Some things no panel was awake to see.</p>
+  <hr class="sep">
+  <div class="panel">
+    <h3>SAVE</h3>
+    <p style="font-family:inherit;font-size:.8rem;opacity:.8;margin:0 0 8px;">
+      Your progress saves automatically on this device.${storageOK?'':' (Saving is not available here — use Export to keep your progress.)'}
+      Export a save code to keep it safe or move to another device.</p>
+    <div class="btn-line">
+      <button class="choice" id="btnExport6">Export save</button>
+      <button class="choice" id="btnImport6">Import save</button>
+    </div>
+    <textarea class="savebox" id="saveBox6" placeholder="Your save code appears here. Or paste a code and press Import." spellcheck="false"></textarea>
+  </div>`;
+ },
+ choices:[
+   {t:'↻ Replay Episode 6', go:'__replay6'},
+   {t:'Back to title', go:'__title'}
+ ],
+ onRender:()=>{
+   const box = document.getElementById('saveBox6');
+   document.getElementById('btnExport6').onclick = ()=>{
+     box.value = btoa(unescape(encodeURIComponent(JSON.stringify(state)))); box.select();
+   };
+   document.getElementById('btnImport6').onclick = ()=>{
      try{
        const sv = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
        if(typeof sv.version !== 'number') throw 0;
@@ -2691,6 +2904,7 @@ function go(id){
   if(id==='__replay3'){ replayEpisode(3,'e3s1'); return; }
   if(id==='__replay4'){ replayEpisode(4,'e4s1'); return; }
   if(id==='__replay5'){ replayEpisode(5,'e5s1'); return; }
+  if(id==='__replay6'){ replayEpisode(6,'e6s1'); return; }
   const sec = SECTIONS[id];
   if(!sec) return;
   state.section = id;

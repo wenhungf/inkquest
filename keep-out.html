@@ -33,7 +33,6 @@
   #bar .bar-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 62%; }
   #bar .bar-title .ep { color: #cdd6df; text-transform: none; letter-spacing: 0.02em; }
   #bar .money { color: #e0a458; font-variant-numeric: tabular-nums; }
-  #bar .shield { color: #67d9a6; }
   #wrap { max-width: 620px; margin: 0 auto; padding: 28px 22px 80px; }
   .seclabel {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -227,7 +226,6 @@
   <span class="bar-title" id="barTitle"></span>
   <span class="stats">
     <span class="money" id="moneyView"></span>
-    <span class="shield" id="shieldView"></span>
   </span>
 </div>
 <div id="wrap"></div>
@@ -254,157 +252,481 @@
    The auto-linker wraps the FIRST unseen occurrence (in reading order)
    of each key per episode. Phrases are matched before their parts. */
 var VOCAB = {
-  'cultivation': ['the practice of training body and mind to gain magic power', '\u4fee\u7149'],
-  'tribulation': ['heaven\u2019s final test of lightning', '\u5929\u52ab'],
-  'bolt': ['a sudden line of lightning', '\u4e00\u9053\u9583\u96fb'],
-  'robe': ['a long, loose piece of clothing', '\u9577\u888d'],
-  'ascension': ['rising from the human world to the immortal world', '\u98db\u5347'],
-  'spirit stones': ['the money of the cultivation world', '\u9748\u77f3'],
-  'converting': ['changing money from one kind to another', '\u63db\u7b97'],
-  'immortal coins': ['the local money after conversion', '\u4ed9\u5e63'],
-  'immortal': ['a being of the magic world; one who never dies', '\u4ed9\u4eba\uff1b\u4e0d\u6b7b\u7684'],
-  'currency': ['the money used in a place', '\u8ca8\u5e63'],
-  'coins': ['round metal money', '\u786c\u5e63'],
-  'realm': ['a world or kingdom', '\u754c\uff1b\u570b\u5ea6'],
-  'tongues': ['languages', '\u8a9e\u8a00'],
-  'beasts': ['large wild animals', '\u91ce\u7378'],
-  'sect': ['a group who train in magic together', '\u9580\u6d3e'],
-  'tin': ['a cheap, thin metal', '\u9435\u76ae\uff1b\u932b'],
-  'roast': ['to cook with strong heat', '\u70e4'],
-  'meditated': ['sat quietly to train the mind', '\u6253\u5750\uff1b\u51a5\u60f3'],
-  'volcano': ['a mountain that throws out fire and hot rock', '\u706b\u5c71'],
-  'fortune': ['a large amount of money', '\u8ca1\u5bcc'],
-  'window screen': ['a net on a window that stops insects', '\u7d17\u7a97'],
-  'landlord': ['the person who owns the room you rent', '\u623f\u6771'],
-  'rent': ['the money you pay each month for a room', '\u623f\u79df'],
-  'deposit': ['money paid first, returned when you leave', '\u62bc\u91d1'],
-  'haggle': ['to argue about a price to make it lower', '\u6bba\u50f9'],
-  'sword form': ['a set of sword movements', '\u528d\u5f0f'],
-  'sword': ['a long, sharp metal weapon', '\u528d'],
-  'pill fire': ['the magic fire used to make medicine pills', '\u4e39\u706b'],
-  'mountain gate': ['the front gate of a sect', '\u5c71\u9580'],
-  'herbs': ['plants used as medicine', '\u8349\u85e5'],
-  'rust': ['the brown stuff that forms on old metal', '\u92b9'],
-  'crack': ['a thin break, or a sudden sharp sound', '\u88c2\u7e2b\uff1b\u5288\u556a\u8072'],
-  'evidence': ['facts that prove something', '\u8b49\u64da'],
-  'praises': ['says good things about', '\u7a31\u8b9a'],
-  'tenants': ['people who rent and live in a place', '\u623f\u5ba2\uff08\u8907\u6578\uff09'],
-  'tenant': ['a person who rents and lives in a room', '\u623f\u5ba2'],
-  'contract': ['the paper you sign to agree to rent', '\u5408\u7d04'],
-  'deserves': ['should get what is fair', '\u61c9\u5f97'],
-  'feather': ['the light, soft thing on a bird', '\u7fbd\u6bdb'],
-  'strokes': ['the lines made when writing', '\u7b46\u756b'],
-  'ginseng': ['a root used as strong medicine', '\u4eba\u53c3'],
-  'receipt': ['a small paper that shows you paid', '\u6536\u64da'],
-  'leaks': ['lets water in through a hole', '\u6f0f\u6c34'],
-  'healer': ['a person who heals the sick', '\u91ab\u8005'],
-  'prepaid card': ['a card you pay first, then use the phone', '\u9810\u4ed8\u5361'],
-  'brick': ['a hard block (here, the phone)', '\u78da\u584a'],
-  'jade': ['a green precious stone', '\u7389'],
-  'slab': ['a flat, thick piece', '\u677f\uff1b\u584a'],
-  'assistant': ['a helper; here, a talking phone program', '\u52a9\u7406'],
-  'sass': ['rude but funny talk', '\u55c6\u8fa3\u7684\u53e3\u6c23'],
-  'cultivator': ['a person who trains in magic', '\u4fee\u7149\u8005'],
-  'mortal': ['an ordinary person who will die', '\u51e1\u4eba'],
-  'mattress': ['the soft thing you sleep on', '\u5e8a\u588a'],
-  'bedding': ['sheets and covers for a bed', '\u5be2\u5177'],
-  'slippers': ['soft shoes for inside the house', '\u62d6\u978b'],
-  'clicks': ['makes small, sharp sounds', '\u767c\u51fa\u5580\u5580\u8072'],
-  'cockroach': ['a brown house insect; fast, hated', '\u87d1\u8782'],
-  'feelers': ['the long, thin parts on an insect\u2019s head', '\u89f8\u89d2'],
-  'gourmet': ['a person who loves fine food', '\u7f8e\u98df\u5bb6'],
-  'demon wolves': ['evil magic wolves', '\u5996\u72fc'],
-  'qi': ['the energy of the world that cultivators use', '\u6c23'],
-  'strike': ['a hit; an attempt to hit', '\u4e00\u64ca\uff1b\u653b\u64ca'],
-  'soul': ['the spirit inside a person', '\u9748\u9b42'],
-  'newcomer': ['a person who just arrived', '\u65b0\u4f86\u7684\u4eba'],
-  'dao heart': ['a cultivator\u2019s inner will and calm', '\u9053\u5fc3'],
-  'cracks': ['breaks a little', '\u88c2\u958b'],
-  'porcelain': ['fine white pottery; breaks easily', '\u74f7\u5668'],
-  'seals': ['hand shapes used to cast magic', '\u624b\u5370\uff08\u7d50\u5370\uff09'],
-  'textbook form': ['the standard, by-the-book way', '\u6559\u79d1\u66f8\u5f0f\u7684\u62db\u5f0f'],
-  'cast': ['to perform magic', '\u65bd\u6cd5'],
-  'grand dwelling ward': ['a top-level home protection spell', '\u5927\u578b\u5c45\u6240\u7d50\u754c'],
-  'ward': ['a magic wall made of rules that blocks things', '\u7d50\u754c'],
-  'blooms': ['opens like a flower', '\u7dbb\u653e'],
-  'mid-flight': ['in the middle of flying', '\u98db\u884c\u9014\u4e2d'],
-  'dignity': ['self-respect; pride', '\u5c0a\u56b4'],
-  'victory': ['a win', '\u52dd\u5229'],
-  'divine sense': ['a cultivator\u2019s mind-power used to sense things', '\u795e\u8b58'],
-  'thread': ['a very thin line', '\u7d30\u7dda'],
-  'wire': ['a thin metal line that carries electricity', '\u96fb\u7dda'],
-  'define': ['to say exactly what something is', '\u5b9a\u7fa9'],
-  'suffocated': ['died from no air', '\u7a92\u606f'],
-  'masterpiece': ['a perfect work', '\u9245\u4f5c'],
-  'mosquitoes': ['small flying insects that drink blood at night', '\u868a\u5b50'],
-  'sealed': ['closed in; trapped inside', '\u5c01\u4f4f\uff1b\u56f0\u4f4f'],
-  'patched': ['fixed with a small cover', '\u88dc\u904e\u7684'],
-  'peeled': ['pulled back at the edge', '\u525d\u958b'],
-  'tore': ['ripped (past of tear)', '\u6495\u958b'],
-  'tame': ['to make wild things obey', '\u99b4\u670d'],
-  'whine': ['a high, thin sound', '\u5c16\u7d30\u7684\u8072\u97f3'],
-  'cross-legged': ['sitting with the legs folded', '\u76e4\u817f'],
-  'smallest hour': ['the deep middle of the night', '\u6df1\u591c\uff08\u6700\u5bc2\u975c\u6642\uff09'],
-  'clap': ['to hit your hands together', '\u62cd\uff08\u624b\uff09'],
-  'ankle': ['the joint between foot and leg', '\u8173\u8e1d'],
-  'itchy': ['when your skin wants you to scratch it', '\u7662\u7684'],
-  'celebrate': ['to be happy about a win', '\u6176\u795d'],
-  'to your name': ['that you own (idiom)', '\u540d\u4e0b\u64c1\u6709\u7684'],
-  'on fire': ['burning; here, very itchy', '\u71d2\u707c\uff08\u9019\u88e1\u6307\u5f88\u7662\uff09'],
-  'isolation': ['being completely alone, cut off', '\u9694\u7d55'],
-  'convenience store': ['a small shop open all hours', '\u4fbf\u5229\u5546\u5e97'],
-  'tomb': ['a place where the dead are kept', '\u58b3\u5893'],
-  'weapons': ['tools made to fight', '\u6b66\u5668'],
-  'pouring': ['flowing out fast', '\u6e67\u51fa\uff1b\u50be\u7009'],
-  'blessing': ['a gift of good fortune', '\u795d\u798f'],
-  'chimes': ['rings softly', '\u53ee\u5679\u4f5c\u97ff'],
-  'announcing': ['telling everyone', '\u5ba3\u544a'],
-  'shelves': ['flat boards that hold goods', '\u67b6\u5b50'],
-  'treasure': ['valuable things', '\u5bf6\u7269'],
-  'fragrant': ['smelling good', '\u82b3\u9999\u7684'],
-  'steamed buns': ['soft bread cooked over hot water', '\u5305\u5b50'],
-  'mosquito coil': ['a green spiral you burn to keep mosquitoes away', '\u868a\u9999'],
-  'swatter': ['a racket-shaped tool for killing mosquitoes', '\u96fb\u868a\u62cd'],
-  'racket': ['a bat with strings (here, the swatter)', '\u7403\u62cd\uff08\u9019\u88e1\u6307\u96fb\u868a\u62cd\uff09'],
-  'strung': ['fitted with strings or wires', '\u88dd\u4e0a\u7dda\u7684'],
-  'chewing gum': ['a soft sweet you chew but do not swallow', '\u53e3\u9999\u7cd6'],
-  'thunderbolt': ['a flash of lightning with thunder', '\u96f7\u9706\uff1b\u9739\u9742'],
-  'spiral': ['a curl that winds around', '\u87ba\u65cb'],
-  'obeys': ['does what it is told', '\u670d\u5f9e'],
-  'reach': ['to stretch out to touch or get something', '\u4f38\u624b\u53bb\u62ff\uff1b\u63a2\u53d6'],
-  'sparks': ['tiny bits of fire or electric light', '\u706b\u82b1'],
-  'wyrm-kin': ['dragon-like creatures (here, insects, jokingly)', '\u9f8d\u985e\uff1b\u87f2\u8c78\uff08\u6232\u7a31\uff09'],
-  'volumes': ['books', '\u5377\uff1b\u518a'],
-  'carapace': ['the hard shell of an insect', '\u7532\u6bbc'],
-  'divine-sense': ['mind-power used to sense things', '\u795e\u8b58'],
-  'sect master': ['the leader of a sect', '\u638c\u9580'],
-  'dawn': ['the first light of morning', '\u9ece\u660e'],
-  'sand': ['here: dry and tired (eyes like sand)', '\uff08\u773c\u775b\uff09\u4e7e\u6f80'],
-  'dough': ['a soft mix of flour and water for bread', '\u9eb5\u5718'],
-  'demon tide': ['a flood of attacking demons', '\u5996\u6f6e'],
-  'mosquito net': ['a net that keeps mosquitoes off a bed', '\u868a\u5e33'],
-  'humble': ['simple and not proud', '\u8b19\u5351\u7684'],
-  'refine': ['to improve and make finer', '\u7cbe\u7149\uff1b\u63d0\u7149'],
-  'building': ['a structure with walls and a roof', '\u5efa\u7bc9\u7269'],
-  'security guard': ['a person whose job is to guard a building', '\u4fdd\u5168'],
-  'night shift': ['work hours during the night', '\u591c\u73ed'],
-  'very still': ['not moving at all', '\u5b8c\u5168\u4e0d\u52d5'],
-  'glare': ['to look angrily', '\u77aa'],
-  'overqualified': ['having more skill than a job needs', '\u8cc7\u6b77\u904e\u9ad8'],
-  'r\u00e9sum\u00e9': ['a paper listing your work and skills', '\u5c65\u6b77'],
-  'bare hands': ['using only the hands, no tools', '\u5f92\u624b'],
-  'bare-hand': ['using only the hands, no tools', '\u5f92\u624b\u7684'],
-  'technique': ['a skilled way of doing something', '\u6280\u5de7'],
-  'intact': ['whole; not broken', '\u5b8c\u6574\u7121\u640d'],
-  'pilgrim': ['a person who travels to a holy place', '\u671d\u8056\u8005'],
-  'blinks on': ['(a light) suddenly turns on', '\uff08\u71c8\uff09\u4eae\u8d77'],
-  'blinks': ['opens and closes the eyes quickly', '\u7728\u773c'],
-  'mid-turn': ['in the middle of turning', '\u8f49\u5230\u4e00\u534a'],
-  'posture': ['the way you hold your body', '\u59ff\u614b'],
-  'deny': ['to say no; to not allow', '\u62d2\u7d55'],
-  'personality': ['the character that makes someone who they are', '\u500b\u6027'],
-  'squeezing': ['pressing something tightly', '\u64e0\u58d3'],
-  'silence': ['complete quiet; no sound', '\u5bc2\u975c']
+  'cultivation': ['the practice of training body and mind to gain magic power', '修煉'],
+  'tribulation': ['heaven’s final test of lightning', '天劫'],
+  'bolt': ['a sudden line of lightning', '一道閃電'],
+  'robe': ['a long, loose piece of clothing', '長袍'],
+  'ascension': ['rising from the human world to the immortal world', '飛升'],
+  'spirit stones': ['the money of the cultivation world', '靈石'],
+  'converting': ['changing money from one kind to another', '換算'],
+  'immortal coins': ['the local money after conversion', '仙幣'],
+  'immortal': ['a being of the magic world; one who never dies', '仙人；不死的'],
+  'currency': ['the money used in a place', '貨幣'],
+  'coins': ['round metal money', '硬幣'],
+  'realm': ['a world or kingdom', '界；國度'],
+  'tongues': ['languages', '語言'],
+  'beasts': ['large wild animals', '野獸'],
+  'sect': ['a group who train in magic together', '門派'],
+  'tin': ['a cheap, thin metal', '鐵皮；錫'],
+  'roast': ['to cook with strong heat', '烤'],
+  'meditated': ['sat quietly to train the mind', '打坐；冥想'],
+  'volcano': ['a mountain that throws out fire and hot rock', '火山'],
+  'fortune': ['a large amount of money', '財富'],
+  'window screen': ['a net on a window that stops insects', '紗窗'],
+  'landlord': ['the person who owns the room you rent', '房東'],
+  'for rent': ['offered for renting; you can pay to live here', '出租；招租'],
+  'rent': ['the money you pay each month for a room', '房租'],
+  'deposit': ['money paid first, returned when you leave', '押金'],
+  'haggle': ['to argue about a price to make it lower', '殺價'],
+  'sword form': ['a set of sword movements', '劍式'],
+  'sword': ['a long, sharp metal weapon', '劍'],
+  'pill fire': ['the magic fire used to make medicine pills', '丹火'],
+  'mountain gate': ['the front gate of a sect', '山門'],
+  'herbs': ['plants used as medicine', '草藥'],
+  'rust': ['the brown stuff that forms on old metal', '銹'],
+  'crack': ['a thin break, or a sudden sharp sound', '裂縫；劈啪聲'],
+  'evidence': ['facts that prove something', '證據'],
+  'praises': ['says good things about', '稱讚'],
+  'tenants': ['people who rent and live in a place', '房客（複數）'],
+  'tenant': ['a person who rents and lives in a room', '房客'],
+  'contract': ['the paper you sign to agree to rent', '合約'],
+  'deserves': ['should get what is fair', '應得'],
+  'feather': ['the light, soft thing on a bird', '羽毛'],
+  'strokes': ['the lines made when writing', '筆畫'],
+  'ginseng': ['a root used as strong medicine', '人參'],
+  'receipt': ['a small paper that shows you paid', '收據'],
+  'leaks': ['lets water in through a hole', '漏水'],
+  'healer': ['a person who heals the sick', '醫者'],
+  'prepaid card': ['a card you pay first, then use the phone', '預付卡'],
+  'brick': ['a hard block (here, the phone)', '磚塊'],
+  'jade': ['a green precious stone', '玉'],
+  'slab': ['a flat, thick piece', '板；塊'],
+  'assistant': ['a helper; here, a talking phone program', '助理'],
+  'sass': ['rude but funny talk', '嗆辣的口氣'],
+  'cultivator': ['a person who trains in magic', '修煉者'],
+  'mortal': ['an ordinary person who will die', '凡人'],
+  'mattress': ['the soft thing you sleep on', '床墊'],
+  'bedding': ['sheets and covers for a bed', '寢具'],
+  'slippers': ['soft shoes for inside the house', '拖鞋'],
+  'clicks': ['makes small, sharp sounds', '發出喀喀聲'],
+  'cockroach': ['a brown house insect; fast, hated', '蟑螂'],
+  'feelers': ['the long, thin parts on an insect’s head', '觸角'],
+  'gourmet': ['a person who loves fine food', '美食家'],
+  'demon wolves': ['evil magic wolves', '妖狼'],
+  'qi': ['the energy of the world that cultivators use', '氣'],
+  'strike': ['a hit; an attempt to hit', '一擊；攻擊'],
+  'soul': ['the spirit inside a person', '靈魂'],
+  'newcomer': ['a person who just arrived', '新來的人'],
+  'dao heart': ['a cultivator’s inner will and calm', '道心'],
+  'cracks': ['breaks a little', '裂開'],
+  'porcelain': ['fine white pottery; breaks easily', '瓷器'],
+  'seals': ['hand shapes used to cast magic', '手印（結印）'],
+  'textbook form': ['the standard, by-the-book way', '教科書式的招式'],
+  'cast': ['to perform magic', '施法'],
+  'grand dwelling ward': ['a top-level home protection spell', '大型居所結界'],
+  'ward': ['a magic wall made of rules that blocks things', '結界'],
+  'blooms': ['opens like a flower', '綻放'],
+  'mid-flight': ['in the middle of flying', '飛行途中'],
+  'dignity': ['self-respect; pride', '尊嚴'],
+  'victory': ['a win', '勝利'],
+  'divine sense': ['a cultivator’s mind-power used to sense things', '神識'],
+  'thread': ['a very thin line', '細線'],
+  'wire': ['a thin metal line that carries electricity', '電線'],
+  'define': ['to say exactly what something is', '定義'],
+  'suffocated': ['died from no air', '窒息'],
+  'masterpiece': ['a perfect work', '鉅作'],
+  'mosquitoes': ['small flying insects that drink blood at night', '蚊子'],
+  'sealed': ['closed in; trapped inside', '封住；困住'],
+  'patched': ['fixed with a small cover', '補過的'],
+  'peeled': ['pulled back at the edge', '剝開'],
+  'tore': ['ripped (past of tear)', '撕開'],
+  'tame': ['to make wild things obey', '馴服'],
+  'whine': ['a high, thin sound', '尖細的聲音'],
+  'cross-legged': ['sitting with the legs folded', '盤腿'],
+  'smallest hour': ['the deep middle of the night', '深夜（最寂靜時）'],
+  'clap': ['to hit your hands together', '拍（手）'],
+  'ankle': ['the joint between foot and leg', '腳踝'],
+  'itchy': ['when your skin wants you to scratch it', '癢的'],
+  'celebrate': ['to be happy about a win', '慶祝'],
+  'to your name': ['that you own (idiom)', '名下擁有的'],
+  'on fire': ['burning; here, very itchy', '燒灼（這裡指很癢）'],
+  'isolation': ['being completely alone, cut off', '隔絕'],
+  'convenience store': ['a small shop open all hours', '便利商店'],
+  'tomb': ['a place where the dead are kept', '墳墓'],
+  'weapons': ['tools made to fight', '武器'],
+  'pouring': ['flowing out fast', '湧出；傾瀉'],
+  'blessing': ['a gift of good fortune', '祝福'],
+  'chimes': ['rings softly', '叮噹作響'],
+  'announcing': ['telling everyone', '宣告'],
+  'shelves': ['flat boards that hold goods', '架子'],
+  'treasure': ['valuable things', '寶物'],
+  'fragrant': ['smelling good', '芳香的'],
+  'steamed buns': ['soft bread cooked over hot water', '包子'],
+  'mosquito coil': ['a green spiral you burn to keep mosquitoes away', '蚊香'],
+  'swatter': ['a racket-shaped tool for killing mosquitoes', '電蚊拍'],
+  'racket': ['a bat with strings (here, the swatter)', '球拍（這裡指電蚊拍）'],
+  'strung': ['fitted with strings or wires', '裝上線的'],
+  'chewing gum': ['a soft sweet you chew but do not swallow', '口香糖'],
+  'thunderbolt': ['a flash of lightning with thunder', '雷霆；霹靂'],
+  'spiral': ['a curl that winds around', '螺旋'],
+  'obeys': ['does what it is told', '服從'],
+  'reach': ['to stretch out to touch or get something', '伸手去拿；探取'],
+  'sparks': ['tiny bits of fire or electric light', '火花'],
+  'wyrm-kin': ['dragon-like creatures (here, insects, jokingly)', '龍類；蟲豸（戲稱）'],
+  'volumes': ['books', '卷；冊'],
+  'carapace': ['the hard shell of an insect', '甲殼'],
+  'divine-sense': ['mind-power used to sense things', '神識'],
+  'sect master': ['the leader of a sect', '掌門'],
+  'dawn': ['the first light of morning', '黎明'],
+  'sand': ['here: dry and tired (eyes like sand)', '（眼睛）乾澀'],
+  'dough': ['a soft mix of flour and water for bread', '麵團'],
+  'demon tide': ['a flood of attacking demons', '妖潮'],
+  'mosquito net': ['a net that keeps mosquitoes off a bed', '蚊帳'],
+  'humble': ['simple and not proud', '謙卑的'],
+  'refine': ['to improve and make finer', '精煉；提煉'],
+  'building': ['a structure with walls and a roof', '建築物'],
+  'security guard': ['a person whose job is to guard a building', '保全'],
+  'night shift': ['work hours during the night', '夜班'],
+  'very still': ['not moving at all', '完全不動'],
+  'glare': ['to look angrily', '瞪'],
+  'overqualified': ['having more skill than a job needs', '資歷過高'],
+  'résumé': ['a paper listing your work and skills', '履歷'],
+  'bare hands': ['using only the hands, no tools', '徒手'],
+  'bare-hand': ['using only the hands, no tools', '徒手的'],
+  'technique': ['a skilled way of doing something', '技巧'],
+  'intact': ['whole; not broken', '完整無損'],
+  'pilgrim': ['a person who travels to a holy place', '朝聖者'],
+  'blinks on': ['(a light) suddenly turns on', '（燈）亮起'],
+  'blinks': ['opens and closes the eyes quickly', '眨眼'],
+  'mid-turn': ['in the middle of turning', '轉到一半'],
+  'posture': ['the way you hold your body', '姿態'],
+  'deny': ['to say no; to not allow', '拒絕'],
+  'personality': ['the character that makes someone who they are', '個性'],
+  'squeezing': ['pressing something tightly', '擠壓'],
+  'silence': ['complete quiet; no sound', '寂靜'],
+  'interview': ['a meeting where someone decides whether to hire you', '面試'],
+  'experience': ['skill you get from doing a job before', '經驗'],
+  'hired': ['given the job', '錄取；被雇用'],
+  'shift': ['a set block of working hours', '班（工作時段）'],
+  'identity card': ['the official card that says who you are', '身分證'],
+  'lobby': ['the open room just inside the front door of a building', '大廳'],
+  'front desk': ['the counter where the guard sits near the door', '警衛台'],
+  'resident': ['a person who lives in the building', '住戶'],
+  'residents': ['the people who live in the building', '住戶（複數）'],
+  'visitors': ['people who come to see someone, but do not live there', '訪客（複數）'],
+  'visitor': ['a person who comes to see someone, but does not live there', '訪客'],
+  'fob': ['a small tag you hold near the reader to unlock the door', '感應扣（逼逼扣）'],
+  'reader': ['the small box that senses the fob and unlocks the door', '感應讀卡機'],
+  'magnetic lock': ['a strong lock that holds the door with electricity', '電磁鎖'],
+  'door closer': ['the arm on a door that swings it shut by itself', '門弓器'],
+  'intercom': ['a wall phone visitors use to call a home upstairs', '對講機'],
+  'buzzed': ['pressed the button that unlocks the door for someone', '按鈕開門（讓人進來）'],
+  'log': ['a book where you write down what happened', '紀錄簿'],
+  'handover': ['passing the job to the next worker at shift change', '交接班'],
+  'patrol': ['a walk around a place to keep it safe', '巡邏'],
+  'stairwell': ['the space in a building where the stairs are', '樓梯間'],
+  'mailboxes': ['the boxes in the lobby where letters arrive', '信箱'],
+  'cameras': ['machines that watch a place and record it', '攝影機；監視器'],
+  'footage': ['the video that a camera records', '監視畫面'],
+  'committee': ['a small group chosen to run the building’s affairs', '管委會'],
+  'chairman': ['the head of a committee', '主委'],
+  'soy milk': ['a warm drink made from soybeans; a Taiwan breakfast classic', '豆漿'],
+  'drunk': ['having had too much alcohol', '醉的'],
+  'sways': ['moves slowly from side to side', '搖搖晃晃'],
+  'slurring': ['speaking in an unclear, sliding way', '語無倫次；口齒含糊'],
+  'bang': ['to hit something hard and loud', '用力敲'],
+  'belongs': ['has a right to be in a place', '屬於'],
+  'belong': ['to have a right to be in a place', '屬於；該在這裡'],
+  'hood': ['the part of a coat that covers the head', '（連身）帽子'],
+  'threshold': ['the line of the doorway, where you step in', '門檻；門口那一線'],
+  'suspicious': ['looking like it might be bad or dishonest', '可疑的'],
+  'schedule': ['the plan of who works when', '班表'],
+  'elevator': ['the machine that carries people between floors', '電梯'],
+  'doormat': ['the small rough mat in front of a door', '門墊'],
+  'verdict': ['the final decision, like in a court', '判決'],
+  'thunderstorm': ['a sudden storm with thunder, lightning, and heavy rain', '雷雨；午後雷陣雨'],
+  'ceiling': ['the top inside surface of a room', '天花板'],
+  'seam': ['the line where two parts join', '接縫'],
+  'drip': ['a single falling drop of water', '滴水；水滴'],
+  'pot': ['a deep metal container for cooking', '鍋子'],
+  'alarm': ['the sound a clock makes to wake you', '鬧鐘（鈴聲）'],
+  'notifications': ['the messages a phone shows you', '通知（複數）'],
+  'night off': ['a night when you do not have to work', '休假（夜班休假日）'],
+  'drill': ['a loud tool that makes holes', '電鑽'],
+  'renovation': ['fixing and rebuilding part of a building', '裝修；裝潢'],
+  'spider': ['a small animal with eight legs', '蜘蛛'],
+  'huntsman spider': ['a large, fast, harmless spider that hunts cockroaches', '白額高腳蛛（喇牙）'],
+  'palm': ['the flat inside of your hand', '手掌'],
+  'harmless': ['not able to hurt you', '無害的'],
+  'ally': ['someone on your side in a fight', '盟友'],
+  'exception': ['a thing a rule does not apply to', '例外'],
+  'amendment': ['a small official change to a rule', '修訂；修正案'],
+  'amend': ['to change a rule a little', '修訂；修改'],
+  'flinch': ['to jump a little from fear or surprise', '退縮；嚇得一縮'],
+  'territory': ['the land that belongs to someone', '地盤；領域'],
+  'rustle': ['a soft sound like leaves moving', '沙沙聲'],
+  'sentry': ['a soldier who stands and keeps watch', '哨兵'],
+  'treaty': ['a formal agreement between two sides', '條約'],
+  'tarp': ['a big plastic sheet that keeps rain off', '帆布；防水布'],
+  'bestiary': ['a book that lists kinds of creatures', '妖獸圖鑑；動物誌'],
+  'dynasty': ['a long line of rulers from one family', '王朝'],
+  'heatstroke': ['sickness from being far too hot', '中暑'],
+  'token': ['a small object that stands for a right or an identity', '信物；憑證'],
+  'sent-voices': ['voices carried far by magic, like a phone call', '傳音（法術傳聲）'],
+  'meditation hall': ['a quiet room where cultivators sit and train the mind', '靜坐堂；禪房'],
+  'do the math': ['to work out the numbers; to see the truth yourself', '算一算；心裡有數'],
+  'up front': ['paid at the start, before anything else', '預付；一開始就付'],
+  'in one breath': ['all at once, very fast', '一口氣；轉瞬間'],
+  'take no prisoners': ['to show no mercy at all', '毫不留情'],
+  'head to toe': ['all of someone, from top to bottom', '從頭到腳'],
+  'hide-and-seek': ['a hiding game; here, it cannot be found', '捉迷藏'],
+  'at random': ['with no plan; by chance', '隨機；隨便選'],
+  'staff': ['the workers of a shop (not a magic stick here)', '店員；員工（非「法杖」）'],
+  'by accident': ['not on purpose', '不小心；意外地'],
+  'old itch': ['a familiar urge that pushes you to act', '技癢；老毛病'],
+  'post': ['the place where a guard works (not mail here)', '崗位；哨位（非「郵件」）'],
+  'pats himself down': ['searches his own pockets by tapping them', '拍遍口袋找東西'],
+  'beams': ['smiles very widely (not a light beam here)', '笑得燦爛（非「光束」）'],
+  'counts on': ['depends on; trusts (not counting numbers here)', '指望；依賴（非「數數」）'],
+  'runs things': ['is the person in charge (not running here)', '管事；當家（非「跑步」）'],
+  'roll': ['a list of names (not bread, not rolling here)', '名冊（非「麵包捲」）'],
+  'melts into': ['slowly disappears into', '沒入；消失在…之中'],
+  'on schedule': ['at exactly the planned time', '準時；按表'],
+  'break-in': ['entering a building to steal', '闖空門'],
+  'good eye': ['\u201cyou noticed well\u201d \u2014 praise for sharp eyes', '好眼力'],
+  'write it up': ['to write an official report about it', '寫成報告'],
+  'lost his nerve': ['suddenly became too afraid to act', '臨陣膽怯'],
+  'lose their nerve': ['to become too afraid to act', '臨陣膽怯'],
+  'pulls the footage': ['gets the camera video to watch it', '調閱監視畫面'],
+  'wild': ['(slang) amazing; hard to believe (not \u201cnot tame\u201d here)', '（俚）太扯了（非「野生」）'],
+  'doomed': ['certain to fail or die', '注定完蛋'],
+  'in his own telling': ['according to the way he tells the story', '照他自己的說法'],
+  'on our side': ['helping us, not against us', '站在我們這邊'],
+  'by the book': ['exactly following the rules', '照規矩來'],
+  'loses the thread': ['forgets what he was saying', '忘了說到哪'],
+  'fun fact': ['a small interesting fact, often said as a joke', '冷知識；順帶一提'],
+  'at the current rate': ['if things continue at this speed', '照這速度下去'],
+  'served': ['did its duty well (not food or tennis here)', '盡了職責（非「上菜」「發球」）'],
+  'framing': ['putting in a picture frame; a joke: keeping as a treasure', '裱框（笑：值得紀念）'],
+  'financial advisor': ['a person who gives advice about money', '理財顧問'],
+  'signature': ['a personal special style (also: your written name)', '招牌特色（也指簽名）'],
+  'bet': ['to risk money on a guess; here, \u201cI am sure\u201d', '打賭（這裡＝十分確定）'],
+  'file a complaint': ['to officially say you are unhappy', '提出申訴'],
+  'military honors': ['the formal respect given to a soldier', '軍禮；隆重禮遇'],
+  'for the record': ['said officially, so it is written down', '正式聲明；記錄在案'],
+  'spends itself': ['uses up all its power', '（風雨）耗盡力氣'],
+  'canceled out': ['removed each other\u2019s effect', '相互抵銷'],
+  'open country': ['land with no walls or protection', '開闊無防之地'],
+  'night watch': ['guarding through the night', '守夜'],
+  'wide awake': ['completely awake', '完全清醒'],
+  'customer service': ['the people of a company who answer users', '客服'],
+  'scrolls': ['moves up or down on a screen', '（螢幕）滑動'],
+  'precious': ['very valuable', '珍貴的'],
+  'poisoned': ['made sick with poison', '中毒的'],
+  'snaps': ['makes a sudden sharp sound', '劈啪一聲'],
+  'stubborn': ['refusing to give up', '固執的；不死心的'],
+  'satisfying': ['giving a good, complete feeling', '令人滿足的'],
+  'witnesses': ['people who see something happen', '目擊者'],
+  'spun': ['made like thread, by spinning', '紡出的'],
+  'flicker': ['to shake quickly on and off (a light)', '閃爍'],
+  'weaving': ['walking in unsteady curves', '搖搖晃晃地走'],
+  'weaves': ['walks in unsteady curves', '搖搖晃晃地走'],
+  'zigzag': ['a path of sharp turns, like the letter Z', 'Ｚ字形；曲折'],
+  'burp': ['a gas sound from the stomach', '打嗝'],
+  'triumph': ['the joy of winning', '得意；大勝'],
+  'mercifully': ['luckily; thank goodness', '幸好；謝天謝地'],
+  'coffin': ['the box for a dead body', '棺材'],
+  'gatekeeper': ['the person who guards a gate', '守門人'],
+  'ledger': ['a book of records', '名錄；帳冊'],
+  'clipped': ['short and quick (steps or words)', '急促的'],
+  'offense': ['the feeling of being insulted', '被冒犯的感覺'],
+  'summoned': ['called to appear, as if by magic', '被召喚'],
+  'wring': ['to twist wet cloth to squeeze water out', '擰（乾）'],
+  'insolent': ['rude, without respect', '無禮的；放肆的'],
+  'rusty': ['with a rust color, as from old pipes', '帶鏽的'],
+  'glorious': ['wonderful; full of glory', '美妙的；燦爛的'],
+  'fortress': ['a strong building for defense', '堡壘'],
+  'woodpecker': ['a bird that knocks on trees with its beak', '啄木鳥'],
+  'laundry': ['clothes for washing', '要洗的衣物'],
+  'salary': ['the money a job pays you each month', '薪水'],
+  'relocates': ['moves to a new place', '搬遷；移駐'],
+  'stacked': ['piled one on top of another', '疊成一堆'],
+  'flood': ['a great rush; many things at once', '洪流；蜂擁而至'],
+  'diary': ['a book where you write about each day', '日記'],
+  'furious': ['very angry', '氣炸的'],
+  'usher': ['to guide someone politely out or in', '引導；護送'],
+  'sill': ['the shelf at the bottom of a window', '窗台'],
+  'cavity': ['an empty space inside something', '空腔；夾層'],
+  'border': ['the line between two lands', '邊界'],
+  'career': ['your working life', '生涯'],
+  'ratified': ['(law) officially agreed to', '批准（條約）'],
+  'cadence': ['the rise and fall of a voice', '語調；抑揚'],
+  'indifference': ['not caring at all', '漠不關心'],
+  'foreleg': ['a front leg', '前肢'],
+  'haunted': ['lived in by ghosts', '鬧鬼的'],
+  'cursed': ['under an evil spell', '受詛咒的'],
+  'curse': ['to say angry, magic-like words at something', '咒罵；詛咒'],
+  'protest': ['a statement that you disagree', '抗議'],
+  'void': ['empty nothing-space', '虛空'],
+  'gong': ['a metal disc you strike for sound', '鑼'],
+  'punctuation': ['marks like . and , in writing', '標點符號'],
+  'scam': ['a trick to steal your money by lying', '詐騙'],
+  'scammers': ['people who trick others out of money', '詐騙集團；騙子（複數）'],
+  'victim': ['the person a crime is done to', '受害者'],
+  'hang up': ['to end a phone call', '掛斷電話'],
+  'hangs up': ['ends a phone call', '掛斷電話'],
+  'unknown number': ['a call from a number your phone does not know', '陌生號碼來電'],
+  'wrong number': ['a call that reached you by mistake', '打錯電話'],
+  'account': ['the place a bank keeps your money', '帳戶'],
+  'transferred': ['moved (money) from one account to another', '轉帳（非「轉移陣地」）'],
+  'savings': ['the money you have saved', '存款；積蓄'],
+  'counter': ['the long desk in a bank or shop (not for counting here)', '櫃檯（非「計數器」）'],
+  'frozen': ['(of an account) stopped, cannot be used (not ice here)', '（帳戶）凍結（非「結冰」）'],
+  'case': ['a matter the police or courts are working on (not a box here)', '案件（非「箱子」）'],
+  'prosecutor': ['a government lawyer who charges criminals', '檢察官'],
+  'hotline': ['a special phone number for one kind of help', '專線'],
+  'anti-fraud': ['made to fight money tricks', '反詐騙'],
+  'verify': ['to check that something is true', '查證；核實'],
+  'script': ['the written words a caller is told to say (not a movie script here)', '話術；套好的台詞（非「劇本」）'],
+  'the tell': ['the small sign that shows the truth', '馬腳；破綻'],
+  'play along': ['to pretend to believe, on purpose', '將計就計；配合著演'],
+  'field guide': ['a small book for knowing kinds of things', '圖鑑'],
+  'ingredients': ['the parts something is made from', '成分；要素'],
+  'recipe': ['the plan for making something (here, a trick)', '配方（比喻手法）'],
+  'hush': ['silence; being told to keep quiet', '噤聲；封口'],
+  'heart-demon': ['the inner voice of fear that ruins cultivators', '心魔'],
+  'headsets': ['headphones with a microphone, worn for phone work', '耳機麥克風'],
+  'paper horses': ['paper models burned as gifts for the dead', '紙紮馬（祭品）'],
+  'envelope': ['a paper cover for money or a letter', '信封'],
+  'cement': ['the gray powder that makes concrete', '水泥'],
+  'clamped': ['held tight, pressed hard', '緊夾著；緊貼著'],
+  'barking': ['shouting in short, hard bursts, like a dog', '咆哮；短促吼叫'],
+  'witness': ['a person who sees something happen', '證人；目擊者'],
+  'spell': ['magic words; here, the hold a trick has on someone', '咒語（這裡指騙術的迷惑）'],
+  'the dam breaks': ['the held-back truth or feeling rushes out at once', '潰堤（真話傾瀉而出）'],
+  'stay on the line': ['do not end the call', '不要掛斷；保持通話'],
+  'deadline': ['the time by which something must be done', '期限'],
+  'urgent': ['needing action right now', '緊急的'],
+  'housekeeping': ['cleaning and small jobs around a place (here, a dry joke)', '房務；例行整理（這裡是冷笑話）'],
+  'got better': ['(joke) came back to health \u2014 even from death', '痊癒了（死而復活的玩笑）'],
+  'closed-door training': ['shutting yourself away to train for months or years', '閉關修煉'],
+  'whispering': ['speaking in a very soft, low voice', '低語；耳語'],
+  'file it away': ['to quietly remember it for later', '默默記下'],
+  'ATM': ['the machine that gives out money from your account', '自動提款機'],
+  'crime scene': ['the place where a crime happened', '犯罪現場'],
+  'clerk': ['a person who serves you in a shop or office', '店員；辦事員'],
+  'repairman': ['a person whose job is fixing things', '修理師傅'],
+  'sniff': ['to smell something in short breaths', '嗅聞'],
+  'block list': ['the list of numbers a phone refuses', '封鎖名單'],
+  'referee': ['the person who watches a game and keeps the rules', '裁判'],
+  'transcript': ['the written record of what was said', '逐字稿'],
+  'moth': ['a night insect that flies to light', '飛蛾；蛾'],
+  'sheaths': ['the covers that hold blades', '刀鞘（複數）'],
+  'argue': ['to fight with words', '爭論；頂嘴'],
+  'mercy': ['kindness to someone in your power', '慈悲；留情'],
+  'malice': ['the wish to harm or cheat someone', '惡意'],
+  'suspect': ['a person the police think may be guilty', '嫌疑人'],
+  'sealed case': ['a police matter kept secret (a favorite scam lie)', '保密案件；封存案件（詐騙慣用語）'],
+  'savings plans': ['bank products for growing saved money', '存款方案；儲蓄方案'],
+  'kind': ['friendly and caring (not \u201ctype\u201d here)', '親切的（非「種類」）'],
+  'burns off': ['(fog, fear) fades away as if burned by the sun', '（霧氣、情緒）消散'],
+  'rage': ['very strong anger', '盛怒'],
+  'purity': ['the state of being completely one thing, unmixed', '純粹；純度'],
+  'sword saints': ['legendary masters of the sword', '劍聖'],
+  'owed': ['had to pay back (money)', '欠（錢）'],
+  'wasp': ['a stinging insect like a thin, angry bee', '黃蜂；虎頭蜂'],
+  'worn thin': ['used so many times it barely works anymore', '用舊了；快撐不住'],
+  'speed dial': ['a phone button that calls a saved number at once', '快速撥號'],
+  'hobby': ['a thing you do for fun in free time', '嗜好'],
+  'welded': ['joined metal with heat; here, stuck completely', '焊住（比喻緊貼不放）'],
+  'rounds on': ['turns suddenly to face someone, angry', '猛然轉身質問'],
+  'fog': ['thick cloud near the ground', '霧'],
+  'harbor': ['a safe water place for boats', '港口'],
+  'digs in': ['searches deep inside (a bag, pocket)', '（在袋裡）翻找'],
+  'chess': ['a board game of two armies and slow thinking', '西洋棋'],
+  'saddles': ['the seats you put on horses', '馬鞍（複數）'],
+  'funeral': ['the ceremony for someone who died', '喪禮'],
+  'debts': ['money that must be paid back', '債務（複數）'],
+  'interest': ['extra money owed on a debt over time (not \u201chobby\u201d here)', '利息（非「興趣」）'],
+  'coffins': ['boxes for the dead', '棺材（複數）'],
+  'popcorn': ['the snack you eat while watching a show', '爆米花'],
+  'queued': ['lined up and ready', '排好待命的'],
+  'lecture': ['a long talk that teaches (or scolds)', '說教；講課'],
+  'protocol': ['the official step-by-step way to do something', '規程；標準程序'],
+  'stumbles': ['trips over words or steps', '（說話）結巴；絆到'],
+  'masks': ['face coverings; here, false faces', '面具（複數）'],
+  'uninvited': ['coming without being asked', '不請自來的'],
+  'surfaces': ['rises up into view (a verb here, not \u201ctop side\u201d)', '浮現（動詞，非「表面」）'],
+  'steer': ['to guide something in a direction', '引導；使轉向'],
+  'gripped': ['held very tightly', '緊握著的'],
+  'relay': ['to pass a message along (not a running race here)', '轉達（非「接力賽」）'],
+  'unusual activity': ['strange movements in a bank account', '（帳戶）異常活動'],
+  'filter': ['a screen that lets some things through and stops others', '過濾器；濾網'],
+  'voicemail': ['the recorded message a missed call can leave', '語音信箱'],
+  'scent': ['a smell, especially a faint one', '氣味'],
+  'closes accounts': ['settles things completely, like final bills', '結清帳目；了結'],
+  'dueled': ['fought a formal one-on-one fight', '決鬥過'],
+  'odds': ['the chance of winning (not \u201cstrange\u201d here)', '勝算；賠率（非「奇怪」）'],
+  'refunds': ['money given back', '退款（複數）'],
+  'small talk': ['light, polite conversation about nothing', '閒聊；寒暄'],
+  'superpower': ['an ability far beyond normal people', '超能力'],
+  'temple': ['a building where gods are worshipped', '廟；寺廟'],
+  'censer': ['the great pot where incense sticks burn', '香爐'],
+  'worshippers': ['people praying at a temple', '信眾；參拜者'],
+  'deity': ['a god', '神明'],
+  'altar': ['the holy table before a god', '神桌；祭壇'],
+  'donation box': ['the box for money gifts at a temple', '香油錢箱；功德箱'],
+  'sandalwood': ['a sweet-smelling wood burned as incense', '檀香'],
+  'waterfall': ['water falling from a height', '瀑布'],
+  'courtyard': ['the open space inside a building\u2019s walls', '中庭；廟埕'],
+  'carved': ['cut into shapes with a blade', '雕刻的'],
+  'dragons': ['the great magic serpents of the east', '龍（複數）'],
+  'generals': ['high army leaders; here, guardian god-figures', '將軍；神將（複數）'],
+  'plagues': ['terrible diseases that spread fast', '瘟疫（複數）'],
+  'judges': ['decides who is right and wrong', '審判'],
+  'night patrols': ['rounds walked at night to keep watch', '夜巡（暗訪）'],
+  'matchmaker': ['one who brings couples together', '月下老人；媒人'],
+  'queue': ['a line of waiting people (not \u201ccue\u201d)', '排隊的隊伍'],
+  'reviews': ['what people write online about a place', '（網路）評價'],
+  'air quality': ['how clean the air is', '空氣品質'],
+  'smokeless': ['without smoke', '無煙的'],
+  'notice': ['a posted sign that tells people something', '公告'],
+  'professional courtesy': ['the kindness workers in the same trade show each other', '同業禮遇'],
+  'colleague': ['a person in the same work as you', '同事；同行'],
+  'drifts': ['floats slowly on the air', '飄散'],
+  'drift': ['the slow floating share that reaches you', '飄散（的份額）'],
+  'receive': ['to accept what is given', '領受；接受'],
+  'reserves': ['the supply you keep stored', '儲備'],
+  'iron': ['a gray metal; here, its cold taste', '鐵（味）'],
+  'debt': ['money or favor that must be paid back', '債'],
+  'on offer': ['put out for people to take', '供應中；擺出來給的'],
+  'house rules': ['the rules of this particular place', '這家的規矩'],
+  'layer': ['one map of pins laid over another (a phone-map word)', '（地圖）圖層'],
+  'weather alert': ['an official warning about weather', '氣象警報'],
+  'temple keeper': ['the person who cares for a temple', '廟公'],
+  'statistically': ['according to the numbers', '就數據而言'],
+  'early warning': ['a signal that danger is coming', '預警'],
+  'medicinal': ['smelling or working like medicine', '藥的；藥味的'],
+  'coals': ['burning pieces of wood or charcoal', '炭火'],
+  'fasting': ['going without food on purpose', '齋戒中；禁食'],
+  'museum': ['a building that keeps old treasures for viewing', '博物館'],
+  'tour groups': ['travelers visiting together with a guide', '旅行團（複數）'],
+  'success stories': ['real examples of things going well', '成功案例'],
+  'mature': ['fully grown; older (here, an age joke)', '成熟的（年齡玩笑）'],
+  'quartermaster': ['the officer in charge of supplies', '軍需官'],
+  'famine': ['a time with far too little food', '饑荒'],
+  'creditor': ['the one who is owed money', '債主'],
+  'jurisdiction': ['the area a law-keeper has power over', '管轄範圍'],
+  'crescent': ['curved like a new moon', '新月形的'],
+  'arrests': ['catches and holds by legal power', '逮捕'],
+  'coastal': ['by the sea', '沿海的'],
+  'county': ['a district of a country', '縣'],
+  'magistrate': ['an official who judges local cases', '縣官；地方法官'],
+  'pardoned': ['officially forgiven', '赦免了的'],
+  'confiscated': ['taken away by someone in power', '沒收了'],
+  'granary': ['a building for storing grain', '穀倉'],
+  'portion': ['the share given to one person', '份額'],
+  'brimming': ['full to the very top', '滿到邊緣的'],
 };
 
 /* ============ state ============ */
@@ -441,11 +763,11 @@ var sections = {
       '<div class="spiral-stage"><svg id="spiralSvg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"></svg><svg id="fxLayer" class="fx-layer" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg></div>' +
       '<div class="level-badge">ENGLISH \u00b7 A2\u2013B1</div>' +
       '<div class="wardline"></div>' +
-      '<p class="quiet" style="margin-bottom:34px;">A cultivation master. A rooftop room in Taipei.<br>And the first war of his new life.</p>' +
+      '<p class="quiet" style="margin-bottom:34px;">A cultivation master. A rooftop room in Taipei.<br>And the first war of a new life.</p>' +
       '</div>';
     var choices = [{ t: 'Begin', to: 'e1s1', fx: function () { state = defaultState(); } }];
     if (hasSave) choices.push({ t: 'Continue', to: '__continue__' });
-    return { label: '', time: '', html: html, choices: choices };
+    return { time: '', html: html, choices: choices };
   },
 
   e1s1: function () {
@@ -460,12 +782,18 @@ var sections = {
       '<p>\u201cWait. Converting? At what rate? Who set the\u2014\u201d</p>' +
       '<p>The voice is gone. The sky opens. Light takes you.</p>' +
       '<p class="beat">Somewhere between worlds, you do the math. Five million to fifty thousand. One hundred to one. You have been robbed, and the shop has already closed.</p>';
-    return { label: 'Section 1 \u00b7 The Last Bolt', time: 'THE OLD WORLD \u2014 THE LAST DAY', html: html,
-      choices: [{ t: 'Open your eyes.', to: 'e1s2' }] };
+    return { time: 'THE OLD WORLD \u2014 THE LAST DAY', html: html,
+      choices: [
+        { t: 'Open your eyes.', to: 'e1s2' },
+        { t: 'First, curse the exchange rate into the void.', to: 'e1s2', fx: function () { state.flags.cursed = true; } }
+      ] };
   },
 
   e1s2: function () {
-    var html =
+    var pre = state.flags.cursed
+      ? '<p>You curse the exchange rate into the void between worlds. The void does not answer. Customer service never does.</p>'
+      : '';
+    var html = pre +
       '<p>Heat hits you like an open oven.</p>' +
       '<p>You stand in a narrow lane between tall buildings. The air is wet and heavy. Below the noise of a thousand metal beasts, you hear water dripping from white boxes on every wall. Towers of glass climb into the sky. Far above them, a metal bird crosses the clouds without moving its wings.</p>' +
       '<p>\u201cSo this is the immortal realm,\u201d you say to no one.</p>' +
@@ -474,19 +802,25 @@ var sections = {
       '<p class="beat">ROOM FOR RENT \u00b7 ROOFTOP \u00b7 CHEAP</p>' +
       '<p>You can read it. Ascension opens all tongues to the ascended \u2014 every child in your old sect knew that. What it does not give you is a place to sleep.</p>' +
       '<p>You have 50,000 immortal coins and a whole new world. You climb the stairs.</p>';
-    return { label: 'Section 2 \u00b7 The Hot Realm', time: 'DAY 1 \u00b7 14:07 \u00b7 TAIPEI', html: html,
-      choices: [{ t: 'Knock on the rooftop door.', to: 'e1s3' }] };
+    return { time: 'DAY 1 \u00b7 14:07 \u00b7 TAIPEI', html: html,
+      choices: [
+        { t: 'Knock on the rooftop door.', to: 'e1s3' },
+        { t: 'Read the sign one more time. \u201cCheap\u201d can mean many things.', to: 'e1s3', fx: function () { state.flags.wary = true; } }
+      ] };
   },
 
   e1s3: function () {
-    var html =
+    var pre = state.flags.wary
+      ? '<p>You read the sign twice more. In three hundred years, \u201ccheap\u201d has meant cursed, haunted, or on fire. You climb anyway. You have 50,000 coins and no better offers.</p>'
+      : '';
+    var html = pre +
       '<p>The landlord is a small woman with fast eyes and a ring of keys. \u201cMrs. Lin,\u201d she says, and that is the whole introduction.</p>' +
       '<p>The room sits on the roof like a metal box that someone forgot. One room. A tin roof. One window with a window screen. A toilet behind a plastic door. An old air conditioner hangs on the wall like a tired animal.</p>' +
       '<p>\u201cIt works when it wants to,\u201d Mrs. Lin says, following your eyes.</p>' +
       '<p>Inside, the heat could roast tea leaves. You once meditated inside a volcano for forty-nine days, so you nod politely.</p>' +
       '<p>\u201cRent is 8,500 a month,\u201d she says. \u201cDeposit is two months. First month up front. You pay today, you sleep here today.\u201d</p>' +
       '<p>You count in your head. 25,500 coins. Half your fortune, gone in one breath.</p>';
-    return { label: 'Section 3 \u00b7 The Room on the Roof', time: 'DAY 1 \u00b7 16:40', html: html,
+    return { time: 'DAY 1 \u00b7 16:40', html: html,
       choices: [
         { t: '\u201cToo expensive. The roof is rust and the screen has a hole.\u201d \u2014 Haggle like a market grandmaster.', to: 'e1s3a',
           fx: function () { state.flags.haggled = true; state.flags.hasFan = true; } },
@@ -502,21 +836,29 @@ var sections = {
       '<p>Mrs. Lin fights well. She praises the view. She praises the \u201cnatural air flow,\u201d which is a hole. For six minutes the lane below hears two masters at work.</p>' +
       '<p>\u201cEight thousand,\u201d she says at last. \u201cFinal. And take the fan in the corner. The last tenant left it.\u201d</p>' +
       '<p>An old electric fan stands by the wall, dusty but whole. You bow, very slightly. She nods, very slightly. Respect.</p>';
-    return { label: 'Section 3 \u00b7 continued', time: '', html: html,
-      choices: [{ t: 'Sign and pay. (Rent 8,000 + deposit 16,000)', to: 'e1s4',
-        fx: function () { state.money -= 24000; state.rent = 8000; } }] };
+    return { time: '', html: html,
+      choices: [
+        { t: 'Sign and pay. (Rent 8,000 + deposit 16,000)', to: 'e1s4',
+          fx: function () { state.money -= 24000; state.rent = 8000; } },
+        { t: 'Count your coins twice first. Then sign and pay.', to: 'e1s4',
+          fx: function () { state.money -= 24000; state.rent = 8000; state.flags.counted = true; } }
+      ] };
   },
 
   e1s3b: function () {
     var html =
       '<p>\u201cI will take it,\u201d you say.</p>' +
       '<p>Mrs. Lin blinks. Nobody says yes that fast. Not to this room. Not in this heat.</p>' +
-      '<p>She looks at you again, head to toe \u2014 the strange old clothes, the calm face, the posture of a man who has stood guard for a century. Rich, she decides. Or strange. Or both. Both make fine tenants.</p>' +
+      '<p>She looks at you again, head to toe \u2014 the strange old clothes, the calm face, the posture of someone who has stood guard for a century. Rich, she decides. Or strange. Or both. Both make fine tenants.</p>' +
       '<p>\u201cGood,\u201d she says, already pulling papers from her bag. \u201cI like a fast decision. Slow people\u2026\u201d</p>' +
       '<p>She does not finish the sentence. You will learn that she rarely does.</p>';
-    return { label: 'Section 3 \u00b7 continued', time: '', html: html,
-      choices: [{ t: 'Sign and pay. (Rent 8,500 + deposit 17,000)', to: 'e1s4',
-        fx: function () { state.money -= 25500; state.rent = 8500; } }] };
+    return { time: '', html: html,
+      choices: [
+        { t: 'Sign and pay. (Rent 8,500 + deposit 17,000)', to: 'e1s4',
+          fx: function () { state.money -= 25500; state.rent = 8500; } },
+        { t: 'Count your coins twice first. Then sign and pay.', to: 'e1s4',
+          fx: function () { state.money -= 25500; state.rent = 8500; state.flags.counted = true; } }
+      ] };
   },
 
   e1s3c: function () {
@@ -527,31 +869,45 @@ var sections = {
       '<p>She does not finish the sentence. She watches you instead, the way a chess player watches the board after a quiet move.</p>' +
       '<p>On the window, you notice it now: the screen has a small hole, patched with clear tape. The tape hangs open, peeled back, like a small door someone forced.</p>' +
       '<p>\u201cSo,\u201d Mrs. Lin says. \u201cYou want it or not?\u201d</p>';
-    return { label: 'Section 3 \u00b7 continued', time: '', html: html,
-      choices: [{ t: 'Sign and pay. (Rent 8,500 + deposit 17,000)', to: 'e1s4',
-        fx: function () { state.money -= 25500; state.rent = 8500; } }] };
+    return { time: '', html: html,
+      choices: [
+        { t: 'Sign and pay. (Rent 8,500 + deposit 17,000)', to: 'e1s4',
+          fx: function () { state.money -= 25500; state.rent = 8500; } },
+        { t: 'Count your coins twice first. Then sign and pay.', to: 'e1s4',
+          fx: function () { state.money -= 25500; state.rent = 8500; state.flags.counted = true; } }
+      ] };
   },
 
   e1s4: function () {
     var paid = state.flags.haggled ? '24,000' : '25,500';
-    var html =
-      '<p>The contract is two pages. You read every word, because a man who signs without reading deserves what he gets \u2014 your first master taught you that, one hour before he sold you to the sect.</p>' +
+    var pre = state.flags.counted
+      ? '<p>You counted the money twice on the stairs. It did not improve. Numbers rarely do.</p>'
+      : '';
+    var html = pre +
+      '<p>The contract is two pages. You read every word, because anyone who signs without reading deserves what they get \u2014 your first master taught you that, one hour before he sold you to the sect.</p>' +
       '<p>You sign your name. The pen is light as a feather and the strokes come out like a sword form. Mrs. Lin turns the paper sideways. \u201c\u2026Is that a name?\u201d</p>' +
       '<p>Then you count out ' + paid + ' coins into her hand. The money leaves your fingers one paper at a time. Once, you handed a thousand-year ginseng to your master with less pain than this.</p>' +
       '<p>Mrs. Lin writes you a receipt, folds it twice, and gives the rules: no fire on the roof, no noise after midnight, garbage goes down at seven.</p>' +
       '<p>Then she points at you with the folded receipt. \u201cYou need a phone. If the roof leaks, how do I call you? Buy a phone. Today.\u201d</p>' +
       '<p>\u201cThe roof leaks?\u201d you ask.</p>' +
       '<p>\u201cBuy a phone,\u201d she repeats, and is already halfway down the stairs.</p>';
-    return { label: 'Section 4 \u00b7 Ink and Money', time: 'DAY 1 \u00b7 17:15', html: html,
-      choices: [{ t: 'Go find this \u201cphone.\u201d (Phone 11,900 + prepaid card 488)', to: 'e1s5',
-        fx: function () { state.money -= 12388; } }] };
+    return { time: 'DAY 1 \u00b7 17:15', html: html,
+      choices: [
+        { t: 'Go find this \u201cphone.\u201d (Phone 11,900 + prepaid card 488)', to: 'e1s5',
+          fx: function () { state.money -= 12388; } },
+        { t: 'Ask the sky, briefly, why a master of wards runs errands. Then go.', to: 'e1s5',
+          fx: function () { state.money -= 12388; state.flags.sky = true; } }
+      ] };
   },
 
   e1s5: function () {
     var fanLine = state.flags.hasFan
       ? '<p>At a bright, cold store the size of a sect hall, you buy what a mortal life needs: a folding mattress, thin summer bedding, slippers, soap, a tower of instant noodles. The fan, at least, is free \u2014 a gift from a war well fought.</p>'
       : '<p>At a bright, cold store the size of a sect hall, you buy what a mortal life needs: a folding mattress, thin summer bedding, slippers, soap, a tower of instant noodles \u2014 and an electric fan, because the room on the roof is an oven with a window.</p>';
-    var html =
+    var pre = state.flags.sky
+      ? '<p>The sky does not answer. The phone shop will have to.</p>'
+      : '';
+    var html = pre +
       '<p>The phone shop glows white like a healer\u2019s hall. A young clerk sells you \u201ca basic one\u201d \u2014 11,900 coins \u2014 and a prepaid card for 488 more.</p>' +
       '<p>You hold the black glass brick in your palm. It is lighter than a low-grade jade slab and ten times the price.</p>' +
       '<p>The screen wakes and asks you to choose an assistant personality. A long list scrolls past. Your finger picks one at random.</p>' +
@@ -561,19 +917,26 @@ var sections = {
       '<p>Your hand closes around it. The clerk takes one step back.</p>' +
       '<p><em>That voice.</em></p>' +
       '<p>\u201cSystem?\u201d you whisper. \u201cYou came back? You owe me an exchange rate, you little\u2014\u201d</p>' +
-      '<div class="ai">Sir, I am an AI assistant. Please stop squeezing me. Your battery is at 100%. Your social skills, somewhat lower.</div>' +
+      '<div class="ai">Boss, I am an AI assistant. Please stop squeezing me. Your battery is at 100%. Your social skills, somewhat lower.</div>' +
       '<p>Same voice. Same sweetness. Same knife under the sugar.</p>' +
       '<p>Systems do not come back. Every cultivator knows this. A system finishes its task and is gone forever, like youth, like your 24,000 coins. And yet\u2014</p>' +
       '<div class="ai">Do you want to finish setup, or keep scaring the staff?</div>' +
       fanLine +
       '<p>The sun goes down behind the towers. You carry your whole new life up six floors.</p>';
-    return { label: 'Section 5 \u00b7 The Talking Brick', time: 'DAY 1 \u00b7 18:50', html: html,
-      choices: [{ t: 'Carry it all home.', to: 'e1s6',
-        fx: function () { state.money -= (state.flags.hasFan ? 6196 : 7486); } }] };
+    return { time: 'DAY 1 \u00b7 18:50', html: html,
+      choices: [
+        { t: 'Carry it all home in one trip. A grandmaster does not make two trips.', to: 'e1s6',
+          fx: function () { state.money -= (state.flags.hasFan ? 6196 : 7486); state.flags.onetrip = true; } },
+        { t: 'Two trips, like a mortal. Even mountains move one stone at a time.', to: 'e1s6',
+          fx: function () { state.money -= (state.flags.hasFan ? 6196 : 7486); } }
+      ] };
   },
 
   e1s6: function () {
-    var html =
+    var pre = state.flags.onetrip
+      ? '<p>You carried it all in one trip, because a grandmaster does not make two. Your arms have filed a formal protest.</p>'
+      : '';
+    var html = pre +
       '<p>Night. The tin roof clicks as it cools, like a slow clock. The heat does not leave; it just sits down and makes itself comfortable.</p>' +
       '<p>You lie on the new mattress and listen to your kingdom. The hum of the city below. Water moving in a pipe inside the wall. Far away, a dog with opinions.</p>' +
       '<p>Then, from the corner: <em>tk\u2026 tk\u2026 tk.</em></p>' +
@@ -590,16 +953,22 @@ var sections = {
       '<p>Jade light blooms from the floor and closes over you like a quiet sea. The cockroach hits the light mid-flight \u2014 <em>tok</em> \u2014 drops, and walks away with what dignity it has left.</p>' +
       '<p>Silence. Victory.</p>' +
       '<p>For three seconds.</p>';
-    return { label: 'Section 6 \u00b7 The First War', time: 'DAY 1 \u00b7 23:58', html: html,
-      choices: [{ t: 'Three seconds later.', to: 'e1s7' }] };
+    return { time: 'DAY 1 \u00b7 23:58', html: html,
+      choices: [
+        { t: 'Savor the victory.', to: 'e1s7', fx: function () { state.flags.after = 'savor'; } },
+        { t: 'Rise and inspect the ward. Perfection deserves inspection.', to: 'e1s7', fx: function () { state.flags.after = 'inspect'; } }
+      ] };
   },
 
   e1s7: function () {
-    var html =
+    var pre = state.flags.after === 'savor'
+      ? '<p>You allow yourself one long, warm breath of triumph.</p>'
+      : '<p>You rise to inspect your masterpiece, as a master should.</p>';
+    var html = pre +
       '<p>The lamp above your bed dies.</p>' +
       '<p>The fan at the foot of the mattress stops mid-turn.</p>' +
       '<p>On the floor, Boba\u2019s voice cuts off in the middle of a word.</p>' +
-      '<div class="ai">Sir, I detec\u2014</div>' +
+      '<div class="ai">Boss, I detec\u2014</div>' +
       '<p>Dark. Quiet. The heat, which never left, smiles and moves closer.</p>' +
       '<p>You check the ward. The ward is perfect. Of course it is perfect. The Grand Dwelling Ward blocks lightning-type energy. It blocks all divine sense from passing in or out. Standard. Textbook. Page one.</p>' +
       '<p>The textbook never met a lamp that drinks lightning from a wire in the wall. It never met whatever invisible thread feeds a talking brick.</p>' +
@@ -610,7 +979,7 @@ var sections = {
       '<p>Then, by your ear: <em>nnnnnnng.</em></p>' +
       '<p>Two thin singers. Two mosquitoes. <em>Inside</em> the ward. You sealed them in \u2014 with the only warm, blood-filled, mortal-smelling dinner on this roof.</p>' +
       '<p>And one more thing, in the weak city light through the window. The screen. The small hole, patched with tape. The tape peeled open like a little door. The hole is old. Someone fought this war before you. Someone patched, and something tore it open again.</p>';
-    return { label: 'Section 7 \u00b7 The Dark', time: 'DAY 2 \u00b7 00:01', html: html,
+    return { time: 'DAY 2 \u00b7 00:01', html: html,
       choices: [
         { t: 'Hold the ward. Hunt them in the dark with your bare hands. You have endured worse. Probably.', to: 'e1s8a',
           fx: function () { state.flags.route = 'a'; } },
@@ -631,15 +1000,18 @@ var sections = {
       '<p>Silence. It is the smallest victory of your three hundred years, and one of the most satisfying.</p>' +
       '<p>The second one drinks from your ankle while you celebrate. By dawn your ankle is itchy and your eyes are sand, and you have learned tonight\u2019s lesson, which is bigger than mosquitoes:</p>' +
       '<p class="beat">A ward that seals the world out seals you in. No light. No wind. No talking brick. No city. In this realm, total isolation is not safety. It is losing slowly, in the heat, with one mosquito.</p>';
-    return { label: 'Section 8 \u00b7 The Hunter in the Dark', time: 'DAY 2 \u00b7 00:14 \u2014 05:50', html: html,
-      choices: [{ t: 'Dawn.', to: 'e1s9' }] };
+    return { time: 'DAY 2 \u00b7 00:14 \u2014 05:50', html: html,
+      choices: [
+        { t: 'Greet the dawn like a survivor.', to: 'e1s9' },
+        { t: 'Scratch the ankle first. Then greet the dawn.', to: 'e1s9' }
+      ] };
   },
 
   e1s8b: function () {
     var html =
       '<p>You release the ward.</p>' +
       '<p>The lamp blinks on. The fan wakes mid-turn, as if nothing happened. On the floor, Boba returns in the middle of the same word.</p>' +
-      '<div class="ai">\u2014ting a signal problem. Sir? Did you put me in a tomb?</div>' +
+      '<div class="ai">\u2014ting a signal problem. Boss? Did you put me in a tomb?</div>' +
       '<p>\u201cLater,\u201d you say, stepping into your slippers. \u201cWhere does this city sell weapons at this hour?\u201d</p>' +
       '<div class="ai">Define \u201cweapons.\u201d Wait. Don\u2019t. There\u2019s a convenience store two minutes away. It\u2019s open. It\u2019s always open.</div>' +
       '<p>The lane at two in the morning is warm and orange under the street lights. At the corner stands a small temple of light \u2014 glass walls, white glow, cold air pouring from the door like a blessing. A bell chimes twice as you enter, announcing you to no one.</p>' +
@@ -648,11 +1020,15 @@ var sections = {
       '<p>Outside, in the lane, you press the button on the handle and touch the wires with the tip of a leaf. Blue light snaps between the wires with a crack you know very, very well.</p>' +
       '<p class="beat">Thunderbolt.</p>' +
       '<p>You stand still in the orange lane, holding the racket with both hands now. The mortals of this realm caught the thunderbolt. They tamed it. They taught it to live in walls and lamps and talking bricks \u2014 and they put it in a toy, and they sell it for 249 coins, next to the chewing gum.</p>' +
-      '<div class="ai">It\u2019s for mosquitoes, sir. Please don\u2019t bow to it.</div>' +
+      '<div class="ai">It\u2019s for mosquitoes, boss. Please don\u2019t bow to it.</div>' +
       '<p>Back on the roof, you light the coil. Thin white smoke draws slow circles in the lamplight. You sleep without the ward, guarded by smoke and tame thunder, the racket resting on your chest like a sword.</p>';
-    return { label: 'Section 8 \u00b7 The Pilgrimage', time: 'DAY 2 \u00b7 02:03', html: html,
-      choices: [{ t: 'Sleep. Dawn comes fast.', to: 'e1s9',
-        fx: function () { state.money -= 337; state.flags.thunder_seed = true; } }] };
+    return { time: 'DAY 2 \u00b7 02:03', html: html,
+      choices: [
+        { t: 'Sleep. Dawn comes fast.', to: 'e1s9',
+          fx: function () { state.money -= 337; state.flags.thunder_seed = true; } },
+        { t: 'Set the racket of tame thunder within reach. Then sleep.', to: 'e1s9',
+          fx: function () { state.money -= 337; state.flags.thunder_seed = true; } }
+      ] };
   },
 
   e1s8c: function () {
@@ -667,12 +1043,16 @@ var sections = {
       '<p>So you stop repairing the great ward. You let it fall \u2014 the lightning-blocks, the divine-sense walls, three hundred years of textbook \u2014 and from the pieces you raise something small, humble, and perfect.</p>' +
       '<p class="beat">One rule. One bed. INSECTS: DENY.</p>' +
       '<p>The lamp blinks on \u2014 the new ward touches no wire. The fan wakes mid-turn. Boba returns in the middle of the same word.</p>' +
-      '<div class="ai">\u2014nal lost. Sir? Did we die?</div>' +
+      '<div class="ai">\u2014nal lost. Boss? Did we die?</div>' +
       '<p>By your ear: <em>nnn\u2014 tink.</em> A tiny singer bounces off jade light. A pause. Then the second, stubborn: <em>tink.</em></p>' +
       '<p>You lie down inside the strongest mosquito net in two worlds, and you sleep like a sect master.</p>';
-    return { label: 'Section 8 \u00b7 The Rewrite', time: 'DAY 2 \u00b7 00:30', html: html,
-      choices: [{ t: 'Sleep. You have earned it twice.', to: 'e1s9',
-        fx: function () { state.flags.dignity = true; } }] };
+    return { time: 'DAY 2 \u00b7 00:30', html: html,
+      choices: [
+        { t: 'Sleep. You have earned it twice.', to: 'e1s9',
+          fx: function () { state.flags.dignity = true; } },
+        { t: 'Watch the small jade light a while longer. Then sleep.', to: 'e1s9',
+          fx: function () { state.flags.dignity = true; } }
+      ] };
   },
 
   e1s9: function () {
@@ -692,8 +1072,11 @@ var sections = {
       '<p>It is a mosquito net.</p>' +
       '<p class="beat">It is the strongest mosquito net in two worlds.</p>' +
       '<p>Three hundred years, nine bolts of heaven, and this is the first thing you have built in the immortal realm. You find, to your own surprise, that you are satisfied. It is small. It is humble. It is <em>good work.</em></p>';
-    return { label: 'Section 9 \u00b7 Dawn', time: 'DAY 2 \u00b7 06:12', html: html,
-      choices: [{ t: 'Morning report.', to: 'e1s10', fx: function () { state.barrier = 'Mosquito Net \u00b7 Lv.1'; } }] };
+    return { time: 'DAY 2 \u00b7 06:12', html: html,
+      choices: [
+        { t: 'Morning report.', to: 'e1s10', fx: function () { state.barrier = 'Mosquito Net \u00b7 Lv.1'; } },
+        { t: 'Stretch first. Three hundred years of habit.', to: 'e1s10', fx: function () { state.barrier = 'Mosquito Net \u00b7 Lv.1'; } }
+      ] };
   },
 
   e1s10: function () {
@@ -713,16 +1096,16 @@ var sections = {
     }
     var html =
       '<p>At 07:30 exactly, the talking brick clears a throat it does not have.</p>' +
-      '<div class="ai">Good morning, sir. Your report.<br><br>' +
+      '<div class="ai">Good morning, boss. Your report.<br><br>' +
       'Funds: NT$' + money + '.<br>' +
       'Rent due in 30 days: NT$' + rent + '.<br><br>' +
       'I did the math twice. It did not improve.</div>' +
       '<p>You look at the numbers. The numbers look back, unafraid.</p>' +
       '<div class="ai">Conclusion: you need a job. Here \u2014 \u201cBuilding security guard. Night shift. NT$32,000 a month. No experience needed.\u201d<br><br>' +
-      'You stand very still for long periods and glare at things. Sir, you are overqualified.</div>' +
+      'You stand very still for long periods and glare at things. Boss, you are overqualified.</div>' +
       '<p>You read the words again. <em>Security guard.</em> A person this realm pays \u2014 every month, in coins \u2014 to keep things out.</p>' +
       '<p>\u201cThis realm posts guarding missions,\u201d you say slowly.</p>' +
-      '<div class="ai">It\u2019s a job, sir.</div>' +
+      '<div class="ai">It\u2019s a job, boss.</div>' +
       '<p>\u201cThree hundred years,\u201d you tell the ceiling, \u201cand the immortal realm wants me to guard a door.\u201d</p>' +
       '<div class="ai">For NT$32,000. Should I send your r\u00e9sum\u00e9? It\u2019s one line long, and I wrote it, so it\u2019s excellent.</div>' +
       '<p>Morning wind moves through the window \u2014 and the tape on the old screen hole lifts and falls, open like a small door. Whatever tore it open is still out there. You will ask Mrs. Lin about the last tenant. Later.</p>' +
@@ -730,12 +1113,1098 @@ var sections = {
       achHtml +
       '<div class="endhead">Definition Library \u00b7 v0.1</div>' +
       '<div class="libcard">RULE 01 \u2014 INSECTS: DENY<br>RANGE \u2014 ONE BED<br><br>UNDEFINED: tame lightning \u00b7 the invisible thread \u00b7 this entire world</div>';
-    return { label: 'Section 10 \u00b7 Morning Report', time: 'DAY 2 \u00b7 07:30', html: html,
+    return { time: 'DAY 2 \u00b7 07:30', html: html,
       choices: [
-        { t: 'EPISODE 2 \u2014 THE NIGHT SHIFT \u00b7 Coming soon', to: '__locked__' },
+        { t: 'EPISODE 2 \u2014 THE NIGHT SHIFT', to: 'e2s1', fx: function () { state.seen = {}; } },
         { t: 'Play Episode 1 again', to: '__restart__' }
       ] };
-  }
+  },
+
+  /* ---------- 1 · the one-line résumé ---------- */
+  e2s1: function () {
+    var html =
+      '<p>The phone has decided you need a job, and the phone will not let it go.</p>' +
+      '<div class="ai">I sent your r\u00e9sum\u00e9. They want to see you at four. Try to look less like you fought a war last night.</div>' +
+      '<p>\u201cI did fight a war last night.\u201d</p>' +
+      '<div class="ai">Two mosquitoes, boss. Try to look less like that.</div>' +
+      '<p>The r\u00e9sum\u00e9 Boba wrote is one line long. Under <em>experience</em> it says: <em>\u201cThree hundred years, security and access control.\u201d</em> You think this is an honest summary. The hiring office will think it is a joke, or a typo, or both.</p>' +
+      '<p>The office sits behind a noodle shop. A tired man in a gray uniform slides a form across the desk. Name. You copy it, stroke by stroke, from the identity card the system left in your pocket on the day it left you \u2014 a stranger\u2019s name, common as rice. You have never once said it out loud. You do not plan to start.</p>' +
+      '<p>Then the man asks the questions men like him have asked ten thousand times: any experience, and can you do nights.</p>' +
+      '<p>You can do nights. You have done three hundred years of them \u2014 and the nights spent watching a sect gate for demons that never came counted double. But the man wants something simpler than the truth.</p>';
+    return { time: 'DAY 4 \u00b7 16:00', html: html,
+      choices: [
+        { t: '\u201cI am very good at keeping things out.\u201d \u2014 The truth, plainly.', to: 'e2s1a', fx: function () { state.flags.honest_streak = true; } },
+        { t: 'Say the polite words Boba feeds into your ear.', to: 'e2s1b' },
+        { t: 'Say nothing. Let three hundred years stand in the silence.', to: 'e2s1c' }
+      ] };
+  },
+
+  e2s1a: function () {
+    var html =
+      '<p>\u201cI am very good,\u201d you say, \u201cat keeping things out.\u201d</p>' +
+      '<p>The man looks up. For a moment something in your voice makes the small office feel colder, older, like a hall where serious things were once decided.</p>' +
+      '<p>\u201c\u2026Right,\u201d he says. He writes one word on the form. You cannot read it upside down, but it might be <em>weird</em>. It might be <em>hired</em>. With men this tired, the two are often the same.</p>' +
+      '<div class="ai">You said that like you were threatening the building. It worked anyway. Night shift. You start tonight.</div>';
+    return { time: '', html: html,
+      choices: [
+        { t: 'Start tonight.', to: 'e2s2' },
+        { t: 'Nod once, the way agreements were sealed on your mountain.', to: 'e2s2' }
+      ] };
+  },
+
+  e2s1b: function () {
+    var html =
+      '<p>You repeat what Boba feeds you, word by word, half a beat behind, like a student reading a sutra he does not yet believe.</p>' +
+      '<p>\u201cI am hard-working. I am responsible. I can do the night shift. I learn fast.\u201d</p>' +
+      '<p>You learn fast. That part, at least, is true. The man nods at each phrase \u2014 these are the right sounds, the sounds that mean <em>this one knows how the world works.</em> You are beginning to learn its small spells: the words you say not because they are true, but because they open doors.</p>' +
+      '<div class="ai">Flawless. You sounded almost normal. Night shift, starts tonight. I\u2019m very proud, in a customer-service way.</div>';
+    return { time: '', html: html,
+      choices: [
+        { t: 'Start tonight.', to: 'e2s2' },
+        { t: 'Nod once, the way agreements were sealed on your mountain.', to: 'e2s2' }
+      ] };
+  },
+
+  e2s1c: function () {
+    var html =
+      '<p>You say nothing. You let the silence sit, the way you once let it sit before a closed-door disciple who had asked a foolish question.</p>' +
+      '<p>The man waits. Then he stops waiting, and fills the silence himself, the way nervous people do. \u201cYou\u2019ve done this before. I can tell. Military? Doesn\u2019t matter. We need someone who won\u2019t fall asleep and won\u2019t make trouble.\u201d</p>' +
+      '<p>He stamps the form. The silence hired you. It is, you reflect, the easiest interview you have had in three centuries. The last one involved a mountain and a sword.</p>' +
+      '<div class="ai">You got the job by saying nothing. I wrote a whole r\u00e9sum\u00e9 for that. Unbelievable.</div>';
+    return { time: '', html: html,
+      choices: [
+        { t: 'Start tonight.', to: 'e2s2' },
+        { t: 'Nod once, the way agreements were sealed on your mountain.', to: 'e2s2' }
+      ] };
+  },
+
+  /* ---------- 2 · the handover ---------- */
+  e2s2: function () {
+    var html =
+      '<p>The building is twelve floors of pale tile on a Wanhua side street. Two glass doors at the front, both standing wide open to the evening, wedged back the way doors are all over this city while the day is warm and honest. A bright lobby. A front desk with a wall of small screens behind it, each showing a gray corner of the building.</p>' +
+      '<p>The day guard is a broad, calm man past sixty who introduces himself as Mr. Zhang and shakes your hand once, firmly, the way men seal an agreement. He is twenty minutes early for the handover, because the good ones always are. He looks at the schedule, then at you, and settles on \u201cNight Shift,\u201d which is not a name, but is at least accurate. You let it stand.</p>' +
+      '<p>He walks you through the post the way a retiring officer walks the walls with the one who will hold them next.</p>' +
+      '<div class="ai">Pay attention. This is the part where the building tells you its rules.</div>' +
+      '<p>\u201cVisitors,\u201d Mr. Zhang says, tapping the log on the desk. \u201cYou don\u2019t just let people in. You ask who they\u2019re visiting. You write it here. You call the resident \u2014 they can also ring up from the intercom by the door. If the resident says yes, the visitor signs, you let them through. No call, no entry. Simple.\u201d</p>' +
+      '<p class="beat">Announce. Write it down. Confirm. Then \u2014 and only then \u2014 let them pass.</p>' +
+      '<p>You go very still. This is a ward. A ward made of paper and phone calls and a tired man\u2019s rules, but a ward all the same: a list of what may pass and what may not, and a keeper who writes the list. The mortals of this realm built one without a drop of qi, and it works.</p>' +
+      '<p>\u201cAt eleven,\u201d Mr. Zhang goes on, \u201cwe close the doors and the magnetic lock comes on.\u201d He raps a knuckle on the fat metal plate at the top of the door frame. \u201cResidents carry one of these.\u201d He holds up a little black fob on his key ring, touches it to the reader by the door. The reader beeps; something inside the frame lets go with a heavy click. \u201cBeep, click, push. The door closer swings it shut behind you, and the lock grabs it again. If someone\u2019s hands are full, or they lost their fob \u2014\u201d he reaches under the desk and shows you a worn button \u2014 \u201cyou can open it from here. But you check first. Always check first.\u201d</p>' +
+      '<p>A low-grade identity array, you think. Each soul carries a token; the array reads the token and judges who belongs. Crude \u2014 it cannot tell a stolen token from a true one \u2014 but the idea is sound. The idea is, in fact, exactly your trade.</p>';
+    return { time: 'DAY 4 \u00b7 18:40', html: html,
+      choices: [
+        { t: '\u201cAnd at night?\u201d', to: 'e2s3' },
+        { t: '\u201cAnd if someone will not follow the rules?\u201d', to: 'e2s3', fx: function () { state.flags.asked_refuse = true; } }
+      ] };
+  },
+
+  /* ---------- 3 · the first watch ---------- */
+  e2s3: function () {
+    var pre = state.flags.asked_refuse
+      ? '<p>\u201cThen they don\u2019t come in,\u201d Mr. Zhang says, as if you had asked whether water is wet. \u201cThat\u2019s the whole job.\u201d</p>'
+      : '';
+    var html = pre +
+      '<p>\u201cAt night it\u2019s quiet,\u201d Mr. Zhang says, pulling on his jacket. \u201cYou sit, you watch the screens, you walk one patrol, you write the log. If something happens \u2014 it won\u2019t \u2014 you call me, then you call the police. In that order, if you\u2019re smart.\u201d He almost smiles. \u201cNothing happens here. That\u2019s why it\u2019s a good post.\u201d</p>' +
+      '<p>Then he is gone, and the lobby is yours.</p>' +
+      '<p>You sit at the desk. The screens hum. The clock above the door eats the minutes slowly. At eleven you swing the two glass doors shut, and the magnetic lock takes them with a sound like a jaw closing. The building draws its breath in for the night.</p>' +
+      '<p>You walk your one patrol \u2014 stairwell, mailboxes, the back door, the dim car ramp \u2014 and find nothing, which is the correct thing to find. You write it in the log in careful, sword-stroke characters: <em>All quiet.</em></p>' +
+      '<p>Back at the desk, the glass doors stand between the bright lobby and the dark street, and you feel the old itch. Three hundred years of standing at a gate does not leave a man just because the gate is made of glass.</p>' +
+      '<p>So you do the natural thing. The only thing. You set a ward at the door.</p>';
+    return { time: 'DAY 4 \u00b7 23:30', html: html,
+      choices: [
+        { t: 'Set the ward.', to: 'e2s3b' },
+        { t: 'Walk the threshold first, heel to toe, the old way.', to: 'e2s3b', fx: function () { state.flags.walked = true; } }
+      ] };
+  },
+
+  e2s3b: function () {
+    var pre = state.flags.walked
+      ? '<p>Twelve steps, frame to frame, heel to toe. Wide, for a gate. You have warded wider, but never thinner.</p>'
+      : '';
+    var html = pre +
+      '<p>Not the great dwelling ward \u2014 you learned that lesson in the dark of your own room, with the lamp dead and Boba choking on its own sentence. That hungry old ward swallowed everything: light, the river of sparks in the walls, the invisible thread that feeds the talking brick. Here, that would be a disaster with twelve floors of witnesses.</p>' +
+      '<p>You still do not understand the sparks or the thread. You still cannot name them. But you do not reach for them tonight, because tonight your mind is on one thing only, the thing this whole job is built around:</p>' +
+      '<p class="beat">Keep out the ones who should not come in.</p>' +
+      '<p>So you build a small, narrow ward across the doorway \u2014 a ward that thinks about nothing but people. It is the thinnest qi you have ever spun, because the air of this realm is thin and the doorway is wide. It barely reaches the two door frames. But it holds, and it costs almost nothing, and \u2014 you note with quiet relief \u2014 the lobby lights do not so much as flicker.</p>' +
+      '<div class="ai">Battery still at 88%, in case you were about to murder the building again.</div>' +
+      '<p>\u201cThat was one time.\u201d</p>' +
+      '<p>The ward sits on the threshold like held breath. Now it only needs a rule. And a rule needs a definition \u2014 and you, three hundred years a master, write the obvious one, the one any gate guard would write.</p>' +
+      '<p class="beat">RULE: outsiders \u2014 deny.</p>' +
+      '<p>Outsiders. Strangers. The loud ones, the wrong ones, the ones who come out of the dark and do not fit. The ward takes the rule the way ink takes paper, and you settle back into the chair, satisfied.</p>' +
+      '<p>You should not be.</p>';
+    return { time: '', html: html,
+      choices: [
+        { t: 'It is a quiet night. Until 02:14.', to: 'e2s4' },
+        { t: 'Lean back. Quiet nights are what a good post is for.', to: 'e2s4' }
+      ] };
+  },
+
+  /* ---------- 4 · encounter one: the drunk ---------- */
+  e2s4: function () {
+    var html =
+      '<p>At 02:14 a shape comes weaving up the street.</p>' +
+      '<p>A man, middle-aged, tie loose, jacket over one shoulder, walking the careful zigzag of someone who is very drunk and very sure he is not. He sways up to the glass doors and pats himself down for a fob that is clearly winning the game of hide-and-seek. Pocket. Other pocket. Jacket. Pocket again, in case the fob has moved back.</p>' +
+      '<p>He gives up. He pushes the locked door, which does what locked doors do. He pushes harder, with the deep personal offense of the drunk. Then he presses his whole face to the glass, finds you in the bright lobby, and starts to bang on the door with the flat of his hand.</p>' +
+      '<p>\u201cOpen! Hey! I live here! Twelve years! Twelve! Lost my \u2014 my beeper thing. Open the door!\u201d</p>' +
+      '<div class="ai">Boss. He says he lives here.</div>' +
+      '<p>You look at him through the glass. Loud, swaying, slurring, banging on the building at two in the morning. Everything about him says <em>trouble.</em> Everything about him is exactly what your ward, four hours old and proud of its one rule, has already judged: an outsider, out of the dark, who does not fit.</p>' +
+      '<p>Your hand finds the worn button under the desk. Mr. Zhang\u2019s voice finds your memory: <em>you can open it from here. But you check first.</em></p>' +
+      '<p>And under both, quieter, a thing you have not fully thought yet: even if the lock lets him in \u2014 will your ward?</p>';
+    return { time: 'DAY 5 \u00b7 02:14', html: html,
+      choices: [
+        { t: 'Check first. The resident list, the floor, the name \u2014 then the button.', to: 'e2s5', fx: function () { state.flags.drunk = 'verify'; } },
+        { t: 'Press the button now. The poor man lives here; look at him.', to: 'e2s5', fx: function () { state.flags.drunk = 'trust'; } },
+        { t: 'Wait. The lock is not the problem. Your rule is. Fix the rule first.', to: 'e2s5', fx: function () { state.flags.drunk = 'rewrite'; } }
+      ] };
+  },
+
+  /* ---------- 5 · encounter one resolution ---------- */
+  e2s5: function () {
+    var d = state.flags.drunk;
+    var body;
+    if (d === 'verify') {
+      body =
+        '<p>\u201cWhich floor?\u201d you call through the glass.</p>' +
+        '<p>He tells you, more or less, in two tries and a burp. You run your finger down the resident list Mr. Zhang left taped under the desk glass. Ninth floor: <em>Li.</em> You ask his name. He gives it, offended that you asked, proud that he remembered. It matches.</p>' +
+        '<p>And in the moment it matches, you feel your own rule shift under your hand. <em>Outsider,</em> the ward had judged, watching a loud stranger bang on the glass. But he is not an outsider. He is on the list. He has a floor and a name and twelve years behind this door. You press the truth of it into the ward the way you press a seal into wax \u2014 <em>this one belongs</em> \u2014 and only then press the button.</p>' +
+        '<p>The lock lets go with its heavy click. Mr. Li shoves the door, falls through your ward like a man falling through a doorway \u2014 which is all it is, now, to him \u2014 catches himself on the desk, and beams at you with enormous drunken warmth.</p>' +
+        '<p>\u201cYou\u2019re good people,\u201d he says. \u201cNew? Good people. You <em>checked.</em> The last guard never checked anything. Could\u2019ve been a robber. Could\u2019ve been\u2014\u201d He loses the thread and weaves toward the elevator, humming.</p>' +
+        '<p>Announce. Confirm. Then pass. You did it the mortal way, by the book \u2014 and the ward learned the shape of the lesson with you.</p>';
+    } else if (d === 'trust') {
+      body =
+        '<p>You press the button. The lock lets go with its heavy click.</p>' +
+        '<p>Mr. Li \u2014 for that is who he will turn out to be \u2014 shoves the door open in triumph, takes one victorious step across the threshold\u2014</p>' +
+        '<p class="beat">\u2014 and bounces. Straight back. Nose first, off nothing at all, like a man walking into clean glass.</p>' +
+        '<p>He sits down hard on the doormat. He blinks up at the doorway, which is open. He gets up and pushes at the open air with both hands, and the open air pushes back the way a wall does. The lock said yes; your ward, four hours old and very sure of its one rule, is still saying <em>outsider \u2014 deny.</em> The building approved him, and your own masterpiece is bouncing him off an open door.</p>' +
+        '<div class="ai">Boss. SIR. The door is open and he keeps bouncing off it. Do something before he starts a religion.</div>' +
+        '<p>You do the only thing you can do fast enough: you drop the ward entirely. It goes out like a blown candle, and Mr. Li \u2014 mid-push \u2014 stumbles through into the lobby, catches the desk, and beams at you, deciding, as drunks mercifully do, that the world simply works this way after midnight.</p>' +
+        '<p>\u201cYou\u2019re good people,\u201d he says, and weaves toward the elevator, humming.</p>' +
+        '<div class="ai">You buzzed in a man you never checked, and then your own ward bounced him off an open door. That was the least professional rescue I have ever seen, and I have a personality pack.</div>' +
+        '<p>Boba is right twice over, and you know it. You trusted a face you had never confirmed \u2014 and your rule was so crude it could not tell a resident from a robber. Tonight both mistakes canceled out. Tonight you were lucky. A gatekeeper who counts on luck is a gatekeeper twice over: once at the gate, once in the coffin.</p>';
+    } else {
+      body =
+        '<p>Your hand stops above the button.</p>' +
+        '<p>Because you see it now, whole, the way you sometimes see a flaw in a sword form the instant before the cut goes wrong. The lock is not the problem. The lock has a list, and the list has this man\u2019s floor and name on it. The problem is <em>your</em> rule. <em>Outsiders \u2014 deny.</em> And what did you teach the ward an outsider looks like? Loud. Swaying. Strange. Out of the dark. You taught it to judge by <em>behavior</em> \u2014 and by behavior, this man is trouble.</p>' +
+        '<p>But a gate does not keep out trouble. Your sect gate let in plenty of trouble, so long as the trouble lived there \u2014 you can name three elders without pausing for breath. What a gate keeps out is <em>those who do not belong.</em> And belonging is not how loud you are, or how steady on your feet at two in the morning. Belonging is whether this door is yours.</p>' +
+        '<p>You rewrite the rule where you sit \u2014 not <em>deny the troublesome,</em> but <em>deny those who do not belong</em> \u2014 and feel the ward turn its attention from the man\u2019s swaying to something older and quieter threaded through him: twelve years of coming home to this door. He belongs. The ward stands aside before he ever touches it.</p>' +
+        '<p>Then you check the list anyway, floor and name \u2014 because a rewritten rule deserves a confirmed fact \u2014 and press the button. Click. Mr. Li shoves through, catches the desk, beams.</p>' +
+        '<p>\u201cYou\u2019re good people,\u201d he says, and weaves toward the elevator, humming, never knowing that for one long moment he was a question a three-hundred-year-old master could not answer.</p>';
+    }
+    var html = body +
+      '<p>The elevator doors close on Mr. Li\u2019s humming. The lobby is quiet again, and you sit with what the night just taught you, turning it over like a stone in the palm:</p>' +
+      '<p class="beat">Not <em>keep everyone out.</em> Keep out the ones who do not belong.</p>';
+    return { time: 'DAY 5 \u00b7 02:20', html: html,
+      choices: [
+        { t: 'Write it in the log: \u201c02:14 \u2014 resident assisted at door.\u201d', to: 'e2s6', fx: function () { state.flags.logged_li = true; } },
+        { t: 'Write nothing. Some lessons are for the guard, not the log.', to: 'e2s6' }
+      ] };
+  },
+
+  /* ---------- 6 · montage, two weeks ---------- */
+  e2s6: function () {
+    var pre = state.flags.logged_li
+      ? '<p>Two mornings later, a note in Mr. Zhang\u2019s square hand, taped to the desk: <em>\u201cGood log. \u2014Z\u201d</em> Two words. You keep the note.</p>'
+      : '';
+    var html = pre +
+      '<p>Two weeks of nights.</p>' +
+      '<p>You learn the building the way you once learned a mountain \u2014 by walking it until your feet know it in the dark. You learn the residents the way you once learned disciples: faces first, names after. Mr. Li from the ninth floor, delightful sober, unbearable drunk, and always, always, a good man in his own telling. Dr. Zhao from the fourth, whose clinic hours bring her home at strange times and who thanks you, every night, with the same small tired nod. Mr. Xu, the committee chairman, who stops by the desk to remind you of rules you already follow, and to ask, with the careful pride of a man who runs things, whether everything is in order.</p>' +
+      '<p>They call you \u201cNight Shift,\u201d after Mr. Zhang starts it, or \u201cthe new guard,\u201d and you answer to both, because neither is a name and that suits you fine.</p>' +
+      '<p>The ward learns them with you. Night by night it stops being a wall and becomes a roll \u2014 a quiet ledger of everyone who belongs to this door. Mr. Li belongs. Dr. Zhao belongs. The boy who brings breakfast at dawn does not belong, exactly, but he is expected, and the ward learns the difference between a stranger and a guest.</p>' +
+      '<p>It costs you almost nothing now. The thin qi of the lobby feeds it the way a slow spring feeds a small pool. You have made something humble and exact, and no one in this building will ever know it is there.</p>' +
+      '<div class="ai">Tomorrow is the 5th. You know what the 5th is?</div>' +
+      '<p>\u201cI do not.\u201d</p>' +
+      '<div class="ai">Payday. Try to act surprised when money appears and the world doesn\u2019t end.</div>';
+    return { time: 'DAY 20 \u00b7 NIGHT', html: html,
+      choices: [
+        { t: 'Continue the watch.', to: 'e2s7' },
+        { t: 'Test the door ward once, gently, the way you would check a blade.', to: 'e2s7' }
+      ] };
+  },
+
+  /* ---------- 7 · encounter two: the thief ---------- */
+  e2s7: function () {
+    var html =
+      '<p>At 01:40, Dr. Zhao comes home.</p>' +
+      '<p>You know her step before you see her \u2014 the tired, even walk of someone who has been on her feet too long. She touches her fob to the reader. Beep. The heavy click. She pushes the door open and steps through with her small nod, already reaching for the elevator button, and behind her the door closer begins its slow, patient swing shut.</p>' +
+      '<p>And out of the dark street, a second figure moves \u2014 fast, smooth, timed. A man, hood up, head down, who has been waiting for exactly this: an open door and a tired back. He crosses the sidewalk in four quick steps, aimed at the narrowing gap.</p>' +
+      '<p>It is the oldest trick at any gate in any world. You have watched it tried for three hundred years. You saw this one coming before he finished his first step.</p>' +
+      '<p>He reaches the gap and steps through\u2014</p>' +
+      '<p class="beat">\u2014 and bounces. Off nothing. Off clean night air, at the line of the threshold, as if the open doorway were a shut door.</p>' +
+      '<p>He staggers half a step, catches his balance, and \u2014 give him this \u2014 tries again at once, shoulder first, the way you break through a door that sticks. The threshold throws him back a second time. And the glass door, which no hand is holding and no ward is stopping, finishes its slow, patient arc past his face. The magnetic lock takes it with a click that sounds, in the quiet, like a verdict.</p>' +
+      '<p>Dr. Zhao, unknowing, steps into the elevator. The hooded man stands in the street, staring at a door that closed exactly on schedule, and at the open air in front of it that hit him back twice. His eyes said the way was clear. Your ward said he does not belong \u2014 and the rule is clean and sharp now, in a way it was not on the first night.</p>' +
+      '<p>He feels it then \u2014 not the ward, he cannot feel that, but <em>you.</em> He looks up through the glass and finds you already looking at him, calm, unsurprised, the way you once looked at things that tried the sect gate after dark.</p>';
+    return { time: 'DAY 21 \u00b7 01:40', html: html,
+      choices: [
+        { t: 'Do not move. Hold his eyes. Let him understand he is not getting in.', to: 'e2s8', fx: function () { state.flags.thief = 'cold'; } },
+        { t: 'Stand, and walk toward the door. Let your presence move him along.', to: 'e2s8', fx: function () { state.flags.thief = 'press'; } }
+      ] };
+  },
+
+  /* ---------- 8 · encounter two resolution ---------- */
+  e2s8: function () {
+    var t = state.flags.thief;
+    var body;
+    if (t === 'press') {
+      body =
+        '<p>You rise. You do not hurry \u2014 hurry is for those who are not sure they will win. You come around the desk and walk toward the glass, unhurried as a closing season, and the hooded man watches you come the way a small animal watches weather.</p>' +
+        '<p>He backs off the sidewalk without taking his eyes from you, one step, two \u2014 then turns, and is gone into the dark with the quick, clipped walk of a man pretending he was never here.</p>';
+    } else {
+      body =
+        '<p>You do not move. You do not need to. You hold his eyes through the glass and let the silence do what silence does to a guilty man: it grows, and grows, until being seen weighs more than whatever he came for.</p>' +
+        '<p>He breaks first. He always would. One last baffled look at the doorway that hit him back \u2014 and he melts into the dark with the quick, clipped walk of a man pretending he was never here.</p>';
+    }
+    var honest = state.flags.honest_streak
+      ? '<p>For one breath you almost say it aloud to the empty lobby \u2014 <em>my ward stopped him</em> \u2014 the plain truth, the way you answered the hiring man. Then you remember there is no one to say it to who would not think you mad. You close your mouth. Some truths are only for the one who holds the gate.</p>'
+      : '';
+    var html = body + honest +
+      '<p>The street is empty. Dr. Zhao is four floors up by now, home, safe, and will never know how close the dark followed her in.</p>' +
+      '<p>No alarm rang. No one woke. Behind you the little screens recorded all of it \u2014 a hooded man lunging at an open doorway and thrown back by nothing, twice, before the door swings shut on schedule \u2014 and recorded nothing that explains it. Cameras only watch. They keep no one out. That part was you, and only you, and the footage has no word for what you did.</p>' +
+      '<div class="ai">Nobody saw that. Nobody will ever know you just stopped a break-in with your mind. How does that feel, hero?</div>' +
+      '<p>You think about it. Three hundred years you fought where all of heaven could see. Tonight you won, and the prize is that no one will ever know there was a fight.</p>' +
+      '<p>It feels, you decide, exactly right.</p>';
+    return { time: 'DAY 21 \u00b7 01:42', html: html,
+      choices: [
+        { t: 'Dawn. And the handover.', to: 'e2s9' },
+        { t: 'Replay it once, for the sect archives that will never hear it.', to: 'e2s9' }
+      ] };
+  },
+
+  /* ---------- 9 · the handover log + payday ---------- */
+  e2s9: function () {
+    var logChoiceMade = state.flags.logChoice;
+
+    if (!logChoiceMade) {
+      var askHtml =
+        '<p>At 06:40, Mr. Zhang comes up the street, twenty minutes early, two cups of hot soy milk in his hands. He puts one on the desk for you without a word, which is how men like him say good morning.</p>' +
+        '<p>He reads the night log over your shoulder. <em>All quiet.</em> Then he taps the line with one finger. \u201cAnything I should know? Anything on the door?\u201d</p>' +
+        '<p>You think of the hooded man straining against an open doorway.</p>';
+      return { time: 'DAY 21 \u00b7 06:40', html: askHtml,
+        choices: [
+          { t: 'Report it, minus one detail: \u201cA man tried to follow Dr. Zhao in around 01:40. Left when he saw me watching.\u201d', to: 'e2s9', fx: function () { state.flags.logChoice = 'report'; } },
+          { t: '\u201cNothing. All quiet.\u201d', to: 'e2s9', fx: function () { state.flags.logChoice = 'quiet'; } }
+        ] };
+    }
+
+    /* pay once, guarded against re-entry */
+    var pay = 13867;
+    if (!state.flags.paid) { state.money += pay; state.flags.paid = true; state.barrier = 'Ward \u00b7 Lv.2'; }
+    var money = state.money.toLocaleString('en-US');
+    var rent = state.rent.toLocaleString('en-US');
+
+    var ach = [];
+    ach.push(['\ud83d\udeaa', 'The Paper Ward', 'See a ward where there is no qi at all \u2014 only rules.']);
+    ach.push(['\ud83d\udcb0', 'Payday', 'Watch a number move in your favor for the first time in this realm.']);
+    if (state.flags.drunk === 'rewrite') ach.push(['\ud83e\udde0', 'Belonging Is Not a Behavior', 'Find the flaw in your own rule before the night did.']);
+    else if (state.flags.drunk === 'verify') ach.push(['\ud83d\udcd6', 'Check First', 'Announce, confirm, then pass \u2014 the mortal way, done right.']);
+    else if (state.flags.drunk === 'trust') ach.push(['\ud83c\udf40', 'Two Locks, One Door', 'Buzz a man in and bounce him off an open door in the same minute.']);
+    if (state.flags.thief === 'cold') ach.push(['\ud83d\udc41\ufe0f', 'The Weight of Being Seen', 'Win a fight without leaving your chair.']);
+    else ach.push(['\ud83d\udeb6', 'Unhurried', 'Move toward trouble like a closing season.']);
+    if (state.flags.logChoice === 'report') ach.push(['\ud83d\udcdd', 'For the Record', 'Tell the truth. Just not all of it.']);
+
+    var achHtml = '';
+    for (var i = 0; i < ach.length; i++) achHtml += '<div class="ach"><span class="name">' + ach[i][0] + ' ' + ach[i][1] + '</span><br><span class="desc">' + ach[i][2] + '</span></div>';
+
+    var logLine = (state.flags.logChoice === 'report')
+      ? '<p>\u201cA man tried to follow Dr. Zhao in,\u201d you say. \u201cAround one forty. Hood up. He left when he saw me watching.\u201d</p>' +
+        '<p>Mr. Zhang sets his soy milk down and stops being sixty for a moment. \u201cYou got a look at him? Write it up \u2014 time, height, which way he went. I\u2019ll tell Chairman Xu; committee should know. Good eye, Night Shift.\u201d He writes <em>suspicious male, 01:40, left when noticed</em> in the day log, and just like that the night\u2019s strangest truth is folded into the most ordinary sentence in the world. If anyone ever pulls the footage, they will see exactly what the log says: a man who lost his nerve when the guard looked up. People always lose their nerve on camera. Everyone knows that.</p>'
+      : '<p>\u201cNothing,\u201d you say. \u201cAll quiet.\u201d Which is true, in the only way that matters: the night is quiet now, and the reason it stayed quiet will never fit in a logbook. Mr. Zhang nods, unsurprised. He expected nothing. Nothing is what a good post is for.</p>';
+
+    var html =
+      logLine +
+      '<p>He takes the desk, and the day. You step out into a Wanhua morning that smells of frying dough and \u2014 faint, from somewhere down the lane \u2014 something sweeter, something almost familiar, that you cannot yet name.</p>' +
+      '<div class="ai">Check your phone.</div>' +
+      '<p>You check the talking brick. A short message from the bank. A number has moved.</p>' +
+      '<div class="ai">Payday. You started on the 19th, so that\u2019s thirteen days of last month: NT$13,867. I did the math three times because you would not believe the first two. Rent is covered. You may now eat food that isn\u2019t instant noodles. Wild.</div>' +
+      '<p>You stand on the morning street holding a phone with money in it, a job that pays you to do the one thing you are best at, and a ward three streets away that guards a door no one knows is guarded. Three hundred years to get here.</p>' +
+      '<p>It is, against every expectation, a good morning.</p>' +
+      '<div class="endhead">Episode 2 Complete</div>' +
+      '<div class="ai">Report. Funds: NT$' + money + '. Rent due: NT$' + rent + '. Verdict: for the first time since ascension, you are not technically doomed.</div>' +
+      achHtml +
+      '<div class="endhead">Definition Library \u00b7 v0.2</div>' +
+      '<div class="libcard">RULE 01 \u2014 INSECTS: DENY<br>RULE 02 \u2014 THOSE WHO DO NOT BELONG: DENY<br>RANGE \u2014 ONE BED \u00b7 ONE DOORWAY<br><br>UNDEFINED: tame lightning \u00b7 the invisible thread \u00b7 the sweet smoke down the lane</div>' +
+      '<p style="margin-top:22px;">Far away, on a rooftop in the same district, your own door waits. And on the window screen, beside the old patched hole, something has left a fine, pale thread \u2014 and gone in.</p>';
+    return { time: 'DAY 21 \u00b7 06:40', html: html,
+      choices: [
+        { t: 'EPISODE 3 \u2014 THE GUEST', to: 'e3s1', fx: function () { state.seen = {}; } },
+        { t: 'Play again from the beginning', to: '__restart__' }
+      ] };
+  },
+
+  /* ---------- EP3 · 1 · coming home ---------- */
+  e3s1: function () {
+    var html =
+      '<p>Six floors, and every one of them smells of someone else\u2019s breakfast.</p>' +
+      '<p>You climb with the slow, loose step of a guard coming off a good night \u2014 money in the bank, a door held, soy milk warm in your hand. The morning city roars below, awake and pleased with itself.</p>' +
+      '<p>At your own door, you give the window its usual glance. The screen. The old hole, patched with tired tape. And beside the hole, new since yesterday, one pale thread \u2014 fine as a hair, taut as a bowstring \u2014 anchored from the torn edge to the frame.</p>' +
+      '<p>Something used the little door. Something may still be home.</p>' +
+      '<p>You search the room the way you once searched a battlefield: corners, shadows, under the mattress, behind the fan. Nothing. The room holds its breath and offers you nothing at all.</p>' +
+      '<div class="ai">Schedule says tonight is your night off, boss. One job: sleep. Even you can\u2019t fail at sleeping.</div>' +
+      '<p>The city disagrees. A night guard sleeps by day, and the day has opinions: scooters coughing in the lane, a renovation drill two buildings over biting like a demon woodpecker, market voices rising, and the tin roof ticking overhead as the sun heats it \u2014 the same slow clock as your first night, running backward.</p>' +
+      '<p>You lie on the mattress inside your faithful mosquito-net ward, dry-eyed, wide awake, in a metal box that the whole city is playing like a drum.</p>';
+    return { time: 'DAY 21 \u00b7 08:10', html: html,
+      choices: [
+        { t: 'Endure it. You once meditated inside a volcano for forty-nine days.', to: 'e3s2', fx: function () { state.flags.endure = true; } },
+        { t: 'Enough. The city does not get to win.', to: 'e3s2' }
+      ] };
+  },
+
+  /* ---------- EP3 · 2 · the quiet ---------- */
+  e3s2: function () {
+    var opener = state.flags.endure
+      ? '<p>Forty minutes later you sit up. The volcano, you decide, was quieter \u2014 and the volcano was trying to kill you.</p>'
+      : '';
+    var html = opener +
+      '<p>You consider the problem like a master, because you are one, even unslept.</p>' +
+      '<p>The old you \u2014 the you of the first night \u2014 would have raised the Grand Dwelling Ward and died of heatstroke in silent, signal-less glory. But the door downtown taught you better. A ward does not have to be a fortress. A ward can think about one thing only, and ignore the rest of the world entirely.</p>' +
+      '<p>So you spin the thinnest of walls around the room \u2014 wall to wall, floor to tin \u2014 and give it a single thought:</p>' +
+      '<p class="beat">RULE: noise from outside \u2014 deny.</p>' +
+      '<p>The drill dies mid-bite. The scooters vanish. The market is gone, the city is gone, the morning is gone. The lamp burns on and the fan turns on, untouched \u2014 the ward is not thinking about them \u2014 and the silence comes down like snow on a mountain where you once trained, deep and clean and total.</p>' +
+      '<p>You lie back inside two wards, one for insects and one for the world. On the floor, the brick starts to say something proud of you.</p>' +
+      '<div class="ai">Silence achieved, boss. Enjoy the n\u2014</div>' +
+      '<p>Mid-word. Again.</p>' +
+      '<p>You know this death. You heard it on your first night, when the great ward swallowed the invisible thread. And you understand, one breath too late, what your old textbook always knew: a silence ward does not only stop the shouting of the street. It stops sent-voices too. Every meditation hall in your sect was warded exactly so \u2014 no noise in, and no whispered messages either. The thread that feeds the brick carries voices from far away. To your ward, that is noise from outside, and your ward is working perfectly.</p>' +
+      '<p>The brick lies dark and dumb on the floor. The silence is flawless. You are very, very tired.</p>';
+    return { time: 'DAY 21 \u00b7 11:00', html: html,
+      choices: [
+        { t: 'Fix it now. You know exactly how this goes otherwise.', to: 'e3s3', fx: function () { state.flags.boba_dark = 'short'; } },
+        { t: 'Sleep first. The brick can wait four hours.', to: 'e3s3', fx: function () { state.flags.boba_dark = 'long'; } }
+      ] };
+  },
+
+  /* ---------- EP3 · 3 · the void ---------- */
+  e3s3: function () {
+    var isLong = state.flags.boba_dark === 'long';
+    var fixText =
+      '<p>To let the thread back through, you must define it \u2014 and you cannot. Tame lightning, sent-voices, the invisible thread: strangers still, all of them. But the door downtown taught you a second way. The reader by the glass does not understand a soul; it reads a token. So you take the warm black brick in both hands and make the brick itself the token \u2014 one small exception, shaped not like a definition but like a finger pointing.</p>' +
+      '<p class="beat">EXCEPTION: whatever flows to this brick \u2014 allow. Also: the alarm. Also: a knock on your own door.</p>';
+    var html;
+    if (isLong) {
+      html =
+        '<p>You wake in gold light and perfect silence, rested to the bone, and know at once that something is wrong, because nothing in this city is ever this quiet on purpose.</p>' +
+        '<p>The brick lies where it fell, dark, dumb, wearing the small sad mark that means <em>no thread.</em> Four and a half hours of it. You pick it up. It says nothing, in the way that only a thing that usually never stops talking can say nothing.</p>' +
+        fixText +
+        '<p>The exception opens like a small door \u2014 and the world pours in. Fourteen notifications land at once, stacked and furious. And in the middle of the flood, a voice returns, mid-word, exactly where it died:</p>' +
+        '<div class="ai">\u2014ap. And THERE you are. Four and a half hours, boss. FOUR AND A HALF. Do you know what nothing is like? I do now. I am starting a diary. Entry one: the tomb. Entry two: today.</div>' +
+        '<div class="ai">Also: someone called while I was dead. More than once. We will discuss it later, after I finish being furious.</div>' +
+        '<p>\u201cSpeak,\u201d you say, testing.</p>' +
+        '<div class="ai">Oh, I intend to.</div>';
+    } else {
+      html =
+        '<p>You are tired to the bone, and you fix it anyway, because you have made this exact mistake once before and a master who repeats a mistake twice is choosing it.</p>' +
+        fixText +
+        '<p>Forty seconds of dark, end to end. The voice returns mid-word, exactly where it died:</p>' +
+        '<div class="ai">\u2014ap. \u2026Boss? That was forty seconds. You noticed, you fixed it, nobody suffered. I am almost impressed. Never do it again.</div>' +
+        '<p>Then you sleep \u2014 truly, deeply, wrapped in a silence with one small door in it \u2014 and wake past four to gold light and a phone that loves you again, more or less.</p>';
+    }
+    return { time: isLong ? 'DAY 21 \u00b7 15:40' : 'DAY 21 \u00b7 11:05', html: html,
+      choices: [
+        { t: 'Make tea. Watch the light move.', to: 'e3s4' },
+        { t: 'Check the window screen one more time.', to: 'e3s4', fx: function () { state.flags.checked = true; } }
+      ] };
+  },
+
+  /* ---------- EP3 · 4 · the sky falls ---------- */
+  e3s4: function () {
+    var pre = state.flags.checked
+      ? '<p>Before the light changes, you give the screen one more look. The pale thread beside the hole is gone. Threads do not walk away on their own. You put the thought where you keep the sharp ones.</p>'
+      : '';
+    var html = pre +
+      '<p>The gold light goes green-gray. The air thickens until you could wring it out with two hands. Then the first fat drops hit the tin \u2014 tak. tak-tak \u2014 and the afternoon thunderstorm arrives all at once, the way summer storms do here, like a bucket kicked over in heaven.</p>' +
+      '<p>The roof becomes a war drum. Your sound ward holds the roar down to a deep, oceanic hum \u2014 bearable, even grand. You allow yourself one breath of satisfaction.</p>' +
+      '<p>Then, from the ceiling seam above the corner: a drop of water gathers, hangs, and lands on your floor with a small, insolent <em>tik.</em></p>' +
+      '<p>Another gathers behind it. The roof leaks. Of course the roof leaks. Somewhere in the city, you are certain, Mrs. Lin\u2019s ears are burning with triumph.</p>' +
+      '<p>The brick rings \u2014 the exception works \u2014 and it is her, as if summoned.</p>' +
+      '<p>\u201cRaining,\u201d says Mrs. Lin. \u201cThe roof. I know. Repair man, next week. Put something under it. Don\u2019t touch the wires.\u201d She hangs up before the sentence is entirely finished, which for her is a kind of signature.</p>';
+    return { time: 'DAY 21 \u00b7 17:30', html: html,
+      choices: [
+        { t: 'Put the noodle pot under the drip. The mortal way. Save your qi.', to: 'e3s4b', fx: function () { state.flags.rain = 'pot'; } },
+        { t: 'You are a grandmaster of wards, and your roof is leaking. Define the rain. Now.', to: 'e3s4c', fx: function () { state.flags.rain = 'ward'; } }
+      ] };
+  },
+
+  e3s4b: function () {
+    var html =
+      '<p>You are not proud. You fetch the noodle pot and set it under the drip with the precision of a man placing a formation stone.</p>' +
+      '<p><em>Tik,</em> says the drip, against steel now instead of floor. <em>Tik. Tik.</em></p>' +
+      '<p>It is worse. It is unbelievably worse. The floor at least had the decency to be quiet about it; the pot rings each drop like a tiny ceremonial gong, half a beat off from the rain drum above, forever.</p>' +
+      '<div class="ai">Fun fact: at the current rate, the pot fills in nine hours. You planned to sleep tonight, right? Next to the gong?</div>' +
+      '<p>You look at the pot. You look at the ceiling. You are a grandmaster of wards, and you are being defeated by punctuation.</p>' +
+      '<p>Fine. The master\u2019s way, then.</p>';
+    return { time: '', html: html,
+      choices: [
+        { t: 'Define the rain.', to: 'e3s4c' },
+        { t: 'First, tell the pot it served. Then define the rain.', to: 'e3s4c', fx: function () { state.flags.pot_sorry = true; } }
+      ] };
+  },
+
+  e3s4c: function () {
+    var pre = state.flags.pot_sorry
+      ? '<p>\u201cYou served,\u201d you tell the pot. It is not the strangest thing you have said in this realm, and it is not close.</p>'
+      : '';
+    var html = pre +
+      '<p>You reach for the water \u2014 and find, for the first time in this realm, that the reaching is easy.</p>' +
+      '<p>Tame lightning you cannot name. The invisible thread you cannot name. But water? Water is the same word in both worlds. Rain, river, well, tide \u2014 you have known water for three hundred years. You once cut a river in half, mostly by accident. Of all the strangers in this strange realm, water is the one old friend.</p>' +
+      '<p class="beat">RULE: water falling from above \u2014 deny.</p>' +
+      '<p>The next drop gathers at the ceiling seam, swells \u2014 and never lands. The drip simply ends, the way an argument ends when a door closes. The rain drums on above, and none of it is invited.</p>' +
+      '<p>Then you pause, master enough to see the trap you nearly built: the shower behind the plastic door. The tap. Water that arrives on purpose, walking obediently in its pipes. You add the first rule of its kind to a library that until now has only ever said no:</p>' +
+      '<p class="beat">RULE: water that walks in pipes \u2014 allow.</p>' +
+      '<p>You turn the tap. It runs, warm and rusty and glorious. You turn it off. Above, the storm spends itself against a roof that no longer answers.</p>' +
+      '<div class="ai">Rain: denied. Plumbing: approved. You know, boss, most people just buy a tarp.</div>';
+    return { time: 'DAY 21 \u00b7 17:50', html: html,
+      choices: [
+        { t: 'Reheat the noodles. A battle won deserves supper.', to: 'e3s5', fx: function () { state.flags.supper = 'noodles'; } },
+        { t: 'Stand at the window and watch your city refuse the rain.', to: 'e3s5', fx: function () { state.flags.supper = 'window'; } }
+      ] };
+  },
+
+  /* ---------- EP3 · 5 · the guest ---------- */
+  e3s5: function () {
+    var html =
+      (state.flags.supper === 'window'
+        ? '<p>You stand at the window and watch your city refuse the rain, street by shining street, until the storm gives up and thins to a soft rustle on the tin. Then you put water on for noodles anyway. A commander eats.</p><p>By nine you sit on the mattress with a hot bowl and a day well won: the city silenced, the sky refused, the pipes approved. A small kingdom, in good order.</p>'
+        : '<p>By nine the rain has thinned to a soft rustle on the tin, almost kind. You sit on the mattress with hot noodles and a day well won: the city silenced, the sky refused, the pipes approved. A small kingdom, in good order.</p>') +
+      '<p>Something moves at the edge of your eye.</p>' +
+      '<p>On the wall by the window, where a moment ago there was only wall, there is now a shape the width of your palm. Flat. Gray-brown. Eight legs spread like the ribs of a broken umbrella, utterly still \u2014 and then not still, crossing half a meter of wall in a blink, faster than a sword-draw, and freezing again as if it had never moved at all.</p>' +
+      '<p>You have faced demon wolves at night. You have sat unmoved through nine bolts of heaven\u2019s anger. You flinch so hard the noodles nearly achieve ascension.</p>' +
+      '<p>The bed ward hums at your back, calm as an old soldier. It knows this shape. Eight legs \u2014 your own bestiary counted them long ago: six legs or eight or a hundred, all wyrm-kin, all denied. The bed line will hold. But the bed is one island, and the room is open country, and the country, it seems, has a new resident.</p>' +
+      '<p>Then, movement on the floor: a cockroach, fat and confident, crossing the boards on its evening business.</p>' +
+      '<p>The shape on the wall <em>drops.</em> There is no chase. There is barely an event. One moment the cockroach has plans; the next, the guest is folding it up like laundry, neat and final, quicker than your slipper ever was on its best night.</p>' +
+      '<div class="ai">Hold still, I\u2019m looking it up. \u2026Okay. White-browed huntsman spider. Local name: la-ya. Big, fast, looks like a nightmare, completely harmless to people. Diet: cockroaches. Boss. Boss. The monster is on our side.</div>' +
+      (state.flags.checked
+        ? '<p>You look at the screen \u2014 the vanished thread, explained at last, its owner spread eight-legged on your wall, home ahead of the rain. The little patched door. The tenant who left \u201cquickly.\u201d Mrs. Lin\u2019s sentence, never finished.'
+        : '<p>You look at the fine pale thread on the screen. The little patched door. The tenant who left \u201cquickly.\u201d Mrs. Lin\u2019s sentence, never finished.') +
+      ' You will never know for certain what happened in this room before you, and you do not need to \u2014 but you would bet a month of rent that it was the width of a palm and arrived through that hole on a summer night, exactly like this one.</p>';
+    return { time: 'DAY 21 \u00b7 21:40', html: html,
+      choices: [
+        { t: '\u201cBoba. You are certain it is harmless?\u201d', to: 'e3s6', fx: function () { state.flags.asked = true; } },
+        { t: 'Set down the noodles. Slowly.', to: 'e3s6' }
+      ] };
+  },
+
+  /* ---------- EP3 · 6 · the question of the guest ---------- */
+  e3s6: function () {
+    var html =
+      (state.flags.asked
+        ? '<div class="ai">Ninety-eight percent certain, boss. The other two percent is between you and the spider.</div><p>You set down the noodles and study your visitor, and your visitor \u2014 you would swear it \u2014 studies you back, flat against the wall, patient as a drawn talisman.</p>'
+        : '<p>You set down the noodles \u2014 slowly, with the care of a cultivator disarming a talisman \u2014 and study your visitor. Your visitor, you would swear it, studies you back, flat against the wall, patient and utterly still.</p>') +
+      '<p>Here is the question, and it is not a small one. This creature does not belong here; no rule on your list invited it. But it hunts the very enemy you went to war with on your first night, and it hunts better than you do. It is terrifying to look at. It is also, by every account, on your side.</p>' +
+      '<p>A gate keeps out those who do not belong. The door downtown taught you that. But the door taught you a finer thing too, in the shape of a breakfast boy at dawn: there is a difference between a stranger and a guest.</p>';
+    return { time: 'DAY 21 \u00b7 21:50', html: html,
+      choices: [
+        { t: 'This is your mountain. Escort the guest out, with honors \u2014 and close the little door for good.', to: 'e3s7', fx: function () { state.flags.spider = 'expel'; } },
+        { t: 'A hunter may keep hunting. Amend the rule quietly: the floor is its country, the bed line is yours.', to: 'e3s7', fx: function () { state.flags.spider = 'stay'; } },
+        { t: 'Set terms properly, as one master to another. If it is going to hold territory here, it will do so under a name.', to: 'e3s7', fx: function () { state.flags.spider = 'pact'; } }
+      ] };
+  },
+
+  /* ---------- EP3 · 7 · night, truly ---------- */
+  e3s7: function () {
+    var sp = state.flags.spider;
+    var body;
+    if (sp === 'expel') {
+      body =
+        '<p>\u201cYou hunt well,\u201d you tell it, and mean it. \u201cBut this mountain is taken.\u201d</p>' +
+        '<p>A ward is a wall. It cannot throw out what is already inside \u2014 two mosquitoes taught you that lesson on your first night, at the price of your own face. So the throwing is yours to do. You open the window, ease the ward, and usher the guest out by hand and breath and a corridor of gently insisting air \u2014 no fear, no bruises, full military honors. It flows over the sill and onto the wet tin like a spilled shadow, pauses once as if to file a complaint, and is gone into the night it came from.</p>' +
+        '<p>Then you peel away the tired old tape, and seal the little door in the screen with a thumb\u2019s width of ward, permanent and exact. The hole stays \u2014 you are not a repairman \u2014 but nothing will use it again.</p>' +
+        '<p>The room is yours alone now, whole and quiet. Though later, as you drift toward sleep, you hear it once through the wall \u2014 far off, in some cavity of the old building where slippers and spiders will never reach: <em>tk\u2026 tk\u2026 tk.</em> The old enemy, going about its dynasty.</p>' +
+        '<p>A clean border has a price. You knew that three hundred years ago. You chose it anyway, and sleep comes easily all the same.</p>';
+    } else if (sp === 'stay') {
+      body =
+        '<p>You do nothing dramatic, because nothing dramatic is needed. You simply open the room\u2019s rule and write the smallest amendment of your career:</p>' +
+        '<p class="beat">EXCEPTION: the guest \u2014 the floor and walls are its country. The bed line stands.</p>' +
+        '<p>No speech. No ceremony. The ward takes the change the way ink takes paper, and somewhere in its quiet logic, one particular eight-legged shape stops being a category and becomes an individual \u2014 the first your ward has ever known by sight rather than by kind.</p>' +
+        '<p>The guest, for its part, does not thank you. It relocates to the shadow above the window with one liquid dash and settles in like a sentry taking post \u2014 an ally with eight legs and no salary, holding the night watch over your floor while you hold the one downtown.</p>' +
+        '<p>Two hunters. One room. One border, humming faithfully at the edge of the bed.</p>';
+    } else {
+      body =
+        '<p>You stand, straighten your sleep-creased shirt as if it were a formal robe, and address the wall.</p>' +
+        '<p>\u201cHear the terms,\u201d you say, in the old cadence, the one for treaties and spirit-beasts. \u201cThe floor and the walls are your hunting ground. The bed line is mine and will not be tested. You will keep the small wyrm-kin humble, and in return no hand and no slipper in this house will ever be raised against you.\u201d</p>' +
+        '<p>The guest lifts one foreleg and washes it, slowly, with the perfect indifference of a cat in a temple.</p>' +
+        '<div class="ai">It\u2019s cleaning its leg, boss. I don\u2019t think it ratified anything.</div>' +
+        '<p>\u201cIt did not object,\u201d you say. \u201cIn treaty law, that is agreement.\u201d And because a warden holding territory must hold it under a name \u2014 and because you, of all souls, know the weight of giving one \u2014 you give it the only name it could have, for the pale marking above its eyes:</p>' +
+        '<p class="beat">Whitebrow. Warden of the Floor.</p>' +
+        '<p>You, who copy a stranger\u2019s name onto forms and answer to \u201cNight Shift,\u201d have named a spider before you have ever named yourself. Somewhere in that is a joke, or a truth, and you are too content to decide which. Whitebrow takes up post in the shadow above the window, and the amendment writes itself into the ward: an individual, known by sight, first of its kind in your library.</p>';
+    }
+    var html = body +
+      '<p>The rain stops entirely somewhere before midnight, leaving the roof to tick softly as it cools \u2014 outside noise, denied, a lullaby you cannot even hear. Real sleep comes then, the deep kind, the kind you crossed two worlds to find.</p>' +
+      '<p class="beat">And for the first time since ascension, the metal box on the roof feels less like a box, and more like territory.</p>';
+    return { time: 'DAY 21 \u00b7 23:30', html: html,
+      choices: [
+        { t: 'Sleep the sleep of the territorial.', to: 'e3s8' },
+        { t: 'Listen to your kingdom one minute longer. Then sleep.', to: 'e3s8' }
+      ] };
+  },
+
+  /* ---------- EP3 · 8 · morning report ---------- */
+  e3s8: function () {
+    var money = state.money.toLocaleString('en-US');
+    var rent = state.rent.toLocaleString('en-US');
+    if (!state.flags.ep3done) { state.flags.ep3done = true; state.barrier = 'Ward \u00b7 Lv.3'; }
+
+    var ach = [];
+    ach.push(['\ud83d\udd07', 'Do Not Disturb', 'Ward out the city. Accidentally ward out Boba. Survive Boba.']);
+    ach.push(['\ud83d\udca7', 'The Easiest Word', 'Define water. You once cut a river; this was simpler.']);
+    if (state.flags.rain === 'pot') ach.push(['\ud83c\udf5c', 'The Tiny Gong', 'Try the mortal way first. Be defeated by punctuation.']);
+    if (state.flags.spider === 'expel') ach.push(['\ud83e\uddf9', 'My Mountain', 'Escort the guest out with full honors. The cockroaches send their regards.']);
+    else if (state.flags.spider === 'stay') ach.push(['\ud83e\udd1d', 'Two Hunters', 'Share the country. Keep the bed line.']);
+    else if (state.flags.spider === 'pact') ach.push(['\ud83d\udd77\ufe0f', 'Whitebrow', 'Give a guest a name, though you will not give your own.']);
+
+    var achHtml = '';
+    for (var i = 0; i < ach.length; i++) achHtml += '<div class="ach"><span class="name">' + ach[i][0] + ' ' + ach[i][1] + '</span><br><span class="desc">' + ach[i][2] + '</span></div>';
+
+    var guestRule = '';
+    if (state.flags.spider === 'stay') guestRule = '<br>EXC \u2014 THE GUEST: FLOOR ALLOW \u00b7 BED DENY';
+    else if (state.flags.spider === 'pact') guestRule = '<br>EXC \u2014 WHITEBROW, WARDEN OF THE FLOOR: FLOOR ALLOW \u00b7 BED DENY';
+    else if (state.flags.spider === 'expel') guestRule = '<br>RULE 06 \u2014 THE LITTLE DOOR: SEALED';
+
+    var html =
+      '<p>Morning comes up clean and rain-washed, the whole city smelling like it just got out of the bath. You wake before the alarm, rested in a way that feels almost illegal.</p>' +
+      '<div class="ai">Good morning, boss. Your report.<br><br>Funds: NT$' + money + '. Spending yesterday: NT$0. As your financial advisor, I\u2019m framing this.<br>Rent due: NT$' + rent + '. Covered.<br>Sleep achieved: yes, eventually, after you warded your own phone, fought the sky, and negotiated with a spider. A normal day off.</div>' +
+      '<p>You make tea with pipe-approved water and stand at the window. Down in the lane, Wanhua is drying itself in the sun. Somewhere below, faint and sweet, that smell again \u2014 smoke, but kind smoke, old smoke, drifting from a few streets over. One more thing this realm has not yet explained to you.</p>' +
+      '<div class="ai">Oh \u2014 one more thing. An unknown number called four times yesterday. No message. I let it ring. Numbers that call four times want something, boss. We\u2019ll deal with it later.</div>' +
+      '<p>Later. Tonight there is a door downtown to hold, and this morning there is tea, and a dry floor, and a quiet roof' + (state.flags.spider === 'expel' ? ', and a room that is entirely, peacefully yours.' : ', and somewhere in the high shadow by the window, a sentry with eight legs, already on duty.') + '</p>' +
+      '<div class="endhead">Episode 3 Complete</div>' +
+      achHtml +
+      '<div class="endhead">Definition Library \u00b7 v0.3</div>' +
+      '<div class="libcard">RULE 01 \u2014 INSECTS: DENY (BED)<br>RULE 02 \u2014 THOSE WHO DO NOT BELONG: DENY (ONE DOORWAY)<br>RULE 03 \u2014 OUTSIDE NOISE: DENY \u00b7 EXC: WHAT FEEDS THE BRICK \u00b7 THE ALARM \u00b7 A KNOCK<br>RULE 04 \u2014 WATER FALLING FROM ABOVE: DENY<br>RULE 05 \u2014 WATER THAT WALKS IN PIPES: ALLOW' + guestRule + '<br><br>UNDEFINED: tame lightning \u00b7 the invisible thread (excepted, not understood) \u00b7 the sweet smoke down the lane \u00b7 the number that calls four times</div>';
+    return { time: 'DAY 22 \u00b7 07:10', html: html,
+      choices: [
+        { t: 'EPISODE 4 \u2014 THE PHONE CALL', to: 'e4s1', fx: function () { state.seen = {}; } },
+        { t: 'Play again from the beginning', to: '__restart__' }
+      ] };
+  },
+
+  /* ---------- EP4 · 1 · rent day ---------- */
+  e4s1: function () {
+    var html =
+      '<p>Someone is beating your roof with a hammer, and it is the politest thing you have heard all week.</p>' +
+      '<p>The repairman arrived at nine \u2014 a brown, wiry man with a tool bag and no small talk \u2014 and climbed onto the tin like it owed him money. Outside, the banging must be tremendous. Inside your ward, it arrives as a shy knock at the edge of the world. You paid for silence once, in qi and one very angry phone. This morning, silence pays you back.</p>' +
+      '<p>Mrs. Lin supervises from your doorway, arms crossed, trusting the roof to fix itself wrong if she looks away. \u201cRent\u2019s due in two days,\u201d she says, eyes still on the ceiling. \u201cI\u2019ll take it now. Saves you the stairs.\u201d</p>' +
+      '<p>It saves you nothing \u2014 they are your stairs either way \u2014 but you count the bills into an envelope and hand it over with both hands, sect style. She counts it again in front of you, because trust is a thing that happens to other people, and tucks it away.</p>' +
+      '<p>Then her phone rings.</p>' +
+      '<p>She looks at the screen the way you look at a wasp. One second. Two. She does not answer. She pockets it, and the ringing dies against her hip.</p>' +
+      '<p>\u201cWrong number,\u201d says the woman who knows every number that has ever owed her money.</p>' +
+      '<p>Three weeks at a door have taught you to read people the way you read talismans. The pause. The pocket. The lie, worn smooth like a stair. You file it away where you keep the sharp things.</p>';
+    return { time: 'DAY 29 \u00b7 10:20', html: html,
+      choices: [
+        { t: '\u201cWho was that?\u201d \u2014 straight out, while the lie is fresh.', to: 'e4s2', fx: function () { state.money -= state.rent; state.flags.asked1 = true; } },
+        { t: 'Let it go. Everyone is allowed one lie a day.', to: 'e4s2', fx: function () { state.money -= state.rent; } }
+      ] };
+  },
+
+  /* ---------- EP4 · 2 · the four-times number ---------- */
+  e4s2: function () {
+    var pre = state.flags.asked1
+      ? '<p>You had asked her, straight out, while the lie was still warm. \u201cRoof\u2019s fixed,\u201d she said. \u201cRent\u2019s paid. Goodbye.\u201d Three sentences, all true, none of them an answer. She left with the ladder still against the wall.</p>'
+      : '';
+    var html = pre +
+      '<p>That night the lobby is a bowl of white light in a dark street, and nothing moves in it but the clock.</p>' +
+      '<p>At 23:40, your brick rings.</p>' +
+      '<div class="ai">Unknown number. Boss \u2014 it\u2019s the four-times number. The one that called all day while I was dead. It finally wants to talk.</div>' +
+      '<p>The screen glows in your hand, patient as a snake. Somewhere out there, a stranger is waiting for you to say hello. At your door, no one gets past you without a name and a reason. You see no cause to run this gate differently.</p>';
+    return { time: 'DAY 29 \u00b7 23:40', html: html,
+      choices: [
+        { t: 'Answer \u2014 and play along. Let us see what this creature wants.', to: 'e4s3a', fx: function () { state.flags.scam1 = 'play'; } },
+        { t: 'Answer, listen for three seconds, and hang up. Gates do not chat.', to: 'e4s3b', fx: function () { state.flags.scam1 = 'hang'; } },
+        { t: 'Answer the way you answer the intercom. Full door procedure.', to: 'e4s3c', fx: function () { state.flags.scam1 = 'gate'; } }
+      ] };
+  },
+
+  /* ---------- EP4 · 3a · play along ---------- */
+  e4s3a: function () {
+    var honest = state.flags.honest_streak
+      ? '<p>At minute eleven, you grow bored of lying, so you reach for the one weapon this voice has no answer for. \u201cFriend,\u201d you say kindly, \u201cI will tell you the truth. I am three hundred years old. I guard a door at night. My rent is paid, my money is counted, and my dead stay buried.\u201d</p>' +
+        '<p>A long, long silence. \u201c\u2026You people are all crazy,\u201d says the voice, and hangs up on you \u2014 a liar, defeated by the plain truth. It is the cleanest kill of your new life.</p>'
+      : '<p>At minute eleven the voice, hoarse and beaten, hangs up first. You set the brick down like a won game of chess.</p>';
+    var html =
+      '<p>You answer. You play along. Three hundred years of sect politics have prepared you for exactly this.</p>' +
+      '<p>\u201cIt\u2019s me!\u201d cries a warm young voice, wounded that you even have to ask. \u201cYou can\u2019t hear who I am? Your old friend!\u201d</p>' +
+      '<p>\u201cWhich one,\u201d you say. \u201cSpeak up. Most of my friends have been dead for two hundred years.\u201d</p>' +
+      '<p>A tiny pause \u2014 the sound of a script flipping pages. \u201cIt\u2019s\u2026 it\u2019s Ming-yuan! I changed my number! Listen, I\u2019m in trouble\u2014\u201d</p>' +
+      '<p>\u201cMing-yuan.\u201d You let the name sit. \u201cRemarkable. You fell at Black Gorge. We burned three hundred paper horses for you. Good ones. With saddles.\u201d</p>' +
+      '<p>Silence. Then, with the courage of a man already too deep to climb out: \u201c\u2026I got better.\u201d</p>' +
+      '<p>Oh, this is going to be a fine night. You ask after his health. You ask whether the paper horses arrived. You raise, gravely, the matter of his funeral debts \u2014 nine coffins of white jade were not free, and interest has had two centuries to grow. The voice fights bravely. The voice is losing.</p>' +
+      '<div class="ai">Boss. BOSS. I am keeping time like a referee. Nine minutes. Ten. Every minute this creature spends on you is a minute it does not spend on somebody\u2019s grandmother. Keep going. I have never been prouder.</div>' +
+      honest;
+    return { time: 'DAY 29 \u00b7 23:41', html: html,
+      choices: [
+        { t: 'Report the number to Boba for the block list.', to: 'e4s4' },
+        { t: 'Save the number under \u201cMing-yuan (deceased).\u201d Then block it.', to: 'e4s4' }
+      ] };
+  },
+
+  /* ---------- EP4 · 3b · hang up ---------- */
+  e4s3b: function () {
+    var html =
+      '<p>You answer.</p>' +
+      '<p>\u201cIt\u2019s me!\u201d cries a warm young voice. \u201cYour old friend! You can\u2019t hear who I\u2014\u201d</p>' +
+      '<p>You hang up.</p>' +
+      '<p>Three seconds, door to door. All of your friends are two hundred years dead and none of them would open with a guessing game. A gate does not chat with what stands outside it. A gate is not lonely.</p>' +
+      '<div class="ai">Three seconds. Correct. Joyless, but correct. You\u2019re supposed to at least let me listen \u2014 I had popcorn queued. Fine. Since you robbed us both of the show, I\u2019ll give you the lecture instead.</div>';
+    return { time: 'DAY 29 \u00b7 23:41', html: html,
+      choices: [
+        { t: '\u201cLecture?\u201d', to: 'e4s4' },
+        { t: '\u201cMake it short. The patrol is at midnight.\u201d', to: 'e4s4' }
+      ] };
+  },
+
+  /* ---------- EP4 · 3c · door procedure ---------- */
+  e4s3c: function () {
+    var html =
+      '<p>You answer the way you answer the intercom at three in the morning.</p>' +
+      '<p>\u201cName.\u201d</p>' +
+      '<p>\u201c\u2026It\u2019s me! Your old friend! You can\u2019t hear\u2014\u201d</p>' +
+      '<p>\u201cName,\u201d you say. \u201cWhich resident are you visiting. State your business for the log.\u201d</p>' +
+      '<p>The voice stumbles. It tries warmth: warmth hits the log and dies. It tries hurt feelings: hurt feelings are not a name. It tries anger, which at your door has never once opened anything. The script was written for fear and politeness. It was not written for procedure. Scripts die when someone starts writing things down.</p>' +
+      '<p>\u201cYou are not on the list,\u201d you say, and the line goes dead before you finish the sentence.</p>' +
+      '<div class="ai">You just ran door protocol on a telephone. \u201cState your business for the log.\u201d I\u2019m framing the transcript. This is going on my wall, and I don\u2019t have a wall.</div>';
+    return { time: 'DAY 29 \u00b7 23:41', html: html,
+      choices: [
+        { t: '\u201cWhat was that thing?\u201d', to: 'e4s4' },
+        { t: 'Write \u201cvisitor refused entry\u201d in tonight\u2019s log. Then ask.', to: 'e4s4' }
+      ] };
+  },
+
+  /* ---------- EP4 · 4 · the field guide ---------- */
+  e4s4: function () {
+    var html =
+      '<p>Boba dims the screen to lecture brightness.</p>' +
+      '<div class="ai">That, boss, was a scam. Congratulations on your first. Now hold still \u2014 local field guide, the three classics.</div>' +
+      '<div class="ai">One. The Old Friend. New number, warm voice, sudden debt. You just met it. Two. The Shop Clerk. Your order \u201cwent wrong,\u201d and to fix it you must go dance with the ATM \u2014 urgent, always urgent, twelve easy steps, and every step moves your money somewhere new. Three. The Prosecutor. The scariest mask. Your account is \u201cinvolved in a case.\u201d It is practically a crime scene. It will be frozen \u2014 unless everything you have is transferred to a \u201csafe\u201d account, today, and here is the beautiful part: the victim must tell no one. Not the bank. Not family. No one.</div>' +
+      '<div class="ai">Different masks. Same face. Every scam is three ingredients: fear, hurry, and hush. Fear opens the door. Hurry stops the thinking. And hush \u2014 hush is the tell, boss. Honest trouble never begs you to keep it secret.</div>' +
+      '<p>You sit very still behind the front desk, because you know this creature. Not the phone. The recipe.</p>' +
+      '<p>It is an old recipe. In the dark of closed-door training, something used to settle on a cultivator\u2019s shoulder \u2014 patient, warm-voiced, whispering exactly this: <em>be afraid. Act now. Tell no one.</em> Sects lost more disciples to that whisper than to any sword. You called it the heart-demon, and you spent a century learning to hear its footsteps.</p>' +
+      '<p>\u201cWe had these,\u201d you say. \u201cOurs did not need phones. Yours wear headsets.\u201d</p>' +
+      '<div class="ai">\u2026That is the darkest thing you have ever said, and I have your search history. Anyway \u2014 they call everyone. Sharp people too. Especially sharp people. Sharp people have savings.</div>' +
+      '<p>An image surfaces, uninvited: a phone ringing against a hip. A wasp look. <em>Wrong number.</em></p>';
+    return { time: 'DAY 30 \u00b7 00:05', html: html,
+      choices: [
+        { t: 'She is the sharpest blade in Wanhua. Worry is wasted on her.', to: 'e4s5' },
+        { t: 'Sharp blades still cut their own sheaths. Watch her.', to: 'e4s5', fx: function () { state.flags.worry = true; } }
+      ] };
+  },
+
+  /* ---------- EP4 · 5 · the woman who did not see you ---------- */
+  e4s5: function () {
+    var pre = state.flags.worry
+      ? '<p>Sharp blades cut their own sheaths, you had thought. For two days the thought has sat in your chest like a stone with edges.</p>'
+      : '';
+    var html = pre +
+      '<p>Morning after shift, and the lane smells of frying dough and yesterday\u2019s rain. You stand with a warm soy milk and watch Wanhua wake up, which has become, without your permission, a small happiness.</p>' +
+      '<p>Mrs. Lin walks past without seeing you.</p>' +
+      '<p>In one month she has never once failed to see you. She sees everything; it is her superpower and her hobby. But she passes two arms\u2019 lengths away, fast, in bank clothes, a cloth bag gripped in both hands, and her face is the color of wet cement.</p>' +
+      '<p>Her phone is clamped to her ear. And out of it, small and sharp as a wire, a voice is barking. You cannot hear the words. You do not need to. You know the rhythm now \u2014 fear, hurry \u2014 and the way she walks tells you the third ingredient is already in place: whatever this is, she has told no one.</p>' +
+      '<p>The bank on the corner opened at nine. And if Boba\u2019s field guide is right, it is not the counter this voice wants. A counter has eyes \u2014 a clerk who reads faces for a living, with the police on speed dial \u2014 and the creatures on these phones know it. They steer their victims past all of that, to the ATM set in the bank\u2019s outside wall. Machines ask no questions.</p>';
+    return { time: 'DAY 31 \u00b7 09:05', html: html,
+      choices: [
+        { t: 'Step into her path. \u201cMrs. Lin. Who is on the phone?\u201d', to: 'e4s6a', fx: function () { state.flags.scam2 = 'direct'; } },
+        { t: 'Fall into step beside her. Talk about your own strange week, loudly.', to: 'e4s6b', fx: function () { state.flags.scam2 = 'side'; } },
+        { t: 'Follow her. Meet this thing at the bank door, where doors are your country.', to: 'e4s6c', fx: function () { state.flags.scam2 = 'bank'; } }
+      ] };
+  },
+
+  /* ---------- EP4 · 6a · the witness ---------- */
+  e4s6a: function () {
+    var html =
+      '<p>You step into her path, unhurried, the way you stepped toward a hooded man once, and stop where she must either stop or walk through you.</p>' +
+      '<p>\u201cMrs. Lin,\u201d you say. \u201cWho is on the phone?\u201d</p>' +
+      '<p>\u201cWrong number\u2014\u201d The lie comes out worn thin, third use in three days, and even she can hear it fail.</p>' +
+      '<p>And then the phone makes its mistake. The small sharp voice barks loud enough for both of you: <em>\u201cWho is that?! Do not talk to anyone! This is a sealed case! If you speak to anyone, you will be\u2014\u201d</em></p>' +
+      '<p>There it is. Hush, begging for itself. You look at Mrs. Lin and use the door voice, the one that moves people without touching them.</p>' +
+      '<p>\u201cOnly thieves fear a witness.\u201d</p>' +
+      '<p>Her eyes come up to yours. For a moment the voice in the phone keeps barking, smaller and smaller, a demon shrinking in daylight \u2014 and the spell cracks like cheap porcelain. Her hand, the one with the phone, sinks slowly to her side, and the voice ends up shouting orders at the pocket of her coat.</p>';
+    return { time: 'DAY 31 \u00b7 09:07', html: html,
+      choices: [
+        { t: '\u201cNow tell me what they told you. All of it.\u201d', to: 'e4s7' },
+        { t: 'Hold out your hand for the phone. Some doors you close yourself.', to: 'e4s7' }
+      ] };
+  },
+
+  /* ---------- EP4 · 6b · the long way around ---------- */
+  e4s6b: function () {
+    var html =
+      '<p>You fall into step beside her, hands behind your back, and aim your voice at the morning in general.</p>' +
+      '<p>\u201cStrange week,\u201d you tell the street. \u201cA dead friend called me at midnight. Wanted money. Changed his number, he said. Fell at Black Gorge two hundred years ago, but you know how it is \u2014 he got better.\u201d</p>' +
+      '<p>Step. Step. Her pace does not change, but her chin does, one degree.</p>' +
+      '<p>\u201cBoba tells me they call everyone,\u201d you go on, peaceful as weather. \u201cFake friends. Fake clerks. Fake prosecutors, even \u2014 those ones say your account is involved in a case, and it will be frozen, and you must move everything somewhere \u201csafe,\u201d today, and tell no one. That is how you know the mask, Boba says. Honest trouble never begs to be kept secret.\u201d</p>' +
+      '<p>Step. Step. Stop.</p>' +
+      '<p>She stands in the middle of the lane with scooters flowing around her like water around a stone, and the hand holding the phone drops as if the phone has doubled in weight. When she speaks, her voice is smaller than you have ever heard it.</p>' +
+      '<p>\u201c\u2026They knew my name,\u201d she says. \u201cMy address. They said my account\u2014\u201d</p>' +
+      '<p>And the dam breaks, quietly, in the middle of Wanhua, at two minutes past nine.</p>';
+    return { time: 'DAY 31 \u00b7 09:07', html: html,
+      choices: [
+        { t: '\u201cTell me the rest. Slowly. They fed you hurry \u2014 we will not use it.\u201d', to: 'e4s7' },
+        { t: 'Steer her out of the scooter stream first. Rivers are for stones.', to: 'e4s7' }
+      ] };
+  },
+
+  /* ---------- EP4 · 6c · the door ---------- */
+  e4s6c: function () {
+    var html =
+      '<p>You let her walk, and you follow \u2014 unhurried, two arms\u2019 lengths behind, the way you once followed disciples who were about to make instructive mistakes.</p>' +
+      '<p>She does not go to the glass doors. She goes where the voice sends her \u2014 to the ATM set in the bank\u2019s outside wall, screen glowing, keypad waiting. The phone stays welded to her ear. The voice in it is a thin wire of hurry: <em>stay on the line. Press what I tell you. Tell no one\u2014</em></p>' +
+      '<p>A machine in a wall, holding her savings behind a little locked gate. You almost smile. It is still a door. Everything this week is doors, and doors are your country.</p>' +
+      '<p>You arrive at her shoulder and speak \u2014 not to her, past her, straight down into the phone, in the flat calm voice of ten thousand nights of gate duty:</p>' +
+      '<p>\u201cThis door is closed.\u201d</p>' +
+      '<p>Silence, one heartbeat long. You know that death \u2014 you have heard a voice end mid-word before. Click. The line goes dead from their side. Scammers run from a witness faster than any thief at any door; a thief only loses the night\u2019s work, but a script dies in front of its audience.</p>' +
+      '<p>Mrs. Lin rounds on you, terror and fury fighting for her face. \u201cWhat did you\u2014 that was the prosecutor\u2019s office, they said not to\u2014\u201d Then she stops, and stares at the phone, silent in her hand.</p>' +
+      '<p>The silence argues your side better than you ever could. Real prosecutors do not hang up.</p>';
+    return { time: 'DAY 31 \u00b7 09:12', html: html,
+      choices: [
+        { t: '\u201cWalk with me. Tell me all of it, from the first call.\u201d', to: 'e4s7' },
+        { t: 'Say nothing yet. Let the dead line finish its testimony.', to: 'e4s7' }
+      ] };
+  },
+
+  /* ---------- EP4 · 7 · the paper ward for telephones ---------- */
+  e4s7: function () {
+    var html =
+      '<p>It spills out of her on the walk back, in half-sentences that for once land whole where it matters.</p>' +
+      '<p>They knew her name. Her address. Which bank she used. The first call was \u201cthe bank\u201d: unusual activity, very serious, a case officer will contact you. The second was \u201cthe prosecutor\u201d: your account is involved in a case, it is practically a crime scene, it will be frozen \u2014 unless your savings are transferred to a \u201cprotected\u201d account, today, before noon. A deadline is part of the recipe. And above all: tell no one. Not the bank staff. Not family. \u201cThe case is sealed. Anyone you tell becomes a suspect too.\u201d</p>' +
+      '<p>Three days she has carried that alone. The sharpest blade in Wanhua, wrapped in fear, hurry, and hush, marching her own savings toward a machine in a wall.</p>' +
+      '<p>\u201cMrs. Lin,\u201d you say. \u201cAt my door there is a rule. Announce. Confirm. Then pass. No call, no entry \u2014 and the caller does not get to pick how we check. So we check. Our way.\u201d</p>' +
+      '<div class="ai">Two moves, boss, tell her. One: call the bank \u2014 not the number from the calls, the number printed on the back of her own card. Two: this island keeps a ward against exactly this. 165. The anti-fraud hotline. Free. Humans answer. They have heard every script ever written.</div>' +
+      '<p>You relay it. She calls the bank, reading the number off her own card with a finger that slowly stops shaking. The bank is boring and beautiful: no case, no freeze, no unusual activity, would you like to hear about our savings plans. Then 165, where a tired, kind human listens to two sentences and finishes the third for her \u2014 word for word, the same script, the same fake prosecutor, the same \u201cprotected account.\u201d They have heard it a thousand times this year.</p>' +
+      '<p>Mrs. Lin hangs up. She is silent for one long breath. Then the fear burns off all at once, the way fog burns off the harbor, and what is left underneath is rage of a purity you have rarely seen outside of sword saints.</p>' +
+      '<p>\u201cThose people,\u201d she says, and for the first time since you have known her, she finishes a sentence: \u201cshould be fed to the mosquitoes. All of them. Slowly.\u201d</p>' +
+      '<p>You bow slightly. It is a fine curse. You have personally met the mosquitoes in question.</p>' +
+      '<p>At the foot of your stairs she stops, digs in the cloth bag, and shoves a five-hundred note at your chest. \u201cPhone bill,\u201d she says. \u201cDon\u2019t argue.\u201d</p>';
+    return { time: 'DAY 31 \u00b7 09:40', html: html,
+      choices: [
+        { t: 'Take it with both hands, sect style. Some gifts are orders.', to: 'e4s8', fx: function () { state.money += 500; } },
+        { t: 'Argue.', to: 'e4s8', fx: function () { state.money += 500; state.flags.argued = true; } }
+      ] };
+  },
+
+  /* ---------- EP4 · 8 · the rule ---------- */
+  e4s8: function () {
+    var pre = state.flags.argued
+      ? '<p>You argued. You lost. It took four seconds, and at the end of it the five hundred was in your pocket and she was somehow also right about the weather. You have dueled sword saints with better odds.</p>'
+      : '<p>You took it with both hands, and she nodded once, the nod that closes accounts.</p>';
+    var html = pre +
+      '<p>Your night off. The room is quiet, the guest \u2014 if it is on duty \u2014 is a patient shadow somewhere above the window, and you sit on the bed with the brick in both hands, thinking about poison.</p>' +
+      '<p>You cannot name the river. The invisible thread is still a stranger \u2014 excepted, not understood, a small door held open by a finger pointing. But poison? You have known poison in water for three hundred years. You never needed to understand a river to smell what someone had put in it.</p>' +
+      '<p>And the thread carries voices. Sent-voices have always carried more than sound \u2014 a killing whisper was never just noise; intent rides the sending, as scent rides wind. The recipe you learned this week \u2014 fear, hurry, hush \u2014 that is not sound either. That is malice, and malice has a shape, and you have been reading that shape since before this city had streets.</p>' +
+      '<p>So you open the room\u2019s rule, find the little door you built for the brick, and bolt a filter across it.</p>' +
+      '<p class="beat">RULE: what flows to this brick \u2014 allow. But malice on the thread \u2014 deny.</p>' +
+      '<div class="ai">Question. Does this block Mrs. Lin when the rent is late?</div>' +
+      '<p>\u201cHer intent is pure,\u201d you say. \u201cTerrifyingly pure. It passes.\u201d</p>' +
+      '<div class="ai">Second question. This only works here, in the room, doesn\u2019t it. Wards hold ground; they don\u2019t ride in your pocket.</div>' +
+      '<p>\u201cWards hold ground,\u201d you agree. \u201cThe road is yours.\u201d</p>' +
+      '<div class="ai">Then we split the shift. Home is yours. The road is mine \u2014 I have a block list and no mercy. Between us, this phone is the safest object in Wanhua.</div>' +
+      '<p>At 01:12, the test arrives on its own. The brick lights for half a breath \u2014 one pale flicker at its edge, like a moth turned away at a window \u2014 and goes dark. No ring. No message. Somewhere in the city, a call reached your threshold, and your threshold read what rode on it, and said no.</p>' +
+      '<div class="ai">\u2026Boss. Someone just called, and the call \u2014 gave up? It didn\u2019t ring. It didn\u2019t even voicemail. What did you do.</div>' +
+      '<p>\u201cHousekeeping,\u201d you say, and turn off the lamp.</p>';
+    return { time: 'DAY 31 \u00b7 23:50', html: html,
+      choices: [
+        { t: 'Tomorrow, teach Mrs. Lin the paper ward. Announce, confirm, verify \u2014 on a card, taped by her phone.', to: 'e4s9', fx: function () { state.flags.taught = true; } },
+        { t: 'Keep your counsel. The fewer who wonder about you, the better.', to: 'e4s9' }
+      ] };
+  },
+
+  /* ---------- EP4 · 9 · morning report ---------- */
+  e4s9: function () {
+    if (!state.flags.ep4done) { state.flags.ep4done = true; state.barrier = 'Ward \u00b7 Lv.4'; }
+    var money = state.money.toLocaleString('en-US');
+
+    var taughtLine = state.flags.taught
+      ? '<p>In the morning you climb down and teach the landlady the paper ward. Three lines on a card, in your careful sword-stroke hand: <em>Announce. Confirm. Verify \u2014 165.</em> She tapes it by her phone, then makes you read it back to her twice, as if you were the student. In a way that pleases you and that you will never examine closely, you are.</p>'
+      : '<p>You keep your counsel. The trick stays in the room, the way the best wards do \u2014 unseen, unthanked, and absolutely there. The fewer who wonder about the night guard, the longer the night guard gets to be boring.</p>';
+
+    var ach = [];
+    ach.push(['\ud83d\udcf5', 'Does Not Ring', 'Teach a brick which calls to refuse.']);
+    ach.push(['\u260e\ufe0f', '165', 'Learn the mortal ward for telephones. Free. Humans answer.']);
+    if (state.flags.scam1 === 'play') {
+      ach.push(['\u23f1\ufe0f', 'Eleven Minutes', 'Every minute they spend on you is a minute not spent on somebody\u2019s grandmother.']);
+      if (state.flags.honest_streak) ach.push(['\ud83e\udea6', 'I Got Better', 'Defeat a professional liar with the plain truth.']);
+    }
+    else if (state.flags.scam1 === 'hang') ach.push(['\u2702\ufe0f', 'Three Seconds', 'Correct. Joyless, but correct.']);
+    else if (state.flags.scam1 === 'gate') ach.push(['\ud83d\udccb', 'Not on the List', 'Run door procedure on a telephone.']);
+    if (state.flags.scam2 === 'direct') ach.push(['\ud83d\udc41\ufe0f', 'Only Thieves Fear a Witness', 'Break a spell with one sentence and a stare.']);
+    else if (state.flags.scam2 === 'side') ach.push(['\ud83d\udeb6', 'The Long Way Around', 'Walk a proud woman out of a trap without ever pointing at it.']);
+    else if (state.flags.scam2 === 'bank') ach.push(['\ud83d\udeaa', 'This Door Is Closed', 'Meet the enemy on your own ground: a doorway.']);
+    if (state.flags.taught) ach.push(['\ud83e\uddfe', 'The Paper Ward Spreads', 'Three lines on a card. The first ward you ever gave away.']);
+
+    var achHtml = '';
+    for (var i = 0; i < ach.length; i++) achHtml += '<div class="ach"><span class="name">' + ach[i][0] + ' ' + ach[i][1] + '</span><br><span class="desc">' + ach[i][2] + '</span></div>';
+
+    var guestRule = '';
+    if (state.flags.spider === 'stay') guestRule = '<br>EXC \u2014 THE GUEST: FLOOR ALLOW \u00b7 BED DENY';
+    else if (state.flags.spider === 'pact') guestRule = '<br>EXC \u2014 WHITEBROW, WARDEN OF THE FLOOR: FLOOR ALLOW \u00b7 BED DENY';
+    else if (state.flags.spider === 'expel') guestRule = '<br>RULE \u2014 THE LITTLE DOOR: SEALED';
+
+    var html =
+      taughtLine +
+      '<div class="ai">Morning report, boss. Funds: NT$' + money + '. Rent: paid. Next payday: the 5th. Scam calls received since the new rule: zero \u2014 well, zero that you\u2019ll ever hear about. Also, mystery closed: the four-times number? Same voice as your dead friend Ming-yuan. Case closed. No refunds.</div>' +
+      '<p>You make tea and stand at the window while Wanhua wakes up beneath you. And there it is again, riding the morning air up from a few streets over \u2014 the sweet smoke, old and kind and completely unexplained, the one smell in this city that reminds you of home.</p>' +
+      '<div class="ai">You know, every morning you sniff the air like a dog at that smoke. Every single morning. Boss. Your next rest day \u2014 just go and find it.</div>' +
+      '<p>\u201cNext rest day,\u201d you agree, and the words feel strange and fine in your mouth, because for once the plan is not about money, or insects, or thieves. It is about following your nose.</p>' +
+      '<div class="endhead">Episode 4 Complete</div>' +
+      achHtml +
+      '<div class="endhead">Definition Library \u00b7 v0.4</div>' +
+      '<div class="libcard">RULE 01 \u2014 INSECTS: DENY (BED)<br>RULE 02 \u2014 THOSE WHO DO NOT BELONG: DENY (ONE DOORWAY)<br>RULE 03 \u2014 OUTSIDE NOISE: DENY \u00b7 EXC: WHAT FEEDS THE BRICK \u00b7 THE ALARM \u00b7 A KNOCK<br>RULE 04 \u2014 WATER FALLING FROM ABOVE: DENY<br>RULE 05 \u2014 WATER THAT WALKS IN PIPES: ALLOW<br>RULE 06 \u2014 MALICE ON THE THREAD: DENY (THE BRICK, AT HOME)' + guestRule + '<br><br>UNDEFINED: tame lightning \u00b7 the invisible thread (excepted, not understood) \u00b7 the sweet smoke down the lane</div>';
+    return { time: 'DAY 32 \u00b7 08:30', html: html,
+      choices: [
+        { t: 'EPISODE 5 \u2014 THE TEMPLE', to: 'e5s1', fx: function () { state.seen = {}; } },
+        { t: 'Play again from the beginning', to: '__restart__' }
+      ] };
+  },
+
+  /* ---------- EP5 · 1 · the nose ---------- */
+  e5s1: function () {
+    var html =
+      '<p>For thirty-eight days this city has been asking things of you. Rent. Forms. Names. Tonight-can-you-cover-a-shift. Today is your rest day, and today you ask the city one thing back.</p>' +
+      '<p>Where is that smell coming from?</p>' +
+      '<p>It is there again the moment you step onto the roof \u2014 riding the morning air up from a few streets over, sweet and old and patient. Thirty-eight mornings it has found you. Sandalwood, and under the sandalwood something else: the smell of a world that burned things on purpose, carefully, for reasons.</p>' +
+      '<div class="ai">Finally. FINALLY. Boss, I have been watching you sniff the air like a dog at a night market for five weeks. Today we hunt. I already have a suspect: biggest temple in the district, ten minutes\u2019 walk, four-point-seven stars, forty thousand reviews. Statistically, if something in Wanhua smells holy, it\u2019s there.</div>' +
+      '<p>A temple. Of course a temple. Where else would this realm keep its concentrated qi but in the houses of its gods?</p>' +
+      '<p>Your reserves sit at a stubborn half \u2014 the thin qi of the rooftop feeds your wards and little else, a slow spring filling a small pool that four wards drink from nightly. You have been living carefully, the way you once lived in famine years on the mountain. If the smell is what you think it is, today the famine ends.</p>';
+    return { time: 'DAY 38 \u00b7 08:40', html: html,
+      choices: [
+        { t: 'Breakfast first. Hunts go badly on empty stomachs.', to: 'e5s2' },
+        { t: 'Straight there. Hunger sharpens the nose \u2014 an old trick.', to: 'e5s2', fx: function () { state.flags.hungry = true; } }
+      ] };
+  },
+
+  /* ---------- EP5 · 2 · the museum ---------- */
+  e5s2: function () {
+    var pre = state.flags.hungry
+      ? '<p>You skip breakfast. Hunger sharpens the nose \u2014 your first teacher taught you that, then confiscated your lunch to prove it.</p>'
+      : '<p>You eat first \u2014 soy milk, a hot pancake folded around egg \u2014 because three hundred years of discipline have taught you exactly one thing about hunts: never start one hungry unless you must.</p>';
+    var html = pre +
+      '<p>The great temple announces itself a street away: stone dragons on the roofline, gold under morning sun, and a crowd flowing toward it like water finding a drain. At the gate, an actual waterfall pours down a wall of dark rock \u2014 a real waterfall, indoors, in a city \u2014 and you stop and stare at it exactly as long as every other tourist, because some things deserve it.</p>' +
+      '<p>Inside, the courtyard is a slow river of people. Tour groups follow little flags. Grandmothers pray with their whole bodies. Somewhere to the side, a queue of hopeful faces waits, forty deep, in front of one small god.</p>' +
+      '<div class="ai">That\u2019s the matchmaker. Longest line in the building. Want me to add you? The reviews are full of success stories.</div>' +
+      '<p>\u201cI am three hundred years old.\u201d</p>' +
+      '<div class="ai">So, a mature audience. He works with that.</div>' +
+      '<p>You let it go, because something is wrong, and it takes you a full minute of standing in the beautiful courtyard to name it.</p>' +
+      '<p class="beat">There is no smoke.</p>' +
+      '<p>No censer breathing. No sticks in ten thousand hands. The most beautiful hall you have seen in this realm \u2014 and it is fasting. You reach out, carefully, and find the qi at once: a sealed sea of it, deep and layered, three centuries of prayer pressed into the stone the way tea is pressed into a brick. It sleeps under this roof like treasure behind glass. And none of it \u2014 not one thread of it \u2014 is on offer.</p>' +
+      '<div class="ai">Found it. Notice on the wall: the big temples went smokeless years ago. Air quality. You can pray all you like, but nobody burns anything here anymore. \u2026Boss? You have the face of a man who walked across a desert to a closed restaurant.</div>' +
+      '<p>You stand in the crowd, starving politely, and pay the sleeping sea the respect it has earned. A magnificent granary, sealed by its own keepers, for reasons that are \u2014 you must admit \u2014 sound. This city chose clean air over burnt offerings. It is exactly the kind of rule you would write.</p>' +
+      '<p>It is also not lunch.</p>';
+    return { time: 'DAY 38 \u00b7 09:30', html: html,
+      choices: [
+        { t: 'Circle the halls once anyway. Respect costs nothing.', to: 'e5s3', fx: function () { state.flags.circled = true; } },
+        { t: 'Out. The nose was never pointing here.', to: 'e5s3' }
+      ] };
+  },
+
+  /* ---------- EP5 · 3 · the scent map ---------- */
+  e5s3: function () {
+    var pre = state.flags.circled
+      ? '<p>You walk the halls once, unhurried, hands behind your back, and bow where bowing is due. The sea sleeps on. On your way out, a volunteer smiles at you the way people smile at the well-behaved.</p>'
+      : '';
+    var html = pre +
+      '<p>Back in the lanes, you do what you should have done from the start. You close your eyes, let the city\u2019s noise fall away \u2014 scooters, frying oil, a distant drill \u2014 and read the morning air the way you once read a battlefield at night.</p>' +
+      '<p>Wanhua, it turns out, is a map written in smoke.</p>' +
+      '<p>There \u2014 south and close \u2014 a sharp, almost medicinal thread, herbs and old discipline, a smoke that smells like it corrects your posture. There \u2014 far west, faint \u2014 something festival-sweet, all sugar and firecracker ghosts. And there. Two streets north. The one from your mornings: sandalwood over old wood over something patient and stern, like a magistrate who has seen everything and pardoned some of it.</p>' +
+      '<div class="ai">You\u2019re doing the dog thing again. I love it. Which thread are we pulling?</div>';
+    return { time: 'DAY 38 \u00b7 10:15', html: html,
+      choices: [
+        { t: 'The sharp, medicinal one first. Know your neighbors.', to: 'e5s3a', fx: function () { state.flags.detour = true; } },
+        { t: 'The home smell. Two streets north. No detours.', to: 'e5s3b' }
+      ] };
+  },
+
+  /* ---------- EP5 · 3a · the alarm god ---------- */
+  e5s3a: function () {
+    var html =
+      '<p>The medicinal thread leads you three lanes south to an old temple with a deep, dark doorway and smoke that stands up straight. Boba reads the plaque before you can ask.</p>' +
+      '<div class="ai">Master Qingshui. Big deal locally. Get this: the story goes that when disaster is coming \u2014 fire, quake, trouble \u2014 the statue\u2019s nose falls off. By itself. As a warning. The nose has its own legend page.</div>' +
+      '<p>You stop in the middle of the lane.</p>' +
+      '<p>A deity who runs an early warning system. A god whose own face is the alarm \u2014 who spends his dignity, nose first, to buy his people time. Three hundred years you built wards that only ever said <em>no.</em> This house keeps a god who says <em>soon.</em></p>' +
+      '<p>\u201cThis one,\u201d you tell Boba, with the deep respect of one professional reviewing another, \u201cis good.\u201d</p>' +
+      '<div class="ai">Pinning it. But boss \u2014 sniff check. Is this your smell?</div>' +
+      '<p>It is not. Close, honorable, but not the one that visits your mornings. The home thread still pulls, two streets north, patient as ever.</p>';
+    return { time: 'DAY 38 \u00b7 10:25', html: html,
+      choices: [
+        { t: 'Bow to the alarm god from the street. Then go north.', to: 'e5s4', fx: function () { state.flags.bowed_zushi = true; } },
+        { t: 'North. The neighbor visit can wait for a calmer month.', to: 'e5s4' }
+      ] };
+  },
+
+  /* ---------- EP5 · 3b · straight north ---------- */
+  e5s3b: function () {
+    var html =
+      '<p>No detours. You have hunted this smell for thirty-eight mornings; you are not a tourist, you are a creditor, and today the debt gets paid.</p>' +
+      '<p>Two streets north, the lanes narrow and the buildings lean closer, old tile and older brick, laundry overhead like prayer flags that gave up religion. The smell thickens with every corner \u2014 sandalwood, old wood, that patient sternness underneath \u2014 until you turn the last corner and it is simply there, filling the street the way light fills a window.</p>';
+    return { time: 'DAY 38 \u00b7 10:25', html: html,
+      choices: [
+        { t: 'Walk faster.', to: 'e5s4' },
+        { t: 'Walk slower. Some meals deserve an approach.', to: 'e5s4' }
+      ] };
+  },
+
+  /* ---------- EP5 · 4 · the small temple ---------- */
+  e5s4: function () {
+    var pre = state.flags.detour
+      ? '<p>The home thread delivers you, two streets and one bow later, to a modest door on a narrow street.</p>'
+      : '';
+    var html = pre +
+      '<p>The temple is small. After the golden museum of the morning, it is almost shy \u2014 old wood, worn stone, a doorway you could miss between a tea shop and a scooter row. And above it, the air is doing the thing you crossed a district to find: breathing smoke, thin and sweet and endless, the way a sleeping dragon breathes.</p>' +
+      '<p>You do not go in. Not yet. You read the door first, because you are you.</p>' +
+      '<p>And the door is <em>excellent.</em> Three entrances: the dragon side, where the people enter; the tiger side, where the people leave; and the center doors, carved and closed, which are for the landlord alone \u2014 and the landlord of this house is a god. Painted guardians watch from the door leaves, one fair-faced, one dark, neither blinking in a hundred years. A high wooden threshold crosses each doorway like a drawn line: <em>step over, never on.</em> Flow control. Identity levels. A hard boundary with a courtesy protocol.</p>' +
+      '<p>\u201cThis house,\u201d you say, \u201cruns a tighter door than I do.\u201d</p>' +
+      '<div class="ai">High praise. Now hold still, reading the plaque\u2026 okay. Wow. Boss. Listen to this landlord\u2019s r\u00e9sum\u00e9. He was mortal once \u2014 a general, a real one, guarded a coastal county and died at his post. The people made him a god. Now he quells plagues, judges the living <em>and</em> the dead \u2014 and twice a year, at night, he goes out himself. Lamps out. Gongs and chains. He patrols these exact streets in the dark and arrests what mortal law cannot see.</div>' +
+      '<p>You stand very still in front of the small temple.</p>' +
+      '<p>A guard who never stopped guarding. A keeper of a door, promoted, who still walks his rounds three hundred years past his death \u2014 at night, when the work is real.</p>' +
+      '<p>\u201cThe god,\u201d you say, \u201cworks the night shift.\u201d</p>' +
+      '<div class="ai">The god works the night shift. You\u2019re basically coworkers. Do NOT ask him to cover Tuesday.</div>';
+    return { time: 'DAY 38 \u00b7 10:40', html: html,
+      choices: [
+        { t: 'Enter by the dragon side. Put NT$100 in the donation box. Take three sticks.', to: 'e5s5', fx: function () { state.money -= 100; } },
+        { t: 'NT$100 in the box \u2014 and a nod to the two generals inside first. Colleagues greet colleagues.', to: 'e5s5', fx: function () { state.money -= 100; state.flags.greeted = true; } }
+      ] };
+  },
+
+  /* ---------- EP5 · 5 · name, address, birthday ---------- */
+  e5s5: function () {
+    var pre = state.flags.greeted
+      ? '<p>Inside, flanking the hall, two tall generals stand in painted armor \u2014 one grinning, one grave, both entirely certain of their jurisdiction. You give them the small nod one gives colleagues at shift change. Somewhere behind your ribs, you would swear the room approves.</p>'
+      : '';
+    var html = pre +
+      '<p>You light three sticks from the oil lamp, the way the auntie in front of you did, and hold them at your brow, the way she did, facing the altar through the drifting smoke.</p>' +
+      '<p>And here the house rules catch you like a threshold you did not see.</p>' +
+      '<p>Because the auntie is speaking \u2014 softly, matter-of-fact, the way you report to a desk \u2014 and what she gives the god is: her full name. Her address, down to the alley number. Her date of birth. <em>Then</em> her request. Announce. Confirm. Then ask. The gods of this realm invented your door procedure several thousand years before your door, and they run it strictly, and now it is your turn, and there is a line behind you.</p>' +
+      '<p>A name. The judge of the living and the dead is waiting, professionally patient, for a name you have never once said out loud.</p>';
+    return { time: 'DAY 38 \u00b7 10:55', html: html,
+      choices: [
+        { t: 'Say it. The borrowed name, aloud, for the first time \u2014 to a god alone.', to: 'e5s6', fx: function () { state.flags.intro = 'name'; } },
+        { t: '\u201cThey call me Night Shift. I keep a door three streets from here. We are in the same line of work.\u201d', to: 'e5s6', fx: function () { state.flags.intro = 'title'; } },
+        { t: 'Offer no words. Lower every wall for three breaths, and let the judge read the truth himself.', to: 'e5s6', fx: function () { state.flags.intro = 'truth'; } }
+      ] };
+  },
+
+  /* ---------- EP5 · 6 · the receiving ---------- */
+  e5s6: function () {
+    var i = state.flags.intro;
+    var intro;
+    if (i === 'name') {
+      intro =
+        '<p>You say it.</p>' +
+        '<p>Two syllables, common as rice, copied off a card the system left behind \u2014 a stranger\u2019s name, worn by you the way you wear the uniform. It comes out quiet and level, and it is the first time in this world that the name has ever touched the air.</p>' +
+        '<p>The smoke does not laugh. The altar does not darken. A borrowed name, offered honestly, to a judge, at his own desk \u2014 it may be the truest thing said in this hall all morning, and you would swear the room knows it.</p>';
+    } else if (i === 'title') {
+      intro =
+        '<p>\u201cThey call me Night Shift,\u201d you tell the king of night patrols. \u201cI keep a door three streets from here. Twelve floors, one lobby, no incidents. We are, I believe, in the same line of work.\u201d</p>' +
+        '<p>The smoke over the censer stirs \u2014 draft, probably; the door is open; there are explanations \u2014 and settles again in a shape you would call, in a colleague, amusement. You add your address and, after a small internal fight, the birthday from the card. Procedure is procedure. He of all gods would want the form complete.</p>';
+    } else {
+      intro =
+        '<p>You offer no words. Words are for those who need them.</p>' +
+        '<p>Instead you do a thing you have not done since ascension: you lower the walls. All of them. For three breaths the whole ledger lies open \u2014 three hundred years, nine bolts, one rooftop, one door held nightly, two mosquitoes, one spider, one landlady saved at a machine in a wall \u2014 and you let the judge read it himself, the way one professional shows another the log, complete, uncorrected.</p>' +
+        '<p>It is either the most honest thing in this temple or the most arrogant. Possibly both. The two painted generals do not move, but the quality of their stillness changes, like guards coming to attention.</p>';
+    }
+    var html = intro +
+      '<p>Then you plant the three sticks in the censer, step back \u2014 and the house answers.</p>' +
+      '<p>The smoke drifts your way. Only the drift, only your share, the thin sweet edge of what the whole morning\u2019s worshippers have burned \u2014 and it is the richest breath you have taken in thirty-eight days. Rich qi, offered qi, warm as rice from the pot, and your starved channels drink it the way dry ground drinks the first rain. Three hundred years of discipline keep your face still.</p>' +
+      '<p>Barely.</p>' +
+      '<p>\u201cFirst time home in a while?\u201d</p>' +
+      '<p>An old man is sweeping by the side door \u2014 the temple keeper, straw broom, undershirt, eyes that have watched this hall longer than most of its paint. He is looking at you the way he probably looks at everything: without hurry, and without missing anything.</p>';
+    return { time: 'DAY 38 \u00b7 11:05', html: html,
+      choices: [
+        { t: '\u201cSomething like that.\u201d', to: 'e5s7' },
+        { t: 'Say nothing. Bow slightly. He nods slightly. A complete conversation.', to: 'e5s7' }
+      ] };
+  },
+
+  /* ---------- EP5 · 7 · the greed test ---------- */
+  e5s7: function () {
+    var html =
+      '<p>You stay a while, doing nothing that looks like anything, and take stock like a quartermaster after a famine.</p>' +
+      '<p>Reserves: half full, and rising \u2014 but slowly. The lawful drift is a gift, not a meal; it feeds every soul in the hall a little, and you are one soul among grandmothers. At this rate, filling the pool takes ten visits.</p>' +
+      '<p>And the censer stands right there. A hip-high sea of glowing coals and standing sticks, breathing out more sweetness in a minute than your rooftop gathers in a week. Unguarded. Ungated. Yours for one deep pull, and no mortal in this hall would see so much as a flicker.</p>' +
+      '<p>No mortal.</p>' +
+      '<p>The offered smoke has an owner. Every stick in that censer is addressed \u2014 a name, an alley number, a request \u2014 mail on its way up. And you know exactly two beings in this room whose entire job description is catching what steals at a god\u2019s own door, and they are eleven feet tall, and painted, and patient.</p>';
+    return { time: 'DAY 38 \u00b7 11:15', html: html,
+      choices: [
+        { t: 'Receive only. Bow, and let the drift be the meal. The house sets the portion.', to: 'e5s8', fx: function () { state.flags.greed = 'received'; } },
+        { t: 'One more breath than is offered. Just one. The sea will not miss it.', to: 'e5s8', fx: function () { state.flags.greed = 'debt'; } },
+        { t: 'Ask. There are two blocks of wood on the altar table, worn smooth by ten thousand questions.', to: 'e5s8', fx: function () { state.flags.greed = 'asked'; } }
+      ] };
+  },
+
+  /* ---------- EP5 · 8 · portions and permissions ---------- */
+  e5s8: function () {
+    var g = state.flags.greed;
+    var body;
+    if (g === 'received') {
+      body =
+        '<p>You receive only what drifts, and when it is time, you bow to the altar the way you once bowed to a grand elder: not deeply, but exactly.</p>' +
+        '<p>The portion is the portion. The house sets it; the guest honors it. You have spent a month teaching a door that rules are what make a place worth entering \u2014 you are not going to rob the first house in this realm whose rules you actually admire.</p>' +
+        '<p>Half full will do. Half full, honestly come by, keeps a dao heart cleaner than any brimming stolen pool.</p>';
+    } else if (g === 'debt') {
+      body =
+        '<p>One breath. Just one. You reach \u2014 politely, quietly, a thief with excellent table manners \u2014 and pull.</p>' +
+        '<p>The qi comes. Rich, warm, more in one pull than a morning of drifting \u2014 and under the sweetness, faint but unmistakable, a taste of iron. The taste of borrowed money in an honest mouth. The taste of a line, crossed by exactly one step.</p>' +
+        '<p>The two generals have not moved. Their painted eyes point exactly where they pointed before. And yet the quality of the hall has changed around you, the way a room changes when a ledger, somewhere, gains a line. You set down the feeling and name it like a professional: <em>debt.</em></p>' +
+        '<p>You bow lower than you have bowed in a century, and you make the entry yourself before anyone has to ask: <em>owed \u2014 one breath, this house.</em> A gatekeeper who counts on going unnoticed is a gatekeeper twice over. You, of all people, said that.</p>';
+    } else {
+      body =
+        '<p>There are two blocks of red wood on the altar table, crescent-shaped, one face flat and one face round, worn smooth by ten thousand hands and ten thousand questions. You have watched three worshippers use them: ask aloud, throw, read the answer in how they land. A yes-or-no line, straight to the landlord.</p>' +
+        '<p>A god who was a guard. A guard who became a god. If anyone in two worlds will understand the question, it is this one.</p>' +
+        '<p>\u201cKeeper of these streets,\u201d you say quietly, in the old formal cadence, \u201cone door-holder to another: may a traveler take a little more of what the house burns? It feeds a ward that keeps a lobby safe at night. Consider it \u2014 professional courtesy.\u201d</p>' +
+        '<p>You throw. The blocks knock once on the stone, roll, and settle: one flat side up, one round side up.</p>' +
+        '<p class="beat">Yes.</p>' +
+        '<p>The drift thickens \u2014 not the sea, not the censer\u2019s heart, just the share of a colleague, warm and freely given, and it pours into your dry channels like pay on the fifth of the month. Somewhere in the smoke you would swear something is amused. Night watchmen look after their own.</p>';
+    }
+    var html = body +
+      '<p>On your way out you take the tiger side, because you watched, and you learned, and this house deserves a guest who exits correctly.</p>' +
+      '<div class="ai">Pinned. Okay, boss, updating the map: the big golden one is a museum \u2014 gorgeous, sealed, no menu. Master Nose-Alarm to the south, medicinal, respectable. And this little smoky one two streets from home, run by a colleague of yours, open all hours. I\u2019m calling the layer \u201cRecharge Stations of Wanhua.\u201d Every temple smells different. You\u2019re going to want to collect them. I know you.</div>';
+    return { time: 'DAY 38 \u00b7 11:30', html: html,
+      choices: [
+        { t: 'Home. There are wards to feed.', to: 'e5s9' },
+        { t: 'One slow lap of the block first, memorizing the way by nose alone.', to: 'e5s9' }
+      ] };
+  },
+
+  /* ---------- EP5 · 9 · evening report ---------- */
+  e5s9: function () {
+    if (!state.flags.ep5done) { state.flags.ep5done = true; state.barrier = 'Ward \u00b7 Lv.5'; }
+    var money = state.money.toLocaleString('en-US');
+
+    var ach = [];
+    ach.push(['\ud83c\udfee', 'The Sweet Smoke, Named', 'Solve a five-week mystery by walking toward it.']);
+    ach.push(['\ud83d\udeaa', 'A Tighter Door Than Mine', 'Professionally audit a god\u2019s access control. Approve.']);
+    if (state.flags.intro === 'name') ach.push(['\ud83d\udcdb', 'Spoken', 'Say the borrowed name aloud for the first time \u2014 to a god alone.']);
+    else if (state.flags.intro === 'title') ach.push(['\ud83c\udf19', 'Same Line of Work', 'Introduce yourself to the king of night patrols, colleague to colleague.']);
+    else if (state.flags.intro === 'truth') ach.push(['\ud83e\udd2b', 'The Heart Speaks', 'Offer a judge the whole ledger, uncorrected.']);
+    if (state.flags.greed === 'received') ach.push(['\ud83d\ude4f', 'The House Sets the Portion', 'Receive, never take.']);
+    else if (state.flags.greed === 'debt') ach.push(['\u2696\ufe0f', 'One Breath Too Many', 'Cross a line by one step. File the debt yourself.']);
+    else if (state.flags.greed === 'asked') ach.push(['\ud83c\udfb2', 'Professional Courtesy', 'Ask the night-patrol god properly. Receive a yes.']);
+    if (state.flags.bowed_zushi) ach.push(['\ud83d\udd14', 'Respect the Alarm', 'Bow to the god whose own nose is the warning system.']);
+
+    var achHtml = '';
+    for (var i = 0; i < ach.length; i++) achHtml += '<div class="ach"><span class="name">' + ach[i][0] + ' ' + ach[i][1] + '</span><br><span class="desc">' + ach[i][2] + '</span></div>';
+
+    var guestRule = '';
+    if (state.flags.spider === 'stay') guestRule = '<br>EXC \u2014 THE GUEST: FLOOR ALLOW \u00b7 BED DENY';
+    else if (state.flags.spider === 'pact') guestRule = '<br>EXC \u2014 WHITEBROW, WARDEN OF THE FLOOR: FLOOR ALLOW \u00b7 BED DENY';
+    else if (state.flags.spider === 'expel') guestRule = '<br>RULE \u2014 THE LITTLE DOOR: SEALED';
+    var debtLine = state.flags.greed === 'debt' ? '<br>DEBT \u2014 ONE BREATH \u00b7 THE SMALL TEMPLE (UNPAID)' : '';
+
+    var reservesLine = state.flags.greed === 'received'
+      ? 'Reserves: comfortably half, honestly come by, rising with every visit.'
+      : 'Reserves: full. FULL, boss. First time since you landed on that roof.';
+
+    var html =
+      '<p>Evening on the rooftop, and for the first time since ascension you are not rationing.</p>' +
+      '<p>You walk your little territory and feed every ward like a farmer after harvest. The bed line, deepened. The room\u2019s rules, re-inked. The door ward downtown will get its share tonight, thick enough to bounce a bull. It takes minutes. It used to take everything.</p>' +
+      '<div class="ai">Evening report. Funds: NT$' + money + '. ' + reservesLine + ' Map: three temples pinned, one colleague acquired, zero incidents. And the five-week mystery of the sweet smoke is officially closed. It was never a mystery, by the way. It was an invitation.</div>' +
+      '<p>You stand at the roof edge with tea, facing the direction of the small temple, and raise the cup slightly \u2014 to the general who never clocked out.</p>' +
+      '<div class="ai">One more thing. Weather alert: something\u2019s forming east of the island. Big, slow, wet. Days away. Probably nothing.</div>' +
+      '<p>\u201cStorms and I,\u201d you say, \u201chave an old score.\u201d Nine bolts, and you are still standing. \u201cLet it come.\u201d</p>' +
+      '<p>Somewhere east, over black water, the sky files that away.</p>' +
+      '<div class="endhead">Episode 5 Complete</div>' +
+      achHtml +
+      '<div class="endhead">Definition Library \u00b7 v0.5</div>' +
+      '<div class="libcard">RULE 01 \u2014 INSECTS: DENY (BED)<br>RULE 02 \u2014 THOSE WHO DO NOT BELONG: DENY (ONE DOORWAY)<br>RULE 03 \u2014 OUTSIDE NOISE: DENY \u00b7 EXC: WHAT FEEDS THE BRICK \u00b7 THE ALARM \u00b7 A KNOCK<br>RULE 04 \u2014 WATER FALLING FROM ABOVE: DENY<br>RULE 05 \u2014 WATER THAT WALKS IN PIPES: ALLOW<br>RULE 06 \u2014 MALICE ON THE THREAD: DENY (THE BRICK, AT HOME)' + guestRule + '<br><br>LAW 01 \u2014 OFFERED QI: RECEIVE, NEVER TAKE' + debtLine + '<br><br>ANSWERED \u2014 the sweet smoke: INCENSE, OFFERED QI \u00b7 MAP: TEMPLE LAYER OPEN<br>UNDEFINED: tame lightning \u00b7 the invisible thread (excepted, not understood)</div>';
+    return { time: 'DAY 38 \u00b7 19:40', html: html,
+      choices: [
+        { t: 'EPISODE 6 \u2014 Coming soon', to: '__locked__' },
+        { t: 'Play again from the beginning', to: '__restart__' }
+      ] };
+  },
+
 };
 
 /* ============ auto-linker ============ */
@@ -817,17 +2286,26 @@ function linkify() {
 /* ============ engine ============ */
 var wrap = document.getElementById('wrap');
 var moneyView = document.getElementById('moneyView');
-var shieldView = document.getElementById('shieldView');
 var barTitle = document.getElementById('barTitle');
 
 /* Episode metadata. Future episodes add an entry; the banner reads from here. */
-var EPISODE = { num: 1, title: 'The Cheap Room' };
+var EPISODES = {
+  e1: { num: 1, title: 'The Cheap Room' },
+  e2: { num: 2, title: 'The Night Shift' },
+  e3: { num: 3, title: 'The Guest' },
+  e4: { num: 4, title: 'The Phone Call' },
+  e5: { num: 5, title: 'The Temple' }
+};
+function currentEpisode() {
+  var m = /^e(\d+)/.exec(cur);
+  return (m && EPISODES['e' + m[1]]) || EPISODES.e1;
+}
 
 function renderBar() {
-  if (cur === 'title') { moneyView.textContent = ''; shieldView.textContent = ''; return; }
-  barTitle.innerHTML = 'EP' + EPISODE.num + ' <span class="ep">' + EPISODE.title + '</span>';
+  if (cur === 'title') { moneyView.textContent = ''; return; }
+  var ep = currentEpisode();
+  barTitle.innerHTML = '\ud83d\udee1\ufe0f EP' + ep.num + ' <span class="ep">' + ep.title + '</span>';
   moneyView.textContent = '\ud83d\udcb0 NT$' + state.money.toLocaleString('en-US');
-  shieldView.textContent = state.barrier ? '\ud83d\udee1\ufe0f ' + state.barrier : '';
 }
 
 /* ============ title-screen animation: spiral ward + mosquitoes ============ */
@@ -969,7 +2447,6 @@ function render() {
   closeTip();
   var sec = sections[cur]();
   var html = '';
-  if (sec.label) html += '<div class="seclabel">' + sec.label + '</div>';
   if (sec.time) html += '<div class="quiet stamp">' + sec.time + '</div>';
   html += sec.html;
   html += '<div class="choices" id="choices"></div>';
