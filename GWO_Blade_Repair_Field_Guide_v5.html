@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GWO Blade Repair — Interpreter's Field Guide</title>
+<style>
+  :root{
+    --paper:#EBEEED; --surface:#FFFFFF; --surface-2:#F5F8F7;
+    --ink:#14201C; --muted:#5A6762; --hairline:#D2DAD7; --hairline-strong:#B9C3BF;
+    --theory:#1E5F78; --theory-soft:#E4EEF2;
+    --practical:#AF5220; --practical-soft:#F6E9E1;
+    --source:#5B6E2E; --source-soft:#EBF0DF;
+    --signal:#C9891A; --focus:#1E5F78;
+    --mono: ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+    --sans: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    --han: "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    font-feature-settings:"kern" 1;text-rendering:optimizeLegibility}
+  a{color:inherit}
+  :focus-visible{outline:2.5px solid var(--focus);outline-offset:2px;border-radius:3px}
+
+  header.top{position:sticky;top:0;z-index:20;background:var(--ink);color:#EEF2F0;border-bottom:1px solid #0c1512}
+  .top-inner{max-width:1000px;margin:0 auto;padding:0 18px}
+  .brandrow{display:flex;align-items:center;gap:14px;height:58px}
+  .mark{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;min-width:0}
+  .mark svg{flex:none;display:block}
+  .mark .code{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:#8FB6C4;
+    border:1px solid #35494f;padding:3px 7px;border-radius:4px;white-space:nowrap}
+  .mark .titles{min-width:0}
+  .mark .t1{font-weight:650;font-size:15px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mark .t2{font-family:var(--han);font-size:11.5px;color:#93A39D;margin-top:1px}
+  .rev{margin-left:auto;font-family:var(--mono);font-size:11px;color:#7f938c;white-space:nowrap}
+
+  .ctx{background:var(--surface);border-bottom:1px solid var(--hairline)}
+  .ctx-inner{max-width:1000px;margin:0 auto;padding:0 18px;min-height:52px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+
+  .seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--hairline-strong);border-radius:9px;padding:3px}
+  .seg button{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--muted);background:transparent;border:0;
+    padding:7px 13px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s,color .15s}
+  .seg button .n{font-family:var(--mono);font-size:10.5px;opacity:.7}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+  .seg button[aria-pressed="true"] .n{opacity:.6}
+
+  .search{position:relative;margin-left:auto;flex:1 1 220px;max-width:340px;min-width:180px}
+  .search input{width:100%;font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--surface-2);
+    border:1px solid var(--hairline-strong);border-radius:9px;padding:9px 32px 9px 34px}
+  .search input::placeholder{color:#93a09b}
+  .search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:.5}
+  .search .clr{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;cursor:pointer;
+    color:var(--muted);font-size:17px;line-height:1;padding:2px 5px;border-radius:5px;display:none}
+  .search .clr.show{display:block}
+
+  .back{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:13.5px;font-weight:600;color:var(--theory);
+    padding:7px 12px 7px 9px;border:1px solid var(--hairline-strong);border-radius:9px;background:var(--surface-2)}
+  .back:hover{background:#eef3f2}
+  .crumb{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;min-width:0}
+  .crumb .sep{color:var(--hairline-strong)}
+  .crumb .here{color:var(--ink);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .crumb .code{font-family:var(--mono);font-size:12px}
+
+  main{max-width:1000px;margin:0 auto;padding:26px 18px 90px}
+  .lede{margin:2px 0 24px;max-width:72ch}
+  .lede h1{font-size:22px;letter-spacing:-.015em;margin:0 0 6px}
+  .lede p{margin:0;color:var(--muted);font-size:14.5px}
+
+  .group{margin:34px 0 12px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .group:first-of-type{margin-top:6px}
+  .group .idx{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--hairline-strong);
+    border-radius:5px;padding:2px 8px;letter-spacing:.06em}
+  .group h2{font-size:15px;letter-spacing:.02em;text-transform:uppercase;margin:0}
+  .group .zh{font-family:var(--han);font-size:13px;color:var(--muted);font-weight:500}
+  .group .meta{margin-left:auto;font-size:12.5px;color:var(--muted);font-family:var(--mono)}
+  .group.theory .idx{color:var(--theory);border-color:#a9cad6}
+  .group.practical .idx{color:var(--practical);border-color:#e0bda8}
+
+  .rows{display:grid;gap:8px}
+  a.row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;text-decoration:none;
+    background:var(--surface);border:1px solid var(--hairline);border-radius:11px;padding:13px 15px;
+    transition:border-color .14s,transform .14s,box-shadow .14s}
+  a.row:hover{border-color:var(--hairline-strong);transform:translateY(-1px);box-shadow:0 4px 14px -8px rgba(20,32,28,.28)}
+  .chip{font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.02em;padding:5px 9px;border-radius:7px;
+    white-space:nowrap;border:1px solid transparent}
+  .chip.T{color:var(--theory);background:var(--theory-soft);border-color:#cfe2e9}
+  .chip.P{color:var(--practical);background:var(--practical-soft);border-color:#ecd6c6}
+  .chip.S{color:var(--source);background:var(--source-soft);border-color:#d4dfbf}
+  .row .body{min-width:0}
+  .row .ttl{font-size:14.5px;font-weight:600;letter-spacing:-.005em;line-height:1.35}
+  .row .sub{font-size:12.5px;color:var(--muted);margin-top:3px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+  .row .tag{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap;border:1px solid var(--hairline);border-radius:6px;padding:3px 8px}
+  .row .tag.theory{color:var(--theory)} .row .tag.practical{color:var(--practical)} .row .tag.src{color:var(--source)}
+
+  .empty{background:var(--surface);border:1px dashed var(--hairline-strong);border-radius:12px;padding:26px;text-align:center;color:var(--muted);font-size:14px}
+
+  .termhead{font-size:13px;color:var(--muted);margin:4px 0 10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+  .terms{display:grid;gap:7px;margin-bottom:26px}
+  a.term{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;text-decoration:none;background:var(--surface);
+    border:1px solid var(--hairline);border-radius:10px;padding:11px 14px}
+  a.term:hover{border-color:var(--hairline-strong)}
+  .term .en{font-weight:600;font-size:14px}
+  .term .zh{font-family:var(--han);color:var(--theory);font-size:14px;margin-left:8px}
+  .term .def{font-size:12.5px;color:var(--muted);margin-top:3px}
+  .term .loc{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap}
+  mark{background:#fbe7b3;color:inherit;border-radius:2px;padding:0 1px}
+
+  .detail-head{border-bottom:1px solid var(--hairline);padding-bottom:20px;margin-bottom:6px}
+  .detail-head .kicker{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .detail-head .day{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--hairline-strong);border-radius:6px;padding:3px 9px}
+  .detail-head h1{font-size:24px;letter-spacing:-.02em;line-height:1.2;margin:0;max-width:36ch}
+  .detail-head .summary{margin:14px 0 0;font-size:15.5px;color:#2c3a35;max-width:66ch;line-height:1.55}
+
+  .xref{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .xref .lbl{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  a.pill{text-decoration:none;font-family:var(--mono);font-size:12px;font-weight:600;padding:4px 9px;border-radius:7px;border:1px solid transparent;white-space:nowrap}
+  a.pill.S{color:var(--source);background:var(--source-soft);border-color:#d4dfbf}
+  a.pill.T{color:var(--theory);background:var(--theory-soft);border-color:#cfe2e9}
+  a.pill.P{color:var(--practical);background:var(--practical-soft);border-color:#ecd6c6}
+  a.pill:hover{filter:brightness(.97)}
+  a.pill .nm{font-family:var(--sans);font-weight:500;color:var(--muted);margin-left:2px}
+
+  section.block{margin-top:34px}
+  .block > h3{display:flex;align-items:center;gap:10px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 14px}
+  .block > h3::after{content:"";flex:1;height:1px;background:var(--hairline)}
+  .block > h3 .zh{font-family:var(--han);font-weight:500;text-transform:none;letter-spacing:0}
+
+  .gloss{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid var(--hairline);
+    border-radius:12px;overflow:hidden;font-size:14px}
+  .gloss thead th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;font-weight:600;
+    padding:10px 14px;background:var(--surface-2);border-bottom:1px solid var(--hairline)}
+  .gloss td{padding:11px 14px;border-bottom:1px solid var(--hairline);vertical-align:top}
+  .gloss tr:last-child td{border-bottom:0}
+  .gloss td.en{font-weight:600;width:30%}
+  .gloss td.zh{font-family:var(--han);color:var(--theory);width:22%;font-weight:500}
+  .gloss td.def{color:var(--muted);font-size:13px}
+  .gloss tbody tr:hover{background:#fafcfb}
+
+  .qa-grid{display:grid;gap:16px}
+  @media(min-width:720px){.qa-grid{grid-template-columns:1fr 1fr}}
+  .qcard{background:var(--surface);border:1px solid var(--hairline);border-radius:12px;padding:16px 18px}
+  .qcard h4{margin:0 0 4px;font-size:14px;display:flex;align-items:center;gap:8px}
+  .qcard .dir{font-family:var(--mono);font-size:11px;padding:3px 7px;border-radius:5px}
+  .qcard.ask h4 .dir{background:var(--theory-soft);color:var(--theory)}
+  .qcard.get h4 .dir{background:var(--practical-soft);color:var(--practical)}
+  .qcard .zhlead{font-family:var(--han);font-size:12px;color:var(--muted);margin:0 0 12px}
+  .qcard ol{margin:0;padding-left:1.15em;display:grid;gap:12px}
+  .qcard li{font-size:14px;line-height:1.5;padding-left:3px}
+  .qcard li::marker{color:var(--muted);font-family:var(--mono);font-size:12px}
+  .qcard li .zh{display:block;font-family:var(--han);font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5}
+
+  .prevnext{display:flex;gap:10px;margin-top:40px;padding-top:22px;border-top:1px solid var(--hairline)}
+  a.pn{flex:1;text-decoration:none;background:var(--surface);border:1px solid var(--hairline);border-radius:11px;padding:12px 15px;transition:border-color .14s}
+  a.pn:hover{border-color:var(--hairline-strong)}
+  a.pn.next{text-align:right}
+  a.pn .lbl{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  a.pn .nm{font-size:13.5px;font-weight:600;margin-top:2px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+  a.pn.disabled{opacity:.4;pointer-events:none}
+
+  footer.foot{max-width:1000px;margin:0 auto;padding:24px 18px 40px;color:var(--muted);font-size:12px}
+  footer.foot .han{font-family:var(--han)}
+
+  @media(max-width:600px){
+    .brandrow{height:52px} .mark .t2{display:none}
+    .search{order:3;flex-basis:100%;max-width:none;margin:0 0 12px}
+    .ctx-inner{padding-top:12px;padding-bottom:4px}
+    .gloss td.def{display:none} .gloss td.en,.gloss td.zh{width:auto}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-inner"><div class="brandrow">
+  <a class="mark" href="#/day" aria-label="Home">
+    <svg width="30" height="18" viewBox="0 0 60 36" aria-hidden="true">
+      <path d="M2 18 C 14 6, 44 8, 58 15 C 46 16, 20 20, 2 18 Z" fill="#2c4a52" stroke="#7cb8c7" stroke-width="1.4"/>
+      <line x1="2" y1="18" x2="58" y2="15" stroke="#7cb8c7" stroke-width="1" stroke-dasharray="2 2" opacity=".7"/>
+    </svg>
+    <span class="code">GWO·BR</span>
+    <span class="titles">
+      <span class="t1">Blade Repair — Interpreter's Field Guide</span>
+      <span class="t2">風機葉片維修 · 逐步口譯速查手冊</span>
+    </span>
+  </a>
+  <span class="rev">v5.0</span>
+</div></div></header>
+
+<div class="ctx"><div class="ctx-inner" id="ctx"></div></div>
+<main id="view" tabindex="-1"></main>
+<footer class="foot">
+  <div id="footnote"></div>
+</footer>
+
+<script>
+/* ============================ LESSON DATA ============================ */
+/* gloss: [en, zh, context] ; ask/get: [en, zh] ; src: PPT section ids */
+const LESSONS = [
+/* ---- DAY 1 ---- */
+{id:"T1",type:"theory",day:1,src:["S1"],title:"Introduction and Course Summary, Tour of Facilities",
+ summary:"Opens the ten-day course: GWO's mission and the scope/learning objectives of the module, enrolment, assessment methods and appeal procedures, site orientation and emergency routes, and the human factors behind wind-industry accidents.",
+ gloss:[
+  ["GWO (Global Wind Organisation)","全球風能組織","Association of turbine owners and manufacturers aiming for an injury-free wind industry."],
+  ["Blade Repair (BR) module","葉片維修模組","The GWO training module delivered by this course."],
+  ["Learning objective","學習目標","What a trainee will be able to do on completion."],
+  ["Scope","課程範疇","The aims and boundaries of the module."],
+  ["Assessment methods","評估方法","How competence is measured — continuous assessment plus a test."],
+  ["Appeal procedure","申訴程序","Route to challenge an assessment result."],
+  ["Special considerations","特殊考量","Adjustments for individual trainee needs."],
+  ["WINDA ID","WINDA 識別碼","GWO training-record identifier checked at registration."],
+  ["Muster point","緊急集合點","Safe assembly area to move to in an emergency."],
+  ["Fire alarm / break-glass point","火災警報器","Manual call point to raise the alarm."],
+  ["First aid / Defibrillator (AED)","急救箱／AED","On-site emergency medical equipment."],
+  ["Certificate without expiry","無效期證照","GWO BR certificate has no fixed expiry date."],
+  ["Human factor","人為因素","Conditions (fatigue, peer pressure, weather) that raise accident risk."]],
+ ask:[
+  ["What do you already know about working on rotor blades?","你對葉片維修工作已經有哪些認識？"],
+  ["Where is the muster point for this facility?","本場地的緊急集合點在哪裡？"],
+  ["What is the main objective of the GWO Blade Repair module?","GWO 葉片維修模組的主要目標是什麼？"],
+  ["Why does GWO standardise training across the industry?","GWO 為什麼要在整個產業推行標準化訓練？"],
+  ["Can you name three human factors that influence accidents?","你能舉出三個影響事故的人為因素嗎？"],
+  ["What will this course NOT make you — a fully independent technician?","本課程無法讓你成為什麼——一位完全獨立作業的技術人員嗎？"],
+  ["What are your own expectations from these ten days?","你對這十天課程有什麼期望？"],
+  ["Why is personal involvement important to your learning outcome?","為什麼親身參與對你的學習成果很重要？"]],
+ get:[
+  ["Does the GWO certificate have an expiry date?","GWO 證照有效期嗎？"],
+  ["How is the final assessment structured?","期末評估是如何安排的？"],
+  ["What is the appeal procedure if I disagree with a result?","如果我不同意評估結果，申訴程序是什麼？"],
+  ["Where are the toilets, break areas and first-aid points?","洗手間、休息區和急救點在哪裡？"],
+  ["What do I do if the fire alarm sounds during the course?","上課期間若火警響起，我該怎麼辦？"],
+  ["Is there a weight limit for the practical training?","實作訓練有體重限制嗎？"],
+  ["What experience level is expected before this course?","上這門課之前需要什麼程度的經驗？"],
+  ["Will I be able to work independently after the course?","結訓後我能獨立作業嗎？"]]},
+
+{id:"T2",type:"theory",day:1,src:["S2"],title:"Basics of Rotor Blade Design, Structure and Materials",
+ summary:"Introduces blade anatomy from root to tip, the two main structural families (structural vs non-structural shell), the internal load-bearing components, and how to define positions on a blade for measuring damage.",
+ gloss:[
+  ["Rotor blade","轉子葉片","The aerofoil that captures wind energy."],
+  ["Leading edge","前緣","Forward edge meeting the wind first; most erosion-prone."],
+  ["Trailing edge","後緣","Rear edge where the shells meet; thin, prone to bond-line failure."],
+  ["Root / Tip","根部／葉尖","Thick hub-connection base vs the outer end of the blade."],
+  ["Chord / Maximum chord","弦長／最寬處","Width of the blade section; its widest point."],
+  ["Suction side (leeward)","吸力面（背風側）","Low-pressure aerodynamic surface."],
+  ["Pressure side (windward)","壓力面（迎風側）","High-pressure aerodynamic surface."],
+  ["Sparcap / Spar","翼樑帽／翼樑","Main load-bearing spine along the blade centre."],
+  ["Shear web","抗剪腹板","Links sparcaps to stop them collapsing — forms an “I-beam”."],
+  ["Structural shell","結構殼","Load carried in the outer shell (GE, Enercon, Nordex)."],
+  ["Non-structural shell / Box-spar","非結構殼／箱形樑","Aerodynamic shell around an internal box-spar (Vestas, Gamesa)."],
+  ["Bulkhead","隔板","Internal partition within the blade."],
+  ["Bond line","黏合線","Glued joint between blade halves/parts."],
+  ["Prebend","預彎","Built-in curvature so a loaded blade clears the tower."],
+  ["Radius measurement","半徑量測","Positions defined by distance from root; used to locate damage."]],
+ ask:[
+  ["Can you name the parts of a blade from root to tip?","你能從根部到葉尖說出葉片各部位嗎？"],
+  ["What is the job of the sparcap?","翼樑帽的功能是什麼？"],
+  ["Why do the shear webs form an “I-beam”?","抗剪腹板為什麼要形成「工字樑」結構？"],
+  ["How do structural and non-structural shell blades differ?","結構殼與非結構殼葉片有什麼不同？"],
+  ["Which is the suction side and which the pressure side?","哪一面是吸力面，哪一面是壓力面？"],
+  ["How do you use radius measurements to locate damage?","你如何用半徑量測來定位損傷位置？"],
+  ["Why does the blade need prebend?","葉片為什麼需要預彎？"],
+  ["What is the function of the core material in a shell?","殼體中芯材的功能是什麼？"]],
+ get:[
+  ["How long is a typical modern blade?","現代葉片一般有多長？"],
+  ["Which manufacturers use which structure type?","哪些製造商使用哪一種結構型式？"],
+  ["Where does the blade carry most of its load?","葉片的主要載荷集中在哪裡？"],
+  ["How do I know if I'm on a structural or non-structural blade?","我怎麼判斷手上是結構殼還是非結構殼葉片？"],
+  ["What are the bolts at the root for?","根部的螺栓是做什麼用的？"],
+  ["How precise does a radius measurement need to be?","半徑量測需要多精確？"],
+  ["Does prebend change how I set up rope access?","預彎會影響繩索作業的架設方式嗎？"],
+  ["Why does damage location matter for the repair method?","損傷位置為什麼會影響修復方法？"]]},
+
+{id:"T3",type:"theory",day:1,src:["S2","S3"],title:"Introduction to Manufacturing Technology and Production Processes",
+ summary:"How blades are made: Type A open-mould production (heated, computer-controlled, ~48 h per blade) versus Type B inflatable-bag construction that avoids bond lines — and why the build method matters for repair.",
+ gloss:[
+  ["Manufacturing Type A","製造方法 A","Open heated moulds, materials added and infused, then bonded — most manufacturers."],
+  ["Manufacturing Type B","製造方法 B","Inflatable-bag build, infused in one piece — the Siemens route, no bond lines."],
+  ["Mould","模具","Heated, computer-controlled tool the blade is formed in."],
+  ["Hydraulic hinge","液壓鉸鏈","Closes the heavy mould halves."],
+  ["Mandrel","芯軸","Holds the internal structure against the shell during cure (Type B)."],
+  ["Resin infusion","樹脂灌注","Vacuum-driven resin flow for void-free laminate."],
+  ["Bond line","黏合線","Glued joint between blade halves; avoided in Type B."],
+  ["Wet lamination","濕式層壓","Applying liquid resin to dry fabric by hand."]],
+ ask:[
+  ["Why does the Type B process avoid bond lines?","B 型製程為什麼能避免黏合線？"],
+  ["What is the main benefit of a bond-line-free blade?","無黏合線葉片的主要好處是什麼？"],
+  ["Roughly how long does it take to mould a 50–70 m blade?","製造一支 50–70 公尺的葉片大約要多久？"],
+  ["Why should a repair technician understand how a blade was built?","維修技術人員為什麼要了解葉片的製造方式？"],
+  ["What holds the internal structure in place during a Type B cure?","B 型製程固化時是什麼固定內部結構？"],
+  ["Which method do most manufacturers use?","大多數製造商採用哪一種方法？"],
+  ["Where are bond lines typically found on a Type A blade?","A 型葉片的黏合線通常出現在哪裡？"],
+  ["Why is the leading edge a weak point on bonded blades?","為什麼前緣是黏合式葉片的弱點？"]],
+ get:[
+  ["Are all blades made the same way?","所有葉片都用同樣方式製造嗎？"],
+  ["Does the build method change how I repair it?","製造方式會改變我的修復方式嗎？"],
+  ["What are the weak points of each process?","每種製程的弱點在哪裡？"],
+  ["How many people does it take to mould a blade?","製造一支葉片需要多少人？"],
+  ["How long before a moulded blade is ready to ship?","葉片成型後多久才能出貨？"],
+  ["Which manufacturer uses the inflatable-bag method?","哪家製造商使用充氣袋製程？"],
+  ["Can a bond line be repaired on site?","黏合線可以在現場修復嗎？"],
+  ["Does infusion make a stronger laminate than hand layup?","灌注做出來的層板比手糊更強嗎？"]]},
+
+{id:"T4",type:"theory",day:1,src:["S1","S7","S8","S9","S10","S11","S12","S13","S14"],title:"Basics of HSE for Composites and Working on Rotor Blades",
+ summary:"Health, safety and environment fundamentals for composite work: the hierarchy of control, chemical hazards (exotherm, sensitisation, dermatitis), PPE and respiratory protection, waste segregation, LOTO, ergonomics and securing the work area. This single lesson is backed by roughly a third of the training deck.",
+ gloss:[
+  ["HSE (Health, Safety & Environment)","環安衛","The safety discipline governing all site work."],
+  ["Hierarchy of control","控制階層","Eliminate, substitute, engineering, administrative, then PPE."],
+  ["PPE","個人防護裝備","Last line of defence in the hierarchy of control."],
+  ["Sensitisation","過敏（致敏）","Immune reaction to epoxy that can end a resin career (<2% of users)."],
+  ["Dermatitis","皮膚炎","Skin reaction to resin/hardener or sanding dust (<10% of users)."],
+  ["Exotherm","放熱反應","Heat released by curing resin — a smoke and fire risk in bulk."],
+  ["Exclusion zone","警示區","Barrier zone guarding against dropped objects and other hazards."],
+  ["Waste segregation","廢棄物分類","Separating ordinary from chemical waste."],
+  ["Lock Out Tag Out (LOTO)","上鎖掛牌","Locking energy sources to prevent unexpected start-up."],
+  ["Ergonomics","人因工程","Correct posture to reduce strain and injury."],
+  ["Local exhaust ventilation (LEV)","局部排氣通風","Captures airborne contaminant at source."],
+  ["Human factor","人為因素","Fatigue, peer pressure, weather etc. that raise accident risk."]],
+ ask:[
+  ["What is the hierarchy of control, and where does PPE sit in it?","控制階層是什麼？PPE 位於其中哪一層？"],
+  ["Why is PPE the last line of defence, not the first?","為什麼 PPE 是最後一道防線，而不是第一道？"],
+  ["What is sensitisation and who does it affect?","什麼是致敏？它會影響哪些人？"],
+  ["Why is exotherm dangerous with a large pot of resin?","一大桶樹脂為什麼會有放熱反應的危險？"],
+  ["When must you set up an exclusion zone?","什麼情況下必須設置警示區？"],
+  ["How do you segregate ordinary from chemical waste?","一般廢棄物與化學廢棄物要如何分類？"],
+  ["What is the purpose of Lock Out Tag Out?","上鎖掛牌的目的是什麼？"],
+  ["Why is correct posture important when working on a blade?","在葉片上作業時，正確姿勢為什麼重要？"]],
+ get:[
+  ["What PPE will I need for resin work?","做樹脂作業需要哪些 PPE？"],
+  ["Can epoxy really cause a permanent allergy?","環氧樹脂真的會造成永久性過敏嗎？"],
+  ["How long can I safely work inside a blade?","我在葉片內部安全作業的時間上限是多久？"],
+  ["What do I do with leftover mixed resin?","調好用不完的樹脂要怎麼處理？"],
+  ["Where do I dispose of contaminated PPE?","被汙染的 PPE 要丟在哪裡？"],
+  ["Which energy sources need locking out?","哪些能源需要上鎖隔離？"],
+  ["How do I set up an exclusion zone correctly?","警示區要怎麼正確設置？"],
+  ["What are the signs that dust exposure is too high?","粉塵暴露過高會有哪些徵兆？"]]},
+
+{id:"T5",type:"theory",day:1,src:["S3","S12"],title:"Laminate Resin and Fibre Types, and Basic Calculations for Composites",
+ summary:"The building blocks of a laminate: fibre reinforcements (E-/S-glass, carbon; UD/biax/triax and nomenclature), resin systems (epoxy vs ester, catalyst/hardener/accelerator, mix ratio), the matrix, and estimating how much resin a repair needs.",
+ gloss:[
+  ["Composite","複合材料","Fibre reinforcement bound in a resin matrix."],
+  ["Laminate","層板（層壓板）","Stacked, resin-bonded plies of reinforcement."],
+  ["Reinforcement / Fibre / Fabric","強化材料／纖維／織物","Names for the fibre mats laminated into the composite."],
+  ["Matrix","基材","The resin binding the fibres and transferring load."],
+  ["E-Glass / S-Glass","電子玻璃／高強度玻纖","Most common reinforcement vs a higher-strength grade."],
+  ["Carbon fibre","碳纖維","High strength, low mass; 5–8× the price of E-glass."],
+  ["Chopped strand mat","短切氈","Easy-to-use mat, low strength; rare in blades."],
+  ["Unidirectional (UD)","單向布","Fibres all one direction — highest strength, common in blades."],
+  ["Biaxial (Biax) / Triaxial (Triax)","雙軸／三軸布","Stitched fabrics at set angles (e.g. +45/-45)."],
+  ["Fibre orientation","纖維方向","Direction relative to the blade's 0° (length) axis."],
+  ["Resin","樹脂","Liquid that cures to bind the fibres; density ~1.0–1.1."],
+  ["Epoxy resin","環氧樹脂","Common in large blades; needs heat, fixed mix ratio."],
+  ["Polyester / Vinylester","聚酯／乙烯基酯","Ester resins with variable, catalyst-driven cure."],
+  ["Catalyst / Hardener / Accelerator","催化劑／硬化劑／加速劑","Components that start, enable or speed the cure."],
+  ["Mix ratio","混合比","Component A:B proportion (epoxy 100:20 to 100:50) — fixed for epoxy."]],
+ ask:[
+  ["Why does dry glass look white and wet-out glass translucent?","乾玻纖為什麼呈白色，浸潤後卻變半透明？"],
+  ["What does that colour change tell you about quality?","這種顏色變化告訴你關於品質的什麼訊息？"],
+  ["What is the difference between E-glass and S-glass?","電子玻璃和高強度玻纖有什麼差別？"],
+  ["What do UD, Biax and Triax mean?","UD、Biax、Triax 分別是什麼意思？"],
+  ["Why can't you vary an epoxy mix ratio?","環氧樹脂的混合比為什麼不能更改？"],
+  ["How does epoxy cure differ from polyester cure?","環氧樹脂與聚酯樹脂的固化方式有何不同？"],
+  ["How do you work out how much resin a repair needs?","你如何計算一次修復需要多少樹脂？"],
+  ["Which axis is 0° when reading fibre orientation?","判讀纖維方向時，0 度是哪一個軸？"]],
+ get:[
+  ["How do I know if I've added enough resin?","我怎麼知道樹脂加得夠不夠？"],
+  ["Is carbon always better than glass?","碳纖維一定比玻纖好嗎？"],
+  ["What happens if my mix ratio is slightly off?","混合比稍微不對會怎樣？"],
+  ["Why is heat so important for epoxy?","熱對環氧樹脂為什麼這麼重要？"],
+  ["Can I speed up a polyester cure?","我可以加快聚酯樹脂的固化嗎？"],
+  ["How do I read the fabric nomenclature code?","布材的命名代碼要怎麼判讀？"],
+  ["What does the number after the glass type mean?","玻纖型號後面的數字代表什麼？"],
+  ["Why is carbon harder to work with than glass?","碳纖維為什麼比玻纖難處理？"]]},
+
+{id:"P1",type:"practical",day:1,src:["S3","S15"],title:"Demonstrations: Materials and Processes for Wind Turbine Blades",
+ summary:"Hands-on introduction where the instructor demonstrates the core materials and repair processes the trainees will use throughout the week.",
+ gloss:[
+  ["Wet lamination","濕式層壓","Applying liquid resin to dry fabric by hand."],
+  ["Consolidation","壓實","Compressing each ply to remove air and excess resin."],
+  ["Peel ply","剝離布","Sacrificial layer peeled off to leave a clean, bondable surface."],
+  ["Reinforcement","強化材料","The fibre fabric being laminated."],
+  ["Mixing pot / stick","混合杯／攪拌棒","For measuring and mixing resin."],
+  ["Paddle roller","槳式滾筒","Rolls out laminate so fibres lie flat and resin spreads evenly."],
+  ["Nylon resin roller","尼龍滾筒","Applies epoxy resin to the fabric."]],
+ ask:[
+  ["What did you notice about how the resin wets out the glass?","你觀察到樹脂是怎麼浸潤玻纖的？"],
+  ["Why do we consolidate each ply?","我們為什麼要把每一層壓實？"],
+  ["What is the purpose of peel ply?","剝離布的用途是什麼？"],
+  ["Which material behaviours surprised you?","哪些材料特性讓你意外？"],
+  ["What tools are used to roll out a laminate?","推開層板要用哪些工具？"],
+  ["How can you tell the glass is fully wetted?","你怎麼判斷玻纖已完全浸潤？"],
+  ["Why keep resin quantity optimised?","為什麼樹脂用量要拿捏得剛好？"],
+  ["What does trapped air do to the laminate?","殘留空氣對層板有什麼影響？"]],
+ get:[
+  ["How much resin do I mix at once?","我一次要調多少樹脂？"],
+  ["How do I avoid trapping air?","我要怎麼避免包進空氣？"],
+  ["How long do I have before it cures?","固化前我有多少作業時間？"],
+  ["Can you show that step again?","那個步驟可以再示範一次嗎？"],
+  ["Which roller do I use for which step?","每個步驟各用哪一種滾筒？"],
+  ["How hard should I press when consolidating?","壓實時要用多大力道？"],
+  ["What does a good laminate look like?","做得好的層板看起來是什麼樣子？"],
+  ["When exactly do I lay the peel ply?","剝離布到底要在哪個時機鋪上？"]]},
+
+{id:"P2",type:"practical",day:1,src:["S3","S15"],title:"Laminations and Exercises Using Wet Lamination Techniques, Including Peel Ply",
+ summary:"First hands-on layup: building a wet-laminated sample, consolidating plies to drive out air, keeping fibre orientation correct, and finishing with peel ply.",
+ gloss:[
+  ["Wet lamination","濕式層壓","The default hand-layup repair process."],
+  ["Ply","層（單層）","A single reinforcement layer."],
+  ["Consolidation","壓實","Compressing plies so no air is trapped."],
+  ["Peel ply","剝離布","Applied last; leaves a clean surface for later bonding."],
+  ["Paddle roller","槳式滾筒","Ensures fibres lie flat and resin penetrates each layer."],
+  ["Air void","氣孔","Trapped air that weakens the laminate."],
+  ["Fibre orientation","纖維方向","Direction of the fibres relative to the load."],
+  ["Wrinkle","皺褶","Fibre imperfection that greatly reduces laminate strength."]],
+ ask:[
+  ["How can you tell a ply is fully wetted out?","你怎麼判斷一層已經完全浸潤？"],
+  ["What does trapped air do to laminate strength?","殘留空氣對層板強度有什麼影響？"],
+  ["Why does fibre orientation matter?","纖維方向為什麼重要？"],
+  ["When do you apply the peel ply?","剝離布要在什麼時候鋪上？"],
+  ["Why must you avoid wrinkles in the fabric?","為什麼要避免布材出現皺褶？"],
+  ["How do you keep the resin level optimised?","你如何讓樹脂量維持在最佳狀態？"],
+  ["What direction is 0° on your sample?","你的試片上 0 度是哪個方向？"],
+  ["How do you check the sample after consolidation?","壓實後你怎麼檢查試片？"]],
+ get:[
+  ["Am I using too much or too little resin?","我的樹脂用得太多還是太少？"],
+  ["How hard should I press with the roller?","滾筒要壓多用力？"],
+  ["What if I see white patches?","如果看到白色斑塊怎麼辦？"],
+  ["Which way should the fibres run?","纖維應該朝哪個方向？"],
+  ["How do I get rid of a wrinkle?","出現皺褶要怎麼處理？"],
+  ["How many plies am I building up?","我要疊幾層？"],
+  ["Does the peel ply stay on until finishing?","剝離布要留到最後修飾才撕嗎？"],
+  ["How do I know when it's cured enough to handle?","我怎麼知道固化到可以搬動了？"]]},
+
+/* ---- DAY 2 ---- */
+{id:"T6",type:"theory",day:2,src:["S4","S5","S6","S8"],title:"Documentation for Inspections and Repairs, Instructions and Guidelines",
+ summary:"The paperwork that governs a safe repair: the Safety Data Sheet (and that an SDS is not a risk assessment), technical data sheets, work instructions, risk assessments/RAMS with priority scoring, and the inspection/reporting formats.",
+ gloss:[
+  ["Work Instruction (WI)","工作指引","Step-by-step task procedure that must be followed exactly."],
+  ["Safety Data Sheet (SDS/MSDS)","物質安全資料表","16-section supplier hazard document; not itself a risk assessment."],
+  ["COSHH risk assessment","危害物質風險評估","The user's own assessment built from SDS information."],
+  ["Technical Data Sheet (TDS)","技術資料表","Product performance, cure and handling data."],
+  ["Risk Assessment","風險評估","Identify hazard, analyse, apply control measures, record residual risk."],
+  ["RAMS","風險評估執行計劃","Combined Risk Assessment + Method Statement."],
+  ["Control measure","控制措施","Action taken to reduce or mitigate a risk."],
+  ["Risk priority score","風險分數","1–9 Low, 10–40 Medium, 41–100 High."],
+  ["Residual risk","剩餘風險","Risk remaining after controls are applied."],
+  ["Blade inspection report","葉片檢查報告","Standard format for recording findings, using a photo card."],
+  ["Job pack / work package","工作包","On-site pack holding WIs, SDS and RAMS."]],
+ ask:[
+  ["What is the difference between an SDS and a risk assessment?","SDS 和風險評估有什麼不同？"],
+  ["Why must you follow a work instruction exactly?","為什麼工作指引必須完全遵循？"],
+  ["Where do you find the SDS on site?","現場的 SDS 在哪裡找？"],
+  ["What are the main sections of an SDS?","SDS 主要有哪些章節？"],
+  ["What goes into a blade inspection report?","葉片檢查報告要記錄哪些內容？"],
+  ["How does the risk-priority score guide your actions?","風險分數如何指引你的處置？"],
+  ["What is the risk of using an outdated work instruction?","使用過期工作指引有什麼風險？"],
+  ["Who provides the current WI and risk assessment?","最新的工作指引和風險評估由誰提供？"]],
+ get:[
+  ["Is the documentation electronic or paper?","文件是電子檔還是紙本？"],
+  ["What if the WI doesn't match the actual damage?","如果工作指引和實際損傷對不上怎麼辦？"],
+  ["Who do I contact if a document is missing?","文件缺漏時我該聯絡誰？"],
+  ["Which SDS section covers first aid?","SDS 的哪一節是急救措施？"],
+  ["How do I know the risk assessment is up to date?","我怎麼確認風險評估是最新的？"],
+  ["What is a photo card and when do I use it?","照片卡是什麼？什麼時候要用？"],
+  ["Does every chemical on site need its own SDS?","現場每種化學品都要有各自的 SDS 嗎？"],
+  ["What score means control measures are mandatory?","分數到多少就一定要有控制措施？"]]},
+
+{id:"P3",type:"practical",day:2,src:["S3","S5","S15"],title:"Manufacturing of Rotor Blades 1 — Production of a Monolithic Wet Lamination Panel",
+ summary:"Build a solid (monolithic) wet-laminated panel to a work instruction: stacking and consolidating multiple plies to a target thickness.",
+ gloss:[
+  ["Monolithic laminate","實心層板","A solid laminate with no core."],
+  ["Wet lamination","濕式層壓","Hand-applied liquid resin over dry fabric."],
+  ["Ply","層","One reinforcement layer of the stack."],
+  ["Consolidation","壓實","Compressing plies to remove air."],
+  ["Fibre orientation","纖維方向","Correct fibre direction for strength."],
+  ["Release agent","離型劑","Stops cured resin sticking to the mould (e.g. Marbocote)."],
+  ["Peel ply","剝離布","Clean-surface layer applied on top."],
+  ["Work Instruction (WI)","工作指引","The procedure the build follows."]],
+ ask:[
+  ["How many plies do you need for the target thickness?","要達到目標厚度需要幾層？"],
+  ["Why keep the orientations correct?","為什麼要保持正確的纖維方向？"],
+  ["How do you avoid resin-starved areas?","你如何避免缺膠區？"],
+  ["What is the release agent for?","離型劑的作用是什麼？"],
+  ["Which document tells you the layup schedule?","疊層順序是哪份文件規定的？"],
+  ["How do you check each ply is wetted out?","你如何檢查每一層都已浸潤？"],
+  ["What PPE does this task require?","這項作業需要哪些 PPE？"],
+  ["Why consolidate between plies rather than at the end?","為什麼要層層壓實而不是最後一次壓？"]],
+ get:[
+  ["How thick should each ply build up?","每一層大約會增加多少厚度？"],
+  ["How do I stop the panel sticking to the mould?","我要怎麼避免板材黏在模具上？"],
+  ["How long until I can demould?","多久之後可以脫模？"],
+  ["How do I check it's fully wetted out?","我怎麼檢查完全浸潤了？"],
+  ["Which resin and hardener are we using?","我們用的是哪種樹脂和硬化劑？"],
+  ["What's the target thickness for this panel?","這片板的目標厚度是多少？"],
+  ["Do I apply release agent to the whole mould?","離型劑要塗滿整個模具嗎？"],
+  ["What if I run out of working time?","如果作業時間不夠了怎麼辦？"]]},
+
+{id:"T7",type:"theory",day:2,src:["S3","S15"],title:"Manufacturing Technology 2 — Vacuum Consolidation and Heated Cure/Post-Cure",
+ summary:"Higher-quality processes: using vacuum to consolidate laminate and remove air, the bagging stack, and applying controlled heat with a heating blanket to fully cure and post-cure epoxy.",
+ gloss:[
+  ["Vacuum consolidation","真空加固","Vacuum compression of plies for critical/structural repairs."],
+  ["Vacuum bag / foil","真空袋膜","Airtight film sealing the repair under vacuum."],
+  ["Breather fabric","透氣布","Allows even air evacuation across the bag."],
+  ["Release film","離型膜","Stops the bagging stack sticking to the laminate."],
+  ["Sealant tape (tacky tape)","密封膠帶","Seals the bag to the surface."],
+  ["Vacuum pump","真空泵","Draws the vacuum; protected by a resin trap."],
+  ["Resin trap","樹脂收集器","Protects the pump from resin drawn into the line."],
+  ["Absolute pressure gauge","絕對壓力錶","Reads the vacuum level."],
+  ["Heating blanket","加熱毯","Applies controlled heat, 0–120 °C, monitored for fire risk."],
+  ["Cure / Post-cure","固化／後固化","Initial hardening vs an extra heated cycle to raise properties."],
+  ["Data logger","數據記錄器","Records the cure temperature over time."]],
+ ask:[
+  ["Why does vacuum improve laminate quality?","真空為什麼能提升層板品質？"],
+  ["What order do the bagging layers go in?","真空袋各層要以什麼順序鋪？"],
+  ["Why does epoxy usually need heat to cure fully?","環氧樹脂為什麼通常需要加熱才能完全固化？"],
+  ["What protects the vacuum pump from resin?","是什麼保護真空泵不被樹脂吸入？"],
+  ["What temperature range does a heating blanket cover?","加熱毯的溫度範圍是多少？"],
+  ["Why must a heating blanket be monitored?","加熱毯為什麼必須全程監控？"],
+  ["What is the difference between cure and post-cure?","固化和後固化有什麼差別？"],
+  ["How do you know the vacuum is holding?","你怎麼知道真空維持住了？"]],
+ get:[
+  ["How much vacuum do we pull?","我們要抽到多少真空度？"],
+  ["How do I find a leak in the bag?","真空袋漏氣要怎麼找？"],
+  ["What temperature and for how long?","溫度設多少、加熱多久？"],
+  ["Where does the resin trap go in the line?","樹脂收集器接在管路的哪個位置？"],
+  ["How do I store a hot heating blanket safely?","加熱毯用完還很燙，要怎麼安全收納？"],
+  ["What if the temperature won't reach target?","如果溫度到不了目標值怎麼辦？"],
+  ["Do I need post-cure for every repair?","每次修復都需要後固化嗎？"],
+  ["How tight should the bag pleats be?","真空袋的褶要收多緊？"]]},
+
+{id:"P4",type:"practical",day:2,src:["S3","S15"],title:"Manufacturing of Rotor Blades 2 — Group Production of a Complex Vacuum-Bag-Consolidated Panel",
+ summary:"Team build of a vacuum-bagged panel: laying the full bagging stack, sealing it, pulling and holding vacuum, and curing under a heating blanket.",
+ gloss:[
+  ["Vacuum bag","真空袋膜","The airtight outer film."],
+  ["Peel ply / Release film","剝離布／離型膜","Clean-surface and non-stick layers of the stack."],
+  ["Breather fabric","透氣布","Even air path under the bag."],
+  ["Sealant tape","密封膠帶","Seals the bag edge to the surface."],
+  ["Vacuum hose","真空管","Connects the bag to pump and resin trap."],
+  ["Absolute pressure gauge","絕對壓力錶","Reads the vacuum level."],
+  ["Heating blanket","加熱毯","Heats the repair to cure temperature."],
+  ["Data logger","數據記錄器","Records the cure temperature."]],
+ ask:[
+  ["Whose job is what within the team?","團隊中每個人負責什麼？"],
+  ["How do you get a good seal on the tacky tape?","密封膠帶要怎麼貼才不會漏？"],
+  ["How will you know the vacuum is holding?","你怎麼確認真空維持住了？"],
+  ["Who monitors the heating blanket?","誰負責監控加熱毯？"],
+  ["What order do you lay the stack in?","真空袋各層要以什麼順序疊？"],
+  ["How do you connect the hose and resin trap?","真空管和樹脂收集器要怎麼接？"],
+  ["What vacuum level are you aiming for?","你們的目標真空度是多少？"],
+  ["How do you find a leak as a team?","團隊要如何合作找漏氣？"]],
+ get:[
+  ["What do I do if the vacuum keeps dropping?","真空一直掉該怎麼辦？"],
+  ["Where do the hose and resin trap connect?","真空管和樹脂收集器接在哪裡？"],
+  ["How tight should the bag pleats be?","真空袋的褶要收多緊？"],
+  ["What temperature are we running?","我們要加熱到幾度？"],
+  ["Who reads the pressure gauge?","誰負責看壓力錶？"],
+  ["How long do we hold the vacuum?","真空要維持多久？"],
+  ["What if part of the bag lifts?","如果真空袋某處鼓起來怎麼辦？"],
+  ["When can we take the blanket off?","加熱毯什麼時候可以拿掉？"]]},
+
+/* ---- DAY 3 ---- */
+{id:"T8",type:"theory",day:3,src:["S2","S3"],title:"Sandwich Panels and Core Materials",
+ summary:"Why blades use sandwich construction — thin skins bonded to a lightweight core carrying shear load — and the main core materials, end-grain balsa versus structural PVC/SAN/PET foam.",
+ gloss:[
+  ["Sandwich panel","夾層板","Thin skins bonded either side of a core."],
+  ["Core material","芯材","Lightweight filler that adds panel stiffness."],
+  ["Skin / Laminate skin","表皮","The thin load-carrying face either side of the core."],
+  ["Balsa core (end-grain)","輕木芯（橫切）","Stiff, strong wood core; risks fungus and water-rot."],
+  ["Structural foam","結構性發泡材","Rigid foam core for load-bearing panels."],
+  ["Foam core (PVC/SAN/PET)","發泡芯","Closed-cell foam; lighter than balsa, grooved for resin."],
+  ["Scrim","稀鬆布","Light material holding balsa blocks together."],
+  ["Compression load","壓縮載荷","Load on the upper skin and core."],
+  ["Tensile stress","拉伸應力","Load on the lower skin of a bent panel."],
+  ["Shear load","剪切載荷","Load the core transfers between skins."],
+  ["Resin flow channel / groove","樹脂流道／開槽","Grooves cut in foam to let resin flow."]],
+ ask:[
+  ["Why does a core make a panel stiffer without adding much weight?","芯材為什麼能讓板材變硬卻幾乎不增重？"],
+  ["Which loads does the core carry?","芯材承受哪些載荷？"],
+  ["When would you choose balsa over foam?","什麼情況下你會選輕木而不是發泡材？"],
+  ["What is the risk with balsa and water?","輕木遇水有什麼風險？"],
+  ["Why are foam cores grooved?","發泡芯為什麼要開槽？"],
+  ["Doubling the thickness — what happens to stiffness?","厚度加倍時，剛度會如何變化？"],
+  ["Why must the skins bond well to the core?","表皮為什麼必須和芯材緊密黏合？"],
+  ["What holds balsa blocks together?","輕木塊之間是靠什麼固定的？"]],
+ get:[
+  ["Can I repair a wet or rotten balsa core?","受潮或腐爛的輕木芯可以修復嗎？"],
+  ["How do I tell balsa from foam?","我要怎麼分辨輕木和發泡材？"],
+  ["Does the core carry structural load?","芯材有承受結構載荷嗎？"],
+  ["What happens if water gets into the core?","水滲進芯材會怎樣？"],
+  ["Why does a wet core make the repair bigger?","芯材受潮為什麼會讓修復範圍變大？"],
+  ["How do I cut the core to shape?","芯材要怎麼裁切成形？"],
+  ["Do both skins need the same layup?","兩面表皮的疊層要一樣嗎？"],
+  ["Which foam type is used in this blade?","這支葉片用的是哪種發泡材？"]]},
+
+{id:"P5",type:"practical",day:3,src:["S3","S15"],title:"Manufacturing of Rotor Blades 3 — Production of Blade Format Panels with Core Materials",
+ summary:"Build a cored sandwich panel: laminating skins either side of a core to blade-representative dimensions, getting resin to flow around the grooved core without crushing it.",
+ gloss:[
+  ["Sandwich panel","夾層板","Skins bonded either side of a core."],
+  ["Core material","芯材","The lightweight centre of the panel."],
+  ["Laminate skin","表皮","The load-carrying face either side of the core."],
+  ["Resin flow channel","樹脂流道","Grooves in the core that let resin flow."],
+  ["Consolidation","壓實","Compressing without crushing the core."],
+  ["Peel ply","剝離布","Clean-surface layer on the finished skin."],
+  ["Dry spot","缺膠區","Un-wetted area, a risk around a grooved core."]],
+ ask:[
+  ["How do you get resin to flow around a grooved core?","你如何讓樹脂流過開槽的芯材？"],
+  ["Why must the skins bond well to the core?","表皮為什麼要和芯材緊密黏合？"],
+  ["How do you avoid crushing the core under vacuum?","真空下如何避免壓垮芯材？"],
+  ["What thickness are we targeting?","我們的目標厚度是多少？"],
+  ["How do you prevent dry spots around the core?","你如何避免芯材周圍出現缺膠區？"],
+  ["Which side of the core faces the mould?","芯材哪一面朝向模具？"],
+  ["Do both skins get the same number of plies?","兩面表皮要疊一樣多層嗎？"],
+  ["How do you check bonding to the core?","你怎麼檢查與芯材的黏合？"]],
+ get:[
+  ["How do I stop dry spots around the core?","芯材周圍缺膠要怎麼避免？"],
+  ["Do both skins need the same layup?","兩面表皮的疊層要一樣嗎？"],
+  ["How much vacuum without crushing the foam?","真空抽到多少才不會壓垮發泡材？"],
+  ["How do I cut the core to shape?","芯材要怎麼裁切成形？"],
+  ["Which way do the grooves face?","開槽面朝哪個方向？"],
+  ["How long is the cure for a cored panel?","夾層板的固化要多久？"],
+  ["What if resin pools in the grooves?","樹脂積在槽裡怎麼辦？"],
+  ["Do I peel-ply both skins?","兩面表皮都要鋪剝離布嗎？"]]},
+
+{id:"T9",type:"theory",day:3,src:["S15"],title:"Specialist Tools and Equipment for Cutting and Grinding Composites",
+ summary:"The tools for removing composite — grinders, sanders, drills, cutting wheels and sanding grits — the composite-dust and hand-arm vibration (HAVS) hazards they create, and how to control them.",
+ gloss:[
+  ["Grinder","電動砂輪機","Removes material from cured laminate."],
+  ["Sander","電動偏心砂磨機","Smooths a surface ready to laminate."],
+  ["Drill","電鑽","Used for sampling and fixings."],
+  ["Diamond cutting wheel","鑽石切割輪","Cuts hard cured composite."],
+  ["Abrasive disc","砂盤","Consumable disc for grinders/sanders."],
+  ["Sanding grit","研磨粗糙度","Grade of abrasive; lower number = coarser."],
+  ["Composite dust","複合材料粉塵","Fine fibre-and-resin mix; extremely bad for health."],
+  ["Local exhaust ventilation (LEV)","局部排氣通風","Captures dust at source."],
+  ["HAVS / White finger","手臂震動症候群／白指症","Vibration disease from prolonged power-tool use."]],
+ ask:[
+  ["Why is composite dust dangerous to health?","複合材料粉塵為什麼對健康有害？"],
+  ["What does composite do to cutting tools, and why?","複合材料對切割工具有什麼影響？為什麼？"],
+  ["How do you keep dust down at source?","你如何在源頭抑制粉塵？"],
+  ["What is HAVS and how do you reduce the risk?","什麼是手臂震動症候群？如何降低風險？"],
+  ["What happens if you overheat the resin while grinding?","研磨時樹脂過熱會發生什麼事？"],
+  ["Which tool removes material and which smooths it?","哪種工具用來移除材料，哪種用來磨平？"],
+  ["Does a lower grit number mean coarser or finer?","研磨號數越低是越粗還是越細？"],
+  ["Why does partly-cured laminate raise the health risk?","半固化層板為什麼會增加健康風險？"]],
+ get:[
+  ["Which disc for which job?","每種作業各用哪一種砂盤？"],
+  ["Why do my discs wear out so fast?","我的砂盤為什麼消耗得這麼快？"],
+  ["Do I need extraction and a mask?","我需要抽氣設備和口罩嗎？"],
+  ["How long can I safely run a grinder?","砂輪機我能連續安全使用多久？"],
+  ["How do I stop the disc clogging with resin?","要怎麼避免砂盤被樹脂堵住？"],
+  ["Which grit do I start with?","我要從哪個號數開始磨？"],
+  ["What PPE is mandatory for grinding?","研磨時哪些 PPE 是必備的？"],
+  ["How do anti-vibration gloves help?","防震手套有什麼幫助？"]]},
+
+{id:"P6",type:"practical",day:3,src:["S15","S13"],title:"Cutting and Grinding Composites",
+ summary:"Hands-on cutting, grinding and sanding of cured laminate — with extraction on, full dust suits and masks — to remove material, cut panels to size and prepare a surface for bonding.",
+ gloss:[
+  ["Grinding / Sanding / Cutting","研磨／打磨／切割","Removing material and preparing surfaces."],
+  ["Diamond cutting wheel","鑽石切割輪","For cutting cured laminate."],
+  ["Dust suit","防塵衣","Keeps composite dust off skin."],
+  ["Forced-air / Air-fed mask","供氣式面罩","Supplies clean air for dusty work."],
+  ["Extraction / LEV","局部排氣通風","Must be on before you start cutting."],
+  ["Scarf / Taper","斜面（斜接）","The shallow angled edge cut for a repair."],
+  ["Surface preparation","表面整理","Roughening a non-peel-ply surface for bonding."]],
+ ask:[
+  ["Is the extraction on before you start?","開始前抽氣設備開了嗎？"],
+  ["Why avoid overheating the laminate?","為什麼要避免層板過熱？"],
+  ["How do you get a clean tapered edge?","你如何切出乾淨的斜面？"],
+  ["What PPE is mandatory for this?","這項作業必備哪些 PPE？"],
+  ["What dimensions are you cutting the panel to?","你要把板材切成什麼尺寸？"],
+  ["How do you prepare a surface with no peel ply?","沒有剝離布的表面要怎麼整理？"],
+  ["Why check the edges after cutting?","切完為什麼要檢查邊緣？"],
+  ["How do you keep dust out of the workshop air?","你如何避免粉塵瀰漫在工作場所？"]],
+ get:[
+  ["How do I stop the resin melting and clogging the disc?","要怎麼避免樹脂熔化堵住砂盤？"],
+  ["How shallow should the taper be?","斜面要磨多平緩？"],
+  ["Why a full dust suit for a small cut?","小小一刀為什麼要穿全套防塵衣？"],
+  ["How do I check the surface is ready?","我怎麼確認表面整理好了？"],
+  ["What size do I cut the shell section to?","殼段要切成多大？"],
+  ["How do I roughen the inside of a cored panel?","夾層板內側要怎麼打粗？"],
+  ["Do I clean the surface before bonding?","黏合前表面要清潔嗎？"],
+  ["How long can I grind before a break?","我磨多久要休息一次？"]]},
+/* ---- DAY 4 ---- */
+{id:"T10",type:"theory",day:4,src:["S3"],title:"Bonding and Adhesives",
+ summary:"How blade parts are glued: adhesive types (epoxy, PU, methacrylate), the difference between construction and enhancement adhesives, why mechanical mixing is critical, and why hand-mixing risks trapping air.",
+ gloss:[
+  ["Adhesive / Bonding paste","黏著劑／黏接膏","Bonding material, density 1.1–1.4, “peanut-butter” thickness."],
+  ["Construction adhesive","結構黏著劑","Bonds main structural components (epoxy-based)."],
+  ["Enhancement adhesive","加強型黏著劑","Bonds non-structural add-ons (e.g. peel-and-stick)."],
+  ["Epoxy / Polyurethane / Methacrylate","環氧樹脂／聚氨酯／甲基丙烯酸酯","Common adhesive chemistries."],
+  ["Bond line","黏合線","The glued joint between parts."],
+  ["Cartridge + Static mix head","靜態混合頭膠筒","Delivers correctly-proportioned, low-air mix; head is single-use."],
+  ["Static mix head","靜態混合頭","Twisted internal helices that mix the two parts."],
+  ["Caulking / Glue gun","膠槍","Manual or pneumatic dispensing gun."],
+  ["Mix ratio","混合比","Correct A:B proportion for the adhesive."]],
+ ask:[
+  ["Why is mixing so critical to adhesive strength?","混合為什麼對黏著劑強度這麼關鍵？"],
+  ["What is the risk of hand-mixing?","手動混合有什麼風險？"],
+  ["What's the difference between construction and enhancement adhesives?","結構黏著劑和加強型黏著劑有什麼差別？"],
+  ["How thick is a correctly mixed bonding paste?","調好的黏接膏大約多稠？"],
+  ["Why are static mix heads single-use?","靜態混合頭為什麼是一次性的？"],
+  ["Name three common adhesive chemistries.","舉出三種常見的黏著劑化學類型。"],
+  ["How thick a bond line can this paste fill?","這種黏接膏能填多厚的黏合線？"],
+  ["Where are adhesives used during blade construction?","黏著劑在葉片製造中用在哪裡？"]],
+ get:[
+  ["Which adhesive for which joint?","不同接頭各用哪種黏著劑？"],
+  ["How thick can I apply it in one pass?","一次可以塗多厚？"],
+  ["Manual or pneumatic gun?","要用手動槍還是氣動槍？"],
+  ["How do I know the mix is good?","我怎麼知道混合品質好？"],
+  ["Do I waste the first bit from the mix head?","混合頭剛擠出的第一段要丟掉嗎？"],
+  ["Can I hand-mix if I have no cartridge?","沒有膠筒時我可以手動混合嗎？"],
+  ["Which adhesive bonds a vortex generator?","黏渦流產生器要用哪種黏著劑？"],
+  ["How long before the bond can take load?","黏合多久後才能承受載荷？"]]},
+
+{id:"P7",type:"practical",day:4,src:["S3","S15"],title:"Bonding of Blade Sections, Use of Adhesives",
+ summary:"Practise bonding blade sections with cartridge adhesive and a static mix head, purging the first bead, and controlling bond-line thickness and cleanliness.",
+ gloss:[
+  ["Adhesive","黏著劑","The bonding paste being applied."],
+  ["Bond line","黏合線","Thickness and cleanliness are critical."],
+  ["Cartridge / Static mix head","膠筒／靜態混合頭","Correct-ratio dispensing; purge the first bead."],
+  ["Pneumatic gun","氣動槍","Air-driven cartridge gun for one-handed use."],
+  ["Purge","排出（初段膠）","Discarding the first, poorly-mixed bead."],
+  ["Clamp","夾具","Holds parts without starving the joint."],
+  ["Cure","固化","Hardening of the adhesive before handling."]],
+ ask:[
+  ["How do you purge the first bit of adhesive from the mix head?","混合頭剛擠的膠要怎麼排掉？"],
+  ["What bond-line thickness are you aiming for?","你的目標黏合線厚度是多少？"],
+  ["How do you clamp without starving the joint?","夾合時如何避免把膠擠光？"],
+  ["How long before it can be handled?","多久之後可以搬動？"],
+  ["Why must the surfaces be clean and prepared?","接合面為什麼必須乾淨且整理過？"],
+  ["Manual or pneumatic gun for this joint?","這個接頭要用手動還是氣動槍？"],
+  ["How do you check for air in the bead?","你怎麼檢查膠條裡有沒有空氣？"],
+  ["What PPE does bonding require?","黏合作業需要哪些 PPE？"]],
+ get:[
+  ["How much do I waste priming the nozzle?","排初段膠會浪費多少？"],
+  ["Do I need to clamp it?","需要夾具嗎？"],
+  ["What if I see air in the bead?","膠條裡有空氣怎麼辦？"],
+  ["How long until the bond is strong?","黏合多久才有強度？"],
+  ["How thick should I lay the bead?","膠條要擠多厚？"],
+  ["What cleans up excess adhesive?","溢出的膠要用什麼清？"],
+  ["Can I move the part while it cures?","固化過程中我可以移動零件嗎？"],
+  ["What if the two parts don't line up?","兩個零件對不齊怎麼辦？"]]},
+
+{id:"T11",type:"theory",day:4,src:["S3"],title:"Coatings and Fillers/Fairing of Rotor Blades",
+ summary:"Protecting and finishing the blade: why gelcoat and paint are used, gelcoat (applied in the mould) versus paint (applied after), UV protection, filler and fairing to restore profile, and typical coating thickness (700–900 µm).",
+ gloss:[
+  ["Gelcoat","膠衣","Protective coating applied in the mould during manufacture."],
+  ["Coating / Paint","塗層／油漆","UV-protective finish applied after manufacture."],
+  ["Topcoat","面漆","The final protective paint layer."],
+  ["Filler","補土","Non-structural paste to restore surface profile."],
+  ["Fairing","整平","Smoothing filler to the correct aerodynamic profile."],
+  ["Polyurethane coating","聚氨酯塗料","A common paint chemistry for blades."],
+  ["UV degradation","紫外線劣化","Why unprotected composite fails outdoors."],
+  ["Coating thickness","塗層厚度","Typically 700–900 µm (0.7–0.9 mm)."],
+  ["Wet film thickness gauge","濕膜厚度規","Checks coating thickness while wet."]],
+ ask:[
+  ["Why must a blade be coated at all?","葉片為什麼一定要塗裝？"],
+  ["Gelcoat vs paint — what differs in when they're applied?","膠衣和油漆在施作時機上有什麼不同？"],
+  ["What is a typical coating thickness?","典型的塗層厚度是多少？"],
+  ["What does filler do that resin does not?","補土能做到樹脂做不到的什麼事？"],
+  ["Why is UV protection so important?","紫外線防護為什麼這麼重要？"],
+  ["Which paint chemistries are used on blades?","葉片上會用哪些油漆化學類型？"],
+  ["What does fairing achieve on the surface?","整平能讓表面達到什麼效果？"],
+  ["How do you measure a wet coating?","濕塗層要怎麼量厚度？"]],
+ get:[
+  ["How many coats of paint?","要上幾道漆？"],
+  ["How thick should the coating be?","塗層要多厚？"],
+  ["How do I measure it while wet?","濕的時候我要怎麼量？"],
+  ["How long between filling and sanding?","補土到打磨之間要等多久？"],
+  ["What's the difference between filler and gelcoat?","補土和膠衣有什麼不同？"],
+  ["Does the whole blade get recoated or just the repair?","是整支葉片重塗還是只塗修復處？"],
+  ["Why does my coating look uneven?","我的塗層為什麼不均勻？"],
+  ["Can I fill and fair in one go?","補土和整平可以一次完成嗎？"]]},
+
+{id:"P8",type:"practical",day:4,src:["S3","S15"],title:"Blade Coatings, Fillers and Fairing",
+ summary:"Apply filler to restore the surface profile, fair it smooth, and finish with a protective topcoat, checking film thickness while wet.",
+ gloss:[
+  ["Filler","補土","Paste applied to restore profile."],
+  ["Fairing","整平","Sanding filler to a smooth, correct profile."],
+  ["Filling knife / Spatula","抹刀","Applies and shapes the filler."],
+  ["Topcoat","面漆","Final protective coat."],
+  ["Paint roller","油漆滾筒","Applies coating evenly."],
+  ["Wet film thickness gauge","濕膜厚度規","Checks film thickness while wet."],
+  ["Pinhole","針孔","Small air hole in filler or coating to avoid."]],
+ ask:[
+  ["How do you avoid pinholes in the filler?","你如何避免補土出現針孔？"],
+  ["When is the filler ready to sand?","補土什麼時候可以打磨？"],
+  ["How do you get an even topcoat?","你如何上出均勻的面漆？"],
+  ["How do you check film thickness?","你如何檢查膜厚？"],
+  ["What order do filling, fairing and coating go in?","補土、整平、塗裝的順序是什麼？"],
+  ["Which tool applies the filler?","補土要用什麼工具塗？"],
+  ["How do you know the profile is right?","你怎麼知道外形對了？"],
+  ["Why fair before you coat?","為什麼要先整平再塗裝？"]],
+ get:[
+  ["How thick can I fill in one go?","我一次可以補多厚？"],
+  ["Why does my filler keep leaving air holes?","我的補土為什麼一直有氣孔？"],
+  ["How smooth before painting?","上漆前要磨到多平滑？"],
+  ["How many topcoat passes?","面漆要上幾道？"],
+  ["When can I sand the filler?","補土什麼時候可以打磨？"],
+  ["What film thickness am I aiming for?","我的目標膜厚是多少？"],
+  ["How do I blend into the old coating?","要怎麼和舊塗層銜接？"],
+  ["Can I recoat if it looks thin?","看起來太薄可以再補一道嗎？"]]},
+
+{id:"T12",type:"theory",day:4,src:["S15"],title:"Inspection Tools, Equipment and Techniques",
+ summary:"The inspection toolkit: tap-testing, moisture and depth measurement, feeler gauges, hardness testing (Barcol/Shore D) for cure, and testing LPS conductivity with a Megger — and how to use each safely.",
+ gloss:[
+  ["Tap test","敲擊測試","Tapping to find voids/delamination by sound."],
+  ["Tapping hammer","敲擊錘","1-ounce hammer used for tap-testing."],
+  ["Moisture meter","含水率計","Detects moisture in core or laminate."],
+  ["Depth micrometre","深度測微計","Measures repair or scarf depth precisely."],
+  ["Feeler gauge","塞尺","Measures gap and crack widths."],
+  ["High-powered torch","高功率手電筒","Raking light to reveal surface defects."],
+  ["Barcol hardness test","巴氏硬度測試","Indentation test indicating degree of cure."],
+  ["Shore D hardness","Shore D 硬度","Complementary hardness/cure check."],
+  ["Megohmmeter (Megger)","高阻計","Tests LPS conductivity; specific electrical hazards."],
+  ["Low-resistance ohmmeter","低阻計","Used to check LPS continuity — has electrical hazards."]],
+ ask:[
+  ["What does a change in tap-test sound tell you?","敲擊聲音改變代表什麼？"],
+  ["What are you checking with a Barcol tester?","巴氏硬度計是用來檢查什麼的？"],
+  ["Why test LPS conductivity?","為什麼要測雷擊防護系統的導通性？"],
+  ["What are the hazards of a low-resistance ohmmeter?","低阻計有哪些危害？"],
+  ["What does the moisture meter detect?","含水率計偵測的是什麼？"],
+  ["How does hardness relate to degree of cure?","硬度和固化程度有什麼關係？"],
+  ["What is the feeler gauge used for?","塞尺是用來做什麼的？"],
+  ["Why use raking light in a visual inspection?","目視檢查為什麼要用斜射光？"]],
+ get:[
+  ["How do I read a void from the tapping sound?","我要怎麼從敲擊聲判斷有空洞？"],
+  ["What Barcol number means “cured”?","巴氏硬度到多少算「已固化」？"],
+  ["How do I use the Megger safely?","高阻計要怎麼安全使用？"],
+  ["What does the moisture meter detect exactly?","含水率計到底偵測什麼？"],
+  ["Which tool measures repair depth?","哪種工具量修復深度？"],
+  ["Is the Barcol test destructive?","巴氏硬度測試會破壞材料嗎？"],
+  ["How do I know a tool is calibrated?","我怎麼知道工具校正過了？"],
+  ["When do I need to test the LPS?","什麼時候需要測雷擊防護系統？"]]},
+
+/* ---- DAY 5 ---- */
+{id:"T13",type:"theory",day:5,src:["S2"],title:"Leading Edge Protection",
+ summary:"Why the leading edge erodes first — worst towards the tip — and how to protect it with tapes, multi-coat paint systems and protective shells to prolong blade life.",
+ gloss:[
+  ["Leading edge","前緣","Forward edge; the worst-affected area for erosion."],
+  ["Erosion","腐蝕（侵蝕）","Surface wear, worst toward the tip."],
+  ["Leading edge protection (LEP)","前緣保護","Measures to slow erosion and extend blade life."],
+  ["3M tape","3M 膠帶","A protective leading-edge tape option."],
+  ["3-coat paint protection","三道漆保護","Multi-coat paint LEP system."],
+  ["Leading edge shell","前緣保護殼","A bonded shell shielding the leading edge."],
+  ["Life expectancy","預期壽命","Blade service life extended by good LEP."]],
+ ask:[
+  ["Why does the leading edge suffer the worst erosion?","前緣為什麼腐蝕最嚴重？"],
+  ["Where on the blade is erosion worst?","葉片哪個部位腐蝕最嚴重？"],
+  ["Name three LEP options.","舉出三種前緣保護方式。"],
+  ["How does LEP extend blade life?","前緣保護如何延長葉片壽命？"],
+  ["Why does erosion reduce productivity?","腐蝕為什麼會降低發電效能？"],
+  ["Which LEP option is a bonded shell?","哪種前緣保護是黏上去的保護殼？"],
+  ["How does surface roughness affect the blade?","表面粗糙會如何影響葉片？"],
+  ["What preventive measures reduce erosion?","有哪些預防措施能減少腐蝕？"]],
+ get:[
+  ["Tape or paint — which lasts longer?","膠帶和油漆哪個比較耐用？"],
+  ["How far along the blade do we protect?","前緣保護要做到葉片的多遠處？"],
+  ["Can LEP be applied on rope?","前緣保護可以用繩索作業施作嗎？"],
+  ["When do we reapply it?","多久要重做一次？"],
+  ["Does LEP change the aerodynamics?","前緣保護會改變空氣力學嗎？"],
+  ["Which option is best for a very windy site?","風很強的場址適合哪種方式？"],
+  ["How do I prepare the surface for tape?","貼膠帶前表面要怎麼處理？"],
+  ["Can I patch just the eroded area?","我可以只補腐蝕的那一段嗎？"]]},
+
+{id:"P9",type:"practical",day:5,src:["S3","S15"],title:"Blade Section Finishing, Filling, Fairing and Coating",
+ summary:"Finish a repaired blade section end-to-end: fill, fair and coat to restore the surface and profile, blending the repair into the surrounding surface.",
+ gloss:[
+  ["Filling","補土","Restoring the surface with filler paste."],
+  ["Fairing","整平","Smoothing to the correct profile."],
+  ["Coating / Topcoat","塗層／面漆","The protective finish over the repair."],
+  ["Filler","填料","Paste used to rebuild the surface."],
+  ["Sanding","打磨","Smoothing between finishing steps."],
+  ["Wet film thickness gauge","濕膜厚度規","Checks coat thickness while wet."],
+  ["Blend / Feather","銜接／羽化","Tapering the repair into the surrounding surface."]],
+ ask:[
+  ["What order do the finishing steps go in?","修飾步驟的順序是什麼？"],
+  ["How do you blend the repair into the surrounding surface?","你如何把修復處和周圍表面銜接起來？"],
+  ["How do you check the final profile?","你如何檢查最終外形？"],
+  ["What film thickness are you aiming for?","你的目標膜厚是多少？"],
+  ["When is the filler ready to sand?","補土什麼時候可以打磨？"],
+  ["How do you avoid a visible repair edge?","你如何避免修復邊緣太明顯？"],
+  ["Which grit do you finish sanding with?","你最後用哪個號數收尾？"],
+  ["How many topcoat passes will you apply?","你要上幾道面漆？"]],
+ get:[
+  ["How smooth is smooth enough?","要磨到多平滑才算好？"],
+  ["How do I hide the repair edge?","修復邊緣要怎麼藏起來？"],
+  ["How many coats?","要上幾道？"],
+  ["How do I match the surrounding surface?","我要怎麼配合周圍的表面？"],
+  ["Why does my topcoat look patchy?","我的面漆為什麼一塊一塊的？"],
+  ["When can I sand between coats?","層與層之間什麼時候可以打磨？"],
+  ["What if the profile is slightly off?","外形有點不對怎麼辦？"],
+  ["How thick is the finished coating?","完工塗層有多厚？"]]},
+
+{id:"T14",type:"theory",day:5,src:["S2"],title:"Understanding Damage of Composites",
+ summary:"The main blade damage types — erosion, lightning, delamination, foreign-object collision, cracks and bond-line failure — their causes, how to recognise them and how to judge urgency.",
+ gloss:[
+  ["Erosion","腐蝕","Surface wear, mainly at the leading edge."],
+  ["Lightning damage","雷擊","Strike damage, often worse internally than it looks."],
+  ["Delamination","脫層","Separation between laminate plies."],
+  ["Foreign object collision","外物撞擊","Impact damage from debris or birds."],
+  ["Cracks","破損（裂紋）","Surface or structural fractures."],
+  ["Bond-line failure","黏合線故障","Separation of a glued joint; repair within 3–6 months."],
+  ["Air void","氣孔","Internal void weakening the laminate."],
+  ["Performance implication","效能影響","How a defect affects noise and productivity."]],
+ ask:[
+  ["How urgent is a bond-line failure vs a crack through the laminate?","黏合線故障和貫穿裂紋，哪個比較急？"],
+  ["What causes delamination?","脫層是什麼原因造成的？"],
+  ["How do you spot leading-edge erosion early?","前緣腐蝕要怎麼早期發現？"],
+  ["Which damage still lets the turbine run?","哪種損傷風機仍可繼續運轉？"],
+  ["Why can lightning damage be worse than it looks?","雷擊損傷為什麼常常比外觀更嚴重？"],
+  ["How does a defect affect blade noise?","缺陷如何影響葉片噪音？"],
+  ["What are the five main damage types?","五種主要損傷類型是什麼？"],
+  ["When should you seek engineering advice?","什麼時候應該尋求工程師的意見？"]],
+ get:[
+  ["Which damage is “fix now” vs “fix in 3–6 months”?","哪種損傷要「立即修」，哪種可「3–6 個月內修」？"],
+  ["How deep is too deep?","損傷多深就算太深？"],
+  ["How do I tell delamination from a surface mark?","脫層和表面痕跡要怎麼分辨？"],
+  ["What does lightning damage look like inside?","雷擊損傷在內部長什麼樣子？"],
+  ["Do I stop the turbine for a bond-line failure?","黏合線故障要不要停機？"],
+  ["What causes a crack to spread?","裂紋為什麼會擴大？"],
+  ["Can a bird strike cause hidden damage?","鳥擊會造成隱藏損傷嗎？"],
+  ["Who decides if it's safe to keep running?","誰來判斷能不能繼續運轉？"]]},
+
+{id:"P10",type:"practical",day:5,src:["S2","S15"],title:"Damage Blade Section — Review of Damage and Reporting Using Correct Formats",
+ summary:"Assess a damaged blade section, classify the damage, measure it by radius position, and document it correctly using the standard reporting format and photo card.",
+ gloss:[
+  ["Damage assessment","損傷評估","Judging type, extent and severity of damage."],
+  ["Blade inspection report","葉片檢查報告","Standard format for documenting findings."],
+  ["Reporting format","報告格式","The required template for the report."],
+  ["Photo card","照片卡","Reference card in damage/repair photographs."],
+  ["Radius measurement","半徑量測","Locating damage by distance from root."],
+  ["Depth micrometre","深度測微計","Measures the depth of damage."],
+  ["Feeler gauge","塞尺","Measures crack or gap width."]],
+ ask:[
+  ["What must a damage report always include?","損傷報告一定要包含哪些內容？"],
+  ["How do you measure the extent of the damage?","損傷範圍要怎麼量測？"],
+  ["How do you photograph and reference the location?","你如何拍照並標示位置？"],
+  ["What classification does this damage get?","這處損傷該歸為哪一類？"],
+  ["Why use a photo card in the photographs?","照片裡為什麼要放照片卡？"],
+  ["How do you record the radius position?","半徑位置要怎麼記錄？"],
+  ["What measures the crack width?","裂縫寬度用什麼量？"],
+  ["Who reads this report next?","這份報告接下來給誰看？"]],
+ get:[
+  ["Which report template do we use?","我們要用哪一份報告範本？"],
+  ["How precise do measurements need to be?","量測要多精確？"],
+  ["How do I describe the location on the blade?","葉片上的位置要怎麼描述？"],
+  ["Who reads this report next?","這份報告接下來誰會看？"],
+  ["Do I photograph before and after?","修復前後都要拍照嗎？"],
+  ["What if I'm unsure of the damage type?","如果我不確定損傷類型怎麼辦？"],
+  ["How do I reference the radius?","半徑位置要怎麼標註？"],
+  ["Does a photo card have to be in every shot?","每張照片都要放照片卡嗎？"]]},
+
+/* ---- DAY 6 ---- */
+{id:"T15",type:"theory",day:6,src:["S15","S2"],title:"Basics of Blade Inspection",
+ summary:"How to inspect a blade systematically: visual and tap-test methods, the inspection tools, the documentation required, and how to record findings that drive the repair decision.",
+ gloss:[
+  ["Blade inspection","葉片檢查","Systematic examination of the blade for defects."],
+  ["Visual inspection","目視檢查","Finding defects by eye under good light."],
+  ["Tap test","敲擊測試","Finding hidden voids by sound."],
+  ["Moisture meter","含水率計","Detects moisture ingress."],
+  ["Inspection report","檢查報告","Record of findings for the repair decision."],
+  ["Technical drawing","技術圖面","Shows layers, orientation and materials at a radius."],
+  ["Bill of materials","材料清單","List of materials required for the repair."]],
+ ask:[
+  ["What is your systematic order for inspecting a blade?","你檢查葉片的系統性順序是什麼？"],
+  ["Which defects can you find by eye vs by tap test?","哪些缺陷靠目視、哪些靠敲擊發現？"],
+  ["What conditions do you need for a good visual inspection?","做好目視檢查需要什麼條件？"],
+  ["How do findings drive the repair decision?","檢查結果如何決定修復方式？"],
+  ["What documentation supports an inspection?","檢查時要有哪些文件支援？"],
+  ["What does a technical drawing tell you?","技術圖面能告訴你什麼？"],
+  ["Why record even a borderline finding?","為什麼連臨界的發現也要記錄？"],
+  ["What is a bill of materials for?","材料清單是做什麼用的？"]],
+ get:[
+  ["Where do I start on the blade?","我要從葉片哪裡開始檢查？"],
+  ["What is a “normal” finding vs a defect?","什麼算「正常」，什麼算缺陷？"],
+  ["How good does the lighting need to be?","照明要多好才夠？"],
+  ["What do I do with a borderline finding?","臨界的發現我該怎麼處理？"],
+  ["How many layers should this repair have?","這處修復該做幾層？"],
+  ["Where do I read fibre orientation from?","纖維方向要從哪裡查？"],
+  ["Do I need to log every tiny mark?","每個小痕跡都要記錄嗎？"],
+  ["Which findings go straight to an engineer?","哪些發現要直接找工程師？"]]},
+
+{id:"P11",type:"practical",day:6,src:["S15"],title:"Basics of Inspection Methods; Damage Assessment and Documentation",
+ summary:"Practise inspection methods hands-on: locating and assessing damage with visual, tap-test and instrument techniques, and documenting it to the correct reporting format.",
+ gloss:[
+  ["Inspection method","檢查方法","Visual, tap-test and instrument techniques."],
+  ["Tap test","敲擊測試","Confirming hidden damage by sound."],
+  ["Damage assessment","損傷評估","Judging extent and severity."],
+  ["Documentation","文件記錄","Recording findings to format."],
+  ["Feeler gauge","塞尺","Measures crack/gap width."],
+  ["High-powered torch","高功率手電筒","Raking light to reveal surface defects."],
+  ["False positive","誤判（假陽性）","An apparent defect that isn't real."]],
+ ask:[
+  ["Which method found the hidden damage — eye or tapping?","隱藏損傷是靠目視還是敲擊發現的？"],
+  ["How do you rule out a false positive?","你如何排除誤判？"],
+  ["What did you record, and why?","你記錄了什麼？為什麼？"],
+  ["How confident are you in your assessment?","你對自己的評估有多大把握？"],
+  ["How do you mark the boundary of the damage?","損傷邊界你如何標示？"],
+  ["Which tool confirms the tap-test result?","哪種工具能佐證敲擊結果？"],
+  ["When would two methods disagree?","什麼情況下兩種方法會不一致？"],
+  ["How much detail belongs in the report?","報告要寫到多詳細？"]],
+ get:[
+  ["How do I confirm what the tap test suggests?","敲擊懷疑的結果我要怎麼確認？"],
+  ["How much detail in the notes?","筆記要記多詳細？"],
+  ["What if two methods disagree?","兩種方法結果不一致怎麼辦？"],
+  ["How do I mark the boundary of the damage?","損傷邊界要怎麼標？"],
+  ["What lighting reveals surface cracks best?","什麼光線最容易看出表面裂紋？"],
+  ["How do I avoid over-reporting?","我要怎麼避免過度回報？"],
+  ["Do I measure before or after cleaning?","要在清潔前還是清潔後量測？"],
+  ["Which finding needs escalation?","哪種發現需要上報？"]]},
+
+{id:"T16",type:"theory",day:6,src:["S3","S5"],title:"Materials and Process — When to Use Which Repair Method, and When to Call the Engineer",
+ summary:"Matching repair method to damage and material — wet lamination, vacuum consolidation, prepreg and UV curing — and recognising when a repair exceeds your authority and needs an engineer.",
+ gloss:[
+  ["Wet lamination","濕式層壓","Default hand-layup repair."],
+  ["Vacuum consolidation","真空加固","For larger or structural/critical repairs."],
+  ["Prepreg","膠片（預浸料）","Pre-resined fabric cured under vacuum and heat."],
+  ["UV curing","紫外光固化","Fast repair cure using a UV source (e.g. Gurit Renuvo)."],
+  ["Structural repair","結構性修復","Repair to load-bearing structure."],
+  ["Work Instruction (WI)","工作指引","Defines the approved method; don't improvise."],
+  ["Engineering authorisation","工程授權","Sign-off required beyond a technician's scope."]],
+ ask:[
+  ["When would you choose vacuum consolidation over wet layup?","什麼情況你會選真空加固而不是手糊？"],
+  ["What kind of damage must you escalate to an engineer?","哪種損傷必須上報工程師？"],
+  ["Why can't you improvise outside the work instruction?","為什麼不能脫離工作指引自行發揮？"],
+  ["When is UV or prepreg the better choice?","什麼時候紫外光或膠片是較好的選擇？"],
+  ["What are the pros and cons of prepreg?","膠片有哪些優缺點？"],
+  ["Which method suits a structural sparcap repair?","結構性翼樑帽修復適合哪種方法？"],
+  ["What decides the repair method — damage or document?","決定修復方法的是損傷還是文件？"],
+  ["Why is vacuum better for a critical repair?","關鍵修復為什麼真空比較好？"]],
+ get:[
+  ["How do I know a repair is beyond my level?","我怎麼知道一個修復超出我的能力範圍？"],
+  ["Who is “the engineer” and how do I reach them?","「工程師」是誰？我怎麼聯絡？"],
+  ["Can I deviate from the WI if it doesn't fit?","如果工作指引不合用，我可以偏離嗎？"],
+  ["Which method for a structural sparcap repair?","結構性翼樑帽修復要用哪種方法？"],
+  ["Is UV curing strong enough for structure?","紫外光固化的強度夠承受結構嗎？"],
+  ["When is wet layup not good enough?","什麼時候手糊就不夠了？"],
+  ["Do I need heat for every epoxy repair?","每次環氧樹脂修復都要加熱嗎？"],
+  ["What if there's no WI for this damage?","如果這種損傷沒有工作指引怎麼辦？"]]},
+
+{id:"P12",type:"practical",day:6,src:["S3","S15"],title:"Repairs to a Small Blade Section",
+ summary:"Complete a full small-area repair: remove the damage, cut a scarf, rebuild the laminate, consolidate, cure and finish.",
+ gloss:[
+  ["Scarf / Taper","斜面（斜接）","Angled edge that blends new plies into old laminate."],
+  ["Scarf ratio","斜接比","Length of taper per unit of thickness."],
+  ["Wet lamination","濕式層壓","Rebuilding the laminate by hand."],
+  ["Ply","層","Each rebuilt reinforcement layer."],
+  ["Consolidation","壓實","Removing air from the repair."],
+  ["Cure","固化","Hardening the repair (ambient or heated)."],
+  ["Filler / Topcoat","補土／面漆","Finishing the repaired area."]],
+ ask:[
+  ["What is your scarf ratio, and why?","你的斜接比是多少？為什麼？"],
+  ["How do you order the plies?","你如何安排各層順序？"],
+  ["How will you cure it?","你要怎麼固化？"],
+  ["How do you check the repair before finishing?","修飾前你如何檢查修復品質？"],
+  ["How far back do you grind the damage?","損傷要向外磨到多遠？"],
+  ["How do you restore the original thickness?","你如何恢復原來的厚度？"],
+  ["What PPE does this whole task need?","整個作業需要哪些 PPE？"],
+  ["How do you know it's fully cured?","你怎麼知道完全固化了？"]],
+ get:[
+  ["How far back do I grind the damage?","損傷我要向外磨多遠？"],
+  ["How many plies to restore thickness?","要恢復厚度需要幾層？"],
+  ["Heat or ambient cure here?","這裡是加熱固化還是常溫固化？"],
+  ["How do I know it passed?","我怎麼知道通過了？"],
+  ["What scarf ratio should I cut?","斜接比要切多少？"],
+  ["Do I peel-ply the last layer?","最後一層要鋪剝離布嗎？"],
+  ["How long is the cure?","固化要多久？"],
+  ["When do I fill and coat?","什麼時候補土和塗裝？"]]},
+/* ---- DAY 7 ---- */
+{id:"P13",type:"practical",day:7,src:["S3","S15"],title:"Repairs to a Blade Section",
+ summary:"A larger, more involved section repair building on the small-section work — more plies, larger area and full finishing, possibly under vacuum.",
+ gloss:[
+  ["Structural repair","結構性修復","Repair restoring load-bearing capacity."],
+  ["Scarf","斜面","The tapered edge for the larger repair."],
+  ["Wet lamination","濕式層壓","Hand layup of the rebuild."],
+  ["Vacuum consolidation","真空加固","Used for larger/critical repairs."],
+  ["Consolidation","壓實","Compressing plies to remove air."],
+  ["Cure","固化","Hardening across the repair."],
+  ["Barcol hardness test","巴氏硬度測試","Confirms full cure of the repair."]],
+ ask:[
+  ["How does this repair differ from yesterday's small one?","這次修復和昨天的小範圍有何不同？"],
+  ["Will you need vacuum here?","這次需要真空嗎？"],
+  ["How do you keep large plies aligned?","大片的層要怎麼對齊？"],
+  ["How do you confirm full cure?","你如何確認完全固化？"],
+  ["What scarf will you cut for this area?","這個範圍你要切什麼樣的斜面？"],
+  ["How do you avoid wrinkles in big plies?","大片布要怎麼避免皺褶？"],
+  ["What Barcol reading confirms cure?","巴氏硬度到多少代表已固化？"],
+  ["Does the layup schedule change with size?","疊層順序會因面積而改變嗎？"]],
+ get:[
+  ["Do larger repairs need vacuum?","較大的修復需要真空嗎？"],
+  ["How do I handle big plies without wrinkles?","大片布要怎麼鋪才不會皺？"],
+  ["Longer cure time?","固化時間要拉長嗎？"],
+  ["What Barcol reading confirms it?","巴氏硬度到多少才算通過？"],
+  ["How many plies for this thickness?","這個厚度要疊幾層？"],
+  ["Do I consolidate more often on a big repair?","大範圍修復要更常壓實嗎？"],
+  ["When do I switch to vacuum?","什麼時候要改用真空？"],
+  ["How do I keep resin from gelling too soon?","要怎麼避免樹脂太快膠化？"]]},
+
+{id:"T17",type:"theory",day:7,src:["S2","S15"],title:"Complex Damage Assessment, Including Lightning Strike",
+ summary:"Assessing complex and lightning damage: how a strike travels through the LPS (receptors, down-conductors), the hidden internal damage it leaves, testing LPS conductivity, and deciding repair scope and escalation.",
+ gloss:[
+  ["Lightning Protection System (LPS)","雷擊防護系統","Receptors and conductors carrying a strike safely."],
+  ["Lightning receptor / button","接閃器（點型）","Removable metal strike point on the blade."],
+  ["Lightning tip / drain hole","尖端型／洩流孔","Tip receptor and drainage for the LPS."],
+  ["Down-conductor","引下導體","Carries strike current down the blade."],
+  ["Delamination","脫層","Common hidden result of a strike."],
+  ["Complex damage","複雜損傷","Multi-mode damage needing careful assessment."],
+  ["Megohmmeter (Megger)","高阻計","Tests whether the LPS is still conductive."],
+  ["Engineering authorisation","工程授權","Required to sign off complex/lightning repairs."]],
+ ask:[
+  ["How does a strike path damage a blade internally?","雷擊路徑如何在內部破壞葉片？"],
+  ["Why can lightning damage be worse than it looks?","雷擊損傷為什麼可能比外觀嚴重？"],
+  ["How do you test whether the LPS is still conductive?","你如何測試雷擊防護系統是否仍導通？"],
+  ["When must this go to an engineer?","什麼情況必須交給工程師？"],
+  ["What are the parts of an LPS?","雷擊防護系統由哪些部件組成？"],
+  ["What does a receptor do in a strike?","接閃器在雷擊時的作用是什麼？"],
+  ["Why is complex damage assessed carefully?","複雜損傷為什麼要謹慎評估？"],
+  ["What does a failed Megger reading indicate?","高阻計讀值不合格代表什麼？"]],
+ get:[
+  ["How do I find hidden strike damage?","隱藏的雷擊損傷要怎麼找？"],
+  ["Is the receptor always repairable on site?","接閃器一定能在現場修復嗎？"],
+  ["What does a failed Megger reading mean?","高阻計不合格是什麼意思？"],
+  ["Who signs off a lightning repair?","雷擊修復由誰簽核？"],
+  ["Can I keep the turbine running after a strike?","雷擊後風機還能繼續運轉嗎？"],
+  ["How deep can internal damage go?","內部損傷可以延伸多深？"],
+  ["Do I always test the LPS after a strike?","雷擊後一定要測雷擊防護系統嗎？"],
+  ["What if the down-conductor is broken?","如果引下導體斷了怎麼辦？"]]},
+
+{id:"P14",type:"practical",day:7,src:["S7","S13"],title:"Planning for Rope Access Repair Training — Kit, etc.",
+ summary:"Plan an in-situ rope-access repair: selecting and preparing the kit, materials and controls needed to work on a hanging blade, and setting up the exclusion zone.",
+ gloss:[
+  ["Rope access","繩索作業（繩技）","Working on ropes to reach the blade in-situ."],
+  ["Repair kit","修復工具包","Tools and materials taken up for the repair."],
+  ["In-situ repair","現場修復","Repair done on the installed blade."],
+  ["Exclusion zone","警示區","Barrier/cone zone guarding against dropped objects."],
+  ["Dropped object","墜落物","Falling tool/material — the key rope-access hazard."],
+  ["Vortex generator (VG)","渦流產生器","Add-on that can snag ropes during access."],
+  ["RAMS","風險評估執行計劃","Risk assessment and method statement for the job."]],
+ ask:[
+  ["What kit do you take up on the ropes, and what stays down?","哪些工具帶上繩，哪些留在地面？"],
+  ["How do add-ons like VGs affect rope work?","像渦流產生器這類配件如何影響繩索作業？"],
+  ["What controls does the exclusion zone need?","警示區需要哪些管制措施？"],
+  ["What is your plan if the weather turns?","天氣變壞時你的計畫是什麼？"],
+  ["How do you prevent dropped objects?","你如何防止墜落物？"],
+  ["What is the minimum kit for this repair?","這次修復最少要帶哪些工具？"],
+  ["Which document defines the rope-access method?","繩索作業方法由哪份文件規定？"],
+  ["How do you carry resin safely on rope?","繩上要怎麼安全攜帶樹脂？"]],
+ get:[
+  ["How do I carry resin and tools on rope?","樹脂和工具在繩上要怎麼帶？"],
+  ["What if I drop something?","如果我掉了東西怎麼辦？"],
+  ["How do VGs snag the rope?","渦流產生器怎麼會勾到繩子？"],
+  ["What is the minimum kit for this repair?","這次修復最少帶哪些工具？"],
+  ["How big does the exclusion zone need to be?","警示區要多大？"],
+  ["Can I cure a repair while hanging?","懸掛作業時可以固化修復嗎？"],
+  ["What's the wind limit for rope work?","繩索作業的風速上限是多少？"],
+  ["How do I secure tools to my harness?","工具要怎麼固定在吊帶上？"]]},
+
+/* ---- DAY 8 ---- */
+{id:"P15",type:"practical",day:8,src:["S15"],title:"Review of Quality of Repairs on a Small Blade Section",
+ summary:"Quality-check completed small-section repairs against acceptance criteria: cure (Barcol/Shore D), profile, finish and freedom from voids.",
+ gloss:[
+  ["Quality check","品質檢查","Verifying the repair meets standard."],
+  ["Barcol hardness test","巴氏硬度測試","Non-destructive cure check."],
+  ["Shore D hardness","Shore D 硬度","Complementary hardness/cure check."],
+  ["Cure","固化","Whether the resin has hardened fully."],
+  ["Acceptance criteria","允收標準","The pass/fail standard for the repair."],
+  ["Tap test","敲擊測試","Checks for voids after cure."],
+  ["Calibration","校正","Ensuring the test tool reads true."]],
+ ask:[
+  ["What makes this repair pass or fail?","這處修復通過或不通過的依據是什麼？"],
+  ["What Barcol or Shore reading do you need?","巴氏或 Shore 硬度要達到多少？"],
+  ["How do you check for voids after cure?","固化後你如何檢查有無空洞？"],
+  ["Does the profile match the original?","外形和原始輪廓相符嗎？"],
+  ["How do you confirm the tester is calibrated?","你如何確認測試儀已校正？"],
+  ["What are the acceptance criteria here?","這裡的允收標準是什麼？"],
+  ["Which checks are non-destructive?","哪些檢查是非破壞性的？"],
+  ["Can a cosmetic flaw fail a repair?","外觀瑕疵會讓修復不通過嗎？"]],
+ get:[
+  ["What is the pass threshold?","及格門檻是多少？"],
+  ["How do I test cure non-destructively?","我要怎麼非破壞性地測固化？"],
+  ["What if it is under-cured?","如果固化不足怎麼辦？"],
+  ["Can a cosmetic flaw fail a repair?","外觀瑕疵會不會讓修復被退？"],
+  ["How many readings do I take?","我要測幾個點？"],
+  ["Where do I take the hardness readings?","硬度要在哪些位置量？"],
+  ["What if the tap test finds a void?","敲擊測到空洞怎麼辦？"],
+  ["Who signs off the quality check?","品質檢查由誰簽核？"]]},
+
+{id:"P16",type:"practical",day:8,src:["S7","S15"],title:"Damage to a Hanging Blade Section — Introduction to In-Situ Inspection and Repair Techniques",
+ summary:"Inspect and repair a blade hanging in a representative position, adapting technique to working at height and in-situ — controlling resin flow, holding vacuum and curing on a vertical surface.",
+ gloss:[
+  ["In-situ repair","現場修復","Repair on the installed/hanging blade."],
+  ["Hanging blade","懸掛葉片","Blade positioned vertically for in-situ practice."],
+  ["Rope access","繩索作業","Access method for the hanging blade."],
+  ["Exclusion zone","警示區","Guards the area below the work."],
+  ["Heating blanket","加熱毯","Cures the repair in-situ."],
+  ["Vacuum pump","真空泵","Holds vacuum on a vertical surface."],
+  ["Dropped-object control","墜落物管制","Securing tools/materials at height."]],
+ ask:[
+  ["What changes when the blade is hanging vs on a bench?","葉片懸掛和放在工作台上有什麼不同？"],
+  ["How do you secure tools and materials at height?","高處作業如何固定工具和材料？"],
+  ["How do you cure a repair in-situ?","現場如何固化修復？"],
+  ["What extra controls does in-situ work need?","現場作業需要哪些額外管制？"],
+  ["How do you stop resin running on a vertical face?","垂直面上如何避免樹脂流淌？"],
+  ["How do you hold vacuum in-situ?","現場如何維持真空？"],
+  ["Where does power for the blanket come from?","加熱毯的電源從哪來？"],
+  ["How do you manage the exclusion zone below?","下方的警示區要怎麼管理？"]],
+ get:[
+  ["How do I keep resin from running on a vertical surface?","垂直面上樹脂會流，我要怎麼處理？"],
+  ["How do I hold vacuum in-situ?","現場真空要怎麼維持？"],
+  ["Where does the power for the blanket come from?","加熱毯的電源哪裡來？"],
+  ["How do I manage dropped-object risk?","墜落物風險要怎麼控管？"],
+  ["Do I need a thicker filler on a vertical face?","垂直面補土要調稠一點嗎？"],
+  ["How do I reach the whole damage on rope?","繩上要怎麼觸及整個損傷？"],
+  ["What if the vacuum bag won't stick overhead?","真空袋在頭頂黏不住怎麼辦？"],
+  ["How long can I work on the ropes?","我在繩上能作業多久？"]]},
+
+{id:"P17",type:"practical",day:8,src:["S3","S15"],title:"Large Blade Repairs 1",
+ summary:"Begin a large-scale repair: planning the ply schedule, managing large plies, and allowing for longer working (pot life) and cure times.",
+ gloss:[
+  ["Large repair","大型修復","A repair over a large area/thickness."],
+  ["Scarf","斜面","Long tapered edge for the large repair."],
+  ["Ply schedule","疊層順序","Planned sequence and orientation of plies."],
+  ["Working time / Pot life","可操作時間（適用期）","Time before mixed resin gels."],
+  ["Cure time","固化時間","Time for the repair to harden."],
+  ["Vacuum consolidation","真空加固","Compresses large layups."],
+  ["Fibre orientation","纖維方向","Keeping large plies correctly aligned."]],
+ ask:[
+  ["How do you plan the ply schedule for a large repair?","大範圍修復的疊層順序你如何規劃？"],
+  ["How do you manage working time before the resin gels?","你如何在樹脂膠化前掌握作業時間？"],
+  ["How do you keep large plies aligned and wrinkle-free?","大片布要怎麼對齊且不起皺？"],
+  ["Will you consolidate under vacuum?","你會用真空加固嗎？"],
+  ["How do you choose the hardener speed?","硬化劑速度你怎麼選？"],
+  ["How long is the scarf for this thickness?","這個厚度的斜面要多長？"],
+  ["How do you split the work among the team?","工作如何在團隊間分配？"],
+  ["What's your plan if you run out of pot life?","如果適用期用完了你的對策是什麼？"]],
+ get:[
+  ["How do I stop the resin gelling before I finish?","我還沒做完樹脂就膠化了怎麼辦？"],
+  ["How do I handle very large plies?","很大片的布要怎麼處理？"],
+  ["Do I need a slower hardener?","我需要用慢速硬化劑嗎？"],
+  ["How long is the cure?","固化要多久？"],
+  ["How many people should lay a big ply?","一大片布要幾個人一起鋪？"],
+  ["How do I keep orientation over a big area?","大面積上要怎麼維持纖維方向？"],
+  ["Do I vacuum every layer or at the end?","要每層抽真空還是最後一次？"],
+  ["What's the target thickness?","目標厚度是多少？"]]},
+
+/* ---- DAY 9 ---- */
+{id:"T18",type:"theory",day:9,src:["S15"],title:"Review of Repairs, Quality Checks, and Typical Requirements for Testing (Tg, etc.)",
+ summary:"How finished repairs are verified: hardness and cure checks, glass-transition temperature (Tg) as an indirect measure of cure, post-cure to raise Tg, and typical acceptance and testing requirements.",
+ gloss:[
+  ["Quality check","品質檢查","Verifying a finished repair."],
+  ["Barcol hardness test","巴氏硬度測試","Indicates degree of cure by indentation."],
+  ["Glass transition temperature (Tg)","玻璃轉化溫度","Temperature where cured resin softens; a key cure metric."],
+  ["Degree of cure","固化程度","How completely the resin has cured."],
+  ["Acceptance criteria","允收標準","The standard a repair must meet."],
+  ["Post-cure","後固化","Extra heated cycle to raise Tg/properties."],
+  ["Data logger","數據記錄器","Records the cure temperature cycle."],
+  ["Calibration","校正","Verifying test instruments read true."]],
+ ask:[
+  ["What is Tg and why does it matter for a repair?","什麼是玻璃轉化溫度？對修復為什麼重要？"],
+  ["How does hardness testing indicate cure?","硬度測試如何反映固化程度？"],
+  ["Why might a repair need post-cure?","修復為什麼可能需要後固化？"],
+  ["What are typical acceptance criteria?","典型的允收標準是什麼？"],
+  ["How does Tg relate to degree of cure?","玻璃轉化溫度和固化程度有什麼關係？"],
+  ["Which tests are destructive vs not?","哪些測試是破壞性、哪些不是？"],
+  ["Why calibrate the test instruments?","測試儀器為什麼要校正？"],
+  ["What does a data logger record?","數據記錄器記錄什麼？"]],
+ get:[
+  ["What Tg do we need to reach?","我們需要達到多少玻璃轉化溫度？"],
+  ["How do I raise Tg if it is low?","如果 Tg 太低我要怎麼提高？"],
+  ["Which tests are destructive vs not?","哪些測試會破壞、哪些不會？"],
+  ["Who defines the acceptance criteria?","允收標準由誰訂定？"],
+  ["Does every repair need a Tg check?","每次修復都要測 Tg 嗎？"],
+  ["How does post-cure work in the field?","現場後固化要怎麼做？"],
+  ["What Barcol number is acceptable?","巴氏硬度到多少可以接受？"],
+  ["How do I prove the repair passed?","我要如何證明修復通過？"]]},
+
+{id:"P18",type:"practical",day:9,src:["S3","S15"],title:"Dealing with the Environment — Cold Weather, Wet Weather, High Wind",
+ summary:"Adapting repairs to field conditions: checking temperature and humidity against the material's operating window, keeping the work area dry and warm, watching the dew point, and respecting wind limits.",
+ gloss:[
+  ["Ambient conditions","環境條件","Temperature and humidity around the repair."],
+  ["Temperature & humidity data logger","溫濕度數據記錄儀","Records ambient conditions."],
+  ["Operating window","操作窗口","The material's allowed temp/humidity range."],
+  ["Heating blanket","加熱毯","Warms the repair in cold conditions."],
+  ["Dew point","露點","Temperature at which moisture condenses on the surface."],
+  ["Wind limit","風速限制","The wind speed above which work must stop."],
+  ["Cure","固化","Slowed or prevented by cold/damp conditions."]],
+ ask:[
+  ["Why check temperature and humidity before starting?","開工前為什麼要量溫度和濕度？"],
+  ["What is the material's operating window?","這種材料的操作窗口是多少？"],
+  ["How does cold affect epoxy cure?","低溫如何影響環氧樹脂固化？"],
+  ["When is it too windy or wet to work?","風多大、多濕就不能作業？"],
+  ["Why does dew point matter?","露點為什麼重要？"],
+  ["How do you keep the work area dry?","你如何保持作業區乾燥？"],
+  ["How do you warm a repair in the cold?","低溫時修復處如何保溫？"],
+  ["What records the ambient conditions?","環境條件由什麼記錄？"]],
+ get:[
+  ["Can I still repair below the recommended temperature?","低於建議溫度時我還能修嗎？"],
+  ["How do I keep the area dry?","作業區要怎麼保持乾燥？"],
+  ["What if humidity is too high?","濕度太高怎麼辦？"],
+  ["What is the wind cut-off?","風速上限是多少？"],
+  ["How close to the dew point is too close?","離露點多近就太危險？"],
+  ["Does cold change my cure time?","低溫會改變固化時間嗎？"],
+  ["Can a heating blanket solve cold weather?","加熱毯能解決低溫問題嗎？"],
+  ["When should I just stop and wait?","什麼時候該直接停工等待？"]]},
+
+{id:"P19",type:"practical",day:9,src:["S3","S15"],title:"Large Blade Repairs 2",
+ summary:"Complete the large repair: consolidate, cure, quality-check across the whole area, and finish to the acceptance standard.",
+ gloss:[
+  ["Large repair","大型修復","The large-area repair being completed."],
+  ["Vacuum consolidation","真空加固","Compressing the large layup."],
+  ["Cure","固化","Hardening evenly across the whole area."],
+  ["Barcol hardness test","巴氏硬度測試","Multiple readings confirm even cure."],
+  ["Finishing / Topcoat","修飾／面漆","Fairing and coating the repair."],
+  ["Acceptance criteria","允收標準","The pass standard."],
+  ["Post-cure","後固化","May be needed to reach required Tg."]],
+ ask:[
+  ["How did you consolidate and cure a repair of this scale?","這種規模的修復你如何壓實與固化？"],
+  ["How do you verify full cure across a large area?","大面積如何確認整體都固化了？"],
+  ["How do you finish and fair a large repair?","大範圍修復你如何修飾與整平？"],
+  ["Does it meet the acceptance criteria?","它符合允收標準嗎？"],
+  ["How many Barcol readings, and where?","要測幾點巴氏硬度？測哪裡？"],
+  ["Did any area need post-cure?","有哪個區域需要後固化嗎？"],
+  ["How do you get even cure over a big area?","大面積如何做到均勻固化？"],
+  ["What's left before sign-off?","簽核前還剩什麼要做？"]],
+ get:[
+  ["How do I get even cure over a big area?","大面積要怎麼均勻固化？"],
+  ["How many Barcol readings, and where?","巴氏硬度要測幾點、測哪裡？"],
+  ["How do I fair a large surface flat?","大面積要怎麼整平？"],
+  ["What is left to pass?","還差什麼才能通過？"],
+  ["Do I need post-cure on this one?","這個需要後固化嗎？"],
+  ["How long is the cure at this size?","這種尺寸固化要多久？"],
+  ["How do I blend a large repair in?","大範圍修復要怎麼銜接？"],
+  ["Who does the final quality check?","最終品質檢查由誰做？"]]},
+
+/* ---- DAY 10 ---- */
+{id:"P20",type:"practical",day:10,src:["S2","S3","S7"],title:"Rope Access Finishing — Post-Repair Inspections, Coatings and Leading Edge Protection, VGs and Aero Fittings",
+ summary:"In-situ finishing on rope: post-repair inspection, applying coatings and leading edge protection, and refitting aerodynamic add-ons such as vortex generators and trailing-edge serrations.",
+ gloss:[
+  ["Rope access","繩索作業","Working on ropes to finish the repair in-situ."],
+  ["Post-repair inspection","修復後檢查","Final check before sign-off."],
+  ["Coating","塗層","Protective finish applied on rope."],
+  ["Leading edge protection","前緣保護","Reapplied to shield the leading edge."],
+  ["Vortex generator (VG)","渦流產生器","Aerodynamic add-on refitted after repair."],
+  ["Trailing edge serrations (Dino tails)","後緣鋸齒","Noise-reducing add-on, bonded with non-structural adhesive."],
+  ["Aero fittings","空力配件","Aerodynamic add-ons whose placement matters."],
+  ["Non-structural adhesive","非結構黏著劑","Peel-and-stick bond for add-ons."]],
+ ask:[
+  ["What do you inspect before signing off the repair?","簽核前你要檢查什麼？"],
+  ["How do you apply coatings and LEP on rope?","繩上如何施作塗層和前緣保護？"],
+  ["How are VGs and serrations bonded back on?","渦流產生器和鋸齒如何黏回去？"],
+  ["Why does add-on placement matter aerodynamically?","配件位置為什麼會影響空氣力學？"],
+  ["Which adhesive is used for aero add-ons?","空力配件用哪種黏著劑？"],
+  ["How do you coat evenly on a vertical surface?","垂直面上如何均勻塗裝？"],
+  ["What documents the finished repair?","完工修復由什麼文件記錄？"],
+  ["How precise must VG placement be?","渦流產生器的位置要多精確？"]],
+ get:[
+  ["How do I coat evenly on a vertical surface?","垂直面上要怎麼均勻塗裝？"],
+  ["Which adhesive for VGs?","渦流產生器用哪種黏著劑？"],
+  ["How precise does add-on placement need to be?","配件位置要多精確？"],
+  ["How do I document the finished repair?","完工修復要怎麼記錄？"],
+  ["Do I reapply LEP over the repair?","修復處上面要重做前緣保護嗎？"],
+  ["What if a VG breaks during access?","渦流產生器在作業中斷了怎麼辦？"],
+  ["How long before add-ons hold?","配件多久才黏牢？"],
+  ["Who inspects before the turbine restarts?","風機重啟前由誰檢查？"]]},
+
+{id:"T19",type:"theory",day:10,src:["S1"],title:"Final Exam",
+ summary:"Theory examination closing the course, followed by a training review — re-presenting the aims and learning objectives, a feedback session, and the online course evaluation.",
+ gloss:[
+  ["Assessment","評估","Final measurement of competence."],
+  ["Theory exam","理論考試","Written test of course knowledge."],
+  ["Competence","能力","Demonstrated ability to work safely and correctly."],
+  ["Pass criteria","及格標準","The mark required to pass."],
+  ["Training review","培訓回顧","Re-presenting aims vs learning outcome."],
+  ["Feedback session","反饋會議","Feed-forward on learning transfer to the workplace."],
+  ["Learning transfer","學習遷移","Applying the training to real work."]],
+ ask:[
+  ["Are there any questions before we begin?","開始前有任何問題嗎？"],
+  ["Are you clear on the exam format?","考試形式你清楚了嗎？"],
+  ["[After] What was your key takeaway from the course?","【考後】這門課你最大的收穫是什麼？"],
+  ["[After] Where will you apply this first?","【考後】你會先把它用在哪裡？"],
+  ["How does your worksite differ from the training scenario?","你的工作現場和訓練情境有何不同？"],
+  ["Did the course meet your stated expectations?","課程符合你先前的期望嗎？"],
+  ["Which element will help you most on site?","哪個單元對你現場最有幫助？"],
+  ["What will you discuss with colleagues afterwards?","結訓後你會和同事討論什麼？"]],
+ get:[
+  ["What is the pass mark?","及格分數是多少？"],
+  ["How long is the exam?","考試多長時間？"],
+  ["What happens if I don't pass?","如果沒通過會怎樣？"],
+  ["Will there be a re-sit?","有補考嗎？"],
+  ["Is the exam open-book?","考試可以看資料嗎？"],
+  ["When do I get my result?","什麼時候會知道成績？"],
+  ["Does the certificate expire?","證照會過期嗎？"],
+  ["How do I complete the course evaluation?","課程評估要怎麼填？"]]}
+];
+/* ============================ PPT SECTION DATA ============================ */
+/* Mirrors the deck's own structure (by GWO syllabus element). p:[start,end]; rel: related lesson ids */
+const SECTIONS = [
+{id:"S1",title:"Introduction / Overview",zh:"課程介紹／總覽",p:[1,19],rel:["T1","T4","T19"],
+ summary:"The course framework: GWO's mission and the module scope and learning objectives, enrolment, assessment and appeal procedures, the facility tour and emergency procedures, instructor and delegate introductions, and the human factors that influence wind-industry accidents.",
+ gloss:[
+  ["GWO (Global Wind Organisation)","全球風能組織","Owner/manufacturer association supporting an injury-free wind industry."],
+  ["Blade Repair (BR) module","葉片維修模組","This GWO training module."],
+  ["Scope","課程範疇","Aims and boundaries of the module."],
+  ["Learning objective","學習目標","What trainees can do on completion."],
+  ["Course enrolment","課程註冊","Registration, ID check and forms."],
+  ["WINDA ID","WINDA 識別碼","GWO training-record identifier."],
+  ["Control Measure form","控制措施表","Registration paperwork."],
+  ["Assessment methods","評估方法","Continuous assessment plus a test."],
+  ["Appeal procedure","申訴程序","Route to challenge a result."],
+  ["Special considerations","特殊考量","Adjustments for individual needs."],
+  ["Fire alarm / break-glass point","火災警報器","Manual call point."],
+  ["Fire extinguisher","滅火器","On-site firefighting equipment."],
+  ["Escape route","逃生路線","Emergency exit path."],
+  ["Muster point","緊急集合點","Emergency assembly area."],
+  ["First aid / Defibrillator (AED)","急救箱／AED","Emergency medical equipment."],
+  ["Handrail policy","扶手規定","Site rule to use handrails."],
+  ["Certificate without expiry","無效期證照","GWO BR certificate has no fixed expiry."],
+  ["Lead / Support instructor","主講師／副講師","The two instructor roles."],
+  ["Human factor","人為因素","Conditions raising accident risk."],
+  ["Attention and perception","注意與感知","A human factor in accidents."],
+  ["Peer pressure","同伴壓力","Group-behaviour human factor."],
+  ["Fatigue","疲勞","A key human factor, worse at height."],
+  ["Time pressure / deadlines","時間壓力／期限","Human factor raising risk."],
+  ["Substance abuse","藥物濫用","Alcohol/medication human factor."]]},
+
+{id:"S2",title:"Composites and Blade Construction",zh:"複合材料與葉片構造",p:[20,44],rel:["T2","T3","T8","T13","T14","T17","P20"],
+ summary:"How blades are built and how they work: Type A vs Type B manufacturing, structural vs non-structural shell, blade anatomy, aerodynamic and safety add-ons, protection systems, blade damage types and mitigation, damage measuring by radius, and turbine orientations and dimensions.",
+ gloss:[
+  ["Manufacturing Type A","製造方法 A","Heated open moulds; most manufacturers."],
+  ["Manufacturing Type B","製造方法 B","Inflatable-bag, single-piece infusion (Siemens); no bond lines."],
+  ["Mould / Hydraulic hinge","模具／液壓鉸鏈","Heated tool and its closing mechanism."],
+  ["Mandrel","芯軸","Holds internal structure during a Type B cure."],
+  ["Bond line","黏合線","Glued joint; avoided in Type B."],
+  ["Structural shell","結構殼","Load in the outer shell (GE, Enercon, Nordex)."],
+  ["Non-structural shell","非結構殼","Aero shell over an internal structure."],
+  ["Box-spar","箱形樑","Internal main structure (Vestas, Gamesa)."],
+  ["Sparcap / Spar","翼樑帽／翼樑","Main load-bearing spine."],
+  ["Shear web","抗剪腹板","Links sparcaps; forms an I-beam."],
+  ["Leading edge / Trailing edge","前緣／後緣","Front and rear edges of the aerofoil."],
+  ["Root / Tip","根部／葉尖","Hub end vs outer end."],
+  ["Chord / Maximum chord","弦長／最寬處","Section width; widest point."],
+  ["Prebend","預彎","Curvature giving tower clearance."],
+  ["Suction / Pressure side","吸力面／壓力面","Leeward vs windward aerodynamic surfaces."],
+  ["Bulkhead","隔板","Internal partition."],
+  ["Hub / Nacelle","輪轂／機艙","Rotor centre and the housing on the tower."],
+  ["Yaw motor","偏航馬達","Rotates the nacelle around the tower."],
+  ["Pitch system","變角（變槳）系統","Rotates blades to control load."],
+  ["Spinner cover","導流罩","Composite cover over the hub."],
+  ["Vortex generator (VG)","渦流產生器","Aerodynamic add-on."],
+  ["Trailing edge serrations (Dino tails)","後緣鋸齒","Noise-reducing add-on."],
+  ["Lightning Protection System (LPS)","雷擊防護系統","Carries a strike safely to earth."],
+  ["Lightning receptor / button / tip","接閃器／點型／尖端型","Metal strike points; often removable."],
+  ["Drain hole","洩流孔","Drains water from the blade tip."],
+  ["De-icing system","除冰系統","Removes ice from the blade."],
+  ["Stall strips / Gurney flaps","失速條／擾流板","Aerodynamic performance add-ons."],
+  ["Erosion","腐蝕","Surface wear, worst at the leading edge/tip."],
+  ["Delamination","脫層","Ply separation."],
+  ["Foreign object collision","外物撞擊","Impact damage."],
+  ["Cracks","破損（裂紋）","Surface or structural fractures."],
+  ["Bond-line failure","黏合線故障","Glued-joint separation; repair in 3–6 months."],
+  ["Leading edge protection (LEP)","前緣保護","Tape, paint or shells to slow erosion."],
+  ["Radius measurement","半徑量測","Locating damage by distance from root."],
+  ["Bunny Ears / Blade Up (Tripod)","兔耳式／三角式","Turbine parking orientations for maintenance."],
+  ["Weight and balance","配重與平衡","Affects component life and productivity."]]},
+
+{id:"S3",title:"Materials",zh:"修復材料",p:[45,83],rel:["T5","T7","T8","T10","T11","T16"],
+ summary:"The repair materials in depth: reinforcement fibres (E-/S-glass, carbon; chopped/UD/biax/triax and nomenclature), the resin matrix (epoxy vs ester; catalyst/hardener/accelerator; mix ratio and cure), prepreg, sandwich cores (balsa, PVC/SAN/PET foam), adhesives (PU/epoxy/methacrylate; cartridge + static mix head), gelcoat/coatings, and the health hazards of fibres and resins.",
+ gloss:[
+  ["Composite","複合材料","Fibre reinforcement in a resin matrix."],
+  ["Laminate","層板（層壓板）","Stacked, resin-bonded plies."],
+  ["Reinforcement / Fibre / Fabric / Mat","強化材料／纖維／織物／氈","Names for the fibre reinforcement."],
+  ["Matrix","基材","The resin binding and load-transferring phase."],
+  ["Viscosity","黏度","Resin flow, between water and engine oil."],
+  ["E-Glass","電子玻璃","Most common reinforcement."],
+  ["S-Glass","高強度玻纖","Higher-strength glass for high-stress areas."],
+  ["Carbon fibre","碳纖維","High strength, low mass; 5–8× glass price."],
+  ["Chopped strand mat","短切氈","Easy but low-strength; rare in blades."],
+  ["Unidirectional (UD)","單向布","Fibres one direction; highest strength."],
+  ["Biaxial (Biax) / Triaxial (Triax)","雙軸／三軸布","Stitched fabrics at set angles."],
+  ["Fibre orientation","纖維方向","Angle relative to blade 0° (length) axis."],
+  ["Nomenclature (gsm, roll width)","命名格式（克重、幅寬）","Standard fabric description code."],
+  ["Hardback material","硬質背材","Backing material characteristic."],
+  ["Resin","樹脂","Cures to bind the fibres."],
+  ["Polyester / Vinylester","聚酯／乙烯基酯","Ester resins; variable cure."],
+  ["Epoxy","環氧樹脂","Heat-driven cure; fixed mix ratio."],
+  ["Catalyst / Hardener / Accelerator","催化劑／硬化劑／加速劑","Start, enable or speed the cure."],
+  ["Mix ratio","混合比","A:B proportion (epoxy 100:20–100:50)."],
+  ["Cross-linking / Thermoset","交聯／熱固性","Curing reaction forming rigid plastic."],
+  ["Cure: ambient / heat / UV","固化：自然／加熱／紫外光","Three curing methods."],
+  ["Exotherm","放熱反應","Heat released while curing; fire risk in bulk."],
+  ["MMA (Methyl methacrylate)","甲基丙烯酸甲酯","Alternative resin/adhesive chemistry."],
+  ["Polyurethane (PU/PUR)","聚氨酯","Resin/adhesive and paint chemistry."],
+  ["Prepreg","膠片（預浸料）","Pre-resined fabric; kept cold, cured with heat/vacuum."],
+  ["Sandwich panel","夾層板","Skins bonded either side of a core."],
+  ["Core material","芯材","Lightweight core giving stiffness."],
+  ["Balsa core (end-grain)","輕木芯（橫切）","Stiff wood core; fungus/rot risk."],
+  ["Structural foam (PVC/SAN/PET)","結構性發泡材","Closed-cell foam core; grooved for resin."],
+  ["Scrim","稀鬆布","Holds balsa blocks together."],
+  ["Consolidation / Air void","壓實／氣孔","Compressing plies to remove air."],
+  ["Operating window","操作窗口","Allowed temperature/humidity range."],
+  ["Adhesive / Bonding paste","黏著劑／黏接膏","Bonding material; “peanut-butter” thickness."],
+  ["Static mix head / Cartridge","靜態混合頭／膠筒","Correct-ratio, low-air adhesive dispensing."],
+  ["Pneumatic gun","氣動槍","Air-driven cartridge gun."],
+  ["Gelcoat","膠衣","In-mould protective coating."],
+  ["Coating / Paint / Topcoat","塗層／油漆／面漆","Post-manufacture UV-protective finish."],
+  ["Filler","補土","Non-structural profile-restoring paste."],
+  ["UV degradation","紫外線劣化","Why composites need coating outdoors."],
+  ["Coating thickness","塗層厚度","Typically 700–900 µm."],
+  ["Sensitisation / Dermatitis","過敏（致敏）／皮膚炎","Resin health hazards."]]},
+
+{id:"S4",title:"Safety Data Sheet",zh:"物質安全資料表",p:[84,95],rel:["T6","T4"],
+ summary:"What a Safety Data Sheet is (a supplier hazard document, not a risk assessment), its 16 sections, a worked example (3M MEKP hardener), where to find SDS on site, hazard labels and pictograms, and how to read PPE requirements from an SDS.",
+ gloss:[
+  ["Safety Data Sheet (SDS)","物質安全資料表","Supplier hazard document for a substance."],
+  ["MSDS","物質安全資料表（舊稱）","Older name for an SDS."],
+  ["COSHH risk assessment","危害物質風險評估","The user's own assessment from SDS data."],
+  ["Section 1: Identification","第1節 化學品與廠商資料","Product and supplier details, emergency phone."],
+  ["Section 2: Hazard identification","第2節 危害辨識","Classification, pictograms, hazard statements."],
+  ["Section 4: First aid measures","第4節 急救措施","What to do on exposure."],
+  ["Section 5: Fire-fighting measures","第5節 滅火措施","Extinguishing media and special hazards."],
+  ["Section 7: Handling and storage","第7節 處理與儲存","Safe handling and storage rules."],
+  ["Section 8: Exposure control / PPE","第8節 暴露預防措施","Required PPE and controls."],
+  ["Section 13: Disposal","第13節 廢棄物處置","How to dispose of the substance."],
+  ["MEKP hardener","MEKP 硬化劑","Organic-peroxide catalyst (worked example)."],
+  ["Signal word (Danger / Warning)","警示語（危險／警告）","Severity indicator on the label."],
+  ["Pictogram","危害圖示","Standard GHS hazard symbol."],
+  ["Hazard statement","危害告知","Describes the nature of the hazard."],
+  ["Precautionary statement","危害預防","Prevention, response, storage, disposal advice."],
+  ["Job pack","工作包","On-site pack holding SDS and documents."],
+  ["HSE advisor","環安衛顧問","On-site contact for safety information."],
+  ["Filter type A","A 型濾罐","Organic-vapour respirator filter (from SDS)."],
+  ["Hazard labels G-01…G-09","危害標示 G-01…G-09","Flammable, oxidizing, compressed, corrosive, explosive, toxic, harmful, health, environmental."]]},
+
+{id:"S5",title:"Work Instruction",zh:"工作指引",p:[96,97],rel:["T6","T16","P3"],
+ summary:"Why a work instruction (WI) matters and what it contains — safety precautions, tools & equipment, consumables, environment conditions and a task list — illustrated with a vacuum-consolidation shear-web panel WI.",
+ gloss:[
+  ["Work Instruction (WI)","工作指引","Step-by-step approved task procedure."],
+  ["Safety precautions","安全須知","PPE and TDS to check before starting."],
+  ["Tools & equipment list","工具及設備清單","Everything needed, checked before use."],
+  ["Consumables list","耗材清單","Materials consumed in the task."],
+  ["Environment condition","環境條件","Required temperature/humidity for the task."],
+  ["Task list","工作項目","The ordered steps of the job."],
+  ["Vacuum consolidation panel","真空加固板","The example WI's product."],
+  ["Shear web","抗剪腹板","Component in the example WI."],
+  ["Release agent (Marbocote/Mirror Glaze)","離型劑","Stops resin sticking to the mould."]]},
+
+{id:"S6",title:"Risk Assessment",zh:"風險評估",p:[98,102],rel:["T6"],
+ summary:"The risk-assessment process — identify hazard, analyse risk, apply control measures, and record a residual-risk strategy — with a risk-priority scoring guide (Low/Medium/High) and where to obtain the current RA and WI on site.",
+ gloss:[
+  ["Risk Assessment","風險評估","Formal process to minimise accident/injury risk."],
+  ["RAMS","風險評估執行計劃","Risk Assessment + Method Statement."],
+  ["Hazard","危害","Something with potential to cause harm."],
+  ["Control measure","控制措施","Action reducing or mitigating a risk."],
+  ["Risk analysis","風險分析","Judging likelihood and severity."],
+  ["Acceptable risk","可接受風險","Risk low enough to proceed."],
+  ["Significant risk","重大風險","Risk needing further control."],
+  ["Residual risk","剩餘風險","Risk remaining after controls."],
+  ["Risk priority score","風險分數","1–9 Low, 10–40 Medium, 41–100 High."],
+  ["Method statement","方法說明","How the task will be done safely."],
+  ["Site lead","場域主管","Provides current WI/RA on site."]]},
+
+{id:"S7",title:"Secure an Area",zh:"警示區設置",p:[103,104],rel:["T4","P14","P16","P20"],
+ summary:"Why and how to set up an exclusion zone around a blade-repair area — protecting against dropped or falling objects and other site hazards, using barrier tape, cones and signs per the site work package.",
+ gloss:[
+  ["Exclusion zone","警示區","Barrier zone protecting against hazards."],
+  ["Dropped / falling object","墜落物","Key hazard an exclusion zone guards against."],
+  ["Barrier tape","警示膠帶","Marks the zone boundary."],
+  ["Traffic cone","交通錐","Marks the zone boundary."],
+  ["Road sign","警示標誌","Warns of the work area."],
+  ["Site work package","現場工作包","Holds instructions for securing the area."],
+  ["Chemical exclusion zone","化學警示區","Zone around chemical hazards."]]},
+
+{id:"S8",title:"Contamination",zh:"汙染防治",p:[105,108],rel:["T4","T6"],
+ summary:"Chemical cross-contamination across every phase of a repair (preparation, transport, inspection, repair, leaving site), its risks and how to prevent and mitigate it — plus the technician's environmental responsibilities.",
+ gloss:[
+  ["Cross contamination","交叉汙染","Chemical spreading between materials/areas."],
+  ["Adjacent work area contamination","鄰區汙染","Contamination of neighbouring work areas."],
+  ["Chemical contamination","化學汙染","Unwanted chemical on surfaces or kit."],
+  ["Repair kit","修復工具包","Received, used and returned during a repair."],
+  ["Environmental responsibility","環境維護責任","Safe storage, use, return and disposal."],
+  ["QSE / QHSE","品質環安衛","Quality-safety-environment contact on site."],
+  ["Mitigation","緩解措施","Steps to reduce contamination risk."]]},
+
+{id:"S9",title:"Waste Segregation",zh:"廢棄物分類",p:[109,112],rel:["T4"],
+ summary:"Separating ordinary from chemical waste — curing rollers, brushes and leftover resin before binning, achieving a “cured ending”, and sending chemical waste to an approved hazardous-waste facility rather than the drain.",
+ gloss:[
+  ["Waste segregation","廢棄物分類","Separating ordinary from chemical waste."],
+  ["Ordinary waste","一般廢棄物","Non-hazardous, cured or clean waste."],
+  ["Chemical waste","化學廢棄物","Hazardous waste needing controlled disposal."],
+  ["Cured ending","完全反應處置","Letting resin fully cure before disposal."],
+  ["Bolt roller (metal / plastic)","壓氣筒（金屬／塑膠）","Metal cleaned; plastic disposable."],
+  ["Offcuts","邊角料","Clean reinforcement scraps."],
+  ["Hazardous-waste incineration","危險廢棄物焚燒","Approved destruction of chemical waste."]]},
+
+{id:"S10",title:"Ergonomic",zh:"人因工程",p:[113,118],rel:["T4"],
+ summary:"Correct posture in the classroom, workshop and on the blade — good sitting and standing with the body aligned and supported — to reduce strain, joint wear and muscle overuse and to protect spine health.",
+ gloss:[
+  ["Ergonomics","人因工程","Fitting the task to the body to prevent injury."],
+  ["Posture","姿勢","Alignment of the body when sitting/standing."],
+  ["Muscle tension","肌肉張力","Supporting force that should be balanced."],
+  ["Strain","拉傷／勞損","Injury from poor posture or overuse."],
+  ["Joint / muscle / ligament wear","關節／肌肉／韌帶磨耗","Reduced by correct posture."],
+  ["Spine health","脊椎健康","Improved by good posture."],
+  ["Backrest / cushion","靠背／靠墊","Support for the lower back."],
+  ["Rest break","休息","Regular breaks from static posture."]]},
+
+{id:"S11",title:"Lock Out and Tag Out",zh:"上鎖掛牌",p:[119,122],rel:["T4"],
+ summary:"LOTO to prevent the unexpected start-up of equipment during service — locking all energy sources, the identify/isolate/lock/test/restore sequence, and following company-specific LOTO procedures and standards (OSHA, EN 50110).",
+ gloss:[
+  ["Lock Out Tag Out (LOTO)","上鎖掛牌","Locking energy to prevent unexpected start-up."],
+  ["Unexpected start-up","意外啟動","What LOTO exists to prevent."],
+  ["Energy source","能源","Any source that can be locked out."],
+  ["Isolation","隔離","Cutting off the energy source."],
+  ["Identify / Lock / Test / Restore","辨識／上鎖／測試／復原","Steps of a LOTO procedure."],
+  ["OSHA","美國職安署標準","US LOTO standard referenced in the deck."],
+  ["EN 50110","EN 50110 標準","European electrical-safety standard."],
+  ["Company-specific LOTO","公司專屬 LOTO 程序","Rules that must be followed before work."]]},
+
+{id:"S12",title:"Chemical Safety",zh:"化學安全",p:[123,131],rel:["T4","T5"],
+ summary:"Handling repair chemicals safely — safe transfer, using labels/precautions/SDS, exotherm and its fire risk, sensitisation and dermatitis from epoxy, avoidance measures, and the molecular-weight basis of epoxy/PU health risk.",
+ gloss:[
+  ["Sensitisation","過敏（致敏）","Immune reaction to epoxy; lifelong, <2% of users."],
+  ["Allergic dermatitis / Eczema","過敏性皮炎／濕疹","Skin reaction from resin/dust exposure."],
+  ["Exotherm","放熱反應","Curing heat; smoke/fire risk in bulk (>a cupful)."],
+  ["Occupational asthma","職業性哮喘","A composite-material health effect."],
+  ["Safe transfer (funnel / hand-pump / siphon)","安全移注（漏斗／手動泵／虹吸）","Prevents splashing when moving liquids."],
+  ["Spill kit","洩漏包","On-site kit to contain spills."],
+  ["Low-molecular-weight epoxy (<700)","低分子量環氧樹脂","Can cause eczema; special rules if ≥1%."],
+  ["High-molecular-weight epoxy (>700)","高分子量環氧樹脂","More solid; won't newly cause eczema."],
+  ["Reactive group","反應基","More reactive groups = higher risk."],
+  ["Carcinogenic / Reprotoxic","致癌／生殖毒性","Long-term hazards to avoid."],
+  ["Bisphenol-A","雙酚 A","Epoxy component; deemed non-carcinogenic in humans."]]},
+
+{id:"S13",title:"Personal Protective Equipment",zh:"個人防護裝備",p:[132,143],rel:["T4","P6","P14"],
+ summary:"The hierarchy of control and where PPE sits (last line of defence), the critical HSE/PPE set for blade repair, glove breakthrough times and resistance charts, and the PPE-by-operation matrix (cutting dry fabric, laminating, bonding, sanding, etc.).",
+ gloss:[
+  ["Hierarchy of control","控制階層","Eliminate → substitute → engineering → administrative → PPE."],
+  ["PPE","個人防護裝備","Last line of defence."],
+  ["Dust mask","防塵口罩","For dust-generating tasks."],
+  ["Nitrile gloves","丁腈手套","Chemical-handling gloves."],
+  ["Safety glasses / Face shield","安全眼鏡／面罩","Eye and face protection."],
+  ["Cover suit","防護衣","Body protection."],
+  ["Safety boots","安全鞋","Foot protection."],
+  ["Handling gloves","作業手套","General handling protection."],
+  ["Forced-air mask / hood","供氣式面罩／頭罩","Clean-air respiratory protection."],
+  ["Cut-resistant gloves","防割手套","For handling cured laminate."],
+  ["Anti-vibration gloves","防震手套","Reduce HAVS risk with power tools."],
+  ["Breakthrough time","穿透時間","How long a glove resists a chemical (from MSDS)."],
+  ["Resistance chart","化合物耐受表","Helps select the right glove."],
+  ["Lamination suit","層壓防護衣","Worn for resin/laminating work."],
+  ["Boot covers","鞋套","Prevent contamination spread."],
+  ["Hearing protection","聽力防護","For noisy operations."]]},
+
+{id:"S14",title:"Mask and Filter",zh:"面罩與過濾器",p:[144,165],rel:["T4"],
+ summary:"Respiratory protection in depth — non-powered vs powered respirators and breathing apparatus, tight- vs loose-fitting facepieces, filter categories (A/B/E/K plus dust class), filter and mask life and facial-hair limits — plus the wider control measures: elimination/substitution, exposure limits (WEL/LTEL/STEL), local exhaust and dilution ventilation, health monitoring and cleanliness.",
+ gloss:[
+  ["Respirator (non-powered)","無動力呼吸器","Wearer's breathing draws air through the filter."],
+  ["Powered respirator","電動呼吸器","Motor passes clean air to the wearer."],
+  ["Breathing apparatus (BA)","自給式呼吸器","Air from an independent cylinder/compressor."],
+  ["Tight-fitting facepiece","緊密貼合面罩","Relies on a good face seal."],
+  ["Loose-fitting facepiece","寬鬆面罩","Hood/visor/blouse; powered only."],
+  ["Filter type A","A 型濾罐","Organic vapour."],
+  ["Filter type B","B 型濾罐","Inorganic vapour."],
+  ["Filter type E","E 型濾罐","Sulphur dioxide."],
+  ["Filter type K","K 型濾罐","Ammonia."],
+  ["Filter dust class","濾罐防塵等級","Number = dust/capacity rating."],
+  ["Mask life expectancy","面罩壽命","Depends on application/chemical."],
+  ["Facial hair (seal)","面部毛髮（密合）","Compromises a tight-fitting seal."],
+  ["WEL (Workplace Exposure Limit)","職場暴露限值","Permitted exposure, as a TWA."],
+  ["TWA / LTEL / STEL","時量平均／長期／短期暴露限值","8-hour vs 15-minute exposure limits."],
+  ["Local exhaust ventilation (LEV)","局部排氣通風","Removes contaminant at source."],
+  ["Dilution ventilation","稀釋通風","Air flow to dilute airborne contaminant."],
+  ["Health monitoring","健康監測","Surveillance where a disease is linked to exposure."],
+  ["Barrier / moisturising cream","隔離霜／保濕霜","Skin-care control measure."]]},
+
+{id:"S15",title:"Tools and Equipment",zh:"工具與設備",p:[166,187],rel:["T9","T12","T15","P1","P11","P13","P15","P17","P19","P20"],
+ summary:"The full toolset: inspection tools (tapping hammer, feeler gauges, moisture meter, depth micrometre, high-powered torch, Megger), grinders/sanders/drills and sanding grits, cutting composites with dust/HAVS hazards, calibration (Barcol, Shore D, thermocouple, data logger), heating-blanket operation, electrical/pneumatic tool checks and RCD, and the documentation used in inspection and repair. Also the module wrap-up and training review.",
+ gloss:[
+  ["Depth micrometre","深度測微計","Measures repair/scarf depth."],
+  ["Moisture meter","含水率計","Detects moisture ingress."],
+  ["High-powered torch","高功率手電筒","Raking light for defects."],
+  ["Tapping hammer","敲擊錘","1-ounce tap-test hammer."],
+  ["Feeler gauge","塞尺","Measures crack/gap width."],
+  ["Megohmmeter (Megger)","高阻計","Tests LPS conductivity."],
+  ["Low-resistance ohmmeter","低阻計","LPS continuity check; electrical hazards."],
+  ["Grinder / Sander / Drill","砂輪機／砂磨機／電鑽","Remove, smooth and bore composite."],
+  ["Paddle roller","槳式滾筒","Rolls out the laminate."],
+  ["Nylon resin roller / Brush","尼龍滾筒／刷","Apply the resin."],
+  ["Filling knife / Spatula","抹刀","Apply and shape filler."],
+  ["Paint roller","油漆滾筒","Apply topcoat."],
+  ["Sanding grit (US / Euro scale)","研磨號數（美規／歐規）","Grade of abrasive; lower = coarser."],
+  ["Diamond cutting wheel","鑽石切割輪","Cuts cured composite."],
+  ["HAVS / White finger","手臂震動症候群／白指症","Vibration disease from power tools."],
+  ["Calibration","校正","Verifying a tool reads true."],
+  ["Barcol hardness test","巴氏硬度測試","Indentation cure check."],
+  ["Shore D hardness","Shore D 硬度","Complementary hardness/cure check."],
+  ["Glass transition temperature (Tg)","玻璃轉化溫度","Indirect measure of degree of cure."],
+  ["Thermocouple thermometer","熱電偶溫度計","Measures repair temperature."],
+  ["Temperature / humidity data logger","溫濕度數據記錄儀","Records ambient/cure conditions."],
+  ["Heating blanket (0–120 °C)","加熱毯","Heats a repair; fix with strap/tape, monitor for fire."],
+  ["Thermostat / Ratchet strap","恆溫器／棘輪帶","Controls temperature; fixes the blanket."],
+  ["Vacuum pump / Resin trap","真空泵／樹脂收集器","Draws vacuum; protects the pump from resin."],
+  ["Pneumatic / Manual glue gun","氣動／手動膠槍","Dispenses cartridge adhesive."],
+  ["RCD / GFCI (residual current device)","漏電斷路器","Life-saving cutout for electric shock/fire."],
+  ["Voltage check (110 / 230 V)","電壓檢查","Match tool to the supply."],
+  ["Photo card","照片卡","Reference in damage/repair photos."],
+  ["Inspection / repair report","檢查／修復報告","Documentation of findings and work."],
+  ["Bill of materials","材料清單","List of materials for the repair."]]}
+];
+
+const DAY_TITLES={
+ 1:["Foundations & first layups","基礎與初次疊層"],
+ 2:["Documentation & vacuum processing","文件與真空製程"],
+ 3:["Cores & cutting/grinding","芯材與切割研磨"],
+ 4:["Bonding, coating & inspection tools","黏合、塗裝與檢查工具"],
+ 5:["Leading edge, damage & reporting","前緣、損傷與報告"],
+ 6:["Inspection & repair-method decisions","檢查與修復方法判斷"],
+ 7:["Section repairs & complex/lightning","區段修復與複雜/雷擊損傷"],
+ 8:["Quality review & in-situ / large repairs","品質審查與現場／大型修復"],
+ 9:["Testing (Tg), environment & large repairs","測試(Tg)、環境與大型修復"],
+ 10:["Rope-access finishing & final exam","繩索作業修飾與期末考"]
+};
+/* ============================ APP ============================ */
+const byId={}; LESSONS.forEach(l=>byId[l.id]=l);
+const secById={}; SECTIONS.forEach(s=>secById[s.id]=s);
+const ORDER=LESSONS.map(l=>l.id);
+const view=document.getElementById('view');
+const ctx=document.getElementById('ctx');
+let state={mode:'day',query:''};
+
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const typeLabel=t=>t==='theory'?'Theory':'Practical';
+const zhType=t=>t==='theory'?'理論':'實作';
+
+function hi(text,q){
+  if(!q) return esc(text);
+  const t=esc(text), needle=esc(q);
+  const i=t.toLowerCase().indexOf(needle.toLowerCase());
+  if(i<0) return t;
+  return t.slice(0,i)+'<mark>'+t.slice(i,i+needle.length)+'</mark>'+t.slice(i+needle.length);
+}
+
+/* -------- context bar -------- */
+function renderCtxHome(){
+  ctx.innerHTML=`
+    <div class="seg" role="tablist" aria-label="View">
+      <button role="tab" data-mode="day" aria-pressed="${state.mode==='day'}">By day <span class="n">1–10</span></button>
+      <button role="tab" data-mode="type" aria-pressed="${state.mode==='type'}">By type <span class="n">T·P</span></button>
+      <button role="tab" data-mode="ppt" aria-pressed="${state.mode==='ppt'}">By PPT <span class="n">§1–15</span></button>
+    </div>
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+      <input id="q" type="search" placeholder="Search lessons, sections or terms…  搜尋課程、章節或術語" value="${esc(state.query)}" aria-label="Search">
+      <button class="clr ${state.query?'show':''}" id="clr" aria-label="Clear search">×</button>
+    </div>`;
+  ctx.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;location.hash='#/'+state.mode;});
+  const q=document.getElementById('q'), clr=document.getElementById('clr');
+  q.addEventListener('input',()=>{state.query=q.value;clr.classList.toggle('show',!!q.value);renderList();});
+  clr.onclick=()=>{state.query='';q.value='';clr.classList.remove('show');renderList();q.focus();};
+}
+function backHash(){return '#/'+(state.mode==='ppt'||state.mode==='type'?state.mode:'day');}
+function renderCtxDetailLesson(l){
+  ctx.innerHTML=`
+    <a class="back" href="${backHash()}">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+      All lessons</a>
+    <div class="crumb"><span>Day ${l.day}</span><span class="sep">/</span>
+      <span class="code" style="color:var(--${l.type})">${l.id}</span><span class="sep">/</span>
+      <span class="here">${esc(l.title)}</span></div>`;
+}
+function renderCtxDetailSection(s){
+  ctx.innerHTML=`
+    <a class="back" href="#/ppt">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+      All sections</a>
+    <div class="crumb"><span>PPT</span><span class="sep">/</span>
+      <span class="code" style="color:var(--source)">${s.id}</span><span class="sep">/</span>
+      <span class="here">${esc(s.title)}</span></div>`;
+}
+
+/* -------- rows -------- */
+function rowHTML(l,q){
+  return `<a class="row" href="#/lesson/${l.id}">
+    <span class="chip ${l.type[0].toUpperCase()}">${l.id}</span>
+    <span class="body"><span class="ttl">${hi(l.title,q)}</span><span class="sub">${hi(l.summary,q)}</span></span>
+    <span class="tag ${l.type}">${typeLabel(l.type)}</span></a>`;
+}
+function secRowHTML(s,q){
+  const pages = s.p[0]===s.p[1] ? ('p'+s.p[0]) : ('p'+s.p[0]+'–'+s.p[1]);
+  return `<a class="row" href="#/section/${s.id}">
+    <span class="chip S">${s.id}</span>
+    <span class="body"><span class="ttl">${hi(s.title,q)} <span style="font-family:var(--han);color:var(--muted);font-weight:500;font-size:13px">${esc(s.zh)}</span></span>
+      <span class="sub">${hi(s.summary,q)}</span></span>
+    <span class="tag src">${pages}</span></a>`;
+}
+
+function matchLesson(l,q){const s=q.toLowerCase();return l.id.toLowerCase().includes(s)||l.title.toLowerCase().includes(s)||l.summary.toLowerCase().includes(s);}
+function matchSection(x,q){const s=q.toLowerCase();return x.id.toLowerCase().includes(s)||x.title.toLowerCase().includes(s)||x.zh.includes(q)||x.summary.toLowerCase().includes(s);}
+function termMatches(q){
+  const s=q.toLowerCase(), out=[];
+  LESSONS.forEach(l=>l.gloss.forEach(g=>{if(g[0].toLowerCase().includes(s)||g[1].includes(q)||g[2].toLowerCase().includes(s))
+    out.push({en:g[0],zh:g[1],def:g[2],loc:l.id,href:'#/lesson/'+l.id,cls:l.type[0].toUpperCase(),col:l.type});}));
+  SECTIONS.forEach(x=>x.gloss.forEach(g=>{if(g[0].toLowerCase().includes(s)||g[1].includes(q)||g[2].toLowerCase().includes(s))
+    out.push({en:g[0],zh:g[1],def:g[2],loc:x.id,href:'#/section/'+x.id,cls:'S',col:'source'});}));
+  return out;
+}
+
+function renderList(){
+  const q=state.query.trim();
+  let html='';
+  if(q){
+    const terms=termMatches(q);
+    if(terms.length){
+      html+=`<div class="termhead">Glossary matches · 術語比對 (${terms.length})</div><div class="terms">`;
+      terms.slice(0,60).forEach(t=>{html+=`<a class="term" href="${t.href}">
+        <span><span class="en">${hi(t.en,q)}</span><span class="zh">${hi(t.zh,q)}</span><div class="def">${hi(t.def,q)}</div></span>
+        <span class="loc" style="color:var(--${t.col})">${t.loc}</span></a>`;});
+      html+=`</div>`;
+    }
+    const ls=LESSONS.filter(l=>matchLesson(l,q));
+    html+=`<div class="termhead">Lessons · 課程 (${ls.length})</div>`;
+    html+= ls.length? `<div class="rows">${ls.map(l=>rowHTML(l,q)).join('')}</div>` : `<div class="empty">No lessons match “${esc(q)}”.</div>`;
+    const xs=SECTIONS.filter(x=>matchSection(x,q));
+    html+=`<div class="termhead" style="margin-top:26px">PPT sections · 簡報章節 (${xs.length})</div>`;
+    html+= xs.length? `<div class="rows">${xs.map(x=>secRowHTML(x,q)).join('')}</div>` : `<div class="empty">No sections match “${esc(q)}”.</div>`;
+    if(!terms.length&&!ls.length&&!xs.length){
+      html=`<div class="empty">Nothing found for “${esc(q)}”.<br>Try “resin”, “LPS”, “exotherm”, or a Chinese term like “樹脂”.</div>`;
+    }
+    document.getElementById('list').innerHTML=html; return;
+  }
+
+  if(state.mode==='day'){
+    for(let d=1;d<=10;d++){
+      const ls=LESSONS.filter(l=>l.day===d);
+      const nT=ls.filter(l=>l.type==='theory').length, nP=ls.filter(l=>l.type==='practical').length;
+      html+=`<div class="group"><span class="idx">DAY ${d}</span><h2>${esc(DAY_TITLES[d][0])}</h2>
+        <span class="zh">${esc(DAY_TITLES[d][1])}</span><span class="meta">${nT}T · ${nP}P</span></div>
+        <div class="rows">${ls.map(l=>rowHTML(l,'')).join('')}</div>`;
+    }
+  }else if(state.mode==='type'){
+    ['theory','practical'].forEach(tp=>{
+      const ls=LESSONS.filter(l=>l.type===tp);
+      html+=`<div class="group ${tp}"><span class="idx">${tp==='theory'?'THEORY':'PRACTICAL'}</span>
+        <h2>${tp==='theory'?'Classroom lessons':'Workshop lessons'}</h2>
+        <span class="zh">${tp==='theory'?'理論課程':'實作課程'}</span><span class="meta">${ls.length} lessons</span></div>
+        <div class="rows">${ls.map(l=>rowHTML(l,'')).join('')}</div>`;
+    });
+  }else{ /* ppt */
+    html+=`<div class="group"><span class="idx" style="color:var(--source);border-color:#d4dfbf">PPT ORDER</span>
+      <h2>As the training deck is organised</h2><span class="zh">依原簡報章節順序</span>
+      <span class="meta">187 pp · §1–15</span></div>
+      <div class="rows">${SECTIONS.map(s=>secRowHTML(s,'')).join('')}</div>`;
+  }
+  document.getElementById('list').innerHTML=html;
+}
+
+function renderHome(){
+  renderCtxHome();
+  const intro = state.mode==='ppt'
+   ? `<div class="lede"><h1>The deck, section by section</h1>
+       <p>The training PPT is organised by GWO syllabus element, not day by day — so one section can feed several lessons. Each section lists the pages it covers and the lessons it maps to. Every page of the 187-page deck lives in one of these fifteen sections.</p></div>`
+   : `<div class="lede"><h1>10-day blade repair, one tap away</h1>
+       <p>Every theory and practical lesson with a bilingual glossary, a one-line brief, and eight anticipated questions each way — plus the PPT sections they come from. Built for live consecutive interpreting.</p></div>`;
+  view.innerHTML=intro+`<div id="list"></div>`;
+  renderList(); view.focus();
+}
+
+/* -------- lesson detail -------- */
+function detailLessonHTML(l){
+  const glossRows=l.gloss.map(g=>`<tr><td class="en">${esc(g[0])}</td><td class="zh">${esc(g[1])}</td><td class="def">${esc(g[2])}</td></tr>`).join('');
+  const qList=arr=>arr.map(q=>`<li>${esc(q[0])}<span class="zh">${esc(q[1])}</span></li>`).join('');
+  const srcPills=(l.src||[]).map(sid=>{const s=secById[sid];return `<a class="pill S" href="#/section/${sid}">${sid}<span class="nm">${esc(s?s.title:'')}</span></a>`;}).join('');
+  const i=ORDER.indexOf(l.id);
+  const prev=i>0?byId[ORDER[i-1]]:null, next=i<ORDER.length-1?byId[ORDER[i+1]]:null;
+  return `<article>
+    <div class="detail-head">
+      <div class="kicker">
+        <span class="chip ${l.type[0].toUpperCase()}">${l.id}</span>
+        <span class="day">Day ${l.day}</span>
+        <span class="day" style="color:var(--${l.type});border-color:var(--${l.type})">${typeLabel(l.type)} · ${zhType(l.type)}</span>
+      </div>
+      <h1>${esc(l.title)}</h1>
+      <p class="summary">${esc(l.summary)}</p>
+      <div class="xref"><span class="lbl">PPT source</span>${srcPills||'<span style="font-size:13px;color:var(--muted)">—</span>'}</div>
+    </div>
+    <section class="block"><h3>Glossary <span class="zh">術語對照</span></h3>
+      <table class="gloss"><thead><tr><th>English</th><th>繁體中文</th><th>Context</th></tr></thead><tbody>${glossRows}</tbody></table></section>
+    <section class="block"><h3>Anticipated Q&amp;A <span class="zh">預期問答</span></h3>
+      <div class="qa-grid">
+        <div class="qcard ask"><h4><span class="dir">INSTR → TRAINEE</span></h4><p class="zhlead">講師可能問學員</p><ol>${qList(l.ask)}</ol></div>
+        <div class="qcard get"><h4><span class="dir">TRAINEE → INSTR</span></h4><p class="zhlead">學員可能問講師</p><ol>${qList(l.get)}</ol></div>
+      </div></section>
+    <nav class="prevnext">
+      <a class="pn prev ${prev?'':'disabled'}" href="${prev?'#/lesson/'+prev.id:'#'}"><div class="lbl">← Prev${prev?' · '+prev.id:''}</div><div class="nm">${prev?esc(prev.title):'—'}</div></a>
+      <a class="pn next ${next?'':'disabled'}" href="${next?'#/lesson/'+next.id:'#'}"><div class="lbl">Next${next?' · '+next.id:''} →</div><div class="nm">${next?esc(next.title):'—'}</div></a>
+    </nav></article>`;
+}
+
+/* -------- section detail -------- */
+function detailSectionHTML(s){
+  const pages = s.p[0]===s.p[1] ? ('p'+s.p[0]) : ('pp '+s.p[0]+'–'+s.p[1]);
+  const glossRows=s.gloss.map(g=>`<tr><td class="en">${esc(g[0])}</td><td class="zh">${esc(g[1])}</td><td class="def">${esc(g[2])}</td></tr>`).join('');
+  const relPills=(s.rel||[]).map(id=>{const l=byId[id];return `<a class="pill ${l.type[0].toUpperCase()}" href="#/lesson/${id}">${id}<span class="nm">${esc(l?l.title:'')}</span></a>`;}).join('');
+  const i=SECTIONS.findIndex(x=>x.id===s.id);
+  const prev=i>0?SECTIONS[i-1]:null, next=i<SECTIONS.length-1?SECTIONS[i+1]:null;
+  return `<article>
+    <div class="detail-head">
+      <div class="kicker">
+        <span class="chip S">${s.id}</span>
+        <span class="day" style="color:var(--source);border-color:var(--source)">${pages}</span>
+        <span class="day" style="font-family:var(--han)">${esc(s.zh)}</span>
+      </div>
+      <h1>${esc(s.title)}</h1>
+      <p class="summary">${esc(s.summary)}</p>
+      <div class="xref"><span class="lbl">Covers lessons</span>${relPills||'<span style="font-size:13px;color:var(--muted)">—</span>'}</div>
+    </div>
+    <section class="block"><h3>Glossary <span class="zh">術語對照</span></h3>
+      <table class="gloss"><thead><tr><th>English</th><th>繁體中文</th><th>Context</th></tr></thead><tbody>${glossRows}</tbody></table></section>
+    <nav class="prevnext">
+      <a class="pn prev ${prev?'':'disabled'}" href="${prev?'#/section/'+prev.id:'#'}"><div class="lbl">← Prev${prev?' · '+prev.id:''}</div><div class="nm">${prev?esc(prev.title):'—'}</div></a>
+      <a class="pn next ${next?'':'disabled'}" href="${next?'#/section/'+next.id:'#'}"><div class="lbl">Next${next?' · '+next.id:''} →</div><div class="nm">${next?esc(next.title):'—'}</div></a>
+    </nav></article>`;
+}
+
+function renderLesson(id){const l=byId[id];if(!l){location.hash=backHash();return;}renderCtxDetailLesson(l);view.innerHTML=detailLessonHTML(l);view.focus();window.scrollTo({top:0,behavior:'auto'});}
+function renderSection(id){const s=secById[id];if(!s){location.hash='#/ppt';return;}renderCtxDetailSection(s);view.innerHTML=detailSectionHTML(s);view.focus();window.scrollTo({top:0,behavior:'auto'});}
+
+/* -------- router -------- */
+function route(){
+  const h=location.hash||'#/day';
+  let m=h.match(/^#\/lesson\/([TP]\d+)/i); if(m){renderLesson(m[1].toUpperCase());return;}
+  m=h.match(/^#\/section\/(S\d+)/i); if(m){renderSection(m[1].toUpperCase());return;}
+  if(h==='#/type')state.mode='type'; else if(h==='#/ppt')state.mode='ppt'; else state.mode='day';
+  renderHome();
+}
+window.addEventListener('hashchange',route);
+
+document.getElementById('footnote').innerHTML =
+  `<div>39 lessons (19 theory / 20 practical) · 15 PPT sections spanning all 187 pages of the GWO Blade Repair V5.0 deck. Every question is shown in English and Traditional Chinese.</div>`+
+  `<div class="han">術語中譯以原簡報用字為準；原簡報未提供中文者採業界標準譯法。所有摘要與問答供口譯準備參考。「依 PPT」檢視涵蓋簡報全部 187 頁。</div>`;
+
+route();
+</script>
+</body>
+</html>
