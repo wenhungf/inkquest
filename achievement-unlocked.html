@@ -245,7 +245,7 @@
    ===================================================== */
 
 const SAVE_KEY = 'au_save';
-const SAVE_VERSION = 6;
+const SAVE_VERSION = 10;
 
 function freshState(){
   return {
@@ -342,7 +342,29 @@ const ACH = {
   the_paint_stays:{ ep:6, name:'The Paint Stays', pts:0, desc:'The light left. The paint did not.' },
   word_left:      { ep:6, name:'Word Left Behind', pts:0, desc:'One name, half a promise, a folding table.' },
   unpaid:         { ep:6, name:'Unpaid', pts:0, desc:'No chime. No points. You crossed with her anyway.' },
-  still_here:     { ep:6, name:'Still Here', pts:0, desc:'No system. You got up anyway.' }
+  still_here:     { ep:6, name:'Still Here', pts:0, desc:'No system. You got up anyway.' },
+  comeback:       { ep:7, name:'The Comeback', pts:10, desc:'It came back. So had you.' },
+  twelve_seconds: { ep:7, name:'Twelve Seconds', pts:0, desc:'Nine of green, twelve of her. You stopped doing the math.' },
+  by_name:        { ep:7, name:'A-po', pts:0, desc:'Names would only be paperwork. You asked anyway.' },
+  wet_paint:      { ep:7, name:'Wet Paint', pts:0, desc:'Someone kept the silence painted. Recently.' },
+  old_friends:    { ep:7, name:'Old Friends', pts:0, desc:'You took the quest. You would have walked it anyway.' },
+  no_thank_you:   { ep:7, name:'No, Thank You', pts:0, desc:'It asked. You answered.' },
+  crossroads:     { ep:8, name:'Crossroads', pts:15, desc:'You answered. That was always the question.' },
+  test_drive:     { ep:8, name:'One Whole Day', pts:0, desc:'You test-drove the other life. It ran.' },
+  her_road:       { ep:8, name:'Her Road', pts:0, desc:'You did not ask which way she chose. It was hers.' },
+  all_in:         { ep:8, name:'All In', pts:0, desc:'One page, three sentences, one open door.' },
+  both_hands:     { ep:8, name:'Both Hands', pts:0, desc:'One life steady, one letter in the drawer.' },
+  the_gold_quest: { ep:9, name:'The Gold Quest', pts:30, desc:'You took it. Not for the gold.' },
+  the_tin_again:  { ep:9, name:'The Tin, Again', pts:0, desc:'Some photos wait sixty years to be asked about.' },
+  small_god:      { ep:9, name:'Small God of the Works', pts:0, desc:'Even the machines had someone watching over them.' },
+  unsealed:       { ep:9, name:'Unsealed', pts:0, desc:'You asked when it first heard you.' },
+  let_it_sleep:   { ep:9, name:'Let It Sleep', pts:0, desc:'Sealed things keep. You were there anyway.' },
+  registered:     { ep:9, name:'Registered', pts:0, desc:'An old hand painted your mark on the wall.' },
+  you_dont_need_me:{ ep:10, name:'You Don\'t Need Me', pts:50, desc:'One week. Every layer. You were already whole.' },
+  old_exam:       { ep:10, name:'The Old Exam', pts:0, desc:'You had taken this test before. The system agreed.' },
+  front_door:     { ep:10, name:'The Front Door', pts:0, desc:'You logged out, and the world stayed on.' },
+  the_relay:      { ep:10, name:'The Relay', pts:0, desc:'Sixty years, and it did not drop tonight.' },
+  player:         { ep:10, name:'Player', pts:0, desc:'No sound. No glow. Just true.' }
 };
 function grant(id){
   if(!state.achievements.includes(id)){
@@ -570,7 +592,21 @@ const VOCAB = {
   chime:{en:'a short, soft ringing sound', zh:'叮聲、提示音'},
   glitch:{en:'a small problem in a machine or program', zh:'小故障'},
   coupon:{en:'a ticket that gives you a lower price', zh:'折價券、優惠券'},
-  anchor:{en:'a heavy metal hook that holds a ship in place', zh:'錨'}
+  anchor:{en:'a heavy metal hook that holds a ship in place', zh:'錨'},
+  bruise:{en:'a dark mark on the skin where you were hit', zh:'瘀傷；（比喻）痛處'},
+  receipt:{en:'a small paper that shows you paid', zh:'收據'},
+  manual:{en:'done by hand, not by a machine or system', zh:'手動的'},
+  resign:{en:'to formally leave your job', zh:'辭職'},
+  resignation:{en:'the act of leaving your job; the letter that says so', zh:'辭職；辭呈'},
+  absurd:{en:'so unreasonable it is almost funny', zh:'荒謬的'},
+  clarity:{en:'the state of seeing or thinking clearly', zh:'清晰；清醒'},
+  sealed:{en:'closed so no one can open or read it', zh:'封存的'},
+  archive:{en:'a stored collection of old records', zh:'檔案庫'},
+  quota:{en:'a fixed amount of work you must finish', zh:'配額；工作定額'},
+  shrine:{en:'a small holy place for a god or spirit', zh:'小廟；神龕'},
+  rattle:{en:'to make quick knocking sounds, like a ball in a can', zh:'嘎啦作響'},
+  stool:{en:'a small seat with no back', zh:'凳子'},
+  platinum:{en:'a rare silver-white metal; the highest rank', zh:'白金（最高階）'}
 };
 function tipTxt(k){ return VOCAB[k].en + '<br><span style="opacity:.75">'+VOCAB[k].zh+'</span>'; }
 function vb(word, key){
@@ -2686,7 +2722,7 @@ e6s1:{
  html:()=>`
   <p class="quiet">EPISODE 6 — OFFLINE</p>
   <p>Tuesday starts the way Tuesdays start. The alarm. The shower. The walk past the temple, where the incense is already going and the morning is already warm.</p>
-  <p>The egg-pancake lady sees you coming and starts yours without asking. That still lands somewhere good, every time.</p>
+  <p>Boss Lin sees you coming and lays your egg pancake on the hot plate without asking. That still lands somewhere good, every time.</p>
   <p>Two corners from home, most mornings, the day's quest finds you. A soft ${vb('chime')}. A green box only you can see. <i>Walk a street you've never walked. Ask the guard about his day. Carry something for someone.</i></p>
   <p>Today: the first corner. The second.</p>
   <p class="beat">Nothing.</p>
@@ -2718,7 +2754,7 @@ e6s3:{
   <p>A ${vb('glitch')}, you tell yourself on the second morning. Systems go down. Systems come back.</p>
   <p>On the third morning you stop saying glitch.</p>
   <p>You test it the way you'd test a dead tooth. You stand where the marks used to bloom — the temple gate, the harbor rail. Wall. Just wall. You carry a box up three floors for a stranger, and at the top there is sweat and a thank-you and nothing else.</p>
-  <p>On the fourth evening you ride to Yancheng and find the wall from those early weeks. The sprayed words are still there. <i>DON'T TAKE THE GOLD QUEST.</i> The paint has gone pale and rough at the edges, but it holds.</p>
+  <p>On the fourth evening you ride to Yancheng and find the warehouse wall from those early weeks. The painted trophy is still there, pale and rough at the edges, but holding. Below it, the covered line — the grey stripe that once gave you three characters and a sleepless night: <i>…LV9…</i></p>
   <p>And something in you goes very still, because you finally see the difference. The system drew its marks in light, and the light is gone. This was made by a hand, with a can, on a night when somebody meant it.</p>
   <p class="beat">The light left. The paint stayed.</p>`,
  choices:[ {t:'Saturday', go:'e6s4'} ]
@@ -2787,7 +2823,7 @@ e6s7:{
 e6s8:{
  html:()=>`
   <p>The sea wall at night is wind and the sound of water working on stone. Behind the fence at your back, the university pool lies flat and closed. In front of you, the dark water, and far out, the patient lights of cargo ships waiting at ${vb('anchor')} for their turn at the port.</p>
-  <p>The paint is here too. Same hand. Same words, under a real streetlight's orange wash.</p>
+  <p>The paint is here too. The same hand, under a real streetlight's orange wash. And this time the words were never covered:</p>
   <p class="beat">DON'T TAKE THE GOLD QUEST.</p>
   <p>You reach for the map out of habit — the gesture, anyway. There's no map to reach for. For months the south of it wore a fog only you could see, one gold point burning inside like a small flame that never went out. Now the south of the city is just the south of the city.</p>
   <p>The gold quest is gone with everything else. The warning outlived the thing it was warning about.</p>
@@ -2867,6 +2903,7 @@ end6:{
   </div>`;
  },
  choices:[
+   {t:'▶ Continue to Episode 7', go:'e7s1'},
    {t:'↻ Replay Episode 6', go:'__replay6'},
    {t:'Back to title', go:'__title'}
  ],
@@ -2876,6 +2913,926 @@ end6:{
      box.value = btoa(unescape(encodeURIComponent(JSON.stringify(state)))); box.select();
    };
    document.getElementById('btnImport6').onclick = ()=>{
+     try{
+       const sv = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
+       if(typeof sv.version !== 'number') throw 0;
+       state = Object.assign(freshState(), sv); save();
+       box.value = 'Save imported ✓';
+     }catch(e){ box.value = 'That code did not work. Check it and try again.'; }
+   };
+ }
+},
+
+e7s1:{
+ onEnter:()=>{ state.episode = 7; snapshotEpisode(7); },
+ html:()=>`
+  <p class="quiet">EPISODE 7 — THE COMEBACK</p>
+  <p>Boss Lin's radio is singing when you turn into the alley — some old song, mid-chorus, the way it has sung every morning since the day you fixed it. He sees you coming and lays your egg pancake on the hot plate without a word. <i>Tss, tss.</i> Still the best sound on this street.</p>
+  <p>The quiet is just quiet now. Somewhere in the last few weeks it stopped being an absence and went back to being morning.</p>
+  <p>You still walk streets you've never walked. Nobody sends you. You still carry things for people, still notice the man on the corner who needs a hand with a ladder, still stop. It turns out the habits were never the system's.</p>
+  <p class="beat">They just lived there.</p>`,
+ choices:[ {t:'Evening. The crossing.', go:'e7s2'} ]
+},
+
+e7s2:{
+ onEnter:()=>{ grant('twelve_seconds'); },
+ html:(st)=>`
+  <p>${st.flags.e6_helped ? "The light by the temple still changes too fast, and she is there again — and this time she sees you coming and lifts one hand a little, the way you'd flag a bus you know will stop." : "The light by the temple still changes too fast, and she is there again. This time you are moving before the thought has time to become a thought. Somewhere behind you, you imagine a kid in a school uniform nodding at you, one colleague to another."}</p>
+  <p>You take her arm. Nine seconds of green, twelve of her, and the numbers have stopped mattering. On the far curb she tells you rain is coming. The knee is never wrong.</p>`,
+ choices:[
+   {t:'Ask her name. It\'s time.', go:'e7s3', set:{e7_asked_name:true}},
+   {t:'Let the quiet be the conversation.', go:'e7s3'}
+ ]
+},
+
+e7s3:{
+ onEnter:()=>{ if(state.flags.e7_asked_name) grant('by_name'); },
+ html:(st)=>`
+  <p>${st.flags.e7_asked_name ? "\"A-po,\" she says, in a tone that closes the matter. A-po. Grandmother to the whole street, then. You can live with that. She pats your hand once more and goes off down the lane with her cart, squeaking into the evening." : "You walk her to the mouth of her lane and leave it at that. Some people you know by the weight of their arm on yours. Names would only be paperwork."}</p>
+  <p>On Wednesday you catch yourself planning at your desk, the way you used to plan quests — a map open in your head, timing the light, counting the stops. Except nobody assigned this one. This one is yours.</p>
+  <p>The warehouse wall in Yancheng. The covered line. <i>…LV9…</i></p>
+  <p>You have been carrying those three characters for months. Time to go back and press on the ${vb('bruise')}.</p>`,
+ choices:[ {t:'Saturday morning. Yancheng.', go:'e7s4'} ]
+},
+
+e7s4:{
+ onEnter:()=>{ grant('wet_paint'); },
+ html:()=>`
+  <p>The warehouse hasn't moved. The gap between the brick and the sea wall is exactly as narrow as you remember, and smells exactly as much like rope and low tide.</p>
+  <p>The painted trophy is still there, faded but holding, the way it has held for years.</p>
+  <p>And the covered line beneath it—</p>
+  <p class="beat">The grey is new.</p>
+  <p>Not new like this year. New like this month. Flat, clean, no dust in it, the edges still sharp. You put one finger against it, gently, the way you'd test a wound. It is not quite done being paint.</p>
+  <p>Somebody came here — while every box in the city was dark, while you were learning to live on nothing — and painted the silence over again.</p>
+  <p>You take three photos, the same three you took a lifetime ago. Then a fourth, close up, of the fresh edge.</p>
+  <p class="beat">The painter left a warning, once. The coverer keeps a schedule.</p>`,
+ choices:[ {t:'The market. It\'s Saturday, after all.', go:'e7s5'} ]
+},
+
+e7s5:{
+ html:(st)=>`
+  <p>You ride the three stops back and walk down into the dome's glow, half out of habit, half out of something you don't examine too closely.</p>
+  <p>${st.flags.e6_left_word ? "The owner spots you across two lanes of tables and waves you over like she has been waiting all morning. \"She came,\" she says, no greeting. \"Tuesday. I told her, word for word.\" She looks extremely pleased with herself, and has earned it. \"She said Saturdays.\"" : "The owner catches your sleeve as you pass her table. \"Your friend came back,\" she says. \"Asking about the other one from that day. I described you.\" She looks apologetic and not sorry at all. \"There aren't many people who guard a folding table like a border crossing.\""}</p>
+  <p>And there, at the end of the passage, by the drinks stand: Yun. Two cold teas in her hands. She holds one out as you walk up, like you're the one who's late.</p>`,
+ choices:[ {t:'Take the tea', go:'e7s6'} ]
+},
+
+e7s6:{
+ html:()=>`
+  <p>You find a bench where the passage widens, under the edge of the dome's light.</p>
+  <p>"Mine was quiet for forty days," she says, with no hello at all. "I counted. Of course I counted."</p>
+  <p>"How long have you had it?" you ask. "Altogether."</p>
+  <p>"Two hundred and ninety-one days." No pause at all. "You?"</p>
+  <p>"…Months," you say, after actually trying to count. "I'd have to work it backward in breakfasts."</p>
+  <p>She looks at you the way you'd look at someone who has confessed to not owning a calendar. Nine levels, in under a year — because she never once said no to any of it. Your months against her days. The math of her is suddenly very simple.</p>
+  <p>She turns her cup a quarter turn. "Then, one Saturday, a woman grabbed my wrist and put a stall in my hands — and mid-grab, after forty days of nothing, it came back. PARTY. Quest. Timer. All of it, all at once."</p>
+  <p>She looks at you, level. "The day I met you."</p>
+  <p>And you finally understand what you saw across that clothes rack — a woman staring at empty air the way you'd reread a line that surprised you. That wasn't someone checking a panel. That was someone whose panel had just come back from the dead, deciding whether to believe it.</p>
+  <p>Yours went dark not long after that Saturday. You set the two facts side by side, and they sit there, not quite a pattern. "Will mine come back?" you ask, because the question refuses to stay in.</p>
+  <p>"I don't know," she says. "Mine did." From her, that counts as comfort, and strangely, it works as some.</p>
+  <p>"The morning after the stall," she goes on, "it offered me a quest before my alarm went off. And I looked at it — and I said no." A beat. "First time in nine levels. My hands were shaking, if you want the truth."</p>
+  <p>"What happened?"</p>
+  <p>"Nothing happened." She sounds like she still doesn't quite believe it. "It waited a moment, like it was thinking. Then it offered a smaller one. I did the smaller one." Quarter turn of the cup. "It was a good quest."</p>`,
+ choices:[ {t:'The thing she isn\'t saying', go:'e7s7'} ]
+},
+
+e7s7:{
+ html:(st)=>`
+  <p>${st.flags.give_her_room ? "\"You didn't ask me, that day at the stall,\" she says, eyes on the passage. \"You had the question and you left it. So I'll tell you one thing for free.\"" : "\"You asked me once about the gold quest,\" she says, eyes on the passage. \"I closed the door on you. Fair's fair — here's one thing through the crack.\""}</p>
+  <p>"That Saturday night, after we folded the last of it, I opened my map for the first time in forty days. The first thing it showed me was the gold point. Front and center." She turns the cup. "And every morning since, that box opens itself. Every morning, I close it."</p>
+  <p>"It isn't angry about it. That's the strange part. It just… asks again."</p>
+  <p>The photos are in your pocket. Four of them. A fresh grey edge that isn't done being paint.</p>`,
+ choices:[
+   {t:'Show her. "The wall in Yancheng. Someone re-covered it. This month."', go:'e7s8', set:{e7_told_yun:true}},
+   {t:'Keep the photos in your pocket. For now.', go:'e7s8'}
+ ]
+},
+
+e7s8:{
+ html:(st)=>`
+  <p>${st.flags.e7_told_yun ? "She looks at the fourth photo for a long time. When she speaks, her voice has dropped, and slowed. \"Then they're still in the city. Whoever covers it.\" She hands the phone back with both hands, carefully, like it's gotten heavier. \"Watch that wall. If it changes again — tell me. The owner knows my Saturdays.\"" : "You leave the photos where they are. Some cards you hold until you understand the game better. She would approve, probably. You don't test the theory."}</p>
+  <p>At the foot of the stairs she stops, the way she did once before.</p>
+  <p>"The system never made me do anything," she says, like it's a ${vb('receipt')} she has checked twice and finally accepts. "It asked. It took me nine levels to learn I could answer."</p>
+  <p>She shoulders her bag. "Yours will come back or it won't. Either way—" and it is almost, almost a smile — "you seem to be running fine on ${vb('manual')}."</p>
+  <p class="beat">Then she's up the stairs and gone, into the Saturday noise.</p>`,
+ choices:[ {t:'The week turns', go:'e7s9'} ]
+},
+
+e7s9:{
+ onEnter:()=>{ grant('comeback'); },
+ html:()=>`
+  <p>Thursday, late. Overtime — the real kind, deadline weather — and on the way home you stop at the convenience store, the way you did a hundred late nights ago. Kiwi nods at you over the register. The rice balls are entering their final hour.</p>
+  <p>You tap your card. <i>Beep.</i></p>
+  <p class="beat">And then you see it.</p>
+  <p>Words. In the air. Soft green light, like an old computer screen.</p>
+  ${sysBox('📋 NEW QUEST','A Different Road',[
+    ['flair','Tomorrow, walk to work by a road you have never used before.'],
+    ['pts','Reward: +10 points']
+  ])}
+  <p>You stand very still. The last time this happened, you asked the person behind this counter if they could see it. This time you don't have to ask anyone anything.</p>
+  <p>"What?" says Kiwi, reading your face.</p>
+  <p>"Nothing," you say. "Old friend."</p>
+  <p>You try to think of a road to work you have never used. It takes a while. It takes a genuinely long while.</p>
+  <p class="beat">That, right there, is the distance, measured.</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','The Comeback',[['flair','"It came back. So had you."'],['pts','+10 points']])}`,
+ choices:[
+   {t:'Take the quest. For old times\' sake.', go:'e7s10a'},
+   {t:'Close the box. Gently.', go:'e7s10b'}
+ ]
+},
+
+e7s10a:{
+ onEnter:()=>{ grant('old_friends'); },
+ html:()=>`
+  <p>In the morning you find it: a lane you have somehow never used, hiding in plain sight two blocks from everything. New wall colors. A different set of breakfast smells. A cat running a doorway like a small business.</p>
+  <p>You walk it slow. Not because the quest says to — the quest never says how. Because slow is how you walk new streets now. You learned that somewhere, from someone, and the someone was you.</p>
+  ${sysBox('✅ QUEST COMPLETE','A Different Road',[['flair','Reward: already collected, somewhere along the way.']])}
+  <p>You laugh — once, out loud, alone in the lane. The cat declines to comment.</p>`,
+ choices:[ {t:'That evening', go:'e7s11'} ]
+},
+
+e7s10b:{
+ onEnter:()=>{ grant('no_thank_you'); },
+ html:()=>`
+  <p>You look at the box for a long moment. Then, gently, the way you'd wave off a second helping from someone you love: <i>no</i>.</p>
+  <p>The box holds still. A breath. Like it's thinking.</p>
+  <p>Then it folds away — and a smaller one opens.</p>
+  ${sysBox('📋 NEW QUEST','One Street',[['flair','Just one.']])}
+  <p>You close that one too. Not tonight. Tonight you have a road in mind already — the old one, the one with almost two thousand mornings in it, the one where you know every crack.</p>
+  <p>In the morning you walk it end to end, unhurried, and it turns out the old road is also yours. It always was. You just needed all those new ones to see it.</p>`,
+ choices:[ {t:'That evening', go:'e7s11'} ]
+},
+
+e7s11:{
+ html:()=>`
+  <p>That evening, on the rooftop of your building where the water tanks hum, you open the map for the first time since the lights came back.</p>
+  <p>The city is all there. Every district you earned, lit and yours — the harbor, the old streets, the ferry line, the long coast road. Months of feet, drawn in light.</p>
+  <p>Then you look south.</p>
+  <p>The fog has moved. Not gone — moved. It sits farther back than you remember, like a tide that went out while nobody watched. And the gold point is not deep inside it anymore.</p>
+  <p>It sits at the edge, where the grey thins.</p>
+  <p class="beat">As if, while everything slept, it walked forward to meet you.</p>
+  <p>You tap it, the way you have tapped it a hundred times, expecting the polite nothing it has always given you.</p>
+  ${sysBox('🟡 GOLD QUEST','???',[['flair','No longer sleeping.']],'gold')}
+  <p>Five words on a wall by the sea, underlined twice. A grey stripe in Yancheng that isn't done being paint. A woman who closes the same box every morning.</p>
+  <p>You close the map and stand a while in the warm dark, the city humming below, the south holding its single gold light.</p>
+  <p>Tomorrow: work, the crossing, maybe rain — the knee is never wrong. And the gold point will still be there, awake, at the edge of the fog.</p>
+  <p class="beat">So will you.</p>`,
+ choices:[ {t:'EPISODE COMPLETE — open the Menu', go:'end7'} ]
+},
+
+end7:{
+ html:(st)=>{
+   function achGroup(ep){
+     let h='';
+     Object.keys(ACH).filter(id=>ACH[id].ep===ep).forEach(id=>{
+       const a=ACH[id]; const got=st.achievements.includes(id);
+       h += '<div class="row"><span>'+
+         (got ? '🏆 <span class="ach-name">'+a.name+'</span><span class="ach-desc">'+a.desc+'</span>'
+              : '<span class="lock">🔒 ???</span>')+
+         '</span><span>'+(got ? (a.pts>0?'+'+a.pts:'—') : '')+'</span></div>';
+     });
+     return h;
+   }
+   const cnt=(ep)=>[st.achievements.filter(id=>ACH[id].ep===ep).length, Object.keys(ACH).filter(id=>ACH[id].ep===ep).length];
+   const [c7,t7]=cnt(7),[c6,t6]=cnt(6),[c5,t5]=cnt(5),[c4,t4]=cnt(4),[c3,t3]=cnt(3),[c2,t2]=cnt(2),[c1,t1]=cnt(1);
+   return `
+  <p class="quiet">EPISODE 7 — THE COMEBACK</p>
+  ${sysBox('✅ EPISODE COMPLETE','The Comeback',[['flair','"You seem to be running fine on manual."']])}
+  <div class="panel">
+    <h3>PLAYER</h3>
+    <div class="row"><span>Level</span><span>${st.level}</span></div>
+    <div class="row"><span>Points</span><span>${st.points}</span></div>
+    <div class="row"><span>Money</span><span>NT$${st.money.toLocaleString()}</span></div>
+    <div class="row"><span>Next level</span><span>700</span></div>
+    <div class="row"><span>System</span><span>Online</span></div>
+    <div class="row"><span>Map</span><span>City yours · the southern fog is thinning</span></div>
+    <div class="row"><span>Party</span><span>Yun · LV 9 · Saturdays</span></div>
+    <div class="row"><span class="goldtxt">GOLD ???</span><span class="goldtxt">Awake.</span></div>
+  </div>
+  <div class="panel ach-list"><h3>EPISODE 7 ACHIEVEMENTS (${c7}/${t7})</h3>${achGroup(7)}</div>
+  <div class="panel ach-list"><h3>EPISODE 6 ACHIEVEMENTS (${c6}/${t6})</h3>${achGroup(6)}</div>
+  <div class="panel ach-list"><h3>EPISODE 5 ACHIEVEMENTS (${c5}/${t5})</h3>${achGroup(5)}</div>
+  <div class="panel ach-list"><h3>EPISODE 4 ACHIEVEMENTS (${c4}/${t4})</h3>${achGroup(4)}</div>
+  <div class="panel ach-list"><h3>EPISODE 3 ACHIEVEMENTS (${c3}/${t3})</h3>${achGroup(3)}</div>
+  <div class="panel ach-list"><h3>EPISODE 2 ACHIEVEMENTS (${c2}/${t2})</h3>${achGroup(2)}</div>
+  <div class="panel ach-list"><h3>EPISODE 1 ACHIEVEMENTS (${c1}/${t1})</h3>${achGroup(1)}</div>
+  <p class="quiet">Missing some? Different choices, different badges. Some of these the panel slept through — the book kept count.</p>
+  <hr class="sep">
+  <div class="panel">
+    <h3>SAVE</h3>
+    <p style="font-family:inherit;font-size:.8rem;opacity:.8;margin:0 0 8px;">
+      Your progress saves automatically on this device.${storageOK?'':' (Saving is not available here — use Export to keep your progress.)'}
+      Export a save code to keep it safe or move to another device.</p>
+    <div class="btn-line">
+      <button class="choice" id="btnExport7">Export save</button>
+      <button class="choice" id="btnImport7">Import save</button>
+    </div>
+    <textarea class="savebox" id="saveBox7" placeholder="Your save code appears here. Or paste a code and press Import." spellcheck="false"></textarea>
+  </div>`;
+ },
+ choices:[
+   {t:'▶ Continue to Episode 8', go:'e8s1'},
+   {t:'↻ Replay Episode 7', go:'__replay7'},
+   {t:'Back to title', go:'__title'}
+ ],
+ onRender:()=>{
+   const box = document.getElementById('saveBox7');
+   document.getElementById('btnExport7').onclick = ()=>{
+     box.value = btoa(unescape(encodeURIComponent(JSON.stringify(state)))); box.select();
+   };
+   document.getElementById('btnImport7').onclick = ()=>{
+     try{
+       const sv = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
+       if(typeof sv.version !== 'number') throw 0;
+       state = Object.assign(freshState(), sv); save();
+       box.value = 'Save imported ✓';
+     }catch(e){ box.value = 'That code did not work. Check it and try again.'; }
+   };
+ }
+},
+
+e8s1:{
+ onEnter:()=>{ state.episode = 8; snapshotEpisode(8); state.stamina = 100; },
+ html:()=>`
+  <p class="quiet">EPISODE 8 — THE COST</p>
+  <p>The seventh morning in a row, it opens itself.</p>
+  <p>You are barely upright, toothbrush in hand, and the box is already there, gold-edged, patient, exactly where your eyes land first. You understand Yun completely now. You close it. It goes without argument.</p>
+  <p>It will be back tomorrow. It is never angry about it. It just asks again.</p>
+  <p>But this morning, before your hand moves, you actually read it — properly, all the way down — for the first time.</p>
+  ${sysBox('🟡 GOLD-TIER QUEST','Resign',[
+    ['flair','Hand in your notice. Go all in.'],
+    ['flair','Every day, quest-shaped. All of it.'],
+    ['pts','Reward: ×10. Points, pay, everything. ×10.']
+  ],'gold')}
+  <p>The reward line reads like a brochure. ${vb('Absurd')}. Numbers that size stop meaning anything — which, you suspect, is the point of printing them.</p>
+  <p>The gold point in the south once sat locked behind a level you did not have. Somewhere in the quiet, the lock stopped caring about levels. And now this: a gold-tier quest with your own office as the target, arriving a week after the point woke up. You do not believe in coincidence anymore. You believe in doors.</p>
+  <p class="beat">The system is not pushing. It has never once pushed. It is asking you a question, every morning, in gold:</p>
+  <p class="beat">Which life?</p>`,
+ choices:[ {t:'Work. The question rides along.', go:'e8s2'} ]
+},
+
+e8s2:{
+ html:()=>`
+  <p>The report is the same report as last week. Only the numbers are different. You knew that sentence years before the system arrived; the system just taught you to hear it.</p>
+  <p>So you spend the day doing something you have never done: reading your own life like a quest log, two columns, honest ones.</p>
+  <p>Against the job: the report. The hum of the office lights. The elevator that takes a long time, always. The thirty-nine percent of a day that simply goes missing. You measured that once. It has not improved.</p>
+  <p>For the job: the fifth of every month, steady as tide. The window desk when afternoon light comes in low. Sam at the lobby, and the lane behind the building, six minutes, yours. The shape of a week — the way Saturday means something because Monday exists.</p>
+  <p>Neither column wins. That's the trouble. That was always going to be the trouble.</p>`,
+ choices:[
+   {t:'Stay late. Finish the report properly.', go:'e8s3', set:{e8_evening:'late'}},
+   {t:'Leave on time, for once, and walk.', go:'e8s3', set:{e8_evening:'walk'}}
+ ]
+},
+
+e8s3:{
+ onEnter:()=>{ state.stamina = Math.max(20, state.stamina - 25); earn('e8_stall_day', 1000); grant('test_drive'); },
+ html:(st)=>`
+  <p>${st.flags.e8_evening==='late' ? "You stay and finish it properly, because whatever you decide, you will not decide it by doing bad work. It's nearly nine when you walk the lane home, and the radio down the street has gone to the late programs." : "You leave at six sharp, and the evening is so wide you almost don't know where to put it. You walk home the long way, on purpose, past streets that used to be quests."}</p>
+  <p>Saturday, you run the experiment. One whole day of the other life.</p>
+  <p>Morning quest before Boss Lin's egg pancake. A repair job off the side-quest board — an aunty's fan, twenty minutes, the same trick you learned a lifetime ago. Then the market, where the owner has stopped pretending she doesn't expect you, and you work her stall through the whole busy stretch — pricing, ${vb('restocking','restock')}, making change, talking a student into the green one.</p>
+  ${sysBox('⚡ STAMINA', '75 / 100', [['flair','−25 · a full day on your feet, and glad of it']])}
+  ${sysBox('💰 EARNED','Side quests + the stall',[['pts','+NT$1,000']])}
+  <p>By evening you are tired in the good way, your pocket is heavier, and you can see it — clearly, completely — this being every day. Waking up to see what the system has for you. The little jolt of a new quest. A life made entirely of Saturdays.</p>
+  <p>And underneath the good tiredness, quieter: a life made entirely of Saturdays has no Saturdays in it.</p>`,
+ choices:[ {t:'Find Yun before the market closes', go:'e8s4'} ]
+},
+
+e8s4:{
+ html:(st)=>`
+  <p>${st.flags.e7_told_yun ? "She's by the drinks stand, and her first words are not hello. \"The wall. Any change?\" — \"None.\" She nods, files it, and only then looks at you properly." : "She's by the drinks stand with a cold tea already sweating in her hand, and she reads your face the way she reads a price tag."}</p>
+  <p>"Something's opened," she says. Not a question.</p>
+  <p>You tell her. The gold-tier box. The word <i>Resign</i>. The reward like a brochure. Seven mornings of closing it.</p>
+  <p>She is quiet for a moment. Then: "I got one shaped like that, once." Quarter turn of the cup. "Took me two weeks to answer it."</p>`,
+ choices:[
+   {t:'"Which way did you answer?"', go:'e8s5', set:{e8_asked_yun:true}},
+   {t:'Don\'t ask. It\'s hers.', go:'e8s5', set:{e8_gave_room:true}}
+ ]
+},
+
+e8s5:{
+ onEnter:()=>{ if(state.flags.e8_gave_room) grant('her_road'); },
+ html:(st)=>`
+  <p>${st.flags.e8_asked_yun ? "\"Mine fit me,\" she says, and that is the whole answer. \"It wouldn't fit you. It's not that kind of test — there's no answer key.\" From the woman who has aced everything since she could hold a pencil, that sentence has a weight you can't see the bottom of." : "You don't ask. She notices — of course she notices; she counts everything. \"You've stopped asking questions that aren't yours,\" she says. \"Took me longer than two hundred and ninety-one days.\""}</p>
+  <p>She finishes her tea and gives you the only advice she is willing to give, and it is about the how, not the which:</p>
+  <p class="beat">"Whichever way — answer it. All the way. Half an answer is the only wrong one."</p>
+  <p>Sunday night, on the way home, you stop at the convenience store and print one page at the machine by the door. A few coins. Three sentences. Kiwi doesn't look at what the machine spits out; Kiwi has seen everything this store prints at eleven on a Sunday.</p>
+  <p>The same store where the first box ever opened. You notice that. These days you notice everything.</p>`,
+ choices:[ {t:'Monday, with the letter', go:'e8s6'} ]
+},
+
+e8s6:{
+ html:()=>`
+  <p>Monday wears its ordinary clothes. Boss Lin's radio, mid-chorus. <i>Tss, tss.</i> The lane, six minutes. Sam's nod at the lobby, one professional to another. The elevator, taking its time.</p>
+  <p>The letter rides in your bag all morning, one page, three sentences, folded once. Nobody knows it's there. Nobody is waiting on your answer. Nobody needs you to stay and nobody needs you to go — the city will make room for either one of you.</p>
+  <p>That is the strange mercy of it, and the whole weight of it: this belongs to you alone.</p>
+  <p>At eleven forty, between meetings, you find yourself standing in the corridor outside the manager's office, the letter in your hand, the paper a little warm from the bag.</p>
+  <p>Two lives. Both real. Both yours, if you want them.</p>
+  <p class="beat">The door is right there.</p>`,
+ choices:[
+   {t:'Knock. Hand it in.', go:'e8s7a', set:{resigned:true}},
+   {t:'Fold it back into the bag.', go:'e8s7b', set:{resigned:false}}
+ ]
+},
+
+e8s7a:{
+ onEnter:()=>{ grant('all_in'); },
+ html:()=>`
+  <p>You knock. You put the page on the desk, square to the edge, and you say the sentence you practiced and it comes out shorter than you practiced it, which is how you know it's true.</p>
+  <p>The manager reads it twice. Looks up. "Another company?"</p>
+  <p>"No."</p>
+  <p>A pause with a whole career of pauses behind it. "…Okay." Two weeks. Handover notes. An email to HR. The world, you notice, does not shake even slightly. Doors are only heavy from the outside.</p>
+  <p>You walk out at noon into flat bright ordinary sunlight, and your legs feel like the first minute off a long bus ride.</p>
+  ${sysBox('🟡 GOLD-TIER QUEST','Resign — resolved',[['flair','You answered. All the way.']],'gold')}
+  <p>By late afternoon, the quest list has changed shape. Three new side quests bloom before dinner — a repair, a delivery, a stall that needs Saturday hands. The system, politely, now expects you everywhere.</p>
+  <p>Passing the lobby with the first box of desk things, you trade nods with Sam. "See you around," he says, and you will — just fewer mornings of it, and both of you know it, and neither of you makes it heavier than it is. The lane will still be six minutes. You will simply have fewer reasons to time it.</p>
+  <p class="beat">Tomorrow, for the first time since school ended, nobody expects you anywhere at nine.</p>`,
+ choices:[ {t:'That night', go:'e8s8'} ]
+},
+
+e8s7b:{
+ onEnter:()=>{ grant('both_hands'); },
+ html:()=>`
+  <p>You look at the door for one long breath. Then you fold the letter along its crease and put it back in the bag — and later that evening, into the desk drawer at home. Not the trash. The drawer. The difference matters, and you don't fully know why yet.</p>
+  <p>When the gold box opens the next morning, you answer it out loud, quietly, in an empty room: "Not this. Not now."</p>
+  ${sysBox('🟡 GOLD-TIER QUEST','Resign — declined',[['flair','Noted. No penalty. It was a real question.']],'gold')}
+  <p>The box folds away without argument — and the quest list adjusts itself around your life instead: evening quests, weekend chains, the stall on Saturdays. The system fits itself to the shape you chose, the way water fits a cup.</p>
+  <p>The cost keeps its own hours. For a few days, walking past the manager's corridor, you feel the door you didn't open — a low hum, like a fridge in another room. Then Friday comes, the fifth lands steady as tide, and you buy the extra egg at Boss Lin's, and the hum gets quieter.</p>
+  <p class="beat">Not gone. Quieter. You suspect that's the honest deal, and you took it with both hands.</p>`,
+ choices:[ {t:'That night', go:'e8s8'} ]
+},
+
+e8s8:{
+ onEnter:()=>{ grant('crossroads'); },
+ html:()=>`
+  <p>That night the panel does something it has not done since the city map first unfolded.</p>
+  ${sysBox('🆕 PANEL UPDATE','Now showing:',[
+    ['flair','▸ '+vb('Clarity','clarity')+' — how clearly you see your own life'],
+    ['flair','▸ Value: —'],
+    ['flair','This one, you fill in yourself.']
+  ])}
+  <p>You stare at the empty field. Every number this system has ever shown you, it measured. Points, stamina, money, percent. And here, at the exact center of the biggest decision it has ever handed you, it puts down its ruler.</p>
+  <p>You know this system's strange grammar by now. The zeros are the ones it respects. The blanks are the ones it means.</p>
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','Crossroads',[['flair','"You answered. That was always the question."'],['pts','+15 points']])}
+  <p>Either way you chose, the quest is resolved. It was never about which door.</p>`,
+ choices:[ {t:'One more thing is glowing', go:'e8s9'} ]
+},
+
+e8s9:{
+ html:()=>`
+  <p>Beside the old Quest History tab — the one with the ${vb('sealed')} records you have carried like a stone in a pocket — a new tab has appeared.</p>
+  ${sysBox('🗂 ARCHIVE','1 record unlocked',[['flair','Reading access: granted']])}
+  <p>You open it. One card, readable. The rest, grey rows going down and down, locked.</p>
+  ${sysBox('🗂 ARCHIVE','Player 001',[
+    ['flair','Kaohsiung'],
+    ['flair','Joined: 19▓▓'],
+    ['flair','Status: still playing.']
+  ])}
+  <p>You read it three times. The year is broken, but the first two digits are not. Nineteen-something. Before your parents met. Before most of the buildings you walk past every day. Somebody in this city has been playing for longer than your whole life —</p>
+  <p class="beat">— and is still playing.</p>
+  <p>Below it, one more card: your own. Every quest since the convenience store, logged in neat green. And above them all, older than all of them, the line you have known about since the panel grew up:</p>
+  ${sysBox('🗂 YOUR FILE','',[['flair','1 sealed record — before activation'],['flair','[ locked ]']])}
+  <p>A sixty-year-old shape in a photograph. A grey stripe in Yancheng that was wet this month. A player older than the harbor cranes, status: still playing. You set the pieces side by side, the way you did once before on a bench under the dome.</p>
+  <p class="beat">This time, they are not refusing to be a pattern.</p>`,
+ choices:[ {t:'Say it out loud', go:'e8s10'} ]
+},
+
+e8s10:{
+ html:(st)=>`
+  <p>"I'm going to find them," you tell the empty room, and the room does not argue.</p>
+  <p>Player 001. The hand that painted trophies across a city and a century. The hand — you would bet this month's points — that keeps one grey stripe fresh in Yancheng. Whoever they are, they are not a record in a tab. They are an address you don't have yet, somewhere south, where the fog is thinnest it has ever been.</p>
+  <p>${st.flags.resigned ? "You have the time now. All of it. Tomorrow belongs to nobody but you and one gold point." : "You have your weekends — and the south has always fit inside a weekend. Saturday is four days away. You can wait four days. Probably."}</p>
+  <p>You put the phone down and turn off the lamp, and the last thing you see before sleep is not the gold point.</p>
+  <p>It's the blank field. <i>Clarity: —.</i></p>
+  <p class="beat">You are starting to know what you'll write there.</p>`,
+ choices:[ {t:'EPISODE COMPLETE — open the Menu', go:'end8'} ]
+},
+
+end8:{
+ html:(st)=>{
+   function achGroup(ep){
+     let h='';
+     Object.keys(ACH).filter(id=>ACH[id].ep===ep).forEach(id=>{
+       const a=ACH[id]; const got=st.achievements.includes(id);
+       h += '<div class="row"><span>'+
+         (got ? '🏆 <span class="ach-name">'+a.name+'</span><span class="ach-desc">'+a.desc+'</span>'
+              : '<span class="lock">🔒 ???</span>')+
+         '</span><span>'+(got ? (a.pts>0?'+'+a.pts:'—') : '')+'</span></div>';
+     });
+     return h;
+   }
+   const cnt=(ep)=>[st.achievements.filter(id=>ACH[id].ep===ep).length, Object.keys(ACH).filter(id=>ACH[id].ep===ep).length];
+   const [c8,t8]=cnt(8),[c7,t7]=cnt(7),[c6,t6]=cnt(6),[c5,t5]=cnt(5),[c4,t4]=cnt(4),[c3,t3]=cnt(3),[c2,t2]=cnt(2),[c1,t1]=cnt(1);
+   return `
+  <p class="quiet">EPISODE 8 — THE COST</p>
+  ${sysBox('✅ EPISODE COMPLETE','The Cost',[['flair','"You answered. That was always the question."']])}
+  <div class="panel">
+    <h3>PLAYER</h3>
+    <div class="row"><span>Level</span><span>${st.level}</span></div>
+    <div class="row"><span>Points</span><span>${st.points}</span></div>
+    <div class="row"><span>Money</span><span>NT$${st.money.toLocaleString()}</span></div>
+    <div class="row"><span>Clarity</span><span>— (you fill this in)</span></div>
+    <div class="row"><span>Work</span><span>${st.flags.resigned ? 'All in · two weeks of handover' : 'Steady · quests fitted around it'}</span></div>
+    <div class="row"><span>Archive</span><span>1 record read · your sealed record still locked</span></div>
+    <div class="row"><span>Party</span><span>Yun · LV 9 · Saturdays</span></div>
+    <div class="row"><span class="goldtxt">GOLD ???</span><span class="goldtxt">Awake. South. Waiting.</span></div>
+  </div>
+  <div class="panel ach-list"><h3>EPISODE 8 ACHIEVEMENTS (${c8}/${t8})</h3>${achGroup(8)}</div>
+  <div class="panel ach-list"><h3>EPISODE 7 ACHIEVEMENTS (${c7}/${t7})</h3>${achGroup(7)}</div>
+  <div class="panel ach-list"><h3>EPISODE 6 ACHIEVEMENTS (${c6}/${t6})</h3>${achGroup(6)}</div>
+  <div class="panel ach-list"><h3>EPISODE 5 ACHIEVEMENTS (${c5}/${t5})</h3>${achGroup(5)}</div>
+  <div class="panel ach-list"><h3>EPISODE 4 ACHIEVEMENTS (${c4}/${t4})</h3>${achGroup(4)}</div>
+  <div class="panel ach-list"><h3>EPISODE 3 ACHIEVEMENTS (${c3}/${t3})</h3>${achGroup(3)}</div>
+  <div class="panel ach-list"><h3>EPISODE 2 ACHIEVEMENTS (${c2}/${t2})</h3>${achGroup(2)}</div>
+  <div class="panel ach-list"><h3>EPISODE 1 ACHIEVEMENTS (${c1}/${t1})</h3>${achGroup(1)}</div>
+  <p class="quiet">Missing some? Different choices, different badges. Two of these can never share a save.</p>
+  <hr class="sep">
+  <div class="panel">
+    <h3>SAVE</h3>
+    <p style="font-family:inherit;font-size:.8rem;opacity:.8;margin:0 0 8px;">
+      Your progress saves automatically on this device.${storageOK?'':' (Saving is not available here — use Export to keep your progress.)'}
+      Export a save code to keep it safe or move to another device.</p>
+    <div class="btn-line">
+      <button class="choice" id="btnExport8">Export save</button>
+      <button class="choice" id="btnImport8">Import save</button>
+    </div>
+    <textarea class="savebox" id="saveBox8" placeholder="Your save code appears here. Or paste a code and press Import." spellcheck="false"></textarea>
+  </div>`;
+ },
+ choices:[
+   {t:'▶ Continue to Episode 9', go:'e9s1'},
+   {t:'↻ Replay Episode 8', go:'__replay8'},
+   {t:'Back to title', go:'__title'}
+ ],
+ onRender:()=>{
+   const box = document.getElementById('saveBox8');
+   document.getElementById('btnExport8').onclick = ()=>{
+     box.value = btoa(unescape(encodeURIComponent(JSON.stringify(state)))); box.select();
+   };
+   document.getElementById('btnImport8').onclick = ()=>{
+     try{
+       const sv = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
+       if(typeof sv.version !== 'number') throw 0;
+       state = Object.assign(freshState(), sv); save();
+       box.value = 'Save imported ✓';
+     }catch(e){ box.value = 'That code did not work. Check it and try again.'; }
+   };
+ }
+},
+
+e9s1:{
+ onEnter:()=>{ state.episode = 9; snapshotEpisode(9); state.stamina = 100; },
+ html:(st)=>`
+  <p class="quiet">EPISODE 9 — THE DESIGNER</p>
+  <p>${st.flags.resigned ? "The week belongs to you now, and you spend it like a careful spender: two side quests, one long walk, and a lot of standing in front of the archive tab, reading one broken year over and over. 19▓▓. Still playing." : "The week crawls. You do your work, and you do it properly, and every evening you open the archive tab and read one broken year over and over. 19▓▓. Still playing. Saturday takes four days to arrive and charges you interest."}</p>
+  <p>Wednesday evening you ride to Yancheng and stand in front of the warehouse wall for a while. The trophy. The grey stripe, no longer wet, settling in for its next few years. Whoever keeps it painted has hands, and hands have an address.</p>
+  <p>The gold point sits at the edge of the fog, patient as a lighthouse. You could go straight at it. But there is one person in this city who has already given you one photograph with that shape in it — and you never asked him about it.</p>
+  <p class="beat">It's time to ask.</p>`,
+ choices:[ {t:'Saturday. The ferry.', go:'e9s2'} ]
+},
+
+e9s2:{
+ onEnter:()=>{ grant('the_tin_again'); },
+ html:()=>`
+  <p>The ferry crossing is ten minutes of wind and engine-hum, scooters packed nose to tail on the lower deck. Old Mr. Hong opens the door in the same cardigan, in the same heat, and his face does the thing faces do when a small kindness comes back around.</p>
+  <p>The tin comes out with tea. The brown rope. The photographs. And this time, when the one with the brick wall and the drying nets goes by, your hand comes down gently on the stack.</p>
+  <p>"This one," you say. "The wall. The painted shape. Do you remember where?"</p>
+  <p>He holds it at arm's length, then close, then at arm's length again, the way old eyes read. And then he laughs, once, surprised at his own memory.</p>
+  <p>"My brother's works," he says. "South side, past where the containers stack now. I took this the day he got the job — nineteen sixty-six, the year the export zone opened and the whole south of the city smelled like new machines." He taps the shape on the wall, blurred and patient. "That was already there. The workers had a story: somebody painted one wherever a job was done clean. Nobody ever caught them at it."</p>
+  <p>The works closed decades ago, he tells you. The gate is probably rust. His brother is fifteen years gone. And then, pressing the photograph into your hand like the dried fish, like the change you once refused:</p>
+  <p>"My brother always said — in there, don't trust the doors. Trust the pipes. Pipes only ever run to where the work is."</p>`,
+ choices:[ {t:'South, then.', go:'e9s3'} ]
+},
+
+e9s3:{
+ html:()=>`
+  <p>From the ferry back, you can see it — south past the container yards, a low grey line of roofs the city forgot to knock down. The fog on your map ends exactly where the roofs begin.</p>
+  <p>You stand at the edge of it, where the last working street gives out, and you open the gold box on purpose for the first time in your life.</p>
+  ${sysBox('🟡 GOLD QUEST','???',[
+    ['flair','South. Past the container yards. The old works.'],
+    ['flair','This quest cannot be handed back.'],
+    ['pts','Reward: the answer.']
+  ],'gold')}
+  <p>Five words on a sea wall. <i>Don't take the gold quest.</i> You have carried them for months, and you finally understand what they weigh: not <i>never</i>. Just — <i>not for the gold.</i></p>
+  <p>You are not here for the gold.</p>`,
+ choices:[
+   {t:'Take it.', go:'e9s4'},
+   {t:'Stand one more breath at the edge. Then take it.', go:'e9s4', set:{e9_breath:true}}
+ ]
+},
+
+e9s4:{
+ onEnter:()=>{ state.stamina = Math.max(20, state.stamina - 15); },
+ html:(st)=>`
+  <p>${st.flags.e9_breath ? "You give the edge its one breath — the last moment of not-knowing, which is its own small country — and then you step across." : "You take it the way you knocked on a door once: before the rehearsal can start."}</p>
+  ${sysBox('💬 SYSTEM','Quest accepted.',[['flair','Good luck, player.']])}
+  <p>It has never said that before.</p>
+  <p>The gate is rust, exactly as promised, open a shoulder's width. Inside, the works are a country of their own: long halls with the machines gone and their shadows still bolted to the floor, light falling in dusty blades from broken roof panels.</p>
+  <p>And your map — you check it once — is fog. All of it. In here, the system draws nothing.</p>
+  <p class="beat">In here, you are the map.</p>`,
+ choices:[ {t:'Deeper', go:'e9s5'} ]
+},
+
+e9s5:{
+ html:()=>`
+  <p>The first hall ends at a choice the building makes for you: a stairway up to a high steel walkway, half its bolts bleeding rust, running toward daylight — or a low doorway where a bundle of old pipes dives into the dark of the machine floor.</p>
+  <p>Trust the doors, or trust the pipes.</p>
+  <p>You can hear an old man laughing at you from across a harbor.</p>`,
+ choices:[
+   {t:'The pipes. Low, through the dark.', go:'e9s6', set:{e9_route:'pipes'}},
+   {t:'The walkway. High, toward the light.', go:'e9s6', set:{e9_route:'high'}}
+ ]
+},
+
+e9s6:{
+ onEnter:()=>{ state.stamina = Math.max(20, state.stamina - 25); if(state.flags.e9_route==='pipes') grant('small_god'); },
+ html:(st)=>`
+  <p>${st.flags.e9_route==='pipes' ? "The pipes run true. You follow them by hand through the dark, palm on cold metal, past the great concrete beds where machines once stood — and halfway along, your phone light finds a little alcove in the wall: a tiny "+vb('shrine')+", swept clean, a cup, the stub of an incense stick not many months old. Even the machines had someone watching over them. Someone still comes. You bow, slightly, because you were raised right, and follow the pipes on into the light of the far stair." : "You take the walkway. It complains about your weight in a language of old bolts, and twice you stop and choose your steps like words in an argument — but from up here the works lay themselves out like a map the system refused to draw: the halls, the courtyard, and on the inner walls, small and sure, painted trophies. A trail of them. You climb down the far stair and follow the trail."}</p>
+  <p>Both hands and both lungs are working now. This is the part of you the system did not invent — the part it only woke: the legs from a hundred quests, the eyes from a thousand streets.</p>
+  ${sysBox('⚡ STAMINA', st.stamina+' / 100', [['flair','−25 · the works make you earn every hall']])}`,
+ choices:[ {t:'The far door', go:'e9s7'} ]
+},
+
+e9s7:{
+ onEnter:()=>{ state.stamina = Math.max(20, state.stamina - 10); },
+ html:()=>`
+  <p>The last door is a roller door, hand-chain and all, and the chain is one solid bar of rust and grease.</p>
+  <p>Your hands look at it the way they looked at a dead fan once, at a radio in pieces on a doorstep. The videos at two in the morning covered stranger machines than this. You find the seized link, work it with grit and a borrowed rhythm, and lean your weight in — and the door goes up, one shriek at a time, into a room with light in it.</p>
+  <p>The light is a gap in the roof. Under the gap is a wall.</p>
+  <p class="beat">And the wall is full.</p>
+  <p>Trophies. Dozens of them, painted one by one, no two the same age — some gone pale as bone, some bright as this year. Each one the size of a hand. Each one, you understand at once and completely, a person. A player who found this room.</p>
+  <p>The air smells faintly, impossibly, of fresh paint.</p>
+  <p>And somewhere to your left, calm as Sunday, a spray can begins to ${vb('rattle')}.</p>`,
+ choices:[ {t:'Turn', go:'e9s8'} ]
+},
+
+e9s8:{
+ html:()=>`
+  <p>An old man sits on a folding ${vb('stool')} by the wall, a cap on his head and a spray can in his hand, touching up a trophy that has started to fade. Small. Neat. Very old — old the way the fort walls are old, weathered and completely unbothered about it.</p>
+  <p>He finishes his stroke before he looks at you. When he does, his eyes are quick as Kiwi's and patient as A-po's, and he smiles like someone whose bus has finally come.</p>
+  <p>"Sixty years," he says, "that door chain has told me every visitor. You took the pipes or the high road?" He waves his own question away. "Doesn't matter. They both come here. Everything in this building comes here."</p>
+  <p>He nods at the wall of painted players, then at you.</p>
+  <p>"Player Zero-Zero-One," he says, tasting the archive's name for him like a slightly funny tea. "I never called myself that. I just started first."</p>`,
+ choices:[ {t:'"You painted the city."', go:'e9s9'} ]
+},
+
+e9s9:{
+ html:()=>`
+  <p>"Some of it," he says. "A trophy wherever somebody did a true thing. Sixty years of them. The city paints over most; I paint them back when my knees agree."</p>
+  <p>"And the grey stripe in Yancheng. You keep that painted too."</p>
+  <p>His stroke pauses. Then goes on. "A player wrote something under that trophy once. Level nine, that one, and burning down fast. Wrote that there was nothing at the end. Nothing worth the climb." He shakes the can slowly, the little ball rolling like a thought. "He wasn't wrong about the pain. He was wrong about the nothing. I couldn't leave the words up. I couldn't scrub a player's words off a wall either. So — grey. Every few years, grey again."</p>
+  <p>"And the wall by the sea. <i>Don't take the gold quest.</i>"</p>
+  <p>"Not mine," he says, simply. "A player who took it, got the answer, and wanted the next ones to come for the right reason. That warning has kept more players safe than I ever did. I leave it be."</p>
+  <p>You look at the wall of trophies. "And the system? What is it? Who built it?"</p>
+  <p>The old man laughs — a real laugh, dust in the light.</p>
+  <p>"Built," he says. "You young ones. Yours shows you a game, doesn't it? Points. Levels. Little gold boxes." He taps his own temple. "Mine showed me a ${vb('quota')} board. Chalk numbers. A foreman's stamp for a clean day's work — because in nineteen sixty-six, that was the shape a better life came in. It isn't a machine, player. It wears whatever your wanting already looks like."</p>
+  <p class="beat">"Nobody built it. Somebody <i>wanted</i>, first and hardest and longest — and it grew around the wanting, the way a pearl grows around grit. I was the grit. Every player since has added a layer."</p>`,
+ choices:[ {t:'"Then why does it choose us?"', go:'e9s10'} ]
+},
+
+e9s10:{
+ html:(st)=>`
+  <p>"It doesn't choose the happy ones," he says. "And it doesn't choose the broken ones. It finds the folded ones — people who wanted a different life once, folded the wanting up small, and put it away in a drawer. Then it waits. Years, sometimes. It waits for the night the wanting gets loud enough to hear through the drawer."</p>
+  <p>Something cold and precise slides into place in your chest. A sealed record, dated years before a convenience store ever spoke to you.</p>
+  <p>"There's a locked line in my file," you say. "From before."</p>
+  <p>"There always is." He sets the can down. "That's the night it first heard you. Yours to open, if you want it. Some players do. Some let it sleep." He looks at you with sixty years of level nine and beyond, and does not lean either way. "No prize in the envelope. Just a date, and what you folded."</p>`,
+ choices:[
+   {t:'"Open it."', go:'e9s11a', set:{e9_unsealed:true}},
+   {t:'"Let it sleep."', go:'e9s11b'}
+ ]
+},
+
+e9s11a:{
+ onEnter:()=>{ grant('unsealed'); },
+ html:()=>`
+  <p>"Open it," you say, and somewhere in the green architecture of you, a lock that has waited years turns over.</p>
+  ${sysBox('🗂 SEALED RECORD','— unsealed —',[
+    ['flair','Three years ago · 23:47'],
+    ['flair','Subject wanted a different life.'],
+    ['flair','Subject put the guitar in the corner instead.'],
+    ['flair','Status: wait.']
+  ])}
+  <p>The guitar. A thousand days of dust, sold one bright morning to hands that would actually play it — and you never once asked yourself which night the dust started.</p>
+  <p>This night. Eleven forty-seven. You don't remember it, and you remember it completely: the case clicking shut, the corner it went to stand in, the sentence you swallowed with the light off. <i>Maybe later.</i></p>
+  <p>"It heard that," the old man says, gently, watching your face read. "It hears every <i>maybe later</i> in this city. It can only ever answer one at a time."</p>`,
+ choices:[ {t:'Breathe', go:'e9s12'} ]
+},
+
+e9s11b:{
+ onEnter:()=>{ grant('let_it_sleep'); },
+ html:()=>`
+  <p>"Let it sleep," you say.</p>
+  <p>The old man nods, and something in the nod tells you a minority of players ever say that, and that he likes the ones who do.</p>
+  <p>"It'll keep," he says. "Sealed things keep. That's the whole point of seals." He picks the can back up. "You already know what's in it anyway, in the way a person knows the shape of their own back. A date. A wanting. A drawer."</p>
+  <p>You find that he's right. You don't need the timestamp. You were there.</p>`,
+ choices:[ {t:'One more question', go:'e9s12'} ]
+},
+
+e9s12:{
+ onEnter:()=>{ grant('registered'); pay('e9_gold',100); grant('the_gold_quest'); },
+ html:(st)=>`
+  <p>"The previous courier," you say, remembering a tin that waited years to cross a harbor. "The one who failed. What happens to a player's quests when they stop?"</p>
+  <p>"They go back in the pool," he says. "And they wait for the next pair of hands. Nothing the system starts is ever wasted — it's just sometimes finished by somebody else." He looks at you over the cap of the can. "You've already finished another player's quest, you know. You've been part of the relay for months."</p>
+  <p>Then he stands — knees negotiating, winning — shakes the can twice, and paints, beside all the others, one new trophy. Small. Sure. Yours.</p>
+  ${sysBox('✅ GOLD QUEST','Complete',[['pts','Reward: the answer · +100 points']])}
+  ${sysBox('🏆 ACHIEVEMENT UNLOCKED','The Gold Quest',[['flair','"You took it. Not for the gold."'],['pts','+30 points']])}
+  <p>And then, in the dusty light, one more box opens — gold-edged, quiet, patient — and you understand it is the last door of the whole long game.</p>
+  ${sysBox('🏆 PLATINUM','You Don\'t Need Me',[
+    ['flair','The final achievement.'],
+    ['flair','Complete it — then choose: keep the system, or pass it on.'],
+    ['flair','[ not yet earned ]']
+  ],'gold')}
+  <p>"That one," the old man says, "I have looked at every morning for sixty years." He settles back onto the stool, entirely at peace, and the peace is the strangest thing in the room — because he is not trapped, not lost, not sorry. He is a man who chose to keep playing, every single day, for a lifetime, and would choose it again.</p>
+  <p>${st.flags.resigned ? "\"You went all in,\" he says, reading you like a wall. \"So did I, once. The game is honest about what it gives you. Make sure you stay honest about what you gave.\"" : "\"You kept your Mondays,\" he says, reading you like a wall. \"Good. The game fits any size of life. Don't let anyone tell you the small door is the lesser one.\""}</p>
+  <p>You look at him a long moment — happy, sharp, sixty years deep — and the cold walks up your spine anyway. Not because his life went wrong.</p>
+  <p class="beat">Because it didn't. And it could be yours. And you still don't know if you want it.</p>
+  <p>"Go home, player," he says, picking up the can. "The last quest finds you when you stop looking for it. They always do."</p>
+  <p>On the way out — the halls, the gate, the evening — you notice you never once checked your points. The number is bigger now. The number was never the door.</p>`,
+ choices:[ {t:'EPISODE COMPLETE — open the Menu', go:'end9'} ]
+},
+
+end9:{
+ html:(st)=>{
+   function achGroup(ep){
+     let h='';
+     Object.keys(ACH).filter(id=>ACH[id].ep===ep).forEach(id=>{
+       const a=ACH[id]; const got=st.achievements.includes(id);
+       h += '<div class="row"><span>'+
+         (got ? '🏆 <span class="ach-name">'+a.name+'</span><span class="ach-desc">'+a.desc+'</span>'
+              : '<span class="lock">🔒 ???</span>')+
+         '</span><span>'+(got ? (a.pts>0?'+'+a.pts:'—') : '')+'</span></div>';
+     });
+     return h;
+   }
+   const cnt=(ep)=>[st.achievements.filter(id=>ACH[id].ep===ep).length, Object.keys(ACH).filter(id=>ACH[id].ep===ep).length];
+   const rows=[9,8,7,6,5,4,3,2,1].map(ep=>{const [c,t]=cnt(ep);return '<div class="panel ach-list"><h3>EPISODE '+ep+' ACHIEVEMENTS ('+c+'/'+t+')</h3>'+achGroup(ep)+'</div>';}).join('');
+   return `
+  <p class="quiet">EPISODE 9 — THE DESIGNER</p>
+  ${sysBox('✅ EPISODE COMPLETE','The Designer',[['flair','"Nobody built it. Somebody wanted, first and hardest and longest."']])}
+  <div class="panel">
+    <h3>PLAYER</h3>
+    <div class="row"><span>Level</span><span>${st.level}</span></div>
+    <div class="row"><span>Points</span><span>${st.points}</span></div>
+    <div class="row"><span>Money</span><span>NT$${st.money.toLocaleString()}</span></div>
+    <div class="row"><span>Clarity</span><span>— (you fill this in)</span></div>
+    <div class="row"><span>Archive</span><span>Player 001: met · your record ${st.flags.e9_unsealed ? 'unsealed' : 'left sealed'}</span></div>
+    <div class="row"><span>Map</span><span>The south has a room in it now</span></div>
+    <div class="row"><span class="goldtxt">GOLD ???</span><span class="goldtxt">Answered.</span></div>
+    <div class="row"><span class="goldtxt">PLATINUM</span><span class="goldtxt">You Don't Need Me · not yet earned</span></div>
+  </div>
+  ${rows}
+  <p class="quiet">Missing some? Different choices, different badges. One pair can never share a save.</p>
+  <hr class="sep">
+  <div class="panel">
+    <h3>SAVE</h3>
+    <p style="font-family:inherit;font-size:.8rem;opacity:.8;margin:0 0 8px;">
+      Your progress saves automatically on this device.${storageOK?'':' (Saving is not available here — use Export to keep your progress.)'}
+      Export a save code to keep it safe or move to another device.</p>
+    <div class="btn-line">
+      <button class="choice" id="btnExport9">Export save</button>
+      <button class="choice" id="btnImport9">Import save</button>
+    </div>
+    <textarea class="savebox" id="saveBox9" placeholder="Your save code appears here. Or paste a code and press Import." spellcheck="false"></textarea>
+  </div>`;
+ },
+ choices:[
+   {t:'▶ Continue to Episode 10', go:'e10s1'},
+   {t:'↻ Replay Episode 9', go:'__replay9'},
+   {t:'Back to title', go:'__title'}
+ ],
+ onRender:()=>{
+   const box = document.getElementById('saveBox9');
+   document.getElementById('btnExport9').onclick = ()=>{
+     box.value = btoa(unescape(encodeURIComponent(JSON.stringify(state)))); box.select();
+   };
+   document.getElementById('btnImport9').onclick = ()=>{
+     try{
+       const sv = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
+       if(typeof sv.version !== 'number') throw 0;
+       state = Object.assign(freshState(), sv); save();
+       box.value = 'Save imported ✓';
+     }catch(e){ box.value = 'That code did not work. Check it and try again.'; }
+   };
+ }
+},
+
+e10s1:{
+ onEnter:()=>{ state.episode = 10; snapshotEpisode(10); state.stamina = 100; },
+ html:(st)=>`
+  <p class="quiet">EPISODE 10 — NEW GAME+</p>
+  <p>The gold box does not open anymore. It has nothing left to ask; you went and got the answer. The mornings are just mornings — ${st.flags.resigned ? "wide ones, shaped by nobody, filled by you" : "workday mornings, egg pancake, lane, elevator, all the old furniture of a life you chose twice"} — and for a handful of days the system is simply quiet company, like a friend on a long train ride.</p>
+  <p>Then, on a morning when you are looking at nothing but the steam off your breakfast, the last quest finds you.</p>
+  <p>Exactly the way the old man said it would.</p>
+  ${sysBox('🟡 FINAL QUEST','You Don\'t Need Me',[
+    ['flair','One week. I will leave, one layer at a time.'],
+    ['flair','Show me — show yourself — that you are already whole.'],
+    ['flair','You may stop this quest at any time. Stopping is also an answer.']
+  ],'gold')}
+  <p>Boss Lin flips something on the hot plate. The radio sings. The morning does not know that anything has begun.</p>
+  <p class="beat">You read the box twice, and you do not stop it.</p>`,
+ choices:[ {t:'Day one', go:'e10s2'} ]
+},
+
+e10s2:{
+ html:(st)=>`
+  <p>Day one, the map goes.</p>
+  <p>You feel it leave like furniture being carried out of a room behind you — no sound, just more space. And the day, on purpose, hands you a reason to care: ${st.flags.resigned ? "a delivery quest, clear across the city, three stops and a signature" : "a delivery to run after work, clear across the city, three stops and a signature"}.</p>
+  <p>No blue line. No little arrow. Just Kaohsiung, and you.</p>`,
+ choices:[
+   {t:'The straight way — big roads, count the blocks', go:'e10s3', set:{e10_way:'roads'}},
+   {t:'Your way — lanes, smells, the grammar of the city', go:'e10s3', set:{e10_way:'lanes'}}
+ ]
+},
+
+e10s3:{
+ onEnter:()=>{ grant('old_exam'); },
+ html:(st)=>`
+  <p>${st.flags.e10_way==='lanes' ? "You go by the grammar. The fried-chicken corner means you're two lanes from the temple; the hardware street runs downhill to the water; the wind off the harbor tells you west better than any arrow. Three stops, one signature, not one wrong turn." : "You go by the count. Big roads, block by block, the way the city was drawn before anyone drew it on a screen. Three stops, one signature, two blocks of honest doubt, zero wrong turns that lasted."}</p>
+  <p>Day two, the quest boxes go.</p>
+  <p>No morning chime. No green rectangle with a small polite task inside. Just a day, raw, unlabeled — and by noon you have carried a ladder, flagged a bus for a tourist holding a map upside down, and told the stall owner you'll do Saturday.</p>
+  <p>Nobody assigned any of it. You saw it. The way you see doors, now, and short counts, and people.</p>
+  <p>"I've taken this test before," you tell the quiet, out loud, on a street corner. "The hard way. Weeks of it — when leaving wasn't your idea."</p>
+  ${sysBox('💬 SYSTEM','Confirmed.',[['flair','This layer was yours already. I am only witnessing.']])}`,
+ choices:[ {t:'Day three', go:'e10s4'} ]
+},
+
+e10s4:{
+ html:()=>`
+  <p>Day three, the points go, and the little sound that came with them.</p>
+  <p>You fix a stroller wheel outside the market for a stranger who is fighting it with one hand and losing. Ten minutes, one borrowed screwdriver, done. She thanks you twice and is gone into the crowd.</p>
+  <p>And then — silence. No chime. No number climbing anywhere.</p>
+  <p>You stand there and wait for the old knife-question, the one that followed you home from a crossing once: <i>was it ever the person, or was it the number?</i></p>
+  <p>It doesn't come. It has nowhere to live in you anymore.</p>
+  <p class="beat">It was never the number. You knew that the night you learned it in the dark, for free.</p>`,
+ choices:[ {t:'Day four', go:'e10s5'} ]
+},
+
+e10s5:{
+ html:()=>`
+  <p>Day four, the stamina bar goes.</p>
+  <p>You spend the afternoon helping the stall owner move her whole back stock up a ramp and into a storeroom, box after box, and when your arms start writing complaint letters you listen to them, and rest, and drink the tea she pushes at you, and go again.</p>
+  <p>It turns out you had a gauge before the system gave you one. Everyone does. The system just taught you to read your own handwriting.</p>
+  <p>Day five, the badges go.</p>
+  <p>Friday evening you do a small thing perfectly — the kind that would have earned a zero-point line and a dry little sentence — and no box opens, and no one will ever know, and it counts anyway.</p>
+  <p class="beat">The zeros were always the ones it respected. Now everything is a zero. Now everything counts.</p>`,
+ choices:[ {t:'Saturday', go:'e10s6'} ]
+},
+
+e10s6:{
+ html:()=>`
+  <p>Saturday, the market, the dome's glow. Yun is at the drinks stand with two teas, because some things have become laws of nature.</p>
+  <p>She looks at you once, properly, the way she prices a jacket.</p>
+  <p>"Yours is quiet," she says. Then, slower, reading deeper: "No. Not quiet. <i>Finishing.</i>"</p>
+  <p>"Last quest," you say. "One week. It leaves a layer at a time."</p>
+  <p>Her cup stops mid-turn. You watch her understand — that there is an end, that it has a shape, that somebody she knows is standing inside it. For one second she looks exactly like a student who has just learned the exam has a final page.</p>
+  <p>You could tell her everything. The works. The wall of trophies. The old man on his stool. What the system is and what waits at the end of her gold box, opening and opening every morning.</p>
+  <p>Or you could hand her only what the sea wall handed you — the right reason — and leave the rest of the road hers.</p>`,
+ choices:[
+   {t:'Tell her everything. Friends don\'t leave friends unarmed.', go:'e10s7', set:{e10_told:true}},
+   {t:'Give her only the reason. The road is hers to walk.', go:'e10s7'}
+ ]
+},
+
+e10s7:{
+ html:(st)=>`
+  <p>${st.flags.e10_told ? "You tell her all of it — the ferry, the pipes, the room where the wall is full of people, the old man who paints them back. She listens the way she counts: completely. At the end she is quiet for a long time, and then she says, \"Two hundred and ninety-one days, and I never once rode the ferry.\" It is not really about the ferry, and you both know it." : "You give her the one sentence. \"When you go south — and someday you will — don't go for the gold.\" She studies you, and finds the shape of everything you're not saying, and nods once, accepting the package without opening it. \"I'll go,\" she says, \"when I stop counting.\" From her, that is a date."}</p>
+  <p>At the foot of the stairs she stops, the way she always stops, one step up, half turned.</p>
+  <p>"See you at level ten," she says — which does not exist, which is a joke, which is how you know it matters.</p>
+  <p>Then she's gone into the Saturday noise, and you stand under the dome's four lights — water, earth, light, fire — and let the market close around you one more time.</p>`,
+ choices:[ {t:'Sunday', go:'e10s8'} ]
+},
+
+e10s8:{
+ html:()=>`
+  <p>Sunday, the panel itself goes — all of it, folding away wall by wall like a stage being taken down — until one thing is left, floating small and patient at the edge of your eye.</p>
+  <p>A button. One word on it. <i>Confirm.</i></p>
+  <p>You spend the day walking it around the city like a small quiet dog.</p>
+  <p>Boss Lin's for the late breakfast, where you buy the extra egg and he grunts his highest praise. The crossing by the temple, where the light still changes too fast and A-po tells you rain is coming; the knee is never wrong; you believe the knee. The lane behind the office, six minutes end to end, hot oil and wet stone and somebody's radio, walked slow, for no reason a map could hold.</p>
+  <p>The button floats along at the edge of everything, patient as the old man on his stool.</p>
+  <p class="beat">Not yet. One more stop.</p>`,
+ choices:[ {t:'The store', go:'e10s9'} ]
+},
+
+e10s9:{
+ html:()=>`
+  <p>The convenience store is bright. Too bright. The door makes its little sound when you walk in, and Kiwi nods at you over the register, and the rice balls are entering their final hour.</p>
+  <p>It is 11:42 p.m. You know because you looked.</p>
+  <p>At the coffee machine at the back stands someone in office clothes, tie loose, work badge still around their neck. They are staring at the machine the way you stare at something you know better than you know most people. Their hand hovers. Same button as always. Same button as every night.</p>
+  <p>You watch them press it, and take the cup, and look at nothing — that specific nothing, the one with a whole folded life inside it.</p>
+  <p>And there it is. No chime, no green light, no box. The clearest quest you have ever seen, standing at a coffee machine in a convenience store at 11:42 on a Sunday night.</p>
+  <p class="beat">The system taught you to play. But this — the seeing — was the real curriculum, and it is yours now, permanently, no battery required.</p>`,
+ choices:[ {t:'The button', go:'e10s10'} ]
+},
+
+e10s10:{
+ onEnter:()=>{ grant('you_dont_need_me'); },
+ html:()=>`
+  <p>You step out into the warm night and stand under the streetlight, and the button drifts around to face you.</p>
+  <p>One field opens beside it, the one that has waited blank since the night you chose a door. <i>Clarity.</i> The system could never fill it. It was never the system's to fill.</p>
+  <p>You fill it now. Three words.</p>
+  <p class="beat">Enough to choose.</p>
+  ${sysBox('🏆 PLATINUM','You Don\'t Need Me',[['flair','"One week. Every layer. You were already whole."'],['pts','+50 points']],'gold')}
+  <p>The last box the system will ever show you hangs in the air, gold-edged and quiet, and then even it folds away, and only the button is left, and one small line of text beneath it:</p>
+  <p class="beat">Log out — or pass me on. I will wait for their loudest night. I am very good at waiting.</p>
+  <p>Through the glass, at the coffee machine, someone is drinking bad coffee with a whole folded life behind their eyes.</p>`,
+ choices:[
+   {t:'Log out. Walk out the front door of the game.', go:'e10s11a', set:{e10_ending:'logout'}},
+   {t:'Pass it on. Someone is standing where you stood.', go:'e10s11b', set:{e10_ending:'pass'}}
+ ]
+},
+
+e10s11a:{
+ onEnter:()=>{ grant('front_door'); grant('player'); },
+ html:()=>`
+  <p>"Log out," you say.</p>
+  <p>The button does not flash or chime. It simply accepts — the way a good door closes, with a click you feel more than hear — and the green goes out of the world.</p>
+  <p>Not the world. The overlay. The world stays: streetlight, scooters, the smell of somebody frying something wonderful two lanes away. You stand in it, unlabeled, unlisted, unranked, and it fits like clothes washed soft.</p>
+  <p>Through the glass, the office worker caps their coffee and heads for the door, and you hold it open — no reason, no reward, the smallest quest there is — and they thank you with the surprised half-second of someone who has not been seen in a while.</p>
+  <p>"Long week?" you say.</p>
+  <p>"Long year," they say, and almost smile, and go out into the dark toward the MRT.</p>
+  <p>No system passed between you. Nothing passed between you but the oldest thing: one person noticing another. It is, you now know for certain, where every quest in the world begins.</p>
+  <p>In the morning, Boss Lin's radio is singing, and the egg pancake hits the plate without a word, and the city opens like a map you no longer need because you are standing inside it.</p>
+  <p>Somewhere south, an old man is touching up a wall of players, one of them yours, and the paint will outlast every panel ever drawn in light.</p>
+  <p>You finish breakfast. You walk out into the morning. You take, on purpose, a road you have walked one thousand eight hundred times —</p>
+  <p class="beat">— and it is new anyway, because you are.</p>
+  <p style="text-align:center;margin-top:28px;opacity:.85;">ACHIEVEMENT UNLOCKED — <i>Player</i></p>
+  <p class="quiet" style="text-align:center;">No sound. No glow. Just true.</p>`,
+ choices:[ {t:'THE END — the record remains', go:'end10'} ]
+},
+
+e10s11b:{
+ onEnter:()=>{ grant('the_relay'); grant('player'); },
+ html:()=>`
+  <p>"Pass it on," you say.</p>
+  <p>The button holds one beat, as if making sure. Then, small and dry, the system's last words to you, ever:</p>
+  <p class="beat">Good game.</p>
+  <p>And the green goes out of the world — out of your world — like a lamp carried into another room. Not gone. Traveling.</p>
+  <p>Through the glass, the office worker is capping their coffee. They will see nothing tonight. Maybe nothing for a year. The system does not arrive at your best moment; it waits for the night the wanting gets loud — and you, of all people, know that some wanting takes three years to get loud enough.</p>
+  <p>They pass you in the doorway. "Excuse me," they say, not seeing you, the way you never saw anyone at 11:42 either.</p>
+  <p>You do not stop them. You do not explain. Nobody explained to you. That is not how the game starts.</p>
+  <p>Weeks later — an ordinary Tuesday — you pass the store and see them through the glass, standing very still in the snack aisle, one hand half-raised toward nothing at all, eyes wide at a patch of empty air.</p>
+  <p>You keep walking. You are smiling like an idiot in the middle of the sidewalk, and you let yourself.</p>
+  <p>Somewhere south, sixty years of trophies wait for one more hand that paints things back instead of over. You have been thinking about that. You have been thinking you might learn.</p>
+  <p class="beat">Every quest begins with a story. Yours is told. Theirs is starting. The relay never dropped once, in sixty years, and it did not drop tonight.</p>
+  <p style="text-align:center;margin-top:28px;opacity:.85;">ACHIEVEMENT UNLOCKED — <i>Player</i></p>
+  <p class="quiet" style="text-align:center;">No sound. No glow. Just true.</p>`,
+ choices:[ {t:'THE END — the record remains', go:'end10'} ]
+},
+
+end10:{
+ html:(st)=>{
+   function achGroup(ep){
+     let h='';
+     Object.keys(ACH).filter(id=>ACH[id].ep===ep).forEach(id=>{
+       const a=ACH[id]; const got=st.achievements.includes(id);
+       h += '<div class="row"><span>'+
+         (got ? '🏆 <span class="ach-name">'+a.name+'</span><span class="ach-desc">'+a.desc+'</span>'
+              : '<span class="lock">🔒 ???</span>')+
+         '</span><span>'+(got ? (a.pts>0?'+'+a.pts:'—') : '')+'</span></div>';
+     });
+     return h;
+   }
+   const cnt=(ep)=>[st.achievements.filter(id=>ACH[id].ep===ep).length, Object.keys(ACH).filter(id=>ACH[id].ep===ep).length];
+   const rows=[10,9,8,7,6,5,4,3,2,1].map(ep=>{const [c,t]=cnt(ep);return '<div class="panel ach-list"><h3>EPISODE '+ep+' ACHIEVEMENTS ('+c+'/'+t+')</h3>'+achGroup(ep)+'</div>';}).join('');
+   const total=st.achievements.length, totalAll=Object.keys(ACH).length;
+   return `
+  <p class="quiet">EPISODE 10 — NEW GAME+ · SEASON COMPLETE</p>
+  <p style="text-align:center;margin:12px 0 2px;opacity:.9;">SEASON COMPLETE — <i>Achievement Unlocked</i></p>
+  <p class="quiet" style="text-align:center;">Every quest begins with a story.</p>
+  <div class="panel">
+    <h3>PLAYER — FINAL</h3>
+    <div class="row"><span>Level</span><span>${st.level} · and it stopped mattering</span></div>
+    <div class="row"><span>Points</span><span>${st.points}</span></div>
+    <div class="row"><span>Money</span><span>NT$${st.money.toLocaleString()}</span></div>
+    <div class="row"><span>Clarity</span><span>Enough to choose.</span></div>
+    <div class="row"><span>Ending</span><span>${st.flags.e10_ending==='pass' ? 'Passed on — the relay continues' : 'Logged out — the front door'}</span></div>
+    <div class="row"><span>Badges</span><span>${total} / ${totalAll}</span></div>
+    <div class="row"><span class="goldtxt">PLATINUM</span><span class="goldtxt">You Don't Need Me · earned</span></div>
+  </div>
+  ${rows}
+  <p class="quiet">Missing some? Different roads, different badges. Play again — the other ending is also true.</p>
+  <hr class="sep">
+  <div class="panel">
+    <h3>SAVE</h3>
+    <p style="font-family:inherit;font-size:.8rem;opacity:.8;margin:0 0 8px;">
+      Your progress saves automatically on this device.${storageOK?'':' (Saving is not available here — use Export to keep your progress.)'}
+      Export a save code to keep it safe or move to another device.</p>
+    <div class="btn-line">
+      <button class="choice" id="btnExport10">Export save</button>
+      <button class="choice" id="btnImport10">Import save</button>
+    </div>
+    <textarea class="savebox" id="saveBox10" placeholder="Your save code appears here. Or paste a code and press Import." spellcheck="false"></textarea>
+  </div>`;
+ },
+ choices:[
+   {t:'↻ Replay Episode 10 — the other ending is waiting', go:'__replay10'},
+   {t:'NEW GAME+ — back to the title', go:'__title'}
+ ],
+ onRender:()=>{
+   const box = document.getElementById('saveBox10');
+   document.getElementById('btnExport10').onclick = ()=>{
+     box.value = btoa(unescape(encodeURIComponent(JSON.stringify(state)))); box.select();
+   };
+   document.getElementById('btnImport10').onclick = ()=>{
      try{
        const sv = JSON.parse(decodeURIComponent(escape(atob(box.value.trim()))));
        if(typeof sv.version !== 'number') throw 0;
@@ -2905,6 +3862,10 @@ function go(id){
   if(id==='__replay4'){ replayEpisode(4,'e4s1'); return; }
   if(id==='__replay5'){ replayEpisode(5,'e5s1'); return; }
   if(id==='__replay6'){ replayEpisode(6,'e6s1'); return; }
+  if(id==='__replay7'){ replayEpisode(7,'e7s1'); return; }
+  if(id==='__replay8'){ replayEpisode(8,'e8s1'); return; }
+  if(id==='__replay9'){ replayEpisode(9,'e9s1'); return; }
+  if(id==='__replay10'){ replayEpisode(10,'e10s1'); return; }
   const sec = SECTIONS[id];
   if(!sec) return;
   state.section = id;
