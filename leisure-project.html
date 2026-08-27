@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="light only">
+<title>The Leisure Project | InkQuest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F2E9;
+  --ink:#1E2433;
+  --accent:#B0563A;
+  --accent-tint:#F6E7DF;
+  --muted:#5C6377;
+  --rule:#E2D6C6;
+  --fs:19px;
+}
+*{box-sizing:border-box;}
+html{
+  background:var(--paper) !important;
+  color-scheme:light only;
+  -webkit-text-size-adjust:100%;
+}
+body{
+  background:var(--paper) !important;
+  color:var(--ink);
+  font-family:'Lora',Georgia,serif;
+  font-size:var(--fs);
+  line-height:1.75;
+  margin:0;
+  padding:0;
+  overflow-wrap:break-word;
+}
+
+/* ---------------- top bar ---------------- */
+#bar{
+  position:sticky;
+  top:0;
+  z-index:30;
+  background:var(--paper);
+  border-bottom:1px solid var(--rule);
+  padding:10px 14px calc(10px + env(safe-area-inset-top,0px));
+  padding-top:calc(10px + env(safe-area-inset-top,0px));
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.iconbtn{
+  background:none;
+  border:0;
+  padding:8px;
+  cursor:pointer;
+  color:var(--ink);
+  line-height:0;
+  border-radius:4px;
+  -webkit-tap-highlight-color:transparent;
+}
+.iconbtn:hover{background:var(--accent-tint);}
+.iconbtn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+#barTitle{
+  flex:1;
+  min-width:0;
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#barTitle b{color:var(--accent);font-weight:600;}
+
+/* ---------------- reader ---------------- */
+#reader{
+  max-width:38rem;
+  margin:0 auto;
+  padding:30px 22px 40px;
+}
+.chapter-no{
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--accent);
+  display:block;
+  margin-bottom:10px;
+}
+h1.ch{
+  font-family:'Lora',Georgia,serif;
+  font-size:1.85rem;
+  line-height:1.2;
+  font-weight:700;
+  letter-spacing:-.01em;
+  margin:0 0 26px;
+  padding-bottom:22px;
+  border-bottom:1px solid var(--rule);
+}
+#body p{margin:0 0 1.15em;}
+#body .dropcap{
+  float:left;
+  font-family:'Lora',Georgia,serif;
+  font-weight:700;
+  font-size:3.9rem;
+  line-height:.82;
+  padding:6px 9px 0 0;
+  color:var(--accent);
+}
+#body .marker{
+  text-align:center;
+  color:var(--accent);
+  font-size:14px;
+  letter-spacing:.6em;
+  margin:2em 0 1.6em;
+  opacity:.7;
+}
+mark.hit{background:#FBE7A2;padding:0 2px;border-radius:2px;}
+mark.hit.target{background:#F6C86A;box-shadow:0 0 0 3px #F6C86A;}
+@keyframes flash{0%,100%{background:#F6C86A;}50%{background:#FBE7A2;}}
+mark.hit.target{animation:flash 1.1s ease-in-out 2;}
+@media (prefers-reduced-motion:reduce){mark.hit.target{animation:none;}}
+
+/* glossary spans — role=button, never <button>, to avoid orphaned punctuation */
+.g{
+  cursor:pointer;
+  border-bottom:1.5px dotted var(--accent);
+  -webkit-tap-highlight-color:transparent;
+}
+.g:hover{background:var(--accent-tint);}
+.g:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px;}
+
+/* ---------------- chapter nav ---------------- */
+#nav{
+  max-width:38rem;
+  margin:0 auto;
+  padding:0 22px calc(40px + env(safe-area-inset-bottom,0px));
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.navbtn{
+  flex:1;
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:13px;
+  font-weight:500;
+  padding:13px 14px;
+  border:1px solid var(--rule);
+  background:none;
+  color:var(--ink);
+  border-radius:4px;
+  cursor:pointer;
+  text-align:center;
+}
+.navbtn:hover:not(:disabled){background:var(--accent-tint);border-color:var(--accent);}
+.navbtn:disabled{opacity:.32;cursor:default;}
+#progress{
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:11px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+
+/* ---------------- drawer ---------------- */
+#scrim{
+  position:fixed;inset:0;
+  background:rgba(30,36,51,.45);
+  opacity:0;pointer-events:none;
+  transition:opacity .2s ease;
+  z-index:40;
+}
+#scrim.on{opacity:1;pointer-events:auto;}
+#drawer{
+  position:fixed;
+  top:0;left:0;bottom:0;
+  width:min(87vw,22rem);
+  background:var(--paper);
+  border-right:1px solid var(--rule);
+  transform:translateX(-102%);
+  transition:transform .22s ease;
+  z-index:41;
+  display:flex;
+  flex-direction:column;
+  font-family:'Poppins',system-ui,sans-serif;
+}
+#drawer.on{transform:translateX(0);}
+.d-head{
+  padding:calc(16px + env(safe-area-inset-top,0px)) 16px 12px;
+  border-bottom:1px solid var(--rule);
+}
+.d-title{
+  font-family:'Lora',Georgia,serif;
+  font-size:1.15rem;
+  font-weight:700;
+  margin:0 0 2px;
+}
+.d-sub{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0;}
+.tabs{display:flex;border-bottom:1px solid var(--rule);}
+.tab{
+  flex:1;
+  padding:11px 4px;
+  background:none;border:0;
+  border-bottom:2px solid transparent;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:500;
+  color:var(--muted);
+  cursor:pointer;
+}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:600;}
+.d-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:env(safe-area-inset-bottom,0px);}
+.pane{display:none;}
+.pane.on{display:block;}
+
+.month{
+  font-size:10.5px;
+  font-weight:600;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--accent);
+  padding:16px 16px 6px;
+  position:sticky;
+  top:0;
+  background:var(--paper);
+}
+.tocitem{
+  display:block;width:100%;text-align:left;
+  background:none;border:0;
+  padding:9px 16px;
+  font-family:inherit;font-size:13.5px;line-height:1.45;
+  color:var(--ink);cursor:pointer;
+  border-left:3px solid transparent;
+}
+.tocitem:hover{background:var(--accent-tint);}
+.tocitem.cur{border-left-color:var(--accent);background:var(--accent-tint);font-weight:600;}
+.tocitem.todo{color:#A9A396;cursor:default;}
+.tocitem.todo:hover{background:none;}
+.tocitem em{font-style:normal;color:var(--muted);font-size:11.5px;margin-right:7px;}
+
+#q{
+  width:calc(100% - 32px);
+  margin:14px 16px 6px;
+  padding:10px 12px;
+  font-family:inherit;font-size:14px;
+  border:1px solid var(--rule);
+  border-radius:4px;
+  background:#fff;
+  color:var(--ink);
+}
+#q:focus{outline:none;border-color:var(--accent);}
+.qnote{font-size:11.5px;color:var(--muted);padding:2px 16px 10px;}
+.hitrow{
+  display:block;width:100%;text-align:left;
+  background:none;border:0;border-top:1px solid var(--rule);
+  padding:11px 16px;cursor:pointer;font-family:inherit;
+}
+.hitrow:hover{background:var(--accent-tint);}
+.hitrow .hr-ch{font-size:11px;color:var(--accent);font-weight:600;display:block;margin-bottom:3px;}
+.hitrow .hr-sn{font-size:12.5px;line-height:1.5;color:var(--muted);}
+.hitrow .hr-sn b{color:var(--ink);background:#FBE7A2;font-weight:400;}
+
+.glossrow{
+  display:block;width:100%;text-align:left;
+  background:none;border:0;border-top:1px solid var(--rule);
+  padding:10px 16px;cursor:pointer;font-family:inherit;
+}
+.glossrow:hover{background:var(--accent-tint);}
+.glossrow{display:flex;align-items:baseline;gap:8px;}
+.glossrow .gr-h{font-family:'Lora',Georgia,serif;font-size:14.5px;font-weight:600;}
+.glossrow .gr-z{font-size:12px;color:var(--muted);flex:1;}
+.glossrow .gr-arrow{
+  font-size:10px;color:var(--muted);
+  transition:transform .18s ease;
+  transform-origin:center;
+}
+.glossrow.open .gr-arrow{transform:rotate(90deg);color:var(--accent);}
+.glossrow.open .gr-h{color:var(--accent);}
+
+/* the source-paragraph panel: paler than the page, so it reads as a quotation */
+.gx{
+  display:none;
+  background:#FFFCF6;
+  border-left:3px solid var(--accent);
+  padding:13px 16px 15px;
+}
+.gx.on{display:block;}
+.gx .gx-def{
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:12.5px;line-height:1.6;color:var(--muted);
+  margin:0 0 12px;
+}
+.gx .gx-ch{
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);margin:14px 0 5px;
+}
+.gx .gx-ch:first-of-type{margin-top:0;}
+.gx .gx-p{
+  font-family:'Lora',Georgia,serif;
+  font-size:14.5px;line-height:1.65;color:var(--ink);
+  margin:0 0 .7em;
+}
+.gx .gx-p:last-child{margin-bottom:0;}
+.gx mark{background:#FBE7A2;padding:0 2px;border-radius:2px;}
+
+.setrow{padding:16px;border-top:1px solid var(--rule);}
+.setrow h4{margin:0 0 9px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.sizes{display:flex;gap:8px;}
+.sizes button{
+  flex:1;padding:9px;border:1px solid var(--rule);background:none;
+  font-family:inherit;cursor:pointer;border-radius:4px;color:var(--ink);
+}
+.sizes button.on{border-color:var(--accent);background:var(--accent-tint);color:var(--accent);font-weight:600;}
+.dangerbtn{
+  width:100%;padding:10px;margin-top:4px;
+  border:1px solid var(--rule);background:none;
+  font-family:inherit;font-size:12.5px;color:var(--muted);
+  border-radius:4px;cursor:pointer;
+}
+.dangerbtn:hover{border-color:#8A6D2F;color:#8A6D2F;}
+
+/* ---------------- resume toast ---------------- */
+#resume{
+  position:fixed;
+  left:14px;right:14px;
+  bottom:calc(14px + env(safe-area-inset-bottom,0px));
+  background:var(--ink);
+  color:#F4F1EA;
+  border-radius:6px;
+  padding:14px 16px;
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:13px;
+  display:none;
+  align-items:center;
+  gap:12px;
+  z-index:35;
+  box-shadow:0 6px 24px rgba(30,36,51,.3);
+  max-width:34rem;
+  margin:0 auto;
+}
+#resume.on{display:flex;}
+#resume span{flex:1;line-height:1.4;}
+#resume button{
+  background:var(--accent);border:0;color:#fff;
+  font-family:inherit;font-size:12.5px;font-weight:600;
+  padding:8px 14px;border-radius:4px;cursor:pointer;white-space:nowrap;
+}
+#resume .dismiss{background:none;color:#8A93A6;padding:8px 4px;}
+
+/* ---------------- glossary popover ---------------- */
+#pop{
+  position:fixed;left:0;right:0;bottom:0;
+  background:var(--ink);color:#F4F1EA;
+  padding:20px 22px calc(26px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -8px 28px rgba(30,36,51,.28);
+  transform:translateY(105%);
+  transition:transform .2s ease;
+  z-index:60;
+  font-family:'Poppins',system-ui,sans-serif;
+}
+#pop.on{transform:translateY(0);}
+.pop-tag{
+  display:inline-block;font-size:9.5px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;
+  padding:3px 8px;border-radius:2px;
+  background:var(--accent);color:#fff;margin-bottom:10px;
+}
+.pop-tag.grammar{background:#8A6D2F;}
+.pop-tag.culture{background:#8C5570;}
+.pop-tag.phrase{background:#5F7A55;}
+.pop-head{font-family:'Lora',Georgia,serif;font-size:1.25rem;font-weight:700;margin:0 0 2px;}
+.pop-zh{font-size:.95rem;color:#E6BE9C;margin:0 0 8px;}
+.pop-def{font-size:.92rem;line-height:1.6;margin:0;color:#DCD8CE;}
+.pop-close{
+  position:absolute;top:12px;right:16px;
+  background:none;border:0;color:#8A93A6;
+  font-size:22px;line-height:1;cursor:pointer;padding:4px;
+}
+@media (min-width:700px){
+  #pop{left:auto;right:28px;bottom:28px;max-width:23rem;border-radius:6px;}
+}
+@media (prefers-reduced-motion:reduce){
+  #pop,#drawer,#scrim{transition:none;}
+}
+</style>
+</head>
+<body>
+
+<div id="bar">
+  <button class="iconbtn" id="menuBtn" aria-label="Contents">
+    <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <div id="barTitle"></div>
+  <button class="iconbtn" id="searchBtn" aria-label="Search">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+  </button>
+</div>
+
+<div id="reader">
+  <span class="chapter-no" id="chNo"></span>
+  <h1 class="ch" id="chTitle"></h1>
+  <div id="body"></div>
+</div>
+
+<div id="nav">
+  <button class="navbtn" id="prevBtn">&larr; Previous</button>
+  <span id="progress"></span>
+  <button class="navbtn" id="nextBtn">Next &rarr;</button>
+</div>
+
+<div id="scrim"></div>
+
+<aside id="drawer" aria-label="Contents and search">
+  <div class="d-head">
+    <p class="d-sub">InkQuest</p>
+    <p class="d-title">The Leisure Project</p>
+  </div>
+  <div class="tabs">
+    <button class="tab on" data-pane="toc">Contents</button>
+    <button class="tab" data-pane="search">Search</button>
+    <button class="tab" data-pane="gloss">Words</button>
+    <button class="tab" data-pane="set">Settings</button>
+  </div>
+  <div class="d-body">
+    <div class="pane on" id="pane-toc"></div>
+
+    <div class="pane" id="pane-search">
+      <input id="q" type="search" placeholder="Search all chapters&hellip;" autocomplete="off">
+      <p class="qnote" id="qnote">Type at least two letters.</p>
+      <div id="hits"></div>
+    </div>
+
+    <div class="pane" id="pane-gloss">
+      <p class="qnote" style="padding-top:14px;">Every word noted in the story, in alphabetical order.</p>
+      <div id="glossList"></div>
+    </div>
+
+    <div class="pane" id="pane-set">
+      <div class="setrow">
+        <h4>Text size</h4>
+        <div class="sizes" id="sizes">
+          <button data-size="17">Small</button>
+          <button data-size="19">Medium</button>
+          <button data-size="22">Large</button>
+        </div>
+      </div>
+      <div class="setrow">
+        <h4>Reading position</h4>
+        <button class="dangerbtn" id="clearBtn">Forget where I stopped</button>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div id="resume">
+  <span id="resumeTxt"></span>
+  <button id="resumeGo">Continue</button>
+  <button class="dismiss" id="resumeNo">&times;</button>
+</div>
+
+<div id="pop" role="dialog" aria-live="polite" aria-hidden="true">
+  <button class="pop-close" id="popClose" aria-label="Close note">&times;</button>
+  <span class="pop-tag" id="popTag">Word</span>
+  <p class="pop-head" id="popHead"></p>
+  <p class="pop-zh" id="popZh"></p>
+  <p class="pop-def" id="popDef"></p>
+</div>
+
+<script>
+/* =========================================================
+   1. GLOSSARY — shared across all chapters.
+   Keys are bare headwords, no leading articles.
+   t: word | phrase | grammar | culture
+   ========================================================= */
+const VOCAB = {
+  "platform": {t:"word", h:"platform", zh:"月台", d:"The raised walkway beside the track where you get on and off a train."},
+  "nowhere to be": {t:"phrase", h:"nowhere to be", zh:"無處可去、沒有行程", d:"No appointment, no obligation, nowhere she is expected. A rare and slightly frightening condition."},
+  "out of habit": {t:"phrase", h:"out of habit", zh:"習慣性地", d:"Doing something automatically, without deciding to. She checks her phone out of habit, not because she expects anything."},
+  "had needed": {t:"grammar", h:"had needed", zh:"（過去完成式）", d:"The story is told in the past. When it reaches back to something even earlier, it uses had + past participle. Nobody had needed anything — earlier than the moment on the platform."},
+  "one-way": {t:"word", h:"one-way ticket", zh:"單程票", d:"A ticket to go, with no ticket to come back. The opposite is a round-trip ticket."},
+  "landlord": {t:"word", h:"landlord", zh:"房東", d:"The person who owns a property and rents it out. A woman may be called a landlord or a landlady."},
+  "titled": {t:"word", h:"titled", zh:"命名為", d:"Gave it a title. As a verb this is slightly formal — and formality is exactly her problem with the note."},
+  "process broke": {t:"phrase", h:"when a process broke", zh:"流程出問題時", d:"In business English, a process is a fixed way of doing repeated work. When it breaks, it stops producing the right result."},
+  "throughput": {t:"word", h:"throughput", zh:"處理量", d:"How much work a system handles in a given time. A word from her old job, and she still thinks in it."},
+  "distribution center": {t:"word", h:"distribution center", zh:"物流中心", d:"A large warehouse where goods arrive, get sorted, and go out again."},
+  "call in sick": {t:"phrase", h:"call in sick", zh:"請病假", d:"To phone your workplace and say you are ill. Note: people call in sick whether or not they are actually sick."},
+  "fill in": {t:"phrase", h:"fill in", zh:"填寫", d:"To write information into a blank space. You fill in a form, a blank, a line."},
+  "to the water": {t:"phrase", h:"down to the water", zh:"往海邊走", d:"The water means the sea here. English often says the water rather than naming the ocean."},
+  "the sort of thing": {t:"phrase", h:"the sort of thing", zh:"（做）那類的事", d:"Left unfinished on purpose. She means the sort of thing a relaxed person does — and she cannot finish the sentence without sounding silly."},
+  "fishing off the rocks": {t:"phrase", h:"fishing off the rocks", zh:"在礁岩上釣魚", d:"Fishing while standing on rocks at the shore. Note off, not on: it marks where the line goes, not where the feet are."},
+  "lasted": {t:"word", h:"lasted", zh:"撐了（多久）", d:"Continued for a period of time. Often used, as here, for something difficult you are enduring."},
+  "would have": {t:"grammar", h:"would have", zh:"（過去）本來會", d:"would have + past participle describes something that did not happen. A month ago she would have answered eleven messages. She didn't, because that month is over."},
+  "yet": {t:"grammar", h:"Yet", zh:"然而", d:"Yet at the start of a sentence means but — and it is stronger. It marks a contradiction the speaker is choosing anyway. She knew it. Yet she left it there."},
+  "hum": {t:"word", h:"hum", zh:"嗡嗡作響", d:"A low, continuous sound. Machines hum. So do people, quietly, when they are content."},
+  "quarter to five": {t:"phrase", h:"a quarter to five", zh:"四點四十五分", d:"4:45. A quarter is fifteen minutes; to means before the hour. Compare a quarter past five, which is 5:15."},
+  "lay still": {t:"word", h:"lay still", zh:"一動也不動地躺著", d:"Stayed lying without moving. lie → lay → lain. Careful: lay is also its own verb meaning to put something down."},
+  "motor": {t:"word", h:"motor", zh:"馬達", d:"The part of a machine that makes it turn. Smaller and simpler than an engine."},
+  "turning verb": {t:"grammar", h:"was turning", zh:"正在轉動", d:"be + -ing for an action in progress. Something heavy was turning — happening at that moment, under the floor, while she lay awake."},
+  "turning noun": {t:"grammar", h:"the turning", zh:"那轉動聲", d:"The same -ing form used as a noun. Add the and the action becomes a thing you can point at: the turning, the running, the waiting. English does this constantly."},
+  "ten past five": {t:"phrase", h:"ten past five", zh:"五點十分", d:"5:10. past means after the hour. British and Taiwanese English use past; American English often says five ten."},
+  "suppliers": {t:"word", h:"suppliers", zh:"供應商", d:"Companies that provide goods to another company. Yi-han used to speak to them in a particular voice."},
+  "delivery window": {t:"phrase", h:"delivery window", zh:"配送時段", d:"The agreed period in which something must arrive. Missing one is a small professional disaster."},
+  "steam": {t:"word", h:"steam", zh:"蒸氣", d:"The white cloud that rises from very hot water. Not the same as smoke."},
+  "column": {t:"word", h:"column", zh:"柱狀", d:"A tall, narrow, upright shape. A column of steam rises straight before the wind catches it."},
+  "sideways": {t:"word", h:"sideways", zh:"橫向地", d:"To the side. Compare forward, backward, upward."},
+  "pinned back": {t:"phrase", h:"pinned back", zh:"（頭髮）別起來", d:"Held in place with hair pins. Practical, not decorative. You cannot cook with hair in your face."},
+  "grind": {t:"word", h:"grinder", zh:"研磨機", d:"A machine that crushes something into small pieces or paste. From the verb grind: to crush between two hard surfaces."},
+  "pale": {t:"word", h:"pale", zh:"淡色的", d:"Light in color, close to white. Dried soybeans are yellow; soaked ones turn pale and soft."},
+  "beans": {t:"word", h:"beans", zh:"豆子", d:"Here, soybeans. English uses bean for many unrelated seeds: green beans, coffee beans, soybeans."},
+  "soaked": {t:"word", h:"soaked", zh:"泡過水的", d:"Left in water for a long time. Soybeans must be soaked for hours before they can be ground."},
+  "scoop": {t:"word", h:"scoop", zh:"勺子", d:"A deep spoon for moving loose things — beans, rice, ice. Also a verb: to scoop."},
+  "stool": {t:"word", h:"stool", zh:"板凳", d:"A small seat with no back. Every breakfast shop in Taiwan has a stack of them."},
+  "skin": {t:"word", h:"skin (on soy milk)", zh:"豆皮", d:"The thin soft layer that forms on the surface of hot soy milk. Many people consider it the best part."},
+  "upright": {t:"word", h:"upright", zh:"直立的", d:"Standing straight up. A spoon that stands almost upright is a boast about how thick the soy milk is."},
+  "soy milk": {t:"word", h:"soy milk", zh:"豆漿", d:"American English writes soy milk. British English writes soya milk."},
+  "convenience stores": {t:"word", h:"convenience stores", zh:"便利商店", d:"Small shops open long hours. In Taiwan, everywhere. Note the plural spelling: store → stores."},
+  "paper cartons": {t:"word", h:"paper cartons", zh:"紙盒", d:"Stiff paper containers for drinks. A carton, not a box, when it holds liquid."},
+  "not a question": {t:"phrase", h:"It was not a question", zh:"那不是疑問句", d:"A sentence shaped like a question but meant as a statement or an order. English writers use this line to show authority in one stroke."},
+  "in the time it took": {t:"phrase", h:"in the time it took to", zh:"在……的時間內", d:"A way of measuring by comparison rather than by clock. She learned a life story in the time it took to fill a bowl."},
+  "in return": {t:"phrase", h:"in return", zh:"作為回報", d:"Back, in exchange. Hsiu-chin gives information and asks nothing in return — which Yi-han notices, because her old life did not work that way."},
+  "first move": {t:"phrase", h:"the first move", zh:"第一步、先手", d:"The opening action in a game or a negotiation. Calling a question a move tells you how she used to experience conversations."},
+  "doorframe": {t:"phrase", h:"against the doorframe", zh:"靠著門框", d:"A doorframe is the edge around a doorway. against means pressed onto something for support — she is leaning her weight on it. Compare: against the wall, against a tree. Not on, which would mean resting upon a surface."},
+  "auntie": {t:"culture", h:"Auntie", zh:"阿姨", d:"Used for any older woman, related or not. Warm and respectful. English has no real equivalent, so English writing about Taiwan usually keeps it."},
+  "soaking": {t:"grammar", h:"are soaking", zh:"正在泡水", d:"be + -ing for something happening right now. The beans are soaking — at this moment, while she sits on the ground with a broken wrist."},
+  "go sour": {t:"phrase", h:"go sour", zh:"變酸、壞掉", d:"To turn bad, of food. go + adjective is common: go bad, go cold, go quiet."},
+  "crouch": {t:"word", h:"crouched", zh:"蹲下", d:"Lowered herself close to the ground with knees bent, without sitting."},
+  "dramatically": {t:"word", h:"dramatically", zh:"誇張地", d:"In a big, obvious, theatrical way. The point here is that the injury is not obvious, which makes it worse."},
+  "picture frame": {t:"word", h:"picture frame", zh:"畫框", d:"The border around a picture on a wall. Chosen deliberately: everyone knows the feeling of one hanging slightly crooked."},
+  "hangs": {t:"word", h:"hangs", zh:"懸掛", d:"Is attached above and held by gravity. hang → hung for objects."},
+  "off level": {t:"phrase", h:"off level", zh:"沒擺正", d:"Not perfectly horizontal. off + noun means away from the correct state: off balance, off center, off course."},
+  "ambulance": {t:"word", h:"ambulance", zh:"救護車", d:"The emergency vehicle that takes people to hospital."},
+  "pity": {t:"word", h:"pity", zh:"憐憫", d:"Sadness for someone else's trouble. Here it is faintly insulting, and both of them know it."},
+  "under the circumstances": {t:"phrase", h:"under the circumstances", zh:"在這種情況下", d:"Given the situation. Note under, not in. Very common in careful, slightly formal English."},
+  "with what": {t:"grammar", h:"with what … was", zh:"帶著（某種）……", d:"A useful pattern: with what was clearly pity. Writers often push a phrase into the middle — with what, under the circumstances, was clearly pity — which delays the noun and adds dry humor."},
+  "truck running": {t:"grammar", h:"had the truck running", zh:"已經讓卡車發動著等在那裡", d:"have + object + -ing means you caused something to be in that state and are keeping it there. Not simply 車子發動了 — he started it and left it running, waiting. Compare: she had the water boiling, he had them all laughing."},
+  "folded towel": {t:"phrase", h:"folded towel", zh:"折好的毛巾", d:"A towel folded into a pad. Used here as a splint — and the fact that he does it without thinking says everything about him."},
+  "slippery": {t:"word", h:"slippery", zh:"滑的", d:"Smooth and wet, so that feet slide. The step was slippery. He had said so for two years."},
+  "switch": {t:"word", h:"switch", zh:"開關", d:"The small control that turns a machine on or off."},
+  "enormous": {t:"word", h:"enormous", zh:"巨大的", d:"Very large. Used here about silence, which is a common and effective move in English."},
+  "emergency room": {t:"word", h:"emergency room", zh:"急診室", d:"The hospital department for urgent cases, also simply called the ER — which is what most Americans and many Taiwanese say. British English says A&E."},
+  "half past five": {t:"phrase", h:"half past five", zh:"五點半", d:"5:30. Note: half past the hour, never half to."},
+  "forearm": {t:"word", h:"forearm", zh:"前臂", d:"The part of the arm between the elbow and the wrist."},
+  "catch herself": {t:"phrase", h:"put your hand out", zh:"用手撐住", d:"To stop yourself falling by pushing a hand toward the ground. It is a reflex, and it is how wrists get broken."},
+  "as breaks go": {t:"phrase", h:"as breaks go", zh:"就骨折而言", d:"Compared with others of the same kind. As breaks go, it is a good one — which is not the same as being good."},
+  "cast": {t:"word", h:"cast", zh:"石膏", d:"A hard covering that holds a broken bone still while it heals. Note the other meanings of cast — this is a different one."},
+  "sore": {t:"word", h:"sore", zh:"疼痛的", d:"Painful in a dull, lasting way. Weaker than agonizing, stronger than uncomfortable."},
+  "heals": {t:"word", h:"heals", zh:"癒合", d:"Becomes whole again by itself. Bones heal; wounds heal; people heal."},
+  "flatly": {t:"word", h:"flatly", zh:"平板地", d:"With no feeling in the voice. Often a sign of a great deal of feeling."},
+  "by the curtain": {t:"phrase", h:"by the curtain", zh:"在簾子旁", d:"by means beside, right next to. In a hospital, the curtain is the only wall a patient gets."},
+  "over her shoulder": {t:"phrase", h:"over her shoulder", zh:"（背帶）掛在肩上", d:"The strap crosses the shoulder and the bag hangs down. over describes the path of the strap and implies carrying."},
+  "arithmetic": {t:"word", h:"arithmetic", zh:"心算、算計", d:"Simple calculation. Here: working out what six weeks of closing will cost her."},
+  "corridor": {t:"word", h:"corridor", zh:"走廊", d:"A long passage inside a building. American English often says hallway."},
+  "picking up": {t:"phrase", h:"picking up", zh:"接電話", d:"Answering the phone. He's not picking up means the phone rings and rings."},
+  "shrugged": {t:"word", h:"shrugged", zh:"聳了聳肩", d:"Lifted the shoulders once. It means I don't know, or it can't be helped."},
+  "isn't it": {t:"grammar", h:"isn't it", zh:"是吧（附加問句）", d:"A tag question added to a statement. It invites agreement rather than information. That's the whole problem, isn't it."},
+  "on her shoulder": {t:"phrase", h:"on her shoulder", zh:"擱在肩上", d:"Compare over her shoulder earlier. over follows the strap and implies carrying; on simply reports where the bag is resting — which is the point, because she has stopped noticing she is holding it."},
+  "asked for it back": {t:"phrase", h:"asked for it back", zh:"要回去", d:"ask for + object + back means to request the return of something you lent or handed over."},
+  "aware": {t:"word", h:"aware", zh:"意識到", d:"Knowing that something is happening. Note: she is aware she is about to speak — she is not deciding to."},
+  "sneeze": {t:"word", h:"sneeze", zh:"打噴嚏", d:"The sudden loud breath your nose forces out. You feel one coming and cannot stop it, which is the whole comparison."}
+};
+
+/* =========================================================
+   2. CHAPTERS
+   Add new chapters by appending to this array.
+   month: groups them in the contents drawer
+   html:  chapter body. Mark glossary terms as
+          <span class="g" data-k="hum">hum</span>
+   Omit html (or leave it empty) and the chapter shows in the
+   contents as not yet written.
+   ========================================================= */
+const CHAPTERS = [
+{
+  n:1, month:"March", title:"Two Weeks, No Plan",
+  html:`
+<p><span class="dropcap">T</span>he train doors opened and the air came in warm and salty, and Yi-han stood on the <span class="g" data-k="platform">platform</span> at Taitung for a moment without moving, because she <span class="g" data-k="nowhere to be">had nowhere to be</span>.</p>
+
+<p>It was a strange feeling. She checked her phone <span class="g" data-k="out of habit">out of habit</span>. Nothing. Nobody <span class="g" data-k="had needed">had needed</span> anything from her since Friday.</p>
+
+<p>She had told her mother two weeks. She had told Pei-chun two weeks. She had bought a <span class="g" data-k="one-way">one-way ticket</span> and told nobody that part.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>The room was on the second floor above a breakfast shop, and it cost less than her parking space in Taipei. Clean floor. One window. Good light in the late afternoon, the <span class="g" data-k="landlord">landlord</span> said, and he was right.</p>
+
+<p>She put her bag down and sat on the bed and opened a new note on her phone.</p>
+
+<p>She <span class="g" data-k="titled">titled</span> it <em>Things I Like Doing</em>.</p>
+
+<p>Then she looked at it.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>Nine years at the same company. Two of them as the person you went to <span class="g" data-k="process broke">when a process broke</span>. She could tell you the <span class="g" data-k="throughput">throughput</span> of a <span class="g" data-k="distribution center">distribution center</span> in Taoyuan on a Wednesday in typhoon season. She could tell you which of four hundred drivers would <span class="g" data-k="call in sick">call in sick</span> on the first cold morning of the year.</p>
+
+<p>She could not <span class="g" data-k="fill in">fill in</span> one line under <em>Things I Like Doing</em>.</p>
+
+<p>She wrote <em>reading</em>. Then she thought about the last book she had finished, and when, and deleted it.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>She walked down <span class="g" data-k="to the water">to the water</span> before dinner because it was there, and because walking seemed like <span class="g" data-k="the sort of thing">the sort of thing</span>.</p>
+
+<p>The beach was gray stones, not sand. The waves came in heavy and loud and did not look friendly. Two men were <span class="g" data-k="fishing off the rocks">fishing off the rocks</span> and neither of them spoke.</p>
+
+<p>She sat down. It was uncomfortable immediately.</p>
+
+<p>She <span class="g" data-k="lasted">lasted</span> what felt like a long time, and then checked her phone. Sixteen minutes.</p>
+
+<p>A month ago she <span class="g" data-k="would have">would have</span> answered eleven messages in sixteen minutes.</p>
+
+<p>She wrote the number down under <em>Things I Like Doing</em>, which was not what the list was for, and she knew it. <span class="g" data-k="yet">Yet</span> she left it there anyway.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>She ate at a place near the station because the woman outside looked at her and said the beef noodles were good, and they were.</p>
+
+<p>Walking back, full and slow, she found she could not remember what she had been worried about on the train.</p>
+
+<p>That was the good part.</p>
+
+<p>The bad part came at <span class="g" data-k="quarter to five">a quarter to five</span> the next morning, when the floor started to <span class="g" data-k="hum">hum</span>.</p>
+`
+},
+{
+  n:2, month:"March", title:"The Room Is Cheap for a Reason",
+  html:`
+<p><span class="dropcap">A</span>t <span class="g" data-k="quarter to five">a quarter to five</span> the floor began to <span class="g" data-k="hum">hum</span>, and Yi-han woke with her heart going hard, the way it used to when her phone rang before six.</p>
+
+<p>She <span class="g" data-k="lay still">lay still</span> and listened.</p>
+
+<p>It was a <span class="g" data-k="motor">motor</span>. Below her, something heavy was <span class="g" data-k="turning verb">turning</span>, and under the <span class="g" data-k="turning noun">turning</span> there was water running, and under the water there was a woman's voice saying something short to nobody.</p>
+
+<p>She looked at the ceiling for twenty-five minutes.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>At <span class="g" data-k="ten past five">ten past five</span> she went downstairs to complain.</p>
+
+<p>She had the sentence ready. She had run it twice in her head, polite and firm, the tone she used on <span class="g" data-k="suppliers">suppliers</span> who missed a <span class="g" data-k="delivery window">delivery window</span>.</p>
+
+<p>The shop was open to the street. <span class="g" data-k="steam">Steam</span> came out of it in a <span class="g" data-k="column">column</span> and went <span class="g" data-k="sideways">sideways</span> in the wind. Inside, an old woman with white hair <span class="g" data-k="pinned back">pinned back</span> stood at a stone <span class="g" data-k="grind">grinder</span> the size of a washing machine, feeding <span class="g" data-k="pale">pale</span> <span class="g" data-k="soaked">soaked</span> <span class="g" data-k="beans">beans</span> into the top with a plastic <span class="g" data-k="scoop">scoop</span>.</p>
+
+<p>She looked up. She looked at Yi-han's face, and at her hair, and at the fact that she was wearing yesterday's shirt.</p>
+
+<p>Then she pointed at a <span class="g" data-k="stool">stool</span>.</p>
+
+<p>&ldquo;Sit.&rdquo;</p>
+
+<p>&ldquo;I actually came down to&mdash;&rdquo;</p>
+
+<p>&ldquo;Sit, sit.&rdquo;</p>
+
+<p>Yi-han sat.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>The bowl came in front of her before she could try the sentence again. <span class="g" data-k="soy milk">Soy milk</span>, hot, with a <span class="g" data-k="skin">skin</span> forming on top, and a spoon standing almost <span class="g" data-k="upright">upright</span> in it.</p>
+
+<p>She had drunk <span class="g" data-k="soy milk">soy milk</span> her entire life. She had bought it from <span class="g" data-k="convenience stores">convenience stores</span> in <span class="g" data-k="paper cartons">paper cartons</span> for twenty-five dollars, cold, on the way to the MRT.</p>
+
+<p>This was not that.</p>
+
+<p>She put the spoon down and sat with the bowl in both hands.</p>
+
+<p>&ldquo;Upstairs,&rdquo; the old woman said. <span class="g" data-k="not a question">It was not a question.</span></p>
+
+<p>&ldquo;Yes.&rdquo;</p>
+
+<p>&ldquo;The machine wakes you.&rdquo;</p>
+
+<p>&ldquo;&hellip;Yes.&rdquo;</p>
+
+<p>&ldquo;Mm.&rdquo; She went back to the <span class="g" data-k="grind">grinder</span>. &ldquo;Everybody. First week.&rdquo;</p>
+
+<p>She said it the way you would say <em>it rains in June</em>. A fact about the world, not a problem in it.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>Her name was Hsiu-chin, and she had opened this shop at five in the morning for nineteen years without closing once, and she gave Yi-han this information <span class="g" data-k="in the time it took">in the time it took</span> to fill a second bowl, without stopping work, and without asking a single question <span class="g" data-k="in return">in return</span>.</p>
+
+<p>Yi-han noticed that. She had spent nine years in rooms where <span class="g" data-k="first move">the first move</span> was always a question.</p>
+
+<p>She drank the second bowl too.</p>
+
+<p>Then she went back upstairs, and slept until eleven, and woke with no idea what to do with the day.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>She came down at <span class="g" data-k="ten past five">ten past five</span> the next morning as well.</p>
+
+<p>She told herself it was because she was awake anyway.</p>
+
+<p>On the third morning she was reaching for the door at five when she heard it &mdash; a sound from the step outside the shop, wet and short and heavy, like a dropped bag of rice.</p>
+
+<p>And then, from the shop below her, nothing at all.</p>
+`
+},
+{
+  n:3, month:"March", title:"The Wet Step",
+  html:`
+<p><span class="dropcap">H</span>siu-chin was sitting on the ground with her back against the <span class="g" data-k="doorframe">doorframe</span> and her right hand held in her left, and she was not making any sound at all, which frightened Yi-han more than screaming would have.</p>
+
+<p>&ldquo;Don't move. Don't move.&rdquo;</p>
+
+<p>&ldquo;The <span class="g" data-k="beans">beans</span> <span class="g" data-k="soaking">are soaking</span>.&rdquo;</p>
+
+<p>&ldquo;<span class="g" data-k="auntie">Auntie</span>&mdash;&rdquo;</p>
+
+<p>&ldquo;Six hours already. If they sit they <span class="g" data-k="go sour">go sour</span>.&rdquo;</p>
+
+<p>Yi-han <span class="g" data-k="crouch">crouched</span> down. The wrist was wrong. Not <span class="g" data-k="dramatically">dramatically</span>, not the way it looks in films, just wrong the way a <span class="g" data-k="picture frame">picture frame</span> is wrong when it <span class="g" data-k="hangs">hangs</span> four degrees <span class="g" data-k="off level">off level</span>, and once you see it you cannot see anything else.</p>
+
+<p>&ldquo;I'm calling an <span class="g" data-k="ambulance">ambulance</span>.&rdquo;</p>
+
+<p>&ldquo;It's twenty minutes to the hospital. Call A-liang, he has the truck.&rdquo;</p>
+
+<p>&ldquo;I don't know who A-liang is.&rdquo;</p>
+
+<p>Hsiu-chin looked at her <span class="g" data-k="with what">with what</span>, <span class="g" data-k="under the circumstances">under the circumstances</span>, was clearly <span class="g" data-k="pity">pity</span>.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>A-liang was two doors down and <span class="g" data-k="truck running">had the truck running</span> in four minutes and did not ask a single question about who Yi-han was or why she was there, which she was beginning to understand was normal here.</p>
+
+<p>He put a <span class="g" data-k="folded towel">folded towel</span> under the arm before they moved her. He had obviously done it before.</p>
+
+<p>&ldquo;<span class="g" data-k="slippery">Slippery</span>,&rdquo; he said, to nobody. &ldquo;I told her. Two years I told her.&rdquo;</p>
+
+<p>Behind them the <span class="g" data-k="grind">grinder</span> was still running. Yi-han went back and stood in front of it and looked at the <span class="g" data-k="switch">switch</span> for a moment, and then turned it off, and the sudden silence was <span class="g" data-k="enormous">enormous</span>.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>The <span class="g" data-k="emergency room">emergency room</span> at <span class="g" data-k="half past five">half past five</span> in the morning was almost empty. A young doctor took the X-ray and came back and put it on the screen and said a word Yi-han didn't know, in English, and then said it again in Chinese.</p>
+
+<p>A break at the end of the <span class="g" data-k="forearm">forearm</span>, just above the wrist. Very common. The classic one you get when you fall forward and <span class="g" data-k="catch herself">put your hand out</span> to stop yourself.</p>
+
+<p>&ldquo;Good news,&rdquo; he said, &ldquo;<span class="g" data-k="as breaks go">as breaks go</span>. Six weeks in a <span class="g" data-k="cast">cast</span>. It'll be <span class="g" data-k="sore">sore</span>, but it <span class="g" data-k="heals">heals</span>.&rdquo;</p>
+
+<p>Hsiu-chin, on the bed, said: &ldquo;Six weeks.&rdquo;</p>
+
+<p>&ldquo;About that.&rdquo;</p>
+
+<p>&ldquo;Six weeks.&rdquo; She said it again, <span class="g" data-k="flatly">flatly</span>, and Yi-han, standing <span class="g" data-k="by the curtain">by the curtain</span> with someone else's handbag <span class="g" data-k="over her shoulder">over her shoulder</span>, watched her do the <span class="g" data-k="arithmetic">arithmetic</span>.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>In the <span class="g" data-k="corridor">corridor</span> afterward, A-liang made two calls and came back shaking his head.</p>
+
+<p>&ldquo;The grandson's in Taipei. He's not <span class="g" data-k="picking up">picking up</span>.&rdquo;</p>
+
+<p>&ldquo;There's nobody else?&rdquo;</p>
+
+<p>&ldquo;The daughter's in Kaohsiung. Two kids.&rdquo; He <span class="g" data-k="shrugged">shrugged</span>. &ldquo;And she doesn't know the shop. Nobody knows the shop. That's the whole problem, <span class="g" data-k="isn't it">isn't it</span>.&rdquo;</p>
+
+<p>Through the curtain Yi-han could hear Hsiu-chin telling the nurse, very clearly, that she would need to be finished by four thirty tomorrow.</p>
+
+<p>Nineteen years without closing once.</p>
+
+<p>Yi-han looked at the handbag <span class="g" data-k="on her shoulder">on her shoulder</span>, which she was still holding because nobody <span class="g" data-k="asked for it back">had asked for it back</span>, and thought about the sixteen minutes on the beach, and the note on her phone that still had nothing on it.</p>
+
+<p>She was <span class="g" data-k="aware">aware</span> that she was about to say something, the way you know a <span class="g" data-k="sneeze">sneeze</span> is coming.</p>
+`
+},
+{n:4,  month:"March", title:"Six Weeks in a Cast"},
+{n:5,  month:"March", title:"Somebody Has to Open at Five"},
+{n:6,  month:"March", title:"Eleven Steps, Four of Them Mentioned"},
+{n:7,  month:"March", title:"Sold Out by Seven"},
+{n:8,  month:"March", title:"Nobody Told Her About the Foam"},
+{n:9,  month:"March", title:"The Man by the Window"},
+{n:10, month:"March", title:"Relaxation, Attempt One"},
+{n:11, month:"March", title:"A Cat Has Decided Something"},
+{n:12, month:"March", title:"He Burns the Eggs"},
+{n:13, month:"March", title:"A-kai Is Not Embarrassed"},
+{n:14, month:"March", title:"Forty Years of Not Speaking"},
+{n:15, month:"March", title:"Fifteen Minutes at a Fruit Stand"},
+{n:16, month:"March", title:"Her Mother Calls"},
+{n:17, month:"March", title:"Two Doors Down"},
+{n:18, month:"March", title:"Everyone Here Surfs"}
+];
+
+/* =========================================================
+   3. STORAGE — localStorage on a real host, memory fallback
+      so the file still works when opened from a preview,
+      a file:// URL, or private browsing.
+   ========================================================= */
+const KEY = "inkquest.leisure.v1";
+const mem = {};
+const store = {
+  get(k){
+    try{ const v = localStorage.getItem(KEY+"."+k); return v===null ? (k in mem ? mem[k] : null) : v; }
+    catch(e){ return (k in mem) ? mem[k] : null; }
+  },
+  set(k,v){
+    mem[k]=String(v);
+    try{ localStorage.setItem(KEY+"."+k,String(v)); }catch(e){}
+  },
+  del(k){
+    delete mem[k];
+    try{ localStorage.removeItem(KEY+"."+k); }catch(e){}
+  }
+};
+
+/* =========================================================
+   4. READER
+   ========================================================= */
+const el = id => document.getElementById(id);
+const written = CHAPTERS.filter(c => c.html && c.html.trim());
+let cur = 0;
+
+function strip(html){
+  return html.replace(/<[^>]+>/g," ").replace(/&[a-z]+;/gi," ").replace(/\s+/g," ").trim();
+}
+
+function render(i, opts){
+  opts = opts || {};
+  const c = CHAPTERS[i];
+  if(!c || !c.html) return;
+  cur = i;
+
+  el("chNo").textContent = "Chapter " + c.n + " \u00b7 " + c.month;
+  el("chTitle").textContent = c.title;
+  el("body").innerHTML = c.html;
+  el("barTitle").innerHTML = "<b>" + c.n + ".</b> " + c.title;
+
+  wireGlossary();
+  updateNav();
+  markToc();
+
+  store.set("last", c.n);
+
+  if(opts.term){ highlight(opts.term, opts.occ || 0); }
+  if(!opts.keepScroll && !opts.term){ window.scrollTo(0,0); }
+}
+
+function updateNav(){
+  const prev = written.findIndex(c => c.n === CHAPTERS[cur].n) - 1;
+  const idx  = written.findIndex(c => c.n === CHAPTERS[cur].n);
+  el("prevBtn").disabled = idx <= 0;
+  el("nextBtn").disabled = idx >= written.length - 1;
+  el("progress").textContent = (idx+1) + " / " + written.length;
+}
+
+function step(d){
+  const idx = written.findIndex(c => c.n === CHAPTERS[cur].n) + d;
+  if(idx < 0 || idx >= written.length) return;
+  const target = CHAPTERS.findIndex(c => c.n === written[idx].n);
+  render(target);
+}
+
+el("prevBtn").onclick = () => step(-1);
+el("nextBtn").onclick = () => step(1);
+document.addEventListener("keydown", e => {
+  if(e.target.tagName === "INPUT") return;
+  if(e.key === "ArrowLeft") step(-1);
+  if(e.key === "ArrowRight") step(1);
+  if(e.key === "Escape"){ closeDrawer(); closeNote(); }
+});
+
+/* ---------- glossary popover ---------- */
+const pop = el("pop");
+const LABEL = {word:"Word", phrase:"Phrase", grammar:"Grammar", culture:"Culture"};
+
+function openNote(k){
+  const v = VOCAB[k];
+  if(!v){ console.warn("No glossary entry:", k); return; }
+  el("popTag").textContent = LABEL[v.t] || "Word";
+  el("popTag").className = "pop-tag " + v.t;
+  el("popHead").textContent = v.h;
+  el("popZh").textContent = v.zh;
+  el("popDef").textContent = v.d;
+  pop.classList.add("on");
+  pop.setAttribute("aria-hidden","false");
+}
+function closeNote(){
+  pop.classList.remove("on");
+  pop.setAttribute("aria-hidden","true");
+}
+el("popClose").onclick = closeNote;
+document.addEventListener("click", e => {
+  if(!pop.contains(e.target) && !e.target.closest(".g")) closeNote();
+});
+
+function wireGlossary(){
+  el("body").querySelectorAll(".g").forEach(s => {
+    s.setAttribute("role","button");
+    s.setAttribute("tabindex","0");
+    const k = s.dataset.k;
+    s.onclick = e => { e.stopPropagation(); openNote(k); };
+    s.onkeydown = e => {
+      if(e.key === "Enter" || e.key === " "){ e.preventDefault(); openNote(k); }
+    };
+  });
+}
+
+/* ---------- drawer ---------- */
+function openDrawer(pane){
+  el("drawer").classList.add("on");
+  el("scrim").classList.add("on");
+  if(pane) switchPane(pane);
+}
+function closeDrawer(){
+  el("drawer").classList.remove("on");
+  el("scrim").classList.remove("on");
+}
+el("menuBtn").onclick = () => openDrawer("toc");
+el("searchBtn").onclick = () => { openDrawer("search"); setTimeout(()=>el("q").focus(),250); };
+el("scrim").onclick = closeDrawer;
+
+function switchPane(name){
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.dataset.pane === name));
+  document.querySelectorAll(".pane").forEach(p => p.classList.toggle("on", p.id === "pane-"+name));
+}
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => switchPane(t.dataset.pane));
+
+/* ---------- contents ---------- */
+function buildToc(){
+  let html = "", month = "";
+  CHAPTERS.forEach((c,i) => {
+    if(c.month !== month){
+      month = c.month;
+      html += '<div class="month">' + month + '</div>';
+    }
+    const done = c.html && c.html.trim();
+    html += '<button class="tocitem' + (done ? '' : ' todo') + '" data-i="' + i + '"' +
+            (done ? '' : ' disabled') + '><em>' + c.n + '</em>' + c.title + '</button>';
+  });
+  el("pane-toc").innerHTML = html;
+  el("pane-toc").querySelectorAll(".tocitem:not(.todo)").forEach(b => {
+    b.onclick = () => { render(+b.dataset.i); closeDrawer(); };
+  });
+}
+function markToc(){
+  el("pane-toc").querySelectorAll(".tocitem").forEach(b => {
+    b.classList.toggle("cur", +b.dataset.i === cur);
+  });
+}
+
+/* ---------- search ---------- */
+const INDEX = CHAPTERS.map((c,i) => ({i:i, n:c.n, title:c.title, text: c.html ? strip(c.html) : ""}));
+
+function esc(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"); }
+
+function search(term){
+  const box = el("hits");
+  const note = el("qnote");
+  if(term.length < 2){
+    box.innerHTML = "";
+    note.textContent = "Type at least two letters.";
+    return;
+  }
+
+  const CAP = 80;
+  let out = "", count = 0, capped = false;
+
+  INDEX.forEach(rec => {
+    if(capped) return;
+    const re = new RegExp(esc(term), "gi");
+    let m, occ = 0;
+
+    /* every occurrence gets its own result row, so a word that appears
+       twice in one chapter can be reached at either place */
+    while((m = re.exec(rec.text)) !== null){
+      if(m[0].length === 0){ re.lastIndex++; continue; }
+      const a = Math.max(0, m.index - 45);
+      const b = Math.min(rec.text.length, m.index + m[0].length + 65);
+      let snip = (a > 0 ? "\u2026" : "") + rec.text.slice(a, b) + (b < rec.text.length ? "\u2026" : "");
+      snip = snip.replace(new RegExp(esc(term), "gi"), x => "<b>" + x + "</b>");
+
+      out += '<button class="hitrow" data-i="' + rec.i + '" data-occ="' + occ + '" data-t="' +
+             term.replace(/"/g, "&quot;") + '">' +
+             '<span class="hr-ch">Chapter ' + rec.n + " \u00b7 " + rec.title + '</span>' +
+             '<span class="hr-sn">' + snip + '</span></button>';
+
+      occ++; count++;
+      if(count >= CAP){ capped = true; break; }
+    }
+
+    /* a chapter whose title matches but whose text doesn't */
+    if(!capped && occ === 0 && new RegExp(esc(term), "i").test(rec.title)){
+      out += '<button class="hitrow" data-i="' + rec.i + '" data-occ="0" data-t="' +
+             term.replace(/"/g, "&quot;") + '">' +
+             '<span class="hr-ch">Chapter ' + rec.n + " \u00b7 " + rec.title + '</span>' +
+             '<span class="hr-sn"><i>Match in the chapter title.</i></span></button>';
+      count++;
+    }
+  });
+
+  note.textContent = count
+    ? (count + (count === 1 ? " result" : " results") + (capped ? " (showing the first " + CAP + ")" : ""))
+    : "Nothing found.";
+  box.innerHTML = out;
+  box.querySelectorAll(".hitrow").forEach(b => {
+    b.onclick = () => {
+      render(+b.dataset.i, {term: b.dataset.t, occ: +b.dataset.occ});
+      closeDrawer();
+    };
+  });
+}
+
+let qt;
+el("q").addEventListener("input", e => {
+  clearTimeout(qt);
+  const v = e.target.value.trim();
+  qt = setTimeout(() => search(v), 160);
+});
+
+function highlight(term, occ){
+  const re = new RegExp(esc(term), "gi");
+  const walk = document.createTreeWalker(el("body"), NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while(walk.nextNode()) nodes.push(walk.currentNode);
+
+  const marks = [];
+  nodes.forEach(node => {
+    if(node.parentNode.nodeName === "MARK") return;
+    const val = node.nodeValue;
+    re.lastIndex = 0;
+    if(!re.test(val)) return;
+    re.lastIndex = 0;
+
+    /* built as DOM nodes, not innerHTML, so an & or < in the prose
+       can never be re-parsed. Glossed spans keep their click handlers
+       because only their text child is replaced, not the span itself. */
+    const frag = document.createDocumentFragment();
+    let last = 0, m;
+    while((m = re.exec(val)) !== null){
+      if(m[0].length === 0){ re.lastIndex++; continue; }
+      if(m.index > last) frag.appendChild(document.createTextNode(val.slice(last, m.index)));
+      const mk = document.createElement("mark");
+      mk.className = "hit";
+      mk.textContent = m[0];
+      frag.appendChild(mk);
+      marks.push(mk);
+      last = m.index + m[0].length;
+    }
+    if(last < val.length) frag.appendChild(document.createTextNode(val.slice(last)));
+    node.parentNode.replaceChild(frag, node);
+  });
+
+  const target = marks[occ || 0] || marks[0];
+  if(target){
+    target.classList.add("target");
+    setTimeout(() => target.scrollIntoView({block:"center", behavior:"smooth"}), 70);
+  }
+}
+
+/* ---------- word list ----------
+   Each entry expands in place to show the meaning and every paragraph
+   in the story where the word appears, with the word highlighted.
+   Nothing navigates, so the reader never loses their place.            */
+
+/* For each key: [{n: chapter number, html: paragraph with the term marked}] */
+function buildContextIndex(){
+  const idx = {};
+  CHAPTERS.forEach(c => {
+    if(!c.html || !c.html.trim()) return;
+    const tmp = document.createElement("div");
+    tmp.innerHTML = c.html;
+    tmp.querySelectorAll("p").forEach(para => {
+      const keys = new Set();
+      para.querySelectorAll(".g").forEach(sp => keys.add(sp.dataset.k));
+      keys.forEach(k => {
+        const clone = para.cloneNode(true);
+        /* the target term becomes a highlight; other glossed terms become plain text */
+        clone.querySelectorAll(".g").forEach(sp => {
+          if(sp.dataset.k === k){
+            const m = document.createElement("mark");
+            m.textContent = sp.textContent;
+            sp.parentNode.replaceChild(m, sp);
+          } else {
+            sp.parentNode.replaceChild(document.createTextNode(sp.textContent), sp);
+          }
+        });
+        /* drop caps float, which looks wrong inside a small panel */
+        clone.querySelectorAll(".dropcap").forEach(d => d.classList.remove("dropcap"));
+        (idx[k] = idx[k] || []).push({n: c.n, html: clone.innerHTML});
+      });
+    });
+  });
+  return idx;
+}
+
+let CTX = {};
+
+function buildGloss(){
+  CTX = buildContextIndex();
+  const keys = Object.keys(VOCAB).sort((a,b) =>
+    VOCAB[a].h.toLowerCase().localeCompare(VOCAB[b].h.toLowerCase()));
+
+  el("glossList").innerHTML = keys.map(k => {
+    const v = VOCAB[k];
+    const hits = CTX[k] || [];
+    let panel = '<p class="gx-def">' + v.d + '</p>';
+    let lastCh = null;
+    hits.forEach(h => {
+      if(h.n !== lastCh){
+        panel += '<p class="gx-ch">Chapter ' + h.n + '</p>';
+        lastCh = h.n;
+      }
+      panel += '<p class="gx-p">' + h.html + '</p>';
+    });
+    if(!hits.length){
+      panel += '<p class="gx-p"><em>Not yet used in a written chapter.</em></p>';
+    }
+    return '<button class="glossrow" data-k="' + k + '">' +
+             '<span class="gr-h">' + v.h + '</span>' +
+             '<span class="gr-z">' + v.zh + '</span>' +
+             '<span class="gr-arrow">&#9654;</span>' +
+           '</button>' +
+           '<div class="gx" data-for="' + k + '">' + panel + '</div>';
+  }).join("");
+
+  el("glossList").querySelectorAll(".glossrow").forEach(row => {
+    row.onclick = () => {
+      const panel = row.nextElementSibling;
+      const wasOpen = panel.classList.contains("on");
+      /* one open at a time keeps the drawer readable */
+      el("glossList").querySelectorAll(".gx.on").forEach(x => x.classList.remove("on"));
+      el("glossList").querySelectorAll(".glossrow.open").forEach(x => x.classList.remove("open"));
+      if(!wasOpen){
+        panel.classList.add("on");
+        row.classList.add("open");
+        setTimeout(() => row.scrollIntoView({block:"nearest", behavior:"smooth"}), 40);
+      }
+    };
+  });
+}
+
+/* ---------- settings ---------- */
+function applySize(px){
+  document.documentElement.style.setProperty("--fs", px + "px");
+  store.set("size", px);
+  document.querySelectorAll("#sizes button").forEach(b =>
+    b.classList.toggle("on", b.dataset.size === String(px)));
+}
+document.querySelectorAll("#sizes button").forEach(b =>
+  b.onclick = () => applySize(+b.dataset.size));
+
+el("clearBtn").onclick = () => {
+  store.del("last");
+  el("clearBtn").textContent = "Cleared";
+  setTimeout(()=>el("clearBtn").textContent = "Forget where I stopped", 1600);
+};
+
+/* ---------- resume ---------- */
+function offerResume(){
+  const last = parseInt(store.get("last") || "0", 10);
+  if(!last || last === CHAPTERS[0].n) return;
+  const c = CHAPTERS.find(x => x.n === last && x.html);
+  if(!c) return;
+  el("resumeTxt").textContent = "You stopped at Chapter " + c.n + ", \u201c" + c.title + ".\u201d";
+  el("resume").classList.add("on");
+  el("resumeGo").onclick = () => {
+    render(CHAPTERS.indexOf(c));
+    el("resume").classList.remove("on");
+  };
+  el("resumeNo").onclick = () => el("resume").classList.remove("on");
+  setTimeout(()=>el("resume").classList.remove("on"), 12000);
+}
+
+/* ---------- boot ---------- */
+buildToc();
+buildGloss();
+applySize(parseInt(store.get("size") || "19", 10));
+render(0);
+offerResume();
+</script>
+</body>
+</html>

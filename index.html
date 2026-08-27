@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark">
 <title>InkQuest — Every quest begins with a story</title>
-<meta name="description" content="Interactive gamebooks for English learners. Branching stories you play in the browser, graded to CEFR levels.">
+<meta name="description" content="Serial stories and interactive gamebooks for English learners. Read in the browser, graded to CEFR levels, with a tap-for-help glossary.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -20,6 +20,7 @@
     --lantern: #c25b3c;      /* Night Train accent */
     --coffee: #c87d2a;       /* Lost Phone accent */
     --pixel: #7ec850;        /* Achievement Unlocked accent */
+    --clay: #d4784f;         /* The Leisure Project accent */
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -190,19 +191,38 @@
     </svg>
     <p class="tagline">Every quest begins with a story.</p>
     <p class="intro">
-      Interactive gamebooks for English learners. Pick a story, make your
-      choices, and see where they lead. Tap a word for help — or switch the
-      tips off and just enjoy the ride.
+      Serial stories and interactive gamebooks for English learners.
+      In the gamebooks, you decide what happens next. In the serials,
+      you come back to find out. Tap any word for help.
     </p>
   </header>
 
-  <p class="shelf-label">Choose your story</p>
+  <p class="shelf-label">Serial stories</p>
+
+  <ul class="stories">
+
+    <li>
+      <a class="card" href="leisure-project.html" style="--accent: var(--clay);">
+        <p class="eyebrow">Slow Life · Taitung</p>
+        <h2>The Leisure Project</h2>
+        <p>Two weeks in Taitung, no plan, no return ticket. Then the auntie
+        downstairs slips on a wet step, and somebody has to open the shop at five.</p>
+        <div class="card-foot">
+          <span class="level">B1–B2</span>
+          <span class="start">Start reading</span>
+        </div>
+      </a>
+    </li>
+
+  </ul>
+
+  <p class="shelf-label">Interactive gamebooks</p>
 
   <ul class="stories">
 
     <li>
       <a class="card" href="achievement-unlocked.html" style="--accent: var(--pixel);">
-        <p class="eyebrow">New · EP1–EP10 Available</p>
+        <p class="eyebrow">Progression Fantasy · Kaohsiung</p>
         <h2>Achievement Unlocked</h2>
         <p>You wake up. Words float in the air: <em>Welcome, Player.</em>
         Your life is a game now — and every choice scores points.</p>
@@ -215,7 +235,7 @@
 
     <li>
       <a class="card" href="keep-out.html" style="--accent: #67d9a6;">
-        <p class="eyebrow">New · EP1-EP10 Available</p>
+        <p class="eyebrow">Progression Fantasy · Taipei</p>
         <h2>Keep Out</h2>
         <p>Three hundred years of training. Nine bolts of heaven's lightning.
         And now you're standing in a back lane in Taipei looking at a sign that says <em>Cheap Room.</em></p>
