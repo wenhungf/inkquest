@@ -933,7 +933,10 @@ function render(i, opts){
   updateNav();
   markToc();
 
-  store.set("last", c.n);
+  /* opts.silent: draw the chapter without recording it as the reading
+     position. Used at boot, where we only need the DOM populated behind
+     the title page and must not overwrite where the reader stopped. */
+  if(!opts.silent){ store.set("last", c.n); }
 
   if(opts.term){ highlight(opts.term, opts.occ || 0); }
   if(!opts.keepScroll && !opts.term){ window.scrollTo(0,0); }
@@ -1252,6 +1255,7 @@ el("clearBtn").onclick = () => {
 
 /* ---------- title page ---------- */
 function showCover(){
+  refreshCover();
   document.body.classList.add("cover");
   el("cover").classList.remove("fading");
   window.scrollTo(0,0);
@@ -1266,7 +1270,7 @@ function leaveCover(){
   }, 280);
 }
 
-function setupCover(){
+function refreshCover(){
   const last = parseInt(store.get("last") || "0", 10);
   const saved = CHAPTERS.find(c => c.n === last && c.html && c.html.trim());
 
@@ -1277,15 +1281,14 @@ function setupCover(){
     el("coverGo").textContent = "Begin reading";
     el("coverGo").onclick = () => { render(0); leaveCover(); };
   }
-  showCover();
 }
 
 /* ---------- boot ---------- */
 buildToc();
 buildGloss();
 applySize(parseInt(store.get("size") || "19", 10));
-render(0);
-setupCover();
+render(0, {silent:true});
+showCover();
 </script>
 </body>
 </html>
