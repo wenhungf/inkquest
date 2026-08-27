@@ -237,6 +237,8 @@ mark.hit.target{animation:flash 1.1s ease-in-out 2;}
 .tocitem.todo{color:#A9A396;cursor:default;}
 .tocitem.todo:hover{background:none;}
 .tocitem em{font-style:normal;color:var(--muted);font-size:11.5px;margin-right:7px;}
+.tocitem.cover-link{border-bottom:1px solid var(--rule);color:var(--muted);}
+.tocitem.cover-link em{color:var(--accent);}
 
 #q{
   width:calc(100% - 32px);
@@ -320,6 +322,83 @@ mark.hit.target{animation:flash 1.1s ease-in-out 2;}
 }
 .dangerbtn:hover{border-color:#8A6D2F;color:#8A6D2F;}
 
+/* ---------------- title page ---------------- */
+body.cover #bar, body.cover #reader, body.cover #nav{display:none;}
+#cover{
+  display:none;
+  min-height:100vh;
+  min-height:100dvh;
+  padding:calc(34px + env(safe-area-inset-top,0px)) 26px calc(34px + env(safe-area-inset-bottom,0px));
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  max-width:34rem;
+  margin:0 auto;
+}
+body.cover #cover{display:flex;}
+#cover.fading{opacity:0;transition:opacity .28s ease;}
+
+.cv-series{
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:10.5px;font-weight:600;
+  letter-spacing:.26em;text-transform:uppercase;
+  color:var(--accent);
+  margin:0 0 22px;
+}
+.cv-title{
+  font-family:'Lora',Georgia,serif;
+  font-size:clamp(2.3rem,11vw,3.2rem);
+  font-weight:700;
+  line-height:1.08;
+  letter-spacing:-.02em;
+  margin:0;
+  color:var(--ink);
+}
+.cv-rule{
+  width:54px;height:1px;
+  background:var(--accent);
+  margin:20px auto 0;
+  opacity:.55;
+}
+.cv-art{width:min(320px,80vw);height:auto;margin:14px auto 6px;display:block;}
+.cv-blurb{
+  font-family:'Lora',Georgia,serif;
+  font-size:1rem;line-height:1.7;
+  color:var(--ink);
+  margin:6px 0 30px;
+  max-width:27rem;
+}
+.cv-blurb em{color:var(--muted);}
+.cv-go{
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:14px;font-weight:600;
+  background:var(--accent);color:#FFF8F3;
+  border:0;border-radius:4px;
+  padding:14px 32px;cursor:pointer;
+  letter-spacing:.02em;
+}
+.cv-go:hover{background:#9A4A31;}
+/* the sun clears the horizon once, then the water keeps moving */
+#sun{animation:rise 2.6s cubic-bezier(.22,.9,.3,1) .25s both;}
+@keyframes rise{
+  from{transform:translateY(30px);opacity:0;}
+  to{transform:translateY(0);opacity:1;}
+}
+#horizon{
+  stroke-dasharray:320;stroke-dashoffset:320;
+  animation:drawline 1.5s ease-out .1s forwards;
+}
+@keyframes drawline{to{stroke-dashoffset:0;}}
+.wave{animation:drift 11s linear infinite;}
+.wave.slow{animation-duration:17s;}
+@keyframes drift{from{transform:translateX(0);}to{transform:translateX(-160px);}}
+@media (prefers-reduced-motion:reduce){
+  #sun,#horizon,.wave{animation:none;}
+  #horizon{stroke-dashoffset:0;}
+  #cover.fading{transition:none;}
+}
+
 /* ---------------- resume toast ---------------- */
 #resume{
   position:fixed;
@@ -387,6 +466,39 @@ mark.hit.target{animation:flash 1.1s ease-in-out 2;}
 </head>
 <body>
 
+<section id="cover">
+  <p class="cv-series">InkQuest &middot; Serial</p>
+  <h1 class="cv-title">The Leisure<br>Project</h1>
+  <div class="cv-rule"></div>
+
+  <svg class="cv-art" viewBox="0 0 320 132" aria-hidden="true">
+    <!-- sun first, so the water can hide its lower half as it rises -->
+    <circle id="sun" cx="160" cy="70" r="21" fill="#B0563A" opacity=".85"/>
+    <!-- paper-colored water mass: the horizon is where the sun comes from -->
+    <rect x="0" y="82" width="320" height="50" fill="#F6F2E9"/>
+    <line id="horizon" x1="14" y1="82" x2="306" y2="82"
+          stroke="#B0563A" stroke-width="1.4" stroke-linecap="round" opacity=".55"/>
+    <g class="wave">
+      <path d="M0 94 q20 -6 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0"
+            fill="none" stroke="#B0563A" stroke-width="1.6" stroke-linecap="round" opacity=".42"/>
+    </g>
+    <g class="wave slow">
+      <path d="M0 106 q20 -7 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0"
+            fill="none" stroke="#B0563A" stroke-width="1.6" stroke-linecap="round" opacity=".26"/>
+    </g>
+    <g class="wave">
+      <path d="M0 118 q20 -5 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0"
+            fill="none" stroke="#B0563A" stroke-width="1.4" stroke-linecap="round" opacity=".16"/>
+    </g>
+  </svg>
+
+  <p class="cv-blurb">
+    Two weeks in Taitung, no plan, no return ticket. Then the auntie downstairs
+    slips on a wet step, and somebody has to open the shop at five.
+  </p>
+  <button class="cv-go" id="coverGo">Begin reading</button>
+</section>
+
 <div id="bar">
   <button class="iconbtn" id="menuBtn" aria-label="Contents">
     <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
@@ -452,12 +564,6 @@ mark.hit.target{animation:flash 1.1s ease-in-out 2;}
     </div>
   </div>
 </aside>
-
-<div id="resume">
-  <span id="resumeTxt"></span>
-  <button id="resumeGo">Continue</button>
-  <button class="dismiss" id="resumeNo">&times;</button>
-</div>
 
 <div id="pop" role="dialog" aria-live="polite" aria-hidden="true">
   <button class="pop-close" id="popClose" aria-label="Close note">&times;</button>
@@ -915,7 +1021,7 @@ document.querySelectorAll(".tab").forEach(t => t.onclick = () => switchPane(t.da
 
 /* ---------- contents ---------- */
 function buildToc(){
-  let html = "", month = "";
+  let html = '<button class="tocitem cover-link"><em>&#9670;</em>Title page</button>', month = "";
   CHAPTERS.forEach((c,i) => {
     if(c.month !== month){
       month = c.month;
@@ -926,12 +1032,13 @@ function buildToc(){
             (done ? '' : ' disabled') + '><em>' + c.n + '</em>' + c.title + '</button>';
   });
   el("pane-toc").innerHTML = html;
-  el("pane-toc").querySelectorAll(".tocitem:not(.todo)").forEach(b => {
+  el("pane-toc").querySelector(".cover-link").onclick = () => { closeDrawer(); showCover(); };
+  el("pane-toc").querySelectorAll(".tocitem:not(.todo):not(.cover-link)").forEach(b => {
     b.onclick = () => { render(+b.dataset.i); closeDrawer(); };
   });
 }
 function markToc(){
-  el("pane-toc").querySelectorAll(".tocitem").forEach(b => {
+  el("pane-toc").querySelectorAll(".tocitem[data-i]").forEach(b => {
     b.classList.toggle("cur", +b.dataset.i === cur);
   });
 }
@@ -1143,20 +1250,34 @@ el("clearBtn").onclick = () => {
   setTimeout(()=>el("clearBtn").textContent = "Forget where I stopped", 1600);
 };
 
-/* ---------- resume ---------- */
-function offerResume(){
+/* ---------- title page ---------- */
+function showCover(){
+  document.body.classList.add("cover");
+  el("cover").classList.remove("fading");
+  window.scrollTo(0,0);
+}
+function leaveCover(){
+  const c = el("cover");
+  c.classList.add("fading");
+  setTimeout(() => {
+    document.body.classList.remove("cover");
+    c.classList.remove("fading");
+    window.scrollTo(0,0);
+  }, 280);
+}
+
+function setupCover(){
   const last = parseInt(store.get("last") || "0", 10);
-  if(!last || last === CHAPTERS[0].n) return;
-  const c = CHAPTERS.find(x => x.n === last && x.html);
-  if(!c) return;
-  el("resumeTxt").textContent = "You stopped at Chapter " + c.n + ", \u201c" + c.title + ".\u201d";
-  el("resume").classList.add("on");
-  el("resumeGo").onclick = () => {
-    render(CHAPTERS.indexOf(c));
-    el("resume").classList.remove("on");
-  };
-  el("resumeNo").onclick = () => el("resume").classList.remove("on");
-  setTimeout(()=>el("resume").classList.remove("on"), 12000);
+  const saved = CHAPTERS.find(c => c.n === last && c.html && c.html.trim());
+
+  if(saved && saved.n !== CHAPTERS[0].n){
+    el("coverGo").textContent = "Continue \u2014 Chapter " + saved.n;
+    el("coverGo").onclick = () => { render(CHAPTERS.indexOf(saved)); leaveCover(); };
+  } else {
+    el("coverGo").textContent = "Begin reading";
+    el("coverGo").onclick = () => { render(0); leaveCover(); };
+  }
+  showCover();
 }
 
 /* ---------- boot ---------- */
@@ -1164,7 +1285,7 @@ buildToc();
 buildGloss();
 applySize(parseInt(store.get("size") || "19", 10));
 render(0);
-offerResume();
+setupCover();
 </script>
 </body>
 </html>
