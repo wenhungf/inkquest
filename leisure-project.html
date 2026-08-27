@@ -108,6 +108,35 @@ h1.ch{
   padding:6px 9px 0 0;
   color:var(--accent);
 }
+
+/* Hanging punctuation: the opening quote sits out in the left margin,
+   optically aligned, smaller than the cap, with the cap's own top edge
+   as its baseline. The paragraph carries left padding so nothing clips. */
+#body .dropcap-q{
+  float:left;
+  position:relative;
+  padding:6px 9px 0 0;
+}
+#body .dropcap-q .quote-hang{
+  position:absolute;
+  left:-0.46em;
+  top:0.10em;
+  font-family:'Lora',Georgia,serif;
+  font-weight:700;
+  font-size:1.75rem;
+  line-height:1;
+  color:var(--accent);
+  opacity:.5;
+}
+#body .dropcap-q .cap{
+  font-family:'Lora',Georgia,serif;
+  font-weight:700;
+  font-size:3.9rem;
+  line-height:.82;
+  color:var(--accent);
+  display:block;
+}
+#body p.opens-quote{padding-left:0.5em;}
 #body .marker{
   text-align:center;
   color:var(--accent);
@@ -599,7 +628,6 @@ const VOCAB = {
   "would have": {t:"grammar", h:"would have", zh:"（過去）本來會", d:"would have + past participle describes something that did not happen. A month ago she would have answered eleven messages. She didn't, because that month is over."},
   "yet": {t:"grammar", h:"Yet", zh:"然而", d:"Yet at the start of a sentence means but — and it is stronger. It marks a contradiction the speaker is choosing anyway. She knew it. Yet she left it there."},
   "hum": {t:"word", h:"hum", zh:"嗡嗡作響", d:"A low, continuous sound. Machines hum. So do people, quietly, when they are content."},
-  "quarter to five": {t:"phrase", h:"a quarter to five", zh:"四點四十五分", d:"4:45. A quarter is fifteen minutes; to means before the hour. Compare a quarter past five, which is 5:15."},
   "lay still": {t:"word", h:"lay still", zh:"一動也不動地躺著", d:"Stayed lying without moving. lie → lay → lain. Careful: lay is also its own verb meaning to put something down."},
   "motor": {t:"word", h:"motor", zh:"馬達", d:"The part of a machine that makes it turn. Smaller and simpler than an engine."},
   "turning verb": {t:"grammar", h:"was turning", zh:"正在轉動", d:"be + -ing for an action in progress. Something heavy was turning — happening at that moment, under the floor, while she lay awake."},
@@ -618,7 +646,7 @@ const VOCAB = {
   "scoop": {t:"word", h:"scoop", zh:"勺子", d:"A deep spoon for moving loose things — beans, rice, ice. Also a verb: to scoop."},
   "stool": {t:"word", h:"stool", zh:"板凳", d:"A small seat with no back. Every breakfast shop in Taiwan has a stack of them."},
   "skin": {t:"word", h:"skin (on soy milk)", zh:"豆皮", d:"The thin soft layer that forms on the surface of hot soy milk. Many people consider it the best part."},
-  "upright": {t:"word", h:"upright", zh:"直立的", d:"Standing straight up. A spoon that stands almost upright is a boast about how thick the soy milk is."},
+  "upright": {t:"word", h:"upright", zh:"直立的", d:"Standing straight up. A spoon that stands almost upright is an exaggeration about how thick the soy milk is."},
   "soy milk": {t:"word", h:"soy milk", zh:"豆漿", d:"American English writes soy milk. British English writes soya milk."},
   "convenience stores": {t:"word", h:"convenience stores", zh:"便利商店", d:"Small shops open long hours. In Taiwan, everywhere. Note the plural spelling: store → stores."},
   "paper cartons": {t:"word", h:"paper cartons", zh:"紙盒", d:"Stiff paper containers for drinks. A carton, not a box, when it holds liquid."},
@@ -663,7 +691,135 @@ const VOCAB = {
   "on her shoulder": {t:"phrase", h:"on her shoulder", zh:"擱在肩上", d:"Compare over her shoulder earlier. over follows the strap and implies carrying; on simply reports where the bag is resting — which is the point, because she has stopped noticing she is holding it."},
   "asked for it back": {t:"phrase", h:"asked for it back", zh:"要回去", d:"ask for + object + back means to request the return of something you lent or handed over."},
   "aware": {t:"word", h:"aware", zh:"意識到", d:"Knowing that something is happening. Note: she is aware she is about to speak — she is not deciding to."},
-  "sneeze": {t:"word", h:"sneeze", zh:"打噴嚏", d:"The sudden loud breath your nose forces out. You feel one coming and cannot stop it, which is the whole comparison."}
+  "sneeze": {t:"word", h:"sneeze", zh:"打噴嚏", d:"The sudden loud breath your nose forces out. You feel one coming and cannot stop it, which is the whole comparison."},
+  "look at a used car": {t:"phrase", h:"the way you look at a used car", zh:"像在看中古車一樣", d:"Carefully, slowly, expecting to find something wrong. A dry English joke: she is being inspected, not thanked."},
+  "have you worked": {t:"grammar", h:"Have you worked", zh:"（現在完成式）你做過嗎", d:"have + past participle asks about experience at any time in your life, not one occasion. Have you worked in a kitchen? Ever, at all."},
+  "there wasn't one": {t:"phrase", h:"There wasn't one", zh:"根本沒有下文", d:"Refers back to the missing rest of the sentence. English often ends a joke this way: set up an expectation, then report that nothing came."},
+  "ruin": {t:"word", h:"ruin", zh:"毀掉", d:"To damage something so badly it cannot be used. Stronger than spoil."},
+  "discharge papers": {t:"word", h:"discharge papers", zh:"出院文件", d:"The forms that release a patient from hospital. To discharge someone is to let them go."},
+  "lift": {t:"word", h:"lift", zh:"提起、舉起", d:"To raise something using your strength. The thing a person with a broken wrist must not do."},
+  "the shrug of a man": {t:"phrase", h:"the shrug of a man who", zh:"那種……的人才有的聳肩", d:"A neat English pattern: name a gesture, then define the person it belongs to. It tells you a whole history in six words."},
+  "voicemail": {t:"word", h:"voicemail", zh:"語音信箱", d:"The recorded message service when nobody answers. Straight to voicemail means the phone was switched off or refused."},
+  "kind of information": {t:"phrase", h:"a kind of information", zh:"一種訊息", d:"Her face not moving tells Yi-han something. English uses this construction to point at meaning hiding inside a non-answer."},
+  "finished being busy": {t:"phrase", h:"finished being busy", zh:"忙完了（諷刺）", d:"Sarcasm. Nobody finishes being busy; you decide to stop. Hsiu-chin is saying something about her grandson without saying it."},
+  "sling": {t:"word", h:"sling", zh:"手臂吊帶", d:"A cloth loop around the neck that holds an injured arm still."},
+  "bucket": {t:"word", h:"bucket", zh:"水桶", d:"A deep round container with a handle. Soybeans soak in one overnight."},
+  "ship": {t:"word", h:"ship (business)", zh:"出貨、推出", d:"In business English, to send a product out to customers. People say ship it about anything finished enough to release — which is exactly the habit Hsiu-chin is refusing."},
+  "good enough": {t:"phrase", h:"good enough", zh:"堪用、勉強可以", d:"Acceptable but not excellent. Nine years of her working life lived inside this phrase."},
+  "apologize": {t:"word", h:"apologize", zh:"道歉", d:"To say you are sorry. American English spells it -ize; British English often -ise."},
+  "the usual": {t:"culture", h:"the usual", zh:"老樣子、跟平常一樣", d:"What a regular customer always orders. Saying it proves you belong — and leaves a new person behind the counter with no idea what to make."},
+  "exact change": {t:"phrase", h:"exact change", zh:"剛剛好的零錢", d:"The precise amount, with nothing to give back. Leaving exact change means you already knew the price."},
+  "mantou": {t:"culture", h:"mantou", zh:"饅頭", d:"A plain steamed bun. English has no word for it, so English writing about Taiwan keeps the Chinese one."},
+  "sacks": {t:"word", h:"sacks", zh:"麻袋", d:"Large rough bags for grain, rice, or beans."},
+  "weigh": {t:"word", h:"weigh", zh:"秤重", d:"To measure how heavy something is. weigh → weighed. The noun is weight."},
+  "worn into": {t:"phrase", h:"worn into", zh:"用久了磨出來的", d:"A mark made slowly by years of use, not by anyone deciding. wear → wore → worn."},
+  "catch": {t:"word", h:"catch (of food)", zh:"燒焦黏鍋", d:"To stick and burn on the bottom of a hot pot. Another sense of a word with many: catch a ball, catch a cold, catch a bus."},
+  "stir": {t:"word", h:"stir", zh:"攪拌", d:"To move liquid in circles with a spoon or paddle so it does not burn or separate."},
+  "just happen": {t:"phrase", h:"the rest just happen", zh:"其他的就自然發生了", d:"Not steps she performs, but things the work does on its own — which is precisely why she never counted them."},
+  "on purpose": {t:"phrase", h:"on purpose", zh:"故意地", d:"Deliberately. The opposite is by accident."},
+  "word got around": {t:"phrase", h:"word got around", zh:"消息傳開了", d:"Here word means news. Nobody announced it; it moved through the town by itself."},
+  "considered": {t:"word", h:"considered", zh:"想了一下", d:"Thought about carefully before answering. More deliberate than thought."},
+  "to the ceiling": {t:"phrase", h:"to the ceiling", zh:"對著天花板（說）", d:"She says it aloud without looking at anyone. A quiet way of showing that a person is thinking out loud, not arguing."},
+  "sure of herself": {t:"phrase", h:"sure of herself", zh:"自信滿滿", d:"Confident, sometimes too confident. Note the reflexive: sure of himself, sure of themselves."},
+  "settled the matter": {t:"phrase", h:"settled the matter", zh:"一錘定音", d:"Ended the discussion; the question is now closed. Often used when only one person believes it is closed."},
+  "car park": {t:"word", h:"car park", zh:"停車場", d:"Where cars are parked. American English says parking lot."},
+  "key ring": {t:"word", h:"key ring", zh:"鑰匙圈", d:"The metal loop that keys hang on."},
+  "half extended": {t:"phrase", h:"half extended", zh:"伸到一半", d:"Reached out only partway, then stopped. The pause is the point: she is deciding something mid-gesture."},
+  "concluded": {t:"word", h:"concluded", zh:"下了什麼結論", d:"Decided after thinking. Whatever she concluded, she kept it — she reached a judgment and did not share it."},
+  "not agreement": {t:"phrase", h:"which was not agreement", zh:"那可不是答應", d:"A dry English move: report a sound, then tell the reader what it wasn't. Mm can mean many things. Here it means no."},
+  "lid": {t:"word", h:"lid", zh:"蓋子", d:"The cover of a pot, box, or bucket."},
+  "arm's length": {t:"phrase", h:"at arm's length", zh:"一臂之遙", d:"As far away as your arm reaches. Used for things you do not want closer — a smell, a person, a problem."},
+  "rinsed": {t:"word", h:"rinsed", zh:"沖洗", d:"Washed with clean water only, no soap. You rinse rice, beans, a cup."},
+  "inconvenience": {t:"word", h:"inconvenience", zh:"不便", d:"Trouble or difficulty caused to someone. A very formal word, which is exactly why the sign was wrong."},
+  "resume": {t:"word", h:"resume", zh:"恢復", d:"To begin again after stopping. Normal service will resume. Note: a different word from résumé, the job document."},
+  "general": {t:"word", h:"a general", zh:"將軍", d:"The highest-ranking army officer. A joke: Hsiu-chin cannot stand up, so she commands the kitchen from a plastic stool."},
+  "delivery slip": {t:"word", h:"delivery slip", zh:"送貨單", d:"The paper that comes with goods, listing what arrived. A slip is a small piece of paper."},
+  "not what he came for": {t:"phrase", h:"not what he came for", zh:"不是他來要的東西", d:"come for something means to come in order to get it. He drinks the tea politely; it is not the reason he walked here at 5:25."},
+  "coins": {t:"word", h:"coins", zh:"硬幣", d:"Metal money. Paper money is called notes or bills."},
+  "driven home": {t:"grammar", h:"let herself be driven home", zh:"讓人載她回家", d:"A passive inside let. She did not offer and did not refuse — she allowed it, which for this woman is a large concession."},
+  "identical": {t:"word", h:"identical", zh:"一模一樣", d:"Exactly the same. They look identical is a claim; they are not identical is a correction."},
+  "tipped her chin": {t:"phrase", h:"tipped her chin at", zh:"用下巴指了指", d:"Pointed using the chin instead of a hand. Common when your hands are full — or in a cast."},
+  "scale": {t:"word", h:"scale", zh:"磅秤", d:"The machine that measures weight. Another sense of a word with several: the scales of a fish, the scale of a map."},
+  "roughly": {t:"word", h:"roughly", zh:"大致上", d:"Approximately. Used here for a meaning that cannot be translated exactly, only approached."},
+  "liters": {t:"word", h:"liters", zh:"公升", d:"A unit of volume. American English spells it liters; British English litres."},
+  "ran out of fingers": {t:"phrase", h:"ran out of fingers", zh:"手指不夠數", d:"run out of means to use up your supply. She has one usable hand and more than five steps, so she has to start again."},
+  "sympathy": {t:"word", h:"sympathy", zh:"同情", d:"Feeling sorry for someone's difficulty. Something close to sympathy is not quite sympathy — it is close, and slightly amused."},
+  "foam": {t:"word", h:"foam", zh:"泡沫", d:"A mass of small bubbles. Boiling soy milk produces a great deal of it, very suddenly."},
+  "ladle": {t:"word", h:"ladle", zh:"湯杓", d:"A long-handled spoon with a deep bowl, for serving soup or skimming foam."},
+  "flame": {t:"word", h:"flame", zh:"爐火", d:"The burning gas on a stove. Put the flame out means turn off the heat."},
+  "scraped": {t:"word", h:"scraped", zh:"刮掉", d:"Removed by dragging something flat across a surface. She scraped the skin off, not knowing it was the best part."},
+  "bin": {t:"word", h:"bin", zh:"垃圾桶", d:"A container for rubbish. American English says trash can or garbage can."},
+  "jammed": {t:"word", h:"jammed", zh:"卡住了", d:"Stuck and unable to move. Machines jam; so do doors, drawers, and printers."},
+  "cloth": {t:"word", h:"cloth", zh:"（濾）布", d:"A piece of fabric. Here, the straining cloth that separates the liquid from the pulp."},
+  "queue": {t:"word", h:"queue", zh:"排隊的人龍", d:"A line of people waiting. Pronounced like the letter Q. American English usually says line."},
+  "flat expression": {t:"phrase", h:"flat expression", zh:"面無表情", d:"A face showing nothing. In this book it is never a sign that nothing is happening."},
+  "eventually": {t:"word", h:"eventually", zh:"最後、過了一會兒", d:"After a long time, or after a delay. It marks the size of the pause before she speaks."},
+  "properly": {t:"word", h:"properly", zh:"好好地、認真地", d:"In the correct or full way. Looked at her properly means really looked, not just glanced."},
+  "kept": {t:"word", h:"kept it", zh:"沒說出口", d:"keep → kept. Here it means kept to herself: she reached a conclusion and did not share it."},
+  "got there": {t:"phrase", h:"got there", zh:"到那裡", d:"get there = arrive. Having got there somehow: she arrived, and the method is a mystery."},
+  "thin": {t:"word", h:"thin", zh:"（氣味）尖銳刺鼻", d:"Used of a smell or a sound: weak and sharp, without body. A thin smell is a wrong smell."},
+  "version": {t:"word", h:"version", zh:"版本", d:"One form of something that exists in several forms. The version that was good enough is business language for a compromise."},
+  "quarter past four": {t:"phrase", h:"a quarter past four", zh:"四點十五分", d:"4:15. past means after the hour; a quarter is fifteen minutes. Compare a quarter to five, which is 4:45."},
+  "ruined": {t:"word", h:"ruined", zh:"毀了的", d:"Damaged beyond use. From ruin. Three kilos of ruined beans cannot be rescued, only carried out."},
+  "sign": {t:"word", h:"sign", zh:"告示、招牌", d:"A board or paper with writing that tells people something. Also a verb: to sign your name."},
+  "understanding": {t:"word", h:"understanding", zh:"體諒", d:"In this formal use: patience and sympathy. Thank you for your understanding is a set phrase from customer service."},
+  "one-handed": {t:"word", h:"one-handed", zh:"單手地", d:"Using only one hand. Built the same way as one-eyed, left-handed, empty-handed."},
+  "across the counter": {t:"phrase", h:"across the counter", zh:"從櫃台推過來", d:"Over the surface, from one side to the other. across carries the sense of a small distance and a clear boundary."},
+  "characters": {t:"word", h:"characters", zh:"字", d:"Chinese written units. Hsiu-chin counts a sign in characters the way an English speaker counts words."},
+  "apology": {t:"word", h:"apology", zh:"道歉", d:"The noun. The verb is apologize. No apology means: do not say sorry on my sign."},
+  "it turned out": {t:"phrase", h:"it turned out", zh:"結果是", d:"Used when reality is discovered rather than planned. Very common in storytelling: it turned out that nobody had told her."},
+  "toast": {t:"word", h:"toast", zh:"吐司", d:"Bread browned by heat. Uncountable in English: two slices of toast, never two toasts."},
+  "twenty past five": {t:"phrase", h:"twenty past five", zh:"五點二十分", d:"5:20. Twenty minutes after the hour."},
+  "discovered": {t:"word", h:"discovered", zh:"發現", d:"Found out something that was already true but unknown to her."},
+  "prices": {t:"word", h:"prices", zh:"價格", d:"How much things cost. A price list is the document this shop has never had."},
+  "lived": {t:"word", h:"lived (inside her head)", zh:"存在於（腦中）", d:"A figurative use: the prices live there the way a person lives in a house. English does this often to make information sound alive."},
+  "entirely": {t:"word", h:"entirely", zh:"完全地", d:"Completely, with nothing left over. Stronger than mostly."},
+  "ordered": {t:"word", h:"ordered", zh:"點餐", d:"Asked for food in a shop or restaurant. The noun is an order."},
+  "machine": {t:"word", h:"the machine", zh:"機器", d:"Everyone in the shop calls the grinder simply the machine. When a thing is the only one of its kind in a room, English drops the name."},
+  "door of the truck": {t:"phrase", h:"At the door of the truck", zh:"在卡車門邊", d:"A common way to mark a last remark: the person is leaving, half in and half out, and says the thing that matters."},
+  "pointed": {t:"word", h:"pointed", zh:"指", d:"Showed direction with a finger — or, in this shop, with a cast."},
+  "pointing": {t:"grammar", h:"for pointing", zh:"用來指東西", d:"for + -ing explains what something is used for: good for pointing, useful for carrying, a knife for cutting."},
+  "scoops": {t:"word", h:"scoops", zh:"（一）勺", d:"Used as a unit of measure. Three scoops is a real quantity in this shop and an unbearable one for a woman who thinks in kilos."},
+  "corner": {t:"word", h:"corner", zh:"角落", d:"Where two walls meet. In the corner is where forgotten things live."},
+  "recognize": {t:"word", h:"recognize", zh:"辨認出", d:"To know something because you have met it before. American English -ize; British -ise."},
+  "unnecessary": {t:"word", h:"unnecessary", zh:"沒必要的", d:"Not needed. un- + necessary. Note the double n."},
+  "mark": {t:"word", h:"mark", zh:"痕跡", d:"A small sign left on a surface. Not written on purpose — made by use."},
+  "thumb": {t:"word", h:"thumb", zh:"大拇指", d:"The short thick finger. The b is silent."},
+  "counted off": {t:"phrase", h:"counted the steps off", zh:"一步一步數出來", d:"count off means to say items aloud one by one, usually touching a finger for each."},
+  "bite": {t:"word", h:"bite", zh:"咬", d:"To cut with your teeth. bite → bit → bitten. Here it is a professional instrument: the only way to know if a bean is ready."},
+  "put out": {t:"phrase", h:"put the flame out", zh:"關火", d:"put out means extinguish. Note the word order: put the flame out, or put out the flame — both work, but with a pronoun only put it out is correct."},
+  "shut": {t:"word", h:"shut", zh:"沒開、關門", d:"Closed. Of a shop, shut means not open for business that day. shut → shut → shut, the same in all three forms."},
+  "counter": {t:"word", h:"counter", zh:"櫃台", d:"The long flat surface where you order and pay. Another sense of a word that also means to oppose or to count."},
+  "fried egg": {t:"culture", h:"fried egg", zh:"荷包蛋", d:"Cooked in oil on a flat hot surface. Taiwanese breakfast shops fry eggs on a griddle all morning; they almost never boil them."},
+  "griddle": {t:"word", h:"griddle", zh:"煎台", d:"The large flat iron cooking surface behind the counter. Eggs, ham, and scallion pancakes all live on it."},
+  "ham": {t:"word", h:"ham", zh:"火腿", d:"Salted pork, sliced thin. In a Taiwanese breakfast shop it goes on the griddle for thirty seconds a side and into a toast sandwich."},
+  "sweetened": {t:"word", h:"sweetened", zh:"加了糖的", d:"With sugar already added. Breakfast-shop black tea comes sweetened by default — asking for it without sugar confuses everyone."}
+,
+  "going hard": {t:"phrase", h:"her heart going hard", zh:"心臟劇烈跳動", d:"go here means to run or beat. Her heart going hard: thumping, the way it does when you wake to a sound you don't recognize."},
+  "twenty to five": {t:"phrase", h:"twenty to five", zh:"四點四十分", d:"4:40. to means before the hour, so you count backwards from five."},
+  "twenty-five past five": {t:"phrase", h:"twenty-five past five", zh:"五點二十五分", d:"5:25. Past the hour, so you count forwards from five."},
+  "ten to five": {t:"phrase", h:"ten to five", zh:"四點五十分", d:"4:50. Ten minutes before five."},
+  "five minutes to five": {t:"phrase", h:"five minutes to five", zh:"四點五十五分", d:"4:55. English usually drops the word minutes \u2014 five to five \u2014 but keeps it when the repetition would confuse."},
+  "quarter past ten": {t:"phrase", h:"a quarter past ten", zh:"十點十五分", d:"10:15. Here, at night: six hours before the beans have to be ground."},
+  "pot": {t:"word", h:"pot", zh:"鍋子", d:"A deep round cooking vessel. In this shop the pot means one particular enormous one, and everyone knows which."},
+  "low simmer": {t:"phrase", h:"a low simmer", zh:"小火慢滾", d:"Liquid kept just barely bubbling, not boiling hard. The difference between simmer and boil matters enormously to soy milk."},
+  "as far down": {t:"phrase", h:"as far down as it will go", zh:"轉到最小", d:"To its lowest possible setting. as far as it will go describes pushing something to its limit \u2014 a dial, a door, a person."},
+  "straining": {t:"word", h:"straining", zh:"過濾", d:"Separating solids from liquid by pouring through cloth or a sieve. The solid left behind is the pulp."},
+  "wet the cloth": {t:"phrase", h:"wet the cloth", zh:"先把布弄濕", d:"wet is used here as a verb: to make something wet. A dry straining cloth will not let liquid through."},
+  "clogs": {t:"word", h:"clogs", zh:"堵住", d:"Becomes blocked so nothing can pass. Drains clog, filters clog, and so does a dry cloth."},
+  "liquid": {t:"word", h:"liquid", zh:"液體", d:"Anything that flows. The three states are solid, liquid, gas."},
+  "pitcher": {t:"word", h:"pitcher", zh:"冷水壺", d:"A tall container with a handle for pouring drinks. American English; British English says jug."},
+  "frozen": {t:"word", h:"frozen", zh:"冷凍的", d:"freeze \u2192 froze \u2192 frozen. Kept hard and cold until needed."},
+  "steamed": {t:"word", h:"steamed", zh:"蒸的", d:"Cooked in hot vapor over boiling water, not in it. How mantou is heated, every time, one basket at a time."},
+  "sealed": {t:"word", h:"sealed", zh:"密封的", d:"Closed so tightly that nothing gets in or out."},
+  "forecast": {t:"word", h:"forecast", zh:"預測", d:"A prediction about the future, especially of demand or weather. Yi-han's old job was full of them. She has just found one in a soup pot."},
+  "half sugar": {t:"culture", h:"half sugar", zh:"半糖", d:"Half the usual sweetness \u2014 which, in Taiwan, is still a great deal of sugar. Ordering by sweetness level is completely standard here."},
+  "radio": {t:"word", h:"radio", zh:"收音機", d:"The machine that plays broadcasts. In a Taiwanese shop at four in the morning, it is almost always on."}
+,
+  "lane": {t:"word", h:"lane", zh:"巷子", d:"A narrow street or passage behind or between buildings. Taiwanese towns are built out of them."},
+  "fridge": {t:"word", h:"fridge", zh:"冰箱", d:"Short for refrigerator, and far more common in speech. Note the d, which the long word does not have."},
+  "back ring": {t:"phrase", h:"the back ring", zh:"後面那個爐口", d:"A ring is one gas burner on a stove. The back ring is the one you use for things that can be left alone."},
+  "food waste": {t:"culture", h:"food waste", zh:"廚餘", d:"Kitchen scraps, kept separate from other rubbish. In Taiwan they go into a covered bucket and are handed to the collection truck \u2014 never down the drain."}
 };
 
 /* =========================================================
@@ -725,19 +881,21 @@ const CHAPTERS = [
 
 <p>That was the good part.</p>
 
-<p>The bad part came at <span class="g" data-k="quarter to five">a quarter to five</span> the next morning, when the floor started to <span class="g" data-k="hum">hum</span>.</p>
+<p>The bad part came at <span class="g" data-k="quarter past four">a quarter past four</span> the next morning, when the floor started to <span class="g" data-k="hum">hum</span>.</p>
 `
 },
 {
   n:2, month:"March", title:"The Room Is Cheap for a Reason",
   html:`
-<p><span class="dropcap">A</span>t <span class="g" data-k="quarter to five">a quarter to five</span> the floor began to <span class="g" data-k="hum">hum</span>, and Yi-han woke with her heart going hard, the way it used to when her phone rang before six.</p>
+<p><span class="dropcap">A</span>t <span class="g" data-k="quarter past four">a quarter past four</span> the floor began to <span class="g" data-k="hum">hum</span>, and Yi-han woke with her <span class="g" data-k="going hard">heart going hard</span>, the way it used to when her phone rang before six.</p>
 
 <p>She <span class="g" data-k="lay still">lay still</span> and listened.</p>
 
 <p>It was a <span class="g" data-k="motor">motor</span>. Below her, something heavy was <span class="g" data-k="turning verb">turning</span>, and under the <span class="g" data-k="turning noun">turning</span> there was water running, and under the water there was a woman's voice saying something short to nobody.</p>
 
-<p>She looked at the ceiling for twenty-five minutes.</p>
+<p>The noise stopped after about ten minutes. Whatever it was, it did not take long.</p>
+
+<p>She looked at the ceiling for another forty.</p>
 
 <div class="marker">&#9670;</div>
 
@@ -749,7 +907,7 @@ const CHAPTERS = [
 
 <p>She looked up. She looked at Yi-han's face, and at her hair, and at the fact that she was wearing yesterday's shirt.</p>
 
-<p>Then she pointed at a <span class="g" data-k="stool">stool</span>.</p>
+<p>Then she <span class="g" data-k="pointed">pointed</span> at a <span class="g" data-k="stool">stool</span>.</p>
 
 <p>&ldquo;Sit.&rdquo;</p>
 
@@ -773,7 +931,7 @@ const CHAPTERS = [
 
 <p>&ldquo;Yes.&rdquo;</p>
 
-<p>&ldquo;The machine wakes you.&rdquo;</p>
+<p>&ldquo;The <span class="g" data-k="machine">machine</span> wakes you.&rdquo;</p>
 
 <p>&ldquo;&hellip;Yes.&rdquo;</p>
 
@@ -797,7 +955,11 @@ const CHAPTERS = [
 
 <p>She told herself it was because she was awake anyway.</p>
 
-<p>On the third morning she was reaching for the door at five when she heard it &mdash; a sound from the step outside the shop, wet and short and heavy, like a dropped bag of rice.</p>
+<p>On the third morning she woke at <span class="g" data-k="quarter past four">a quarter past four</span> and lay there waiting for the floor to start.</p>
+
+<p>It didn't.</p>
+
+<p>She was halfway down the stairs before she had decided to get up, and that was when she heard it &mdash; a sound from the step outside the shop, wet and short and heavy, like a dropped bag of rice.</p>
 
 <p>And then, from the shop below her, nothing at all.</p>
 `
@@ -833,7 +995,7 @@ const CHAPTERS = [
 
 <p>&ldquo;<span class="g" data-k="slippery">Slippery</span>,&rdquo; he said, to nobody. &ldquo;I told her. Two years I told her.&rdquo;</p>
 
-<p>Behind them the <span class="g" data-k="grind">grinder</span> was still running. Yi-han went back and stood in front of it and looked at the <span class="g" data-k="switch">switch</span> for a moment, and then turned it off, and the sudden silence was <span class="g" data-k="enormous">enormous</span>.</p>
+<p>Behind them the <span class="g" data-k="radio">radio</span> was still going, some man talking cheerfully about tomorrow's weather to an empty shop. Yi-han went back in and looked at the <span class="g" data-k="switch">switch</span> for a moment, and then turned it off, and the silence that came down was <span class="g" data-k="enormous">enormous</span>.</p>
 
 <div class="marker">&#9670;</div>
 
@@ -868,11 +1030,376 @@ const CHAPTERS = [
 <p>She was <span class="g" data-k="aware">aware</span> that she was about to say something, the way you know a <span class="g" data-k="sneeze">sneeze</span> is coming.</p>
 `
 },
-{n:4,  month:"March", title:"Six Weeks in a Cast"},
-{n:5,  month:"March", title:"Somebody Has to Open at Five"},
-{n:6,  month:"March", title:"Eleven Steps, Four of Them Mentioned"},
+{
+  n:4, month:"March", title:"Six Weeks in a Cast",
+  html:`
+<p class="opens-quote"><span class="dropcap-q"><span class="quote-hang">&ldquo;</span><span class="cap">I</span></span> could do it.&rdquo;</p>
+
+<p>The sentence came out of her the way a <span class="g" data-k="sneeze">sneeze</span> does &mdash; whole, unplanned, and slightly too loud for a hospital <span class="g" data-k="corridor">corridor</span>.</p>
+
+<p>A-liang turned around.</p>
+
+<p>Behind the curtain, Hsiu-chin said nothing for four seconds.</p>
+
+<p>&ldquo;You.&rdquo;</p>
+
+<p>&ldquo;Me.&rdquo;</p>
+
+<p>&ldquo;Come where I can see you.&rdquo;</p>
+
+<div class="marker">&#9670;</div>
+
+<p>Yi-han went in. Hsiu-chin looked at her <span class="g" data-k="look at a used car">the way you look at a used car</span>.</p>
+
+<p>&ldquo;<span class="g" data-k="have you worked">Have you worked</span> in a kitchen?&rdquo;</p>
+
+<p>&ldquo;No.&rdquo;</p>
+
+<p>&ldquo;Have you cooked for more than four people?&rdquo;</p>
+
+<p>&ldquo;Once.&rdquo; Yi-han <span class="g" data-k="considered">considered</span> it. &ldquo;It went badly.&rdquo;</p>
+
+<p>&ldquo;Do you know what time the <span class="g" data-k="beans">beans</span> go in?&rdquo;</p>
+
+<p>&ldquo;No.&rdquo;</p>
+
+<p>&ldquo;Do you know what happens if they go in late?&rdquo;</p>
+
+<p>&ldquo;No.&rdquo;</p>
+
+<p>Hsiu-chin nodded. &ldquo;Good.&rdquo;</p>
+
+<p>Yi-han waited for the rest of the sentence. <span class="g" data-k="there wasn't one">There wasn't one</span>.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>&ldquo;Somebody who was <span class="g" data-k="sure of herself">sure of herself</span>,&rdquo; Hsiu-chin said <span class="g" data-k="eventually">eventually</span>, <span class="g" data-k="to the ceiling">to the ceiling</span>, &ldquo;would <span class="g" data-k="ruin">ruin</span> it on the first morning and not notice until the third.&rdquo;</p>
+
+<p>&ldquo;And somebody who knows nothing?&rdquo;</p>
+
+<p>&ldquo;Asks.&rdquo;</p>
+
+<p>She said it as though this <span class="g" data-k="settled the matter">settled the matter</span>, which, Yi-han was beginning to understand, it did.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>The doctor came back with the <span class="g" data-k="discharge papers">discharge papers</span> and told Hsiu-chin not to <span class="g" data-k="lift">lift</span> anything with her right hand.</p>
+
+<p>&ldquo;How many kilos?&rdquo;</p>
+
+<p>&ldquo;None.&rdquo;</p>
+
+<p>&ldquo;Yes. But how many.&rdquo;</p>
+
+<p>The doctor looked at A-liang. A-liang gave him <span class="g" data-k="the shrug of a man">the shrug of a man</span> who had watched this exact conversation happen before, possibly at this exact hospital.</p>
+
+<p>&ldquo;<span class="g" data-k="auntie">Auntie</span>. None.&rdquo;</p>
+
+<p>&ldquo;Mm,&rdquo; said Hsiu-chin, <span class="g" data-k="not agreement">which was not agreement</span>.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>In the <span class="g" data-k="corridor">corridor</span> A-liang tried the grandson again. Straight to <span class="g" data-k="voicemail">voicemail</span>.</p>
+
+<p>Hsiu-chin's face did not move, which was itself <span class="g" data-k="kind of information">a kind of information</span>.</p>
+
+<p>&ldquo;He'll come,&rdquo; she said.</p>
+
+<p>&ldquo;When?&rdquo;</p>
+
+<p>&ldquo;When he's <span class="g" data-k="finished being busy">finished being busy</span>.&rdquo;</p>
+
+<div class="marker">&#9670;</div>
+
+<p>They gave Yi-han the keys in the <span class="g" data-k="car park">car park</span>, out of a handbag she had been carrying for three hours.</p>
+
+<p>&ldquo;I can't pay you much.&rdquo;</p>
+
+<p>&ldquo;I don't need it.&rdquo;</p>
+
+<p>Hsiu-chin stopped with the <span class="g" data-k="key ring">key ring</span> <span class="g" data-k="half extended">half extended</span> and looked at her <span class="g" data-k="properly">properly</span> for the first time all morning &mdash; at the shirt she had now been wearing for two days, at the woman from upstairs who did not need paying and had nowhere to be at five in the morning.</p>
+
+<p>Whatever she <span class="g" data-k="concluded">concluded</span>, she <span class="g" data-k="kept">kept it</span>.</p>
+
+<p>&ldquo;Four o'clock,&rdquo; she said.</p>
+
+<p>&ldquo;The shop opens at five.&rdquo;</p>
+
+<p>&ldquo;The shop opens at five,&rdquo; Hsiu-chin said, <span class="g" data-k="door of the truck">at the door of the truck</span>, &ldquo;because I start at four.&rdquo;</p>
+`
+},
+{
+  n:5, month:"March", title:"Somebody Has to Open at Five",
+  html:`
+<p><span class="dropcap">A</span>t four o'clock the light in the shop was already on.</p>
+
+<p>Hsiu-chin was sitting in the middle of her own kitchen on a red plastic <span class="g" data-k="stool">stool</span>, arm in a <span class="g" data-k="sling">sling</span>, wearing yesterday's clothes.</p>
+
+<p>&ldquo;How did you <span class="g" data-k="got there">get here</span>?&rdquo;</p>
+
+<p>&ldquo;I walked.&rdquo;</p>
+
+<p>&ldquo;You&mdash;&rdquo;</p>
+
+<p>&ldquo;It's two streets.&rdquo; She said it the way you would explain something to a slow child.</p>
+
+<p>&ldquo;The doctor said&mdash;&rdquo;</p>
+
+<p>&ldquo;The doctor is thirty-one.&rdquo;</p>
+
+<div class="marker">&#9670;</div>
+
+<p>The <span class="g" data-k="bucket">bucket</span> had stood by the back door since the night before last. Yi-han lifted the <span class="g" data-k="lid">lid</span> and did not need to be told: the smell reached her <span class="g" data-k="arm's length">from arm&rsquo;s length</span>, <span class="g" data-k="thin">thin</span> and sharp and wrong.</p>
+
+<p>&ldquo;Can we&mdash;&rdquo;</p>
+
+<p>&ldquo;No.&rdquo;</p>
+
+<p>&ldquo;If we <span class="g" data-k="rinsed">rinsed</span> them&mdash;&rdquo;</p>
+
+<p>&ldquo;No.&rdquo;</p>
+
+<p>And Yi-han, who had spent nine years finding the <span class="g" data-k="version">version</span> of a thing that was <span class="g" data-k="good enough">good enough</span> to <span class="g" data-k="ship">ship</span>, carried two kilos of <span class="g" data-k="ruined">ruined</span> <span class="g" data-k="beans">beans</span> out to the <span class="g" data-k="lane">lane</span>.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>The <span class="g" data-k="fridge">fridge</span> held two <span class="g" data-k="pitcher">pitchers</span> of black tea and two covered <span class="g" data-k="pot">pots</span> of cold soy milk, one sweet and one plain.</p>
+
+<p>&ldquo;Tea stays,&rdquo; Hsiu-chin said. &ldquo;Pots go.&rdquo;</p>
+
+<p>&ldquo;They're <span class="g" data-k="sealed">sealed</span>. They've been cold the whole time.&rdquo;</p>
+
+<p>&ldquo;They were made on Tuesday.&rdquo;</p>
+
+<p>They went the way the <span class="g" data-k="beans">beans</span> had gone, into the covered <span class="g" data-k="food waste">food waste</span> <span class="g" data-k="bucket">bucket</span> for the afternoon truck. Two things in one morning that Yi-han would have sold.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>They needed a <span class="g" data-k="sign">sign</span>.</p>
+
+<p>Yi-han wrote one. She was rather pleased with it. It explained the situation, <span class="g" data-k="apologize">apologized</span> for the <span class="g" data-k="inconvenience">inconvenience</span>, thanked customers for their <span class="g" data-k="understanding">understanding</span>, and promised that normal service would <span class="g" data-k="resume">resume</span> tomorrow.</p>
+
+<p>Hsiu-chin read it <span class="g" data-k="one-handed">one-handed</span>.</p>
+
+<p>&ldquo;Too many words.&rdquo;</p>
+
+<p>&ldquo;It's four lines.&rdquo;</p>
+
+<p>&ldquo;Nobody reads at four in the morning. They look.&rdquo; She pushed the paper back <span class="g" data-k="across the counter">across the counter</span> with one finger. &ldquo;Four <span class="g" data-k="characters">characters</span>. No <span class="g" data-k="apology">apology</span>.&rdquo;</p>
+
+<p>Yi-han opened her mouth, closed it, and wrote:</p>
+
+<p style="text-align:center;font-weight:600;">NO <span class="g" data-k="soy milk">SOY MILK</span> TODAY</p>
+
+<p>&ldquo;Better.&rdquo;</p>
+
+<div class="marker">&#9670;</div>
+
+<p>What was left, <span class="g" data-k="it turned out">it turned out</span>, was <span class="g" data-k="toast">toast</span>, <span class="g" data-k="mantou">mantou</span>, <span class="g" data-k="ham">ham</span>, eggs, and tea. Five things, which went together in about nine ways. All nine had names. Yi-han would need to know them by five.</p>
+
+<p>Egg in a <span class="g" data-k="mantou">mantou</span>. Egg in <span class="g" data-k="toast">toast</span>. Ham and egg in <span class="g" data-k="toast">toast</span>. <span class="g" data-k="toast">Toast</span> with nothing, for the man who has <span class="g" data-k="toast">toast</span> with nothing.</p>
+
+<p>The <span class="g" data-k="mantou">mantou</span> came <span class="g" data-k="frozen">frozen</span>, six to a bag, <span class="g" data-k="steamed">steamed</span> four at a time as they were wanted. Nobody here had made one by hand since 1998, a fact Hsiu-chin delivered without shame.</p>
+
+<p>The <span class="g" data-k="griddle">griddle</span> took eleven minutes to heat, under the direction of <span class="g" data-k="general">a general</span> on a plastic <span class="g" data-k="stool">stool</span> who <span class="g" data-k="pointed">pointed</span> at everything with a <span class="g" data-k="cast">cast</span>. Yi-han burned her first <span class="g" data-k="fried egg">fried egg</span> onto the iron in under thirty seconds.</p>
+
+<p>&ldquo;Less oil,&rdquo; Hsiu-chin said, from the <span class="g" data-k="stool">stool</span>.</p>
+
+<p>&ldquo;You said more oil.&rdquo;</p>
+
+<p>&ldquo;Less than that.&rdquo;</p>
+
+<div class="marker">&#9670;</div>
+
+<p>The first customer came in at 5:04, looked at the <span class="g" data-k="sign">sign</span>, looked at Yi-han, and said, &ldquo;<span class="g" data-k="the usual">The usual</span>.&rdquo;</p>
+
+<p>&ldquo;I&mdash;&rdquo; said Yi-han. &ldquo;I don't know what that is.&rdquo;</p>
+
+<p>&ldquo;Ham and egg <span class="g" data-k="toast">toast</span>. Tea. Iced.&rdquo;</p>
+
+<p>&ldquo;It's March.&rdquo;</p>
+
+<p>&ldquo;Iced,&rdquo; he said, and sat down.</p>
+
+<p>The tea came already <span class="g" data-k="sweetened">sweetened</span>. Anyone who wanted it hot meant a <span class="g" data-k="ladle">ladle</span> of the same tea into a small <span class="g" data-k="pot">pot</span> on <span class="g" data-k="back ring">the back ring</span> for ninety seconds.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>By <span class="g" data-k="twenty past five">twenty past five</span>, Yi-han had <span class="g" data-k="discovered">discovered</span> that there was no menu, that there never had been, that the <span class="g" data-k="prices">prices</span> <span class="g" data-k="lived">lived</span> <span class="g" data-k="entirely">entirely</span> inside Hsiu-chin's head, and that eleven people had <span class="g" data-k="ordered">ordered</span> by describing the thing they always had.</p>
+
+<p>She found a pen. She found the back of a <span class="g" data-k="delivery slip">delivery slip</span>.</p>
+
+<p>She started writing it down.</p>
+
+<p>&ldquo;What are you doing?&rdquo; said Hsiu-chin, from the <span class="g" data-k="stool">stool</span>.</p>
+
+<p>&ldquo;Nothing.&rdquo;</p>
+
+<div class="marker">&#9670;</div>
+
+<p>At <span class="g" data-k="twenty-five past five">twenty-five past five</span> a man came in whom she had not served yet, stood at the <span class="g" data-k="counter">counter</span> for a moment reading the <span class="g" data-k="sign">sign</span>, and then went to the window seat and sat down.</p>
+
+<p>&ldquo;There's no soy milk today,&rdquo; Yi-han said. &ldquo;I'm sorry. There's tea.&rdquo;</p>
+
+<p>He nodded once.</p>
+
+<p>She brought him tea. He drank it slowly, the way a person drinks something that is <span class="g" data-k="not what he came for">not what he came for</span>. When he left he put money on the table without being asked, and it was <span class="g" data-k="exact change">exact change</span> for one tea &mdash; a price nobody had told her, in a shop with no menu.</p>
+
+<p>Yi-han looked at the <span class="g" data-k="coins">coins</span> for a long moment.</p>
+
+<p>Then she wrote that down too.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>They closed at nine. A-liang drove her the two streets home, which she <span class="g" data-k="driven home">allowed</span>, and which told Yi-han more about the state of that wrist than anything the doctor had said.</p>
+
+<p><span class="g" data-k="door of the truck">At the door of the truck</span> she stopped.</p>
+
+<p>&ldquo;Tonight. <span class="g" data-k="quarter past ten">Quarter past ten</span>.&rdquo;</p>
+
+<p>&ldquo;At night?&rdquo;</p>
+
+<p>&ldquo;That's when it starts.&rdquo; She got in. &ldquo;Wear shoes you don't like.&rdquo;</p>
+`
+},
+{
+  n:6, month:"March", title:"Eleven Steps, and the Ones Nobody Counts",
+  html:`
+<p><span class="dropcap">A</span>t <span class="g" data-k="quarter past ten">a quarter past ten</span> at night the street was so quiet she could hear the sea, which she had not known was close enough to hear.</p>
+
+<p>The <span class="g" data-k="sacks">sacks</span> were under the <span class="g" data-k="counter">counter</span>. Hsiu-chin sat on the <span class="g" data-k="stool">stool</span> and <span class="g" data-k="pointed">pointed</span> with the <span class="g" data-k="cast">cast</span>, which she had <span class="g" data-k="discovered">discovered</span> was excellent <span class="g" data-k="pointing">for pointing</span>.</p>
+
+<p>&ldquo;That one. Not that one.&rdquo;</p>
+
+<p>&ldquo;They look <span class="g" data-k="identical">identical</span>.&rdquo;</p>
+
+<p>&ldquo;They are not <span class="g" data-k="identical">identical</span>.&rdquo;</p>
+
+<div class="marker">&#9670;</div>
+
+<p>&ldquo;How much?&rdquo;</p>
+
+<p>&ldquo;This much.&rdquo; Hsiu-chin <span class="g" data-k="tipped her chin">tipped her chin</span> at the <span class="g" data-k="scoop">scoop</span>. &ldquo;Three of those.&rdquo;</p>
+
+<p>Yi-han put three <span class="g" data-k="scoops">scoops</span> into the <span class="g" data-k="bucket">bucket</span>, carried it to the <span class="g" data-k="scale">scale</span> in the <span class="g" data-k="corner">corner</span>, and <span class="g" data-k="weigh">weighed</span> it.</p>
+
+<p>&ldquo;Two point one kilos.&rdquo;</p>
+
+<p>&ldquo;It's three <span class="g" data-k="scoops">scoops</span>.&rdquo;</p>
+
+<p>&ldquo;It's two point one kilos.&rdquo;</p>
+
+<p>Hsiu-chin made a small sound Yi-han would come to <span class="g" data-k="recognize">recognize</span>, which meant <span class="g" data-k="roughly">roughly</span>: <em>this is <span class="g" data-k="unnecessary">unnecessary</span>, and I am not going to stop you.</em></p>
+
+<div class="marker">&#9670;</div>
+
+<p>Then water, to a line nobody had drawn: a <span class="g" data-k="mark">mark</span> <span class="g" data-k="worn into">worn into</span> the plastic by twenty years of a <span class="g" data-k="thumb">thumb</span> resting in the same place.</p>
+
+<p>&ldquo;To here.&rdquo;</p>
+
+<p>&ldquo;How many <span class="g" data-k="liters">liters</span> is that?&rdquo;</p>
+
+<p>&ldquo;To here.&rdquo;</p>
+
+<p>Yi-han wrote: <em>to the <span class="g" data-k="mark">mark</span>. There is no number. Do not ask again.</em></p>
+
+<div class="marker">&#9670;</div>
+
+<p>Hsiu-chin <span class="g" data-k="counted off">counted the steps off</span> on the fingers of her left hand, twice, because she <span class="g" data-k="ran out of fingers">ran out of fingers</span>.</p>
+
+<p>Eleven.</p>
+
+<p>Yi-han wrote down eleven. Within the hour she had twelve, and the twelfth arrived like this:</p>
+
+<p>&ldquo;How long do they <span class="g" data-k="soaked">soak</span>?&rdquo;</p>
+
+<p>&ldquo;Six hours.&rdquo;</p>
+
+<p>&ldquo;Always six?&rdquo;</p>
+
+<p>&ldquo;In summer, less. In winter, more.&rdquo;</p>
+
+<p>&ldquo;How much more?&rdquo;</p>
+
+<p>Hsiu-chin looked at her with something close to <span class="g" data-k="sympathy">sympathy</span>. &ldquo;You take one out and you <span class="g" data-k="bite">bite</span> it. If it goes soft between your teeth, it's ready. If it fights you, it isn't.&rdquo;</p>
+
+<p>They walked her home at half past ten. Two streets, eleven minutes, and the whole way she talked about a man who had owed her father money in 1974.</p>
+
+<p>Yi-han slept until three and then lay wide awake until the alarm.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>The <span class="g" data-k="grind">grinder</span> went on at <span class="g" data-k="quarter past four">a quarter past four</span>. It ran for nine minutes.</p>
+
+<p>The long part was the <span class="g" data-k="pot">pot</span>.</p>
+
+<p>Thirteen was the <span class="g" data-k="foam">foam</span>. It came up over the top at <span class="g" data-k="twenty to five">twenty to five</span>, white and fast and unstoppable, and Yi-han <span class="g" data-k="put out">put the flame out</span> and stood in a cloud of <span class="g" data-k="steam">steam</span> holding a <span class="g" data-k="ladle">ladle</span> she did not know what to do with.</p>
+
+<p>&ldquo;You take it off,&rdquo; Hsiu-chin said, from the <span class="g" data-k="stool">stool</span>, not moving.</p>
+
+<p>&ldquo;You didn't say that.&rdquo;</p>
+
+<p>&ldquo;Everyone knows that.&rdquo;</p>
+
+<p>&ldquo;I don't know that!&rdquo;</p>
+
+<p>&ldquo;Now you do.&rdquo;</p>
+
+<p>Fourteen was that it has to keep going afterward &mdash; <span class="g" data-k="low simmer">a low simmer</span> with the <span class="g" data-k="flame">flame</span> <span class="g" data-k="as far down">as far down as it will go</span>, another quarter of an hour, or it is not <span class="g" data-k="properly">properly</span> cooked. And that if she stopped <span class="g" data-k="stir">stirring</span> long enough to serve one customer, the bottom would <span class="g" data-k="catch">catch</span>. She learned that at <span class="g" data-k="ten to five">ten to five</span>, by smell.</p>
+
+<p>Half of what came out of that pot would be drunk hot before nine. The other half went into a second pot to cool all day and sit cold in the <span class="g" data-k="fridge">fridge</span> for tomorrow's ice.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>The fifteenth thing was not a step at all, which was the trouble with it.</p>
+
+<p>It was the <span class="g" data-k="skin">skin</span>, which comes up by itself and which you leave alone, because it is the best part of the pot and belongs to whoever asks first. Yi-han <span class="g" data-k="scraped">scraped</span> it into the <span class="g" data-k="bin">bin</span> while an old woman with a broken wrist watched her do it and said nothing, <span class="g" data-k="on purpose">on purpose</span>.</p>
+
+<p>&ldquo;You said eleven.&rdquo;</p>
+
+<p>&ldquo;Eleven that I do,&rdquo; Hsiu-chin said. &ldquo;<span class="g" data-k="just happen">The rest just happen</span>.&rdquo;</p>
+
+<div class="marker">&#9670;</div>
+
+<p>Sugar was its own problem.</p>
+
+<p>Hot is <span class="g" data-k="sweetened">sweetened</span> in the bowl: two spoons first, then the <span class="g" data-k="liquid">liquid</span> poured over. <span class="g" data-k="half sugar">Half sugar</span> is one spoon, which is still a great deal of sugar.</p>
+
+<p>Cold is different. It has to be <span class="g" data-k="sweetened">sweetened</span> while the <span class="g" data-k="pot">pot</span> is still hot, or the sugar never goes in <span class="g" data-k="properly">properly</span>. So the cold half is split before it cools &mdash; one <span class="g" data-k="pot">pot</span> sweet, one plain &mdash; and half sugar tomorrow means pouring from both.</p>
+
+<p>Yi-han put her pen down.</p>
+
+<p>&ldquo;So you decide tonight how many people will want it sweet tomorrow.&rdquo;</p>
+
+<p>&ldquo;Yes.&rdquo;</p>
+
+<p>&ldquo;That's a <span class="g" data-k="forecast">forecast</span>.&rdquo;</p>
+
+<p>&ldquo;That's Saturday,&rdquo; said Hsiu-chin.</p>
+
+<div class="marker">&#9670;</div>
+
+<p>On the third morning she made it alone.</p>
+
+<p>Not well. The <span class="g" data-k="grind">grinder</span> <span class="g" data-k="jammed">jammed</span> once, and she had to be told twice to <span class="g" data-k="wet the cloth">wet</span> the <span class="g" data-k="cloth">cloth</span> before <span class="g" data-k="straining">straining</span>, because a dry one <span class="g" data-k="clogs">clogs</span> and the <span class="g" data-k="liquid">liquid</span> sits on top looking at you.</p>
+
+<p>But at <span class="g" data-k="five minutes to five">five minutes to five</span> there was a <span class="g" data-k="pot">pot</span> of soy milk in her shop &mdash; hot, <span class="g" data-k="pale">pale</span>, with a <span class="g" data-k="skin">skin</span> coming up on top.</p>
+
+<p>By 5:15 there were nine people inside and four more coming down the street.</p>
+
+<p>&ldquo;Is this normal?&rdquo;</p>
+
+<p>Hsiu-chin looked out at the <span class="g" data-k="queue">queue</span> with the <span class="g" data-k="flat expression">flat expression</span> of a woman doing <span class="g" data-k="arithmetic">arithmetic</span>.</p>
+
+<p>&ldquo;It's Saturday.&rdquo;</p>
+
+<p>&ldquo;Oh.&rdquo;</p>
+
+<p>&ldquo;And <span class="g" data-k="word got around">word got around</span>,&rdquo; she added, &ldquo;that we were <span class="g" data-k="shut">shut</span>.&rdquo;</p>
+`
+},
 {n:7,  month:"March", title:"Sold Out by Seven"},
-{n:8,  month:"March", title:"Nobody Told Her About the Foam"},
+{n:8,  month:"March", title:"Nobody Has Ever Written It Down"},
 {n:9,  month:"March", title:"The Man by the Window"},
 {n:10, month:"March", title:"Relaxation, Attempt One"},
 {n:11, month:"March", title:"A Cat Has Decided Something"},
@@ -1151,7 +1678,7 @@ function highlight(term, occ){
   const target = marks[occ || 0] || marks[0];
   if(target){
     target.classList.add("target");
-    setTimeout(() => target.scrollIntoView({block:"center", behavior:"smooth"}), 70);
+    if(target.scrollIntoView){ setTimeout(() => target.scrollIntoView({block:"center", behavior:"smooth"}), 70); }
   }
 }
 
@@ -1231,7 +1758,7 @@ function buildGloss(){
       if(!wasOpen){
         panel.classList.add("on");
         row.classList.add("open");
-        setTimeout(() => row.scrollIntoView({block:"nearest", behavior:"smooth"}), 40);
+        if(row.scrollIntoView){ setTimeout(() => row.scrollIntoView({block:"nearest", behavior:"smooth"}), 40); }
       }
     };
   });
