@@ -183,12 +183,36 @@ button small{display:block;font-family:var(--body);font-size:11px;opacity:.8}
 .clk-z{animation:zz 2.4s ease-in-out infinite}
 @keyframes zz{50%{transform:translateY(-5px);opacity:.5}}
 
+/* team editor */
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#0e0f24;border-radius:12px;padding:4px}
+.seg button{font-family:var(--body);font-size:13px;padding:8px 4px;border-radius:9px;background:transparent;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--panel2);color:var(--text)}
+.sec{font-family:var(--display);font-weight:400;font-size:15px;color:var(--lantern);margin:4px 0 -4px}
+.dex.slots{grid-template-columns:repeat(4,1fr)}
+.dex .it.sel{outline:2px solid var(--lantern);outline-offset:2px}
+.dex .it.empty-slot{border-style:dashed;border-color:var(--line);color:var(--muted);background:transparent}
+.dex .it .stat{display:block;color:var(--muted);font-size:10.5px}
+.team-hint{font-size:12.5px;color:var(--muted);text-align:center;margin:0;min-height:1.4em}
+.team-hint.warn{color:var(--lantern)}
+.combos{display:flex;flex-direction:column;gap:6px}
+.combo{background:#0e0f24;border-radius:10px;padding:8px 10px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;border:1.5px solid transparent;font-size:12.5px}
+.combo.on{border-color:var(--lantern)}
+button.combo{width:100%;text-align:left;color:var(--text);line-height:1.5;cursor:pointer}
+button.combo:hover{border-color:var(--line)}
+.combo .go{grid-column:2;justify-self:start;font-family:var(--body);font-size:11.5px;color:var(--lantern);margin-top:2px}
+.combo .ce{font-size:22px;grid-row:span 2;align-self:center}
+.combo .cn{font-family:var(--display);font-size:14px}
+.combo .cn b{font-family:var(--body);font-weight:500;font-size:11px;color:var(--lantern-ink);background:var(--lantern);border-radius:5px;padding:0 5px;margin-left:6px}
+.combo .cd{color:var(--muted)}
+.combo .cm{grid-column:2;letter-spacing:.1em}
+.hero .cmb{position:absolute;top:3px;right:5px;font-size:11px}
+.danger-link{font-family:var(--body);font-size:12px;background:transparent;border:1px solid var(--line);color:var(--muted);padding:6px 10px;border-radius:8px;align-self:center}
 /* language + long-press */
 /* Latin text gets a Latin face: CJK fonts draw ’ “ ” as full-width glyphs */
 [lang="en"]{--display:"Nunito","Huninn",system-ui,sans-serif;--body:"Nunito","Noto Sans TC",system-ui,sans-serif}
 [lang="zh-Hant"]{--display:"Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;--body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
 .face{font-family:var(--body)}
-html[lang="en"] .logo,html[lang="en"] .m-name,html[lang="en"] .face .nm,html[lang="en"] button{font-weight:700}
+html[lang="en"] .logo,html[lang="en"] .m-name,html[lang="en"] .face .nm,html[lang="en"] button:not(.it){font-weight:700}
 .lang-btn{position:absolute;top:calc(12px + env(safe-area-inset-top, 0px));right:16px;font-family:var(--body);font-size:13px;padding:6px 12px;border-radius:999px;background:var(--panel);border:1px solid var(--line);color:var(--text)}
 .chip.lang{font-family:var(--body);font-size:12px;line-height:1.35;color:var(--text);padding:4px 9px;border-radius:999px;min-width:38px}
 .card{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation}
@@ -270,9 +294,9 @@ html[lang="en"] .face .nm{line-height:1.15}
   <div class="foot">
     <span id="pity"></span>
     <span style="display:flex;gap:6px">
-      <button id="helpBtn" data-s="rulesBtn">規則</button>
+      <button id="teamBtn" data-s="teamBtn">隊伍</button>
       <button id="dexBtn" data-s="dexBtn">圖鑑</button>
-      <button id="resetBtn" data-s="resetBtn">重新開始</button>
+      <button id="helpBtn" data-s="rulesBtn">規則</button>
     </span>
   </div>
 </div>
@@ -300,6 +324,7 @@ const STR={
   rulesBtn:['規則','Rules'],
   dexBtn:['圖鑑','Cards'],
   resetBtn:['重新開始','Restart'],
+  teamBtn:['隊伍','Team'],
 };
 function applyStatic(){
   document.documentElement.lang=LANG==='en'?'en':'zh-Hant';
@@ -414,7 +439,7 @@ const shortName=(h,l=LANG)=>l==='en'?(h.en.short||h.en.name):(h.short||h.name);
 
 /* ---------- state ---------- */
 const KEY='tangping-v2';
-function fresh(){return {gems:10,floor:1,roster:{jie:1},bAtk:0,bHp:0,seen:{},pity:0,pulls:0,wins:0,losses:0,done:false}}
+function fresh(){return {gems:10,floor:1,roster:{jie:1},bAtk:0,bHp:0,seen:{},teamMode:'auto',team:[],pity:0,pulls:0,wins:0,losses:0,done:false}}
 let S = fresh();
 try{const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(fresh(),JSON.parse(raw));}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
@@ -427,10 +452,34 @@ function heroStats(id){
   const h=H[id], st=S.roster[id], m=1+0.25*(st-1);
   return {id, h, stars:st, hp:Math.round(h.hp*m)+S.bHp, atk:Math.round(h.atk*m)+S.bAtk};
 }
-function team(){
+function autoTeam(){
   return Object.keys(S.roster).map(heroStats)
     .sort((a,b)=>(b.atk*3+b.hp)-(a.atk*3+a.hp)).slice(0,4);
 }
+/* auto: the 4 strongest. manual: the player's picks, in the player's order */
+function team(){
+  if(S.teamMode!=='manual') return autoTeam();
+  S.team=S.team.filter(id=>S.roster[id]).slice(0,4);
+  if(!S.team.length) S.team=autoTeam().map(t=>t.id);
+  return S.team.map(heroStats);
+}
+
+/* ---------- combos ---------- */
+const COMBOS=[
+  {id:'night_market',e:'🏮',members:['fortune','boba'],name:'夜市之夜',desc:'全隊攻擊 +3，算命師的暴擊率提高到 50%。',
+    en:{name:'Night Market Night',desc:'Team +3 attack. The Fortune Teller’s critical hit chance goes up to 50%.'}},
+  {id:'clockout',e:'⏰',members:['jie','uber','intern'],name:'準時下班聯盟',desc:'全隊攻擊 +6。沒有人想多加一分鐘的班。',
+    en:{name:'Clock-Out Club',desc:'Team +6 attack. Nobody here wants one more minute of overtime.'}},
+  {id:'temple',e:'🏯',members:['medium','grandma'],name:'廟口午後',desc:'乩童一開場就起乩，阿嬤每回合多回復 5 生命。',
+    en:{name:'Afternoon at the Temple',desc:'The Medium is possessed from round 1. A-má heals 5 more HP each round.'}},
+  {id:'discipline',e:'🪖',members:['drill','guard'],name:'紀律部隊',desc:'全隊受到的傷害 -3。',
+    en:{name:'Discipline Squad',desc:'Every crew member takes 3 less damage from each hit.'}},
+  {id:'nightshift',e:'🌙',members:['engineer','clerk'],name:'大夜班',desc:'工程師可以重開機兩次，店員丟泡麵的傷害變成 40。',
+    en:{name:'Night Shift',desc:'The Engineer can reboot twice. The Clerk’s noodle box does 40 damage.'}},
+  {id:'typhoon_day',e:'☔',members:['typhoon','uber'],name:'颱風天外送',desc:'阿豪冒著風雨送餐：第 1 回合攻擊 ×5。',
+    en:{name:'Typhoon Delivery',desc:'Hao delivers through the storm: ×5 attack in round 1.'}}
+];
+const activeCombos=ids=>COMBOS.filter(c=>c.members.every(m=>ids.includes(m)));
 
 /* ---------- render ---------- */
 /* log lines are stored as [zh,en] so the log can switch language too */
@@ -463,13 +512,14 @@ function renderMonster(cur){
 }
 function renderParty(units){
   const t=units||team().map(x=>({...x,cur:x.hp,max:x.hp}));
+  const comboIds=activeCombos(t.map(u=>u.id)).flatMap(c=>c.members);
   let html='';
   for(let i=0;i<4;i++){
     const u=t[i];
-    if(!u){html+=`<div class="hero empty">${tx('空位<br>去抽卡！','Empty<br>Pull a card!')}</div>`;continue}
+    if(!u){html+=`<div class="hero empty">${Object.keys(S.roster).length>t.length?tx('空位<br>點這裡補人','Empty<br>Tap to add'):tx('空位<br>去抽卡！','Empty<br>Pull a card!')}</div>`;continue}
     const pct=Math.max(0,u.cur/u.max*100);
     html+=`<div class="hero r-${u.h.r} ${u.cur<=0?'dead':''}" data-i="${i}">
-      <div class="e">${u.h.e}</div><div class="n">${shortName(u.h)}</div>
+      ${comboIds.some(m=>m===u.id)?'<span class="cmb" aria-hidden="true">✨</span>':''}<div class="e">${u.h.e}</div><div class="n">${shortName(u.h)}</div>
       <div class="s">${'★'.repeat(u.stars)}</div>
       <div class="bar hpb ${pct<35?'low':''}"><span style="width:${pct}%"></span></div>
       <div class="a num">⚔ ${u.atk}　♥ ${Math.max(0,u.cur)}</div></div>`;
@@ -486,9 +536,9 @@ function renderUI(){
   $('goHint').textContent=busy?(fast?tx('快轉中…','Fast-forwarding…'):tx('戰鬥中…（點戰鬥紀錄可快轉）','Fighting… (tap the log to skip)'))
     :S.done?tx('已通關','Cleared!'):tx(`挑戰 ${N(MONSTERS[S.floor-1],'name')}`,`Fight the ${N(MONSTERS[S.floor-1],'name')}`);
   $('pity').textContent=tx(`再抽 ${PITY_MAX-S.pity} 次必出傳說`,`Legendary in ${PITY_MAX-S.pity} pulls`);
-  const owned=Object.keys(S.roster).length;
-  $('buffs').innerHTML=tx(`裝備加成（全隊）：攻擊 <b class="num">+${S.bAtk}</b>・生命 <b class="num">+${S.bHp}</b>　｜　夥伴 <b class="num">${owned}</b> / ${HEROES.length}`,
-    `Gear (team): ATK <b class="num">+${S.bAtk}</b> · HP <b class="num">+${S.bHp}</b>　|　Crew <b class="num">${owned}</b> / ${HEROES.length}`);
+  const owned=Object.keys(S.roster).length, combosNow=activeCombos(team().map(t=>t.id)).length;
+  $('buffs').innerHTML=tx(`裝備加成（全隊）：攻擊 <b class="num">+${S.bAtk}</b>・生命 <b class="num">+${S.bHp}</b>　｜　夥伴 <b class="num">${owned}</b> / ${HEROES.length}${combosNow?`　｜　組合技 <b class="num">${combosNow}</b>`:''}`,
+    `Gear: ATK <b class="num">+${S.bAtk}</b> · HP <b class="num">+${S.bHp}</b>　|　Crew <b class="num">${owned}</b>/${HEROES.length}${combosNow?`　|　Combos <b class="num">${combosNow}</b>`:''}`);
   save();
 }
 
@@ -511,7 +561,7 @@ function pullOne(min='C',forceType=null){
   const c=pick(pool); const card={type,c,r,tag:null};
   if(type==='hero'){
     if(S.roster[c.id]){ if(S.roster[c.id]<5){S.roster[c.id]++;card.tag={k:'up',n:S.roster[c.id]}} else {S.gems+=2;card.tag={k:'max'}} }
-    else {S.roster[c.id]=1;card.tag={k:'new'}}
+    else {S.roster[c.id]=1;card.tag={k:'new'}; if(S.teamMode==='manual'&&S.team.length<4) S.team.push(c.id);}
   } else if(type==='gear'){
     S.bAtk+=c.atk; S.bHp+=c.hp;
   } else if(c.fx){ c.fx(S) }
@@ -613,19 +663,24 @@ function simulate(){
   const frames=[]; const snap=(text,cls,hit)=>frames.push({text,cls,hit,mon:{...mon},u:units.map(u=>u.cur)});
   const sz=u=>shortName(u.h,'zh'), se=u=>shortName(u.h,'en');
   let teamAtk=0;
+  const combos=activeCombos(units.map(u=>u.id)), C=id=>combos.some(c=>c.id===id);
   if(units.some(u=>u.id==='drill')){teamAtk+=4}
   if(units.some(u=>u.id==='grandma')){teamAtk+=5}
+  if(C('night_market')) teamAtk+=3;
+  if(C('clockout')) teamAtk+=6;
   snap([`— 第 ${f} 層：${m0.e} ${mz} 出現了！ —`,`— Floor ${f}: ${m0.e} The ${me} appears! —`],'sys');
+  combos.forEach(c=>snap([`${c.e} 組合技發動：${c.name}！${c.desc}`,`${c.e} Combo: ${c.en.name}! ${c.en.desc}`],'gold'));
   if(teamAtk) snap([`全隊士氣高昂，攻擊力 +${teamAtk}。`,`The team is fired up! Attack +${teamAtk}.`],'good');
   if(has('typhoon')){const d=Math.round(mon.max*.25);mon.hp-=d;snap([`🌀 颱風假之神宣布停班停課！${mz} 失去 ${d} 生命！`,`🌀 The Typhoon God cancels work and school! The ${me} loses ${d} HP!`],'gold','m')}
   let win=false, stunned=null;
   const hurt=(t,d)=>{
     if(t.id==='guard')d=Math.max(1,d-3);
+    if(C('discipline'))d=Math.max(1,d-3);
     t.cur-=d;
     snap([`${m0.e} ${mz} 攻擊 ${sz(t)}，造成 ${d} 傷害。`,`${m0.e} The ${me} hits ${se(t)} for ${d} damage.`],'bad',units.indexOf(t));
     if(m0.trait==='drain'){mon.hp=Math.min(mon.max,mon.hp+d)}
     if(t.cur<=0){
-      if(t.id==='engineer'&&!t.revived){t.revived=true;t.cur=Math.ceil(t.max/2);snap(['💻 資深工程師重開機了！以一半生命復活。','💻 The Engineer reboots! She’s back with half HP.'],'good')}
+      if(t.id==='engineer'&&(t.reboots||0)<(C('nightshift')?2:1)){t.reboots=(t.reboots||0)+1;t.cur=Math.ceil(t.max/2);snap(['💻 資深工程師重開機了！以一半生命復活。','💻 The Engineer reboots! She’s back with half HP.'],'good')}
       else snap([`${t.h.e} ${sz(t)} 躺平了……`,`${t.h.e} ${se(t)} is down for the count…`],'bad');
     }
   };
@@ -638,21 +693,21 @@ function simulate(){
       if(alive.length){stunned=pick(alive);snap([`🐙 ${sz(stunned)} 被拉進會議，這回合無法行動。`,`🐙 ${se(stunned)} gets pulled into a meeting and can’t act this round.`],'bad')}
     }
     if(has('boba')){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+5)});snap(['🧋 店長發飲料，全隊回復 5。','🧋 The Tea Manager hands out drinks. Team heals 5 HP.'],'good')}
-    if(has('grandma')){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+10)});snap(['👵 阿嬤端出滷肉飯，全隊回復 10。','👵 A-má brings out braised pork rice. Team heals 10 HP.'],'good')}
+    if(has('grandma')){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+(C('temple')?15:10))});const g=C('temple')?15:10;snap([`👵 阿嬤端出滷肉飯，全隊回復 ${g}。`,`👵 A-má brings out braised pork rice. Team heals ${g} HP.`],'good')}
     if(has('clerk')){
       const x=Math.floor(Math.random()*3);
       if(x===0){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+12)});snap(['🏪 店員發了茶葉蛋，全隊回復 12。','🏪 The Clerk hands out tea eggs. Team heals 12 HP.'],'good')}
       else if(x===1){teamAtk+=3;snap(['🏪 店員遞上能量飲料，全隊攻擊 +3。','🏪 The Clerk passes around energy drinks. Team attack +3.'],'good')}
-      else {mon.hp-=25;snap(['🏪 店員丟出一整箱泡麵，造成 25 傷害！','🏪 The Clerk throws a whole box of instant noodles! 25 damage!'],'gold','m')}
+      else {const d=C('nightshift')?40:25;mon.hp-=d;snap([`🏪 店員丟出一整箱泡麵，造成 ${d} 傷害！`,`🏪 The Clerk throws a whole box of instant noodles! ${d} damage!`],'gold','m')}
     }
     for(const u of units){
       if(u.cur<=0||mon.hp<=0||u===stunned)continue;
       if(m0.trait==='dodge'&&Math.random()<.25){snap([`${u.h.e} ${sz(u)} 的攻擊……被已讀不回了。`,`${u.h.e} ${se(u)} attacks… and gets left on read.`],'sys');continue}
       let a=u.atk+teamAtk, nz='', ne='';
       if(u.id==='jie'&&r>=4){a*=2;nz='（準時下班！）';ne=' (Leave on time!)'}
-      if(u.id==='uber'&&r===1){a*=3;nz='（準時送達！）';ne=' (Right on time!)'}
-      if(u.id==='medium'&&u.cur<u.max/2){a*=2;nz='（起乩！）';ne=' (Possessed!)'}
-      if(u.id==='fortune'&&Math.random()<.3){a=Math.round(a*2.5);nz='（鐵口直斷，暴擊！）';ne=' (Never wrong! Critical hit!)'}
+      if(u.id==='uber'&&r===1){a*=C('typhoon_day')?5:3;nz='（準時送達！）';ne=' (Right on time!)'}
+      if(u.id==='medium'&&(u.cur<u.max/2||C('temple'))){a*=2;nz='（起乩！）';ne=' (Possessed!)'}
+      if(u.id==='fortune'&&Math.random()<(C('night_market')?.5:.3)){a=Math.round(a*2.5);nz='（鐵口直斷，暴擊！）';ne=' (Never wrong! Critical hit!)'}
       let hits=1; if(u.id==='intern'&&Math.random()<.25){hits=2;nz='（連印兩張！）';ne=' (Double copy!)'}
       const dmg=a*hits; mon.hp-=dmg;
       snap([`${u.h.e} ${sz(u)} 攻擊，造成 ${dmg} 傷害${nz}`,`${u.h.e} ${se(u)} attacks for ${dmg} damage${ne}`],'','m');
@@ -862,12 +917,12 @@ function showCard(type,id,fromDex){
     rows=tx(`<dt>星等</dt><dd>${st.stars}★（基礎數值 +${(st.stars-1)*25}%）</dd>
       <dt>目前生命</dt><dd class="num">${st.hp}（含裝備 +${S.bHp}）</dd>
       <dt>目前攻擊</dt><dd class="num">${st.atk}（含裝備 +${S.bAtk}）</dd>
-      <dt>狀態</dt><dd>${inTeam?'出戰中':'候補（戰力不在前 4 名）'}</dd>
+      <dt>狀態</dt><dd>${inTeam?'出戰中':S.teamMode==='manual'?'候補':'候補（戰力不在前 4 名）'}</dd>
       <dt>下一星</dt><dd>${st.stars<5?`再抽到 1 張就升到 ${st.stars+1}★`:'已滿星，再抽到會換成 💎2'}</dd>`,
      `<dt>Stars</dt><dd>${st.stars}★ (base stats +${(st.stars-1)*25}%)</dd>
       <dt>HP now</dt><dd class="num">${st.hp} (gear +${S.bHp})</dd>
       <dt>ATK now</dt><dd class="num">${st.atk} (gear +${S.bAtk})</dd>
-      <dt>Status</dt><dd>${inTeam?'In the team':'On the bench (not in the top 4)'}</dd>
+      <dt>Status</dt><dd>${inTeam?'In the team':S.teamMode==='manual'?'On the bench':'On the bench (not in the top 4)'}</dd>
       <dt>Next star</dt><dd>${st.stars<5?`Pull 1 more copy to reach ${st.stars+1}★`:'Max stars. Extra copies become 💎2'}</dd>`);
   } else if(type==='gear'){
     const n=S.seen[id]||0;
@@ -883,7 +938,9 @@ function showCard(type,id,fromDex){
   }
   openModal(`<div class="cards one">${cardHTML({type,c,r:c.r,tag},0)}</div>${lpHint()}
     <dl class="info">${rows}</dl>
-    <div class="btns"><button id="mOk">${fromDex?tx('返回圖鑑','Back to Cards'):tx('關閉','Close')}</button></div>`);
+    ${type==='hero'?comboRows(id):''}
+    <div class="btns">${type==='hero'&&S.roster[id]?`<button id="mTeam">${tx('調整隊伍','Edit team')}</button>`:''}<button id="mOk">${fromDex?tx('返回圖鑑','Back to Cards'):tx('關閉','Close')}</button></div>`);
+  if($('mTeam')) $('mTeam').onclick=()=>openTeam();
   $('modal').querySelector('.card').classList.add('open');
   $('mOk').onclick=fromDex?openDex:closeModal;
 }
@@ -900,7 +957,7 @@ function openDex(){
     const nm=dexTab==='hero'?shortName(c):N(c,'name');
     return `<button class="it" data-id="${c.id}" style="--rc:${RAR[c.r].css}"><div class="e">${c.e}</div>${nm}<br><span class="sub">${sub}</span></button>`;
   }).join('');
-  const hint={hero:tx('點夥伴看詳細資料。出戰的是戰力最高的 4 位。','Tap a crew member for details. The 4 strongest go into battle.'),
+  const hint={hero:tx('點夥伴看詳細資料。用「隊伍」按鈕選擇誰上場。','Tap a crew member for details. Use the Team button to choose who fights.'),
     gear:tx('裝備會疊加，效果套用在全隊。','Gear stacks, and it works for the whole team.'),
     event:tx('抽到過的事件才會出現在這裡。','Events show up here after you pull them.')}[dexTab];
   openModal(`<h2>${tx('圖鑑','Card Collection')}</h2><div class="tabs" role="tablist">${tabs}</div><div class="dex">${items}</div>
@@ -912,6 +969,7 @@ function openDex(){
 $('dexBtn').onclick=openDex;
 $('party').addEventListener('click',e=>{
   if(busy)return;
+  if(e.target.closest('.hero.empty')){openTeam();return}
   const h=e.target.closest('.hero[data-i]'); if(!h)return;
   const t=team()[+h.dataset.i]; if(t) showCard('hero',t.id,false);
 });
@@ -934,7 +992,10 @@ function helpHTML(){
     <ul><li><b>Gear</b> stacks, and every bonus goes to the whole team.</li>
     <li><b>Events</b> give you a reward right away, or ask you to choose one of two options.</li></ul></section>
   <section><h3>Your team</h3>
-    <p>Your 4 strongest crew members go into battle automatically. Everyone else waits on the bench. Tap a crew member to see their details.</p></section>
+    <p>By default, your 4 strongest crew members go into battle automatically. Everyone else waits on the bench.</p>
+    <p>Want to choose for yourself? Press <b>Team</b> at the bottom. Tap a team member, then tap someone on the bench to swap them. Once you change anything, the team switches to <b>Manual</b> and stays that way until you switch back to <b>Auto</b>.</p></section>
+  <section><h3>Combos</h3>
+    <p>Some crew members work better together. When everyone in a combo is on the team, the combo turns on at the start of each battle. A ✨ marks the crew members in an active combo. You can see every combo in the Team screen, and a crew member’s combos on their card.</p></section>
   <section><h3>Battles</h3>
     <ul><li>A battle lasts up to ${MAX_ROUNDS} rounds. If the monster is still standing when time runs out, you lose.</li>
     <li>Every monster has a special ability. You can read it under its name.</li>
@@ -944,7 +1005,7 @@ function helpHTML(){
     <li>If your whole team goes down, you get ${LOSS_GEMS} gems as comfort pay.</li></ul></section>
   <section><h3>Language</h3>
     <p>Tap “中文” at the top to switch to Chinese. Press and hold any card to see it in Chinese.</p></section>
-  </div><div class="btns"><button id="mOk">Got it</button></div>`;
+  </div><div class="btns"><button id="mOk">Got it</button></div><button class="danger-link" id="mReset">Restart the game…</button>`;
   return `<h2>遊戲規則</h2><div class="help" style="display:flex;flex-direction:column;gap:14px">
   <section><h3>怎麼玩</h3>
     <p>抽卡補強冒險團，按「出發！」讓夥伴自動戰鬥。打倒第 10 層的加班之王就通關。</p></section>
@@ -962,7 +1023,10 @@ function helpHTML(){
     <ul><li><b>裝備</b>會疊加，加成套用在全隊每一位夥伴。</li>
     <li><b>事件</b>可能直接給獎勵，也可能讓你二選一。</li></ul></section>
   <section><h3>編隊</h3>
-    <p>戰力最高的 4 位夥伴自動上場，其他人在候補。點隊伍裡的夥伴可以看詳細資料。</p></section>
+    <p>預設是自動編隊：戰力最高的 4 位夥伴上場，其他人在候補。</p>
+    <p>想自己決定？按下方的<b>隊伍</b>。先點隊伍裡的人，再點候補的人，就能交換。只要動過隊伍，就會切換成<b>手動</b>，直到你切回<b>自動</b>為止。</p></section>
+  <section><h3>組合技</h3>
+    <p>有些夥伴湊在一起特別強。組合技的成員全部上場時，每場戰鬥開始就會發動。有組合技的夥伴會標上 ✨。所有組合技都列在隊伍畫面，夥伴卡片上也看得到他參加哪些組合技。</p></section>
   <section><h3>戰鬥</h3>
     <ul><li>最多 ${MAX_ROUNDS} 回合，時間到怪物還站著就算輸。</li>
     <li>每隻怪物都有特殊能力，寫在怪物名字下面。</li>
@@ -972,9 +1036,9 @@ function helpHTML(){
     <li>全員躺平時，領到 ${LOSS_GEMS} 顆補償金。</li></ul></section>
   <section><h3>語言</h3>
     <p>點右上角的「EN」切換成英文。長按任何一張卡片，可以看它的英文版。</p></section>
-  </div><div class="btns"><button id="mOk">知道了</button></div>`;
+  </div><div class="btns"><button id="mOk">知道了</button></div><button class="danger-link" id="mReset">重新開始遊戲…</button>`;
 }
-function openHelp(){ modalView=openHelp; openModal(helpHTML()); $('mOk').onclick=closeModal; }
+function openHelp(){ modalView=openHelp; openModal(helpHTML()); $('mOk').onclick=closeModal; $('mReset').onclick=openReset; }
 $('helpBtn').onclick=openHelp;
 function openReset(){
   modalView=openReset;
@@ -982,7 +1046,82 @@ function openReset(){
     <div class="btns"><button id="mYes">${tx('重新開始','Start over')}</button><button id="mNo">${tx('算了','Never mind')}</button></div>`);
   $('mYes').onclick=()=>{closeModal();reset()}; $('mNo').onclick=closeModal;
 }
-$('resetBtn').onclick=openReset;
+
+/* ---------- team editor ---------- */
+let teamSel=null, teamMsg=null;
+function comboRows(id){
+  const list=COMBOS.filter(c=>c.members.includes(id)); if(!list.length) return '';
+  const ids=team().map(t=>t.id);
+  return `<h3 class="sec">${tx('組合技','Combos')}</h3><div class="combos">${list.map(c=>comboHTML(c,ids)).join('')}</div>`;
+}
+/* a combo is "ready" when you own every member but they aren't all on the team yet */
+function comboHTML(c,ids){
+  const on=c.members.every(m=>ids.includes(m));
+  const ready=!on&&c.members.every(m=>S.roster[m]);
+  const who=c.members.map(m=>S.roster[m]?H[m].e:'❔').join(' ');
+  const inner=`<span class="ce">${c.e}</span>
+    <span class="cn">${N(c,'name')}${on?`<b>${tx('發動中','ON')}</b>`:''}</span>
+    <span class="cd">${N(c,'desc')}</span><span class="cm">${who}</span>
+    ${ready?`<span class="go">${tx('▶ 點一下，讓他們上場','▶ Tap to put them on the team')}</span>`:''}`;
+  return ready?`<button class="combo" data-combo="${c.id}">${inner}</button>`:`<div class="combo ${on?'on':''}">${inner}</div>`;
+}
+/* put a combo's members on the team; keep the strongest of the others for the remaining slots */
+function useCombo(id){
+  const c=COMBOS.find(x=>x.id===id); if(!c) return;
+  const cur=team().map(t=>t.id);
+  const keep=cur.filter(m=>!c.members.includes(m)).map(heroStats).sort((a,b)=>(b.atk*3+b.hp)-(a.atk*3+a.hp)).map(t=>t.id);
+  S.teamMode='manual'; S.team=[...c.members,...keep].slice(0,4); teamSel=null;
+  teamMsg=tx(`${c.e} ${c.name} 的成員上場了！`,`${c.e} ${c.en.name} is ready to go!`);
+  renderUI(); openTeam();
+}
+document.addEventListener('click',e=>{const b=e.target.closest('button.combo[data-combo]'); if(b&&!$('overlay').hidden) useCombo(b.dataset.combo);});
+function toManual(){ if(S.teamMode!=='manual'){ S.team=autoTeam().map(t=>t.id); S.teamMode='manual'; } }
+function openTeam(){
+  modalView=openTeam;
+  const cur=team(), ids=cur.map(t=>t.id);
+  const bench=Object.keys(S.roster).filter(id=>!ids.includes(id)).map(heroStats).sort((a,b)=>(b.atk*3+b.hp)-(a.atk*3+a.hp));
+  const chip=(t,extra,attrs)=>`<button class="it ${extra}" ${attrs} style="--rc:${RAR[t.h.r].css}"><div class="e">${t.h.e}</div>${shortName(t.h)}<br><span class="sub">${'★'.repeat(t.stars)}</span><span class="stat num">⚔${t.atk} ♥${t.hp}</span></button>`;
+  let slots='';
+  for(let i=0;i<4;i++){
+    const t=cur[i];
+    slots+=t?chip(t,teamSel===i?'sel':'',`data-slot="${i}"`):`<button class="it empty-slot" data-slot="${i}"><div class="e">＋</div>${tx('空位','Empty')}</button>`;
+  }
+  const hint=teamMsg?`<p class="team-hint warn" role="status">${teamMsg}</p>`
+    :`<p class="team-hint">${teamSel!=null?tx('點一位候補夥伴來交換，或按「移到候補」。','Tap someone on the bench to swap, or press “Move to bench”.')
+      :S.teamMode==='manual'?tx('點隊伍裡的人，再點候補的人來交換。','Tap a team member, then someone on the bench to swap.')
+      :tx('目前由戰力最高的 4 位自動上場。點任何人就能改成手動。','The 4 strongest fight automatically. Tap anyone to switch to Manual.')}</p>`;
+  const all=COMBOS.map(c=>comboHTML(c,ids)).join('');
+  openModal(`<h2>${tx('隊伍','Team')}</h2>
+    <div class="seg" role="group"><button data-mode="auto" aria-pressed="${S.teamMode!=='manual'}">${tx('自動（最強 4 位）','Auto (strongest 4)')}</button><button data-mode="manual" aria-pressed="${S.teamMode==='manual'}">${tx('手動','Manual')}</button></div>
+    <div class="dex slots">${slots}</div>${hint}
+    ${teamSel!=null&&cur.length>1?`<button class="danger-link" id="mBench">${tx('移到候補','Move to bench')}</button>`:''}
+    <h3 class="sec">${tx('候補','Bench')}</h3>
+    ${bench.length?`<div class="dex">${bench.map(t=>chip(t,'',`data-bench="${t.id}"`)).join('')}</div>`:`<p class="summary">${tx('還沒有候補夥伴。多抽幾張吧！','No one on the bench yet. Pull more cards!')}</p>`}
+    <h3 class="sec">${tx('組合技','Combos')}</h3><div class="combos">${all}</div>
+    <div class="btns"><button id="mOk">${tx('完成','Done')}</button></div>`);
+  teamMsg=null;
+  const m=$('modal');
+  m.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{
+    if(b.dataset.mode==='auto'){S.teamMode='auto';S.team=[];} else toManual();
+    teamSel=null; renderUI(); openTeam();
+  });
+  m.querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.slot; toManual();
+    if(!cur[i]){ teamSel=null; teamMsg=bench.length?tx('點一位候補夥伴補上這個空位。','Tap someone on the bench to fill this slot.'):tx('還沒有候補夥伴。','No one on the bench yet.'); }
+    else teamSel=(teamSel===i?null:i);
+    renderUI(); openTeam();
+  });
+  m.querySelectorAll('[data-bench]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.bench; toManual();
+    if(teamSel!=null&&S.team[teamSel]) S.team[teamSel]=id;
+    else if(S.team.length<4) S.team.push(id);
+    else teamMsg=tx('隊伍滿了。先點隊伍裡要換下來的人。','The team is full. First tap the team member you want to swap out.');
+    teamSel=null; renderUI(); openTeam();
+  });
+  if($('mBench')) $('mBench').onclick=()=>{ S.team.splice(teamSel,1); teamSel=null; renderUI(); openTeam(); };
+  $('mOk').onclick=()=>{teamSel=null;closeModal()};
+}
+$('teamBtn').onclick=()=>{teamSel=null;openTeam()};
 function reset(){S=fresh();logLines.length=0;$('log').innerHTML='';intro();renderUI()}
 function intro(){
   log(['潮濕的風從洞裡吹出來，帶著烤地瓜的味道。','A damp wind blows out of the cave. It smells like roasted sweet potatoes.'],'sys');
