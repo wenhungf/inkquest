@@ -6,7 +6,7 @@
 <title>躺平冒險團</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&family=Nunito:wght@400;600;700;800&display=swap">
 <style>
 body{margin:0}
 [hidden]{display:none!important}
@@ -33,9 +33,11 @@ body{
 
 /* top */
 .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.top .logo{flex:none;white-space:nowrap}
+.top .logo small{white-space:normal;max-width:14em}
 .logo{font-family:var(--display);font-size:24px;letter-spacing:.04em;line-height:1.1}
 .logo small{display:block;font-family:var(--body);font-size:11px;color:var(--muted);letter-spacing:.12em}
-.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;flex:1 1 0;min-width:0}
 .chip{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:13px;white-space:nowrap}
 .chip.snd{font-family:var(--body);font-size:14px;line-height:1.2;color:var(--text);padding:4px 9px;border-radius:999px}
 .chip b{font-family:var(--display);font-weight:400;font-size:15px}
@@ -173,6 +175,24 @@ button small{display:block;font-family:var(--body);font-size:11px;opacity:.8}
 .clk-z{animation:zz 2.4s ease-in-out infinite}
 @keyframes zz{50%{transform:translateY(-5px);opacity:.5}}
 
+/* language + long-press */
+/* Latin text gets a Latin face: CJK fonts draw ’ “ ” as full-width glyphs */
+[lang="en"]{--display:"Nunito","Huninn",system-ui,sans-serif;--body:"Nunito","Noto Sans TC",system-ui,sans-serif}
+[lang="zh-Hant"]{--display:"Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;--body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+.face{font-family:var(--body)}
+html[lang="en"] .logo,html[lang="en"] .m-name,html[lang="en"] .face .nm,html[lang="en"] button{font-weight:700}
+.lang-btn{position:absolute;top:calc(12px + env(safe-area-inset-top, 0px));right:16px;font-family:var(--body);font-size:13px;padding:6px 12px;border-radius:999px;background:var(--panel);border:1px solid var(--line);color:var(--text)}
+.chip.lang{font-family:var(--body);font-size:12px;line-height:1.35;color:var(--text);padding:4px 9px;border-radius:999px;min-width:38px}
+.card{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.face.alt{display:none}
+.card.showalt .face.main{display:none}
+.card.showalt .face.alt{display:flex}
+.face.alt{outline:2px dashed var(--rc);outline-offset:-6px}
+.lp-hint{font-size:12px;color:var(--muted);text-align:center;margin:0}
+html[lang="en"] .hero .n{font-size:11px}
+html[lang="en"] .logo small{letter-spacing:.02em}
+.hero .a{white-space:nowrap;font-size:10.5px}
+html[lang="en"] .face .nm{line-height:1.15}
 @media (prefers-reduced-motion: reduce){
   *{animation:none!important;transition:none!important}
 }
@@ -197,28 +217,30 @@ button small{display:block;font-family:var(--body);font-size:11px;opacity:.8}
       <text x="150" y="166" text-anchor="middle" fill="#ff7070" font-family="Huninn, sans-serif" font-size="21" font-weight="700">18:00</text>
     </g>
   </svg>
-  <h1 class="t">躺平冒險團</h1>
-  <p class="slogan">撐到下班，就是勝利。</p>
-  <p class="sub">抽卡就好，打怪交給夥伴。</p>
-  <button id="startBtn">打卡上工</button>
-  <p class="sub" id="splashHint">👆 點一下畫面，開啟音樂</p>
+  <h1 class="t" data-s="title">躺平冒險團</h1>
+  <p class="slogan" data-s="slogan">撐到下班，就是勝利。</p>
+  <p class="sub" data-s="splashSub">抽卡就好，打怪交給夥伴。</p>
+  <button id="startBtn" data-s="start">打卡上工</button>
+  <p class="sub" id="splashHint" data-s="hintTap">👆 點一下畫面，開啟音樂</p>
+  <button class="lang-btn" id="langBtn2" aria-label="Switch language">EN</button>
 </div>
 <div class="wrap">
   <header class="top">
-    <div class="logo">躺平冒險團<small>只要抽卡，其他交給夥伴</small></div>
+    <div class="logo"><span data-s="title">躺平冒險團</span><small data-s="tagline">只要抽卡，其他交給夥伴</small></div>
     <div class="chips">
+      <button class="chip lang" id="langBtn" aria-label="Switch language">EN</button>
       <button class="chip snd" id="soundBtn" aria-label="關閉聲音">🔊</button>
       <span class="chip">💎 <b class="num" id="gems">10</b></span>
-      <span class="chip">第 <b class="num" id="floorNum">1</b> / 10 層</span>
+      <span class="chip" id="floorChip"></span>
     </div>
   </header>
-  <div class="floors" id="floors" aria-label="樓層進度"></div>
+  <div class="floors" id="floors"></div>
 
   <section class="stage">
     <div class="monster">
       <div class="m-emoji" id="mEmoji">🍄</div>
       <div>
-        <div class="m-floor" id="mFloor">第 1 層</div>
+        <div class="m-floor" id="mFloor"></div>
         <div class="m-name" id="mName"></div>
         <div class="m-quote" id="mQuote"></div>
         <div class="bar"><span id="mBar" style="width:100%"></span></div>
@@ -230,18 +252,18 @@ button small{display:block;font-family:var(--body);font-size:11px;opacity:.8}
   </section>
 
   <div class="actions">
-    <button class="btn-pull" id="pull1">抽一張<small>💎 1</small></button>
-    <button class="btn-pull" id="pull10">十連抽<small>💎 10・必出史詩以上</small></button>
-    <button class="btn-go" id="go">出發！<small id="goHint">冒險團自動戰鬥</small></button>
+    <button class="btn-pull" id="pull1"><span data-s="pull1">抽一張</span><small>💎 1</small></button>
+    <button class="btn-pull" id="pull10"><span data-s="pull10">十連抽</span><small data-s="pull10sub">💎 10・必出史詩以上</small></button>
+    <button class="btn-go" id="go"><span data-s="go">出發！</span><small id="goHint"></small></button>
   </div>
 
   <div class="buffs" id="buffs"></div>
   <div class="foot">
     <span id="pity"></span>
     <span style="display:flex;gap:6px">
-      <button id="helpBtn" aria-label="遊戲規則">？ 規則</button>
-      <button id="dexBtn">圖鑑</button>
-      <button id="resetBtn">重新開始</button>
+      <button id="helpBtn" data-s="rulesBtn">規則</button>
+      <button id="dexBtn" data-s="dexBtn">圖鑑</button>
+      <button id="resetBtn" data-s="resetBtn">重新開始</button>
     </span>
   </div>
 </div>
@@ -249,70 +271,137 @@ button small{display:block;font-family:var(--body);font-size:11px;opacity:.8}
 <div class="overlay" id="overlay" hidden><div class="modal" id="modal"></div></div>
 
 <script>
+/* ---------- language ---------- */
+let LANG='zh'; try{ if(localStorage.getItem('clockout-lang')==='en') LANG='en'; }catch(e){}
+const other=l=>l==='en'?'zh':'en';
+const tx=(zh,en,l=LANG)=>l==='en'?en:zh;
+/* N(item, field, lang): the zh value lives on the item, the en value in item.en */
+const N=(c,f,l=LANG)=>l==='en'&&c.en&&c.en[f]!=null?c.en[f]:c[f];
+const STR={
+  title:['躺平冒險團','Clock Out'],
+  tagline:['只要抽卡，其他交給夥伴','Pull cards. Your crew does the rest.'],
+  slogan:['撐到下班，就是勝利。','Make it to clock-out. That’s a win.'],
+  splashSub:['抽卡就好，打怪交給夥伴。','Just pull cards. Your crew does the fighting.'],
+  start:['打卡上工','Clock In'],
+  hintTap:['👆 點一下畫面，開啟音樂','👆 Tap the screen to turn on the music'],
+  pull1:['抽一張','Pull ×1'],
+  pull10:['十連抽','Pull ×10'],
+  pull10sub:['💎 10・必出史詩以上','💎 10 · Epic or better'],
+  go:['出發！','Go!'],
+  rulesBtn:['規則','Rules'],
+  dexBtn:['圖鑑','Cards'],
+  resetBtn:['重新開始','Restart'],
+};
+function applyStatic(){
+  document.documentElement.lang=LANG==='en'?'en':'zh-Hant';
+  document.title=STR.title[LANG==='en'?1:0];
+  document.querySelectorAll('[data-s]').forEach(el=>{const v=STR[el.dataset.s]; if(v) el.textContent=v[LANG==='en'?1:0]});
+  ['langBtn','langBtn2'].forEach(id=>{const b=$(id); b.textContent=LANG==='en'?'中文':'EN'; b.setAttribute('aria-label',LANG==='en'?'切換成中文':'Switch to English')});
+}
+
+/* ---------- data ---------- */
 const RAR = {
-  C:{name:'普通',w:55,css:'var(--C)'},
-  R:{name:'稀有',w:30,css:'var(--R)'},
-  E:{name:'史詩',w:12,css:'var(--E)'},
-  L:{name:'傳說',w:3,css:'var(--L)'}
+  C:{name:'普通',en:{name:'Common'},w:55,css:'var(--C)'},
+  R:{name:'稀有',en:{name:'Rare'},w:30,css:'var(--R)'},
+  E:{name:'史詩',en:{name:'Epic'},w:12,css:'var(--E)'},
+  L:{name:'傳說',en:{name:'Legendary'},w:3,css:'var(--L)'}
 };
 const ORDER = ['C','R','E','L'];
 const PITY_MAX = 30;
+const TYPE_NAME={hero:['夥伴','Crew'],gear:['裝備','Gear'],event:['事件','Event']};
+const typeName=(t,l=LANG)=>TYPE_NAME[t][l==='en'?1:0];
 
 const HEROES = [
-  {id:'intern',name:'實習生小美',e:'🙋‍♀️',r:'C',hp:22,atk:6,skill:'影印機大師',desc:'每回合 25% 機率攻擊兩次。',q:'「這個要印幾份？全部嗎？好喔。」'},
-  {id:'guard',name:'保全伯伯',e:'👮',r:'C',hp:42,atk:4,skill:'老神在在',desc:'受到的傷害 -3。',q:'「少年欸，登記一下。」'},
-  {id:'uber',name:'外送員阿豪',e:'🛵',r:'C',hp:26,atk:7,skill:'準時送達',desc:'第 1 回合攻擊力 ×3。',q:'「您的餐點到了，麻煩給五星。」'},
-  {id:'jie',name:'打工仔騎士・阿傑',e:'🛡️',r:'R',hp:30,atk:8,skill:'準時下班',desc:'第 4 回合起攻擊力翻倍。',q:'「老闆，這不在我的工作範圍內……好啦我打。」'},
-  {id:'fortune',name:'夜市算命師',e:'🔮',r:'R',hp:24,atk:9,skill:'鐵口直斷',desc:'30% 機率暴擊，傷害 ×2.5。',q:'「你今天……會打贏。五百。」'},
-  {id:'boba',name:'手搖飲店長',e:'🧋',r:'R',hp:28,atk:6,skill:'半糖少冰',desc:'每回合全隊回復 5 生命。',q:'「甜度冰塊？好的，下一位。」'},
-  {id:'drill',name:'退休教官',e:'🎖️',r:'E',hp:50,atk:10,skill:'集合！',desc:'全隊攻擊力 +4。',q:'「頭髮太長！全部給我站好！」'},
-  {id:'medium',name:'廟口乩童',e:'🥁',r:'E',hp:38,atk:12,skill:'起乩',desc:'生命低於一半時，攻擊力 ×2。',q:'「神明說……可以打。」'},
-  {id:'engineer',name:'資深工程師',e:'💻',r:'E',hp:34,atk:14,skill:'重開機',desc:'第一次倒下時，以一半生命復活。',q:'「你有試過關掉再打開嗎？」'},
-  {id:'grandma',name:'阿嬤',e:'👵',r:'L',hp:60,atk:14,skill:'呷飽未',desc:'每回合全隊回復 10 生命，全隊攻擊力 +5。',q:'「瘦成這樣！再吃一碗！」'},
-  {id:'typhoon',name:'颱風假之神',e:'🌀',r:'L',hp:45,atk:20,skill:'停班停課',desc:'戰鬥開始時，敵人失去 25% 生命。',q:'「人事行政總處宣布——」'},
-  {id:'clerk',name:'超商店員',e:'🏪',r:'L',hp:50,atk:16,skill:'什麼都有',desc:'每回合隨機：全隊回血 12／全隊攻擊 +3／丟出 25 點傷害。',q:'「歡迎光臨～需要袋子嗎？」'}
+  {id:'intern',name:'實習生小美',e:'🙋‍♀️',r:'C',hp:22,atk:6,skill:'影印機大師',desc:'每回合 25% 機率攻擊兩次。',q:'「這個要印幾份？全部嗎？好喔。」',
+    en:{name:'Mei the Intern',short:'Mei',skill:'Copy Machine Master',desc:'25% chance to attack twice each round.',q:'“How many copies? All of them? Okay.”'}},
+  {id:'guard',name:'保全伯伯',e:'👮',r:'C',hp:42,atk:4,skill:'老神在在',desc:'受到的傷害 -3。',q:'「少年欸，登記一下。」',
+    en:{name:'Uncle Security',short:'Uncle',skill:'Seen It All',desc:'Takes 3 less damage from every hit.',q:'“Young man, sign in first.”'}},
+  {id:'uber',name:'外送員阿豪',e:'🛵',r:'C',hp:26,atk:7,skill:'準時送達',desc:'第 1 回合攻擊力 ×3。',q:'「您的餐點到了，麻煩給五星。」',
+    en:{name:'Hao the Delivery Guy',short:'Hao',skill:'Right on Time',desc:'Triple attack in round 1.',q:'“Your food’s here. Five stars, please.”'}},
+  {id:'jie',name:'打工仔騎士・阿傑',short:'阿傑',e:'🛡️',r:'R',hp:30,atk:8,skill:'準時下班',desc:'第 4 回合起攻擊力翻倍。',q:'「老闆，這不在我的工作範圍內……好啦我打。」',
+    en:{name:'Jie, Part-Time Knight',short:'Jie',skill:'Leave on Time',desc:'Double attack from round 4.',q:'“Boss, that’s not in my job description… Fine. I’ll fight.”'}},
+  {id:'fortune',name:'夜市算命師',e:'🔮',r:'R',hp:24,atk:9,skill:'鐵口直斷',desc:'30% 機率暴擊，傷害 ×2.5。',q:'「你今天……會打贏。五百。」',
+    en:{name:'Night Market Fortune Teller',short:'Fortune Teller',skill:'Never Wrong',desc:'30% chance of a critical hit (×2.5 damage).',q:'“Today… you will win. That’s 500 dollars.”'}},
+  {id:'boba',name:'手搖飲店長',e:'🧋',r:'R',hp:28,atk:6,skill:'半糖少冰',desc:'每回合全隊回復 5 生命。',q:'「甜度冰塊？好的，下一位。」',
+    en:{name:'Bubble Tea Shop Manager',short:'Tea Manager',skill:'Half Sugar, Less Ice',desc:'Heals the whole team 5 HP each round.',q:'“Sugar? Ice? Okay. Next!”'}},
+  {id:'drill',name:'退休教官',e:'🎖️',r:'E',hp:50,atk:10,skill:'集合！',desc:'全隊攻擊力 +4。',q:'「頭髮太長！全部給我站好！」',
+    en:{name:'Retired Drill Instructor',short:'Instructor',skill:'Fall In!',desc:'Whole team +4 attack.',q:'“Your hair is too long! Everybody, stand up straight!”'}},
+  {id:'medium',name:'廟口乩童',e:'🥁',r:'E',hp:38,atk:12,skill:'起乩',desc:'生命低於一半時，攻擊力 ×2。',q:'「神明說……可以打。」',
+    en:{name:'Temple Spirit Medium',short:'Medium',skill:'Possessed!',desc:'Double attack when below half HP.',q:'“The gods say… fight.”'}},
+  {id:'engineer',name:'資深工程師',e:'💻',r:'E',hp:34,atk:14,skill:'重開機',desc:'第一次倒下時，以一半生命復活。',q:'「你有試過關掉再打開嗎？」',
+    en:{name:'Senior Engineer',short:'Engineer',skill:'Reboot',desc:'The first time she falls, she comes back with half HP.',q:'“Have you tried turning it off and on again?”'}},
+  {id:'grandma',name:'阿嬤',e:'👵',r:'L',hp:60,atk:14,skill:'呷飽未',desc:'每回合全隊回復 10 生命，全隊攻擊力 +5。',q:'「瘦成這樣！再吃一碗！」',
+    en:{name:'A-má (Grandma)',short:'A-má',skill:'Have You Eaten Yet?',desc:'Heals the whole team 10 HP each round. Whole team +5 attack.',q:'“You’re so skinny! Have another bowl!”'}},
+  {id:'typhoon',name:'颱風假之神',e:'🌀',r:'L',hp:45,atk:20,skill:'停班停課',desc:'戰鬥開始時，敵人失去 25% 生命。',q:'「人事行政總處宣布——」',
+    en:{name:'God of Typhoon Days',short:'Typhoon God',skill:'No Work, No School',desc:'The enemy loses 25% of its HP when the battle starts.',q:'“The government has announced—”'}},
+  {id:'clerk',name:'超商店員',e:'🏪',r:'L',hp:50,atk:16,skill:'什麼都有',desc:'每回合隨機：全隊回血 12／全隊攻擊 +3／丟出 25 點傷害。',q:'「歡迎光臨～需要袋子嗎？」',
+    en:{name:'Convenience Store Clerk',short:'Clerk',skill:'We Have Everything',desc:'Each round, one at random: heal the team 12 HP / team +3 attack / throw 25 damage.',q:'“Welcome! Do you need a bag?”'}}
 ];
 const GEAR = [
-  {id:'stick',name:'樹枝',e:'🌿',r:'C',atk:1,hp:0,q:'冒險的起點。'},
-  {id:'helmet',name:'機車安全帽',e:'⛑️',r:'C',atk:0,hp:4,q:'記得扣好扣環。'},
-  {id:'slipper',name:'藍白拖',e:'🩴',r:'C',atk:1,hp:2,q:'台灣最強近戰武器。'},
-  {id:'bento',name:'鐵製便當盒',e:'🍱',r:'R',atk:0,hp:8,q:'擋刀也擋子彈。'},
-  {id:'umbrella',name:'自動傘',e:'☂️',r:'R',atk:2,hp:3,q:'在捷運站按下去會被瞪。'},
-  {id:'cooker',name:'大同電鍋',e:'🍚',r:'E',atk:1,hp:15,q:'用了四十年還沒壞。'},
-  {id:'milktea',name:'全糖珍奶',e:'🥤',r:'E',atk:4,hp:0,q:'血糖飆升，戰力也飆升。'},
-  {id:'bonus',name:'年終獎金',e:'🧧',r:'L',atk:6,hp:18,q:'傳說中的道具，很少人見過。'}
+  {id:'stick',name:'樹枝',e:'🌿',r:'C',atk:1,hp:0,q:'冒險的起點。',en:{name:'Stick',q:'Every adventure starts somewhere.'}},
+  {id:'helmet',name:'機車安全帽',e:'⛑️',r:'C',atk:0,hp:4,q:'記得扣好扣環。',en:{name:'Scooter Helmet',q:'Don’t forget to buckle it.'}},
+  {id:'slipper',name:'藍白拖',e:'🩴',r:'C',atk:1,hp:2,q:'台灣最強近戰武器。',en:{name:'Blue-and-White Slippers',q:'The deadliest weapon in Taiwan.'}},
+  {id:'bento',name:'鐵製便當盒',e:'🍱',r:'R',atk:0,hp:8,q:'擋刀也擋子彈。',en:{name:'Steel Lunch Box',q:'Stops knives. Stops bullets.'}},
+  {id:'umbrella',name:'自動傘',e:'☂️',r:'R',atk:2,hp:3,q:'在捷運站按下去會被瞪。',en:{name:'Pop-Up Umbrella',q:'Open it inside the MRT station and everyone glares.'}},
+  {id:'cooker',name:'大同電鍋',e:'🍚',r:'E',atk:1,hp:15,q:'用了四十年還沒壞。',en:{name:'Tatung Rice Cooker',q:'Forty years old and still going.'}},
+  {id:'milktea',name:'全糖珍奶',e:'🥤',r:'E',atk:4,hp:0,q:'血糖飆升，戰力也飆升。',en:{name:'Full-Sugar Bubble Tea',q:'Blood sugar up. Power up.'}},
+  {id:'bonus',name:'年終獎金',e:'🧧',r:'L',atk:6,hp:18,q:'傳說中的道具，很少人見過。',en:{name:'Year-End Bonus',q:'A legendary item. Few people have ever seen one.'}}
 ];
 const EVENTS = [
-  {id:'receipt',name:'對中發票',e:'🧾',r:'C',desc:'中了兩百元！換成 💎 1。',fx:s=>{s.gems+=1}},
-  {id:'tudigong',name:'巷口土地公',e:'🙏',r:'C',desc:'拜了一下，全隊生命 +3。',fx:s=>{s.bHp+=3}},
+  {id:'receipt',name:'對中發票',e:'🧾',r:'C',desc:'中了兩百元！換成 💎 1。',fx:s=>{s.gems+=1},
+    en:{name:'Winning Receipt',desc:'Your receipt won the lottery: 200 dollars! You get 💎 1.'}},
+  {id:'tudigong',name:'巷口土地公',e:'🙏',r:'C',desc:'拜了一下，全隊生命 +3。',fx:s=>{s.bHp+=3},
+    en:{name:'Earth God Shrine',desc:'You stop and pray at the little shrine. Team +3 HP.'}},
   {id:'boss_line',name:'老闆傳 LINE',e:'📱',r:'R',desc:'晚上十點，老闆傳來：「在嗎？」',
-    choices:[{label:'已讀不回',sub:'全隊攻擊 +2',fx:s=>{s.bAtk+=2;return '你把手機蓋起來。全隊士氣大振，攻擊 +2。'}},
-             {label:'乖乖回覆',sub:'獲得 💎 3',fx:s=>{s.gems+=3;return '老闆很滿意，發了紅包。💎 +3。'}}]},
+    en:{name:'LINE from the Boss',desc:'10 p.m. Your boss sends a message: “You there?”'},
+    choices:[{label:'已讀不回',sub:'全隊攻擊 +2',fx:s=>{s.bAtk+=2},res:'你把手機蓋起來。全隊士氣大振，攻擊 +2。',
+               en:{label:'Leave it on read',sub:'Team +2 attack',res:'You turn your phone face down. Team spirit goes up. Attack +2.'}},
+             {label:'乖乖回覆',sub:'獲得 💎 3',fx:s=>{s.gems+=3},res:'老闆很滿意，發了紅包。💎 +3。',
+               en:{label:'Reply politely',sub:'Get 💎 3',res:'Your boss is happy and sends you a red envelope. 💎 +3.'}}]},
   {id:'balloon',name:'夜市射氣球',e:'🎈',r:'R',desc:'攤販老闆說：「十發一百，射中送大獎！」',
-    choices:[{label:'認真射',sub:'全隊攻擊 +2',fx:s=>{s.bAtk+=2;return '十發中九發，大家都學會了瞄準。攻擊 +2。'}},
-             {label:'去買雞排',sub:'全隊生命 +8',fx:s=>{s.bHp+=8;return '雞排不切要辣。全隊生命 +8。'}}]},
+    en:{name:'Balloon Darts',desc:'The stall owner shouts: “Ten shots, 100 dollars! Win a big prize!”'},
+    choices:[{label:'認真射',sub:'全隊攻擊 +2',fx:s=>{s.bAtk+=2},res:'十發中九發，大家都學會了瞄準。攻擊 +2。',
+               en:{label:'Take aim',sub:'Team +2 attack',res:'Nine out of ten! Now everyone knows how to aim. Attack +2.'}},
+             {label:'去買雞排',sub:'全隊生命 +8',fx:s=>{s.bHp+=8},res:'雞排不切要辣。全隊生命 +8。',
+               en:{label:'Buy fried chicken',sub:'Team +8 HP',res:'Don’t cut it, make it spicy. Team +8 HP.'}}]},
   {id:'capsule',name:'神秘扭蛋攤',e:'🎰',r:'E',desc:'巷子底有一台會發光的扭蛋機。',
-    choices:[{label:'投 💎 3 轉一次',sub:'必出史詩以上夥伴',need:3,fx:s=>{s.gems-=3;return {pull:true}}},
-             {label:'拿走地上的 💎 2',sub:'穩穩的',fx:s=>{s.gems+=2;return '你撿起鑽石，頭也不回地離開。'}}]},
-  {id:'mazu',name:'媽祖遶境',e:'🏮',r:'E',desc:'鞭炮聲中，全隊攻擊 +3、生命 +6。',fx:s=>{s.bAtk+=3;s.bHp+=6}},
-  {id:'lotto',name:'樂透頭獎',e:'🎉',r:'L',desc:'真的中了！💎 +8。',fx:s=>{s.gems+=8}}
+    en:{name:'Mystery Capsule Machine',desc:'At the end of the alley, a capsule toy machine is glowing.'},
+    choices:[{label:'投 💎 3 轉一次',sub:'必出史詩以上夥伴',need:3,fx:s=>{s.gems-=3;return 'pull'},
+               en:{label:'Put in 💎 3',sub:'Get an Epic or better crew member'}},
+             {label:'拿走地上的 💎 2',sub:'穩穩的',fx:s=>{s.gems+=2},res:'你撿起鑽石，頭也不回地離開。',
+               en:{label:'Take the 💎 2 on the ground',sub:'Play it safe',res:'You pick up the gems and walk away without looking back.'}}]},
+  {id:'mazu',name:'媽祖遶境',e:'🏮',r:'E',desc:'鞭炮聲中，全隊攻擊 +3、生命 +6。',fx:s=>{s.bAtk+=3;s.bHp+=6},
+    en:{name:'Mazu Procession',desc:'Firecrackers everywhere! Team +3 attack, +6 HP.'}},
+  {id:'lotto',name:'樂透頭獎',e:'🎉',r:'L',desc:'真的中了！💎 +8。',fx:s=>{s.gems+=8},
+    en:{name:'Lottery Jackpot',desc:'You actually won! 💎 +8.'}}
 ];
 const MONSTERS = [
-  {name:'發光蘑菇',e:'🍄',hp:45,atk:6,q:'散發著烤地瓜的香味。'},
-  {name:'會咬人的釘書機',e:'📎',hp:380,atk:21,trait:'bite',q:'【連咬】30% 機率攻擊兩次。'},
-  {name:'已讀不回史萊姆',e:'💬',hp:560,atk:26,trait:'dodge',q:'【已讀不回】每次攻擊有 25% 機率落空。'},
-  {name:'無限會議章魚',e:'🐙',hp:800,atk:31,trait:'meeting',q:'【拉進會議】每 2 回合讓一位夥伴無法行動。'},
-  {name:'報表巨人',e:'📊',hp:1100,atk:37,trait:'aoe',q:'中頭目【月底結算】每 3 回合攻擊全隊。'},
-  {name:'KPI 蝙蝠群',e:'🦇',hp:1600,atk:40,trait:'kpi',q:'【比上月更高】每回合攻擊力 +3。'},
-  {name:'奧客惡靈',e:'😡',hp:1850,atk:60,trait:'weak',q:'【專挑軟柿子】總是攻擊生命最低的夥伴。'},
-  {name:'颱風天上班幽靈',e:'👻',hp:2500,atk:66,trait:'storm',q:'【風雨無阻】每 2 回合攻擊全隊。'},
-  {name:'情緒勒索龍',e:'🐉',hp:3150,atk:80,trait:'drain',q:'【我都是為你好】造成傷害的 100% 回復自己。'},
-  {name:'加班之王',e:'🕴️',hp:3900,atk:70,trait:'boss',q:'最終魔王【今天誰都不准走】每回合攻擊兩次，血量減半後暴怒。'}
+  {name:'發光蘑菇',e:'🍄',hp:45,atk:6,q:'散發著烤地瓜的香味。',
+    en:{name:'Glowing Mushroom',q:'It smells like roasted sweet potatoes.'}},
+  {name:'會咬人的釘書機',e:'📎',hp:380,atk:21,trait:'bite',q:'【連咬】30% 機率攻擊兩次。',
+    en:{name:'Biting Stapler',q:'[Double Bite] 30% chance to attack twice.'}},
+  {name:'已讀不回史萊姆',e:'💬',hp:560,atk:26,trait:'dodge',q:'【已讀不回】每次攻擊有 25% 機率落空。',
+    en:{name:'Left-on-Read Slime',q:'[Seen, No Reply] Each of your attacks has a 25% chance to miss.'}},
+  {name:'無限會議章魚',e:'🐙',hp:800,atk:31,trait:'meeting',q:'【拉進會議】每 2 回合讓一位夥伴無法行動。',
+    en:{name:'Endless Meeting Octopus',q:'[Pulled into a Meeting] Every 2 rounds, one crew member can’t act.'}},
+  {name:'報表巨人',e:'📊',hp:1100,atk:37,trait:'aoe',q:'中頭目【月底結算】每 3 回合攻擊全隊。',
+    en:{name:'Spreadsheet Giant',q:'Mini-boss. [Month-End Report] Hits the whole team every 3 rounds.'}},
+  {name:'KPI 蝙蝠群',e:'🦇',hp:1600,atk:40,trait:'kpi',q:'【比上月更高】每回合攻擊力 +3。',
+    en:{name:'KPI Bat Swarm',q:'[Higher Than Last Month] +3 attack every round.'}},
+  {name:'奧客惡靈',e:'😡',hp:1850,atk:60,trait:'weak',q:'【專挑軟柿子】總是攻擊生命最低的夥伴。',
+    en:{name:'Nightmare Customer',q:'[Picks on the Weak] Always attacks the crew member with the lowest HP.'}},
+  {name:'颱風天上班幽靈',e:'👻',hp:2500,atk:66,trait:'storm',q:'【風雨無阻】每 2 回合攻擊全隊。',
+    en:{name:'Typhoon Workday Ghost',q:'[Rain or Shine] Hits the whole team every 2 rounds.'}},
+  {name:'情緒勒索龍',e:'🐉',hp:3150,atk:80,trait:'drain',q:'【我都是為你好】造成傷害的 100% 回復自己。',
+    en:{name:'Guilt-Trip Dragon',q:'[It’s for Your Own Good] Heals itself for all the damage it deals.'}},
+  {name:'加班之王',e:'🕴️',hp:3900,atk:70,trait:'boss',q:'最終魔王【今天誰都不准走】每回合攻擊兩次，血量減半後暴怒。',
+    en:{name:'King of Overtime',q:'Final boss. [Nobody Leaves Today] Attacks twice each round. Gets angry at half HP.'}}
 ];
 const MAX_ROUNDS = 15;
 const LOSS_GEMS = 2;
 const floorReward = f => f+1+(f===5?3:0);
 const H = Object.fromEntries(HEROES.map(h=>[h.id,h]));
+const shortName=(h,l=LANG)=>l==='en'?(h.en.short||h.en.name):(h.short||h.name);
 
 /* ---------- state ---------- */
 const KEY='tangping-v2';
@@ -335,33 +424,43 @@ function team(){
 }
 
 /* ---------- render ---------- */
+/* log lines are stored as [zh,en] so the log can switch language too */
+const logLines=[];
 function log(text,cls=''){
-  const p=document.createElement('p'); p.textContent=text; if(cls)p.className=cls;
+  const pair=Array.isArray(text)?text:[text,text];
+  logLines.push({pair,cls}); if(logLines.length>80) logLines.shift();
+  const p=document.createElement('p'); p.textContent=pair[LANG==='en'?1:0]; if(cls)p.className=cls;
   $('log').appendChild(p); $('log').scrollTop=$('log').scrollHeight;
   while($('log').children.length>80) $('log').firstChild.remove();
 }
+function redrawLog(){
+  $('log').innerHTML='';
+  logLines.forEach(({pair,cls})=>{const p=document.createElement('p');p.textContent=pair[LANG==='en'?1:0];if(cls)p.className=cls;$('log').appendChild(p)});
+  $('log').scrollTop=$('log').scrollHeight;
+}
 function renderFloors(){
+  $('floors').setAttribute('aria-label',tx('樓層進度','Floor progress'));
   $('floors').innerHTML=Array.from({length:10},(_,i)=>{
     const f=i+1; return `<i class="${f<S.floor||S.done?'done':f===S.floor?'now':''}"></i>`}).join('');
 }
 function renderMonster(cur){
   const m=MONSTERS[Math.min(S.floor,10)-1];
   const hp=cur?cur.hp:m.hp, max=cur?cur.max:m.hp;
-  $('mEmoji').textContent=m.e; $('mName').textContent=m.name; $('mQuote').textContent=m.q;
-  $('mFloor').textContent=S.floor===10?'第 10 層・最終魔王':`第 ${S.floor} 層`;
+  $('mEmoji').textContent=m.e; $('mName').textContent=N(m,'name'); $('mQuote').textContent=N(m,'q');
+  $('mFloor').textContent=S.floor===10?tx('第 10 層・最終魔王','FLOOR 10 · FINAL BOSS'):tx(`第 ${S.floor} 層`,`FLOOR ${S.floor}`);
   $('mBar').style.width=Math.max(0,hp/max*100)+'%';
-  $('mHp').textContent=`生命 ${Math.max(0,hp)} / ${max}`;
-  $('mAtk').textContent=`攻擊 ${cur?cur.atk:m.atk}`;
+  $('mHp').textContent=tx(`生命 ${Math.max(0,hp)} / ${max}`,`HP ${Math.max(0,hp)} / ${max}`);
+  $('mAtk').textContent=tx(`攻擊 ${cur?cur.atk:m.atk}`,`ATK ${cur?cur.atk:m.atk}`);
 }
 function renderParty(units){
   const t=units||team().map(x=>({...x,cur:x.hp,max:x.hp}));
   let html='';
   for(let i=0;i<4;i++){
     const u=t[i];
-    if(!u){html+=`<div class="hero empty">空位<br>去抽卡！</div>`;continue}
+    if(!u){html+=`<div class="hero empty">${tx('空位<br>去抽卡！','Empty<br>Pull a card!')}</div>`;continue}
     const pct=Math.max(0,u.cur/u.max*100);
     html+=`<div class="hero r-${u.h.r} ${u.cur<=0?'dead':''}" data-i="${i}">
-      <div class="e">${u.h.e}</div><div class="n">${u.h.name.replace('打工仔騎士・','')}</div>
+      <div class="e">${u.h.e}</div><div class="n">${shortName(u.h)}</div>
       <div class="s">${'★'.repeat(u.stars)}</div>
       <div class="bar hpb ${pct<35?'low':''}"><span style="width:${pct}%"></span></div>
       <div class="a num">⚔ ${u.atk}　♥ ${Math.max(0,u.cur)}</div></div>`;
@@ -369,15 +468,18 @@ function renderParty(units){
   $('party').innerHTML=html;
 }
 function renderUI(){
-  $('gems').textContent=S.gems; $('floorNum').textContent=Math.min(S.floor,10);
+  $('gems').textContent=S.gems;
+  $('floorChip').innerHTML=tx(`第 <b class="num">${Math.min(S.floor,10)}</b> / 10 層`,`Floor <b class="num">${Math.min(S.floor,10)}</b> / 10`);
   renderFloors();
   if(!busy){renderMonster(); renderParty();}
   $('pull1').disabled=busy||S.gems<1; $('pull10').disabled=busy||S.gems<10;
   $('go').disabled=busy||S.done;
-  $('goHint').textContent=busy?(fast?'快轉中…':'戰鬥中…（點戰鬥紀錄可快轉）'):S.done?'已通關':`挑戰 ${MONSTERS[S.floor-1].name}`;
-  $('pity').textContent=`再抽 ${PITY_MAX-S.pity} 次必出傳說`;
+  $('goHint').textContent=busy?(fast?tx('快轉中…','Fast-forwarding…'):tx('戰鬥中…（點戰鬥紀錄可快轉）','Fighting… (tap the log to skip)'))
+    :S.done?tx('已通關','Cleared!'):tx(`挑戰 ${N(MONSTERS[S.floor-1],'name')}`,`Fight the ${N(MONSTERS[S.floor-1],'name')}`);
+  $('pity').textContent=tx(`再抽 ${PITY_MAX-S.pity} 次必出傳說`,`Legendary in ${PITY_MAX-S.pity} pulls`);
   const owned=Object.keys(S.roster).length;
-  $('buffs').innerHTML=`裝備加成（全隊）：攻擊 <b class="num">+${S.bAtk}</b>・生命 <b class="num">+${S.bHp}</b>　｜　夥伴 <b class="num">${owned}</b> / ${HEROES.length}`;
+  $('buffs').innerHTML=tx(`裝備加成（全隊）：攻擊 <b class="num">+${S.bAtk}</b>・生命 <b class="num">+${S.bHp}</b>　｜　夥伴 <b class="num">${owned}</b> / ${HEROES.length}`,
+    `Gear (team): ATK <b class="num">+${S.bAtk}</b> · HP <b class="num">+${S.bHp}</b>　|　Crew <b class="num">${owned}</b> / ${HEROES.length}`);
   save();
 }
 
@@ -397,49 +499,59 @@ function pullOne(min='C',forceType=null){
   if(!type){const x=Math.random(); type=x<.42?'hero':x<.77?'gear':'event';}
   let pool=(type==='hero'?HEROES:type==='gear'?GEAR:EVENTS).filter(c=>c.r===r);
   if(!pool.length){type='hero';pool=HEROES.filter(c=>c.r===r)}
-  const c=pick(pool); const card={type,c,r,tag:''};
+  const c=pick(pool); const card={type,c,r,tag:null};
   if(type==='hero'){
-    if(S.roster[c.id]){ if(S.roster[c.id]<5){S.roster[c.id]++;card.tag=`升到 ${S.roster[c.id]}★`} else {S.gems+=2;card.tag='滿星・換 💎2'} }
-    else {S.roster[c.id]=1;card.tag='NEW'}
+    if(S.roster[c.id]){ if(S.roster[c.id]<5){S.roster[c.id]++;card.tag={k:'up',n:S.roster[c.id]}} else {S.gems+=2;card.tag={k:'max'}} }
+    else {S.roster[c.id]=1;card.tag={k:'new'}}
   } else if(type==='gear'){
     S.bAtk+=c.atk; S.bHp+=c.hp;
   } else if(c.fx){ c.fx(S) }
-  if(type!=='hero'){ if(!S.seen[c.id])card.tag='NEW'; S.seen[c.id]=(S.seen[c.id]||0)+1; }
+  if(type!=='hero'){ if(!S.seen[c.id])card.tag={k:'new'}; S.seen[c.id]=(S.seen[c.id]||0)+1; }
   return card;
 }
-function cardHTML(k,i){
-  const {type,c,r,tag}=k;
-  const ty=type==='hero'?'夥伴':type==='gear'?'裝備':'事件';
-  let st='',ds='',q='';
-  if(type==='hero'){st=`生命 ${c.hp}｜攻擊 ${c.atk}`;ds=`【${c.skill}】${c.desc}`;q=c.q}
-  if(type==='gear'){st=[c.atk?`全隊攻擊 +${c.atk}`:'',c.hp?`全隊生命 +${c.hp}`:''].filter(Boolean).join('・');q=c.q}
-  if(type==='event'){ds=c.desc}
-  return `<div class="card r${r}" style="--rc:${RAR[r].css}" data-i="${i}"><div class="card-in">
-    <div class="face"><div class="rar">${RAR[r].name}${ty}</div><div class="e">${c.e}</div>
-    <div class="nm">${c.name}</div>${tag?`<div class="tag">${tag}</div>`:''}
-    ${st?`<div class="st">${st}</div>`:''}${ds?`<div class="ds">${ds}</div>`:''}${q?`<div class="q">${q}</div>`:''}</div>
-    <div class="back">抽</div></div></div>`;
+function tagText(tag,l=LANG){
+  if(!tag) return '';
+  if(tag.k==='new') return 'NEW';
+  if(tag.k==='up') return tx(`升到 ${tag.n}★`,`Up to ${tag.n}★`,l);
+  if(tag.k==='max') return tx('滿星・換 💎2','Max ★ · 💎2',l);
+  if(tag.k==='stars') return '★'.repeat(tag.n)+'☆'.repeat(5-tag.n);
+  return '';
 }
+function faceHTML(k,l,cls){
+  const {type,c,r,tag}=k;
+  const sep=l==='en'?' ':'';
+  let st='',ds='',q='';
+  if(type==='hero'){st=tx(`生命 ${c.hp}｜攻擊 ${c.atk}`,`HP ${c.hp} | ATK ${c.atk}`,l);ds=tx(`【${N(c,'skill',l)}】${N(c,'desc',l)}`,`[${N(c,'skill',l)}] ${N(c,'desc',l)}`,l);q=N(c,'q',l)}
+  if(type==='gear'){st=[c.atk?tx(`全隊攻擊 +${c.atk}`,`Team ATK +${c.atk}`,l):'',c.hp?tx(`全隊生命 +${c.hp}`,`Team HP +${c.hp}`,l):''].filter(Boolean).join(' · ');q=N(c,'q',l)}
+  if(type==='event'){ds=N(c,'desc',l)}
+  const tg=tagText(tag,l);
+  return `<div class="face ${cls}" lang="${l==='en'?'en':'zh-Hant'}"><div class="rar">${N(RAR[r],'name',l)}${sep}${typeName(type,l)}</div><div class="e">${c.e}</div>
+    <div class="nm">${N(c,'name',l)}</div>${tg?`<div class="tag">${tg}</div>`:''}
+    ${st?`<div class="st">${st}</div>`:''}${ds?`<div class="ds">${ds}</div>`:''}${q?`<div class="q">${q}</div>`:''}</div>`;
+}
+function cardHTML(k,i){
+  return `<div class="card r${k.r}" style="--rc:${RAR[k.r].css}" data-i="${i}"><div class="card-in">
+    ${faceHTML(k,LANG,'main')}${faceHTML(k,other(LANG),'alt')}
+    <div class="back">${tx('抽','?')}</div></div></div>`;
+}
+const lpHint=()=>`<p class="lp-hint">${tx('長按卡片看英文','Press and hold a card to see Chinese')}</p>`;
 function showPulls(cards,title,after){
   const ten=cards.length>1;
   const best=cards.reduce((a,k)=>Math.max(a,ORDER.indexOf(k.r)),0);
   openModal(`<h2>${title}</h2><div class="cards ${ten?'ten':'one'}">${cards.map(cardHTML).join('')}</div>
-    ${ten?`<div class="summary" id="sum"></div>`:''}
-    <div class="btns"><button id="mOk">收下</button></div>`);
+    ${ten?`<div class="summary" id="sum"></div>`:''}${lpHint()}
+    <div class="btns"><button id="mOk">${tx('收下','Keep')}</button></div>`);
   const els=[...document.querySelectorAll('#modal .card')];
   els.forEach((el,i)=>setTimeout(()=>{el.classList.add('open');Sound.sfx.flip[cards[i].r]()},250+i*(ten?160:0)));
   if(ten){
     const n=r=>cards.filter(k=>k.r===r).length;
-    setTimeout(()=>{$('sum').textContent=`傳說 ${n('L')}・史詩 ${n('E')}・稀有 ${n('R')}・普通 ${n('C')}`},250+cards.length*160);
-    els.forEach((el,i)=>el.addEventListener('click',()=>{ // tap a small card to see details
-      const k=cards[i]; showDetail(k);
-    }));
+    setTimeout(()=>{$('sum').textContent=tx(`傳說 ${n('L')}・史詩 ${n('E')}・稀有 ${n('R')}・普通 ${n('C')}`,`Legendary ${n('L')} · Epic ${n('E')} · Rare ${n('R')} · Common ${n('C')}`)},250+cards.length*160);
+    els.forEach((el,i)=>el.addEventListener('click',()=>{ if(el.dataset.lp){delete el.dataset.lp;return} showDetail(cards[i]); }));
   }
-  const newHeroes=cards.filter(k=>k.type==='hero'&&k.tag==='NEW');
-  newHeroes.forEach(k=>log(`${k.c.e} ${k.c.name} 加入了冒險團！`,'good'));
-  cards.filter(k=>k.type==='gear').forEach(k=>log(`${k.c.e} 裝備了 ${k.c.name}。`,'sys'));
-  cards.filter(k=>k.type==='event'&&!k.c.choices).forEach(k=>log(`${k.c.e} ${k.c.name}：${k.c.desc}`,'gold'));
-  if(best===3) log('✨ 傳說降臨！','gold');
+  cards.filter(k=>k.type==='hero'&&k.tag&&k.tag.k==='new').forEach(k=>log([`${k.c.e} ${N(k.c,'name','zh')} 加入了冒險團！`,`${k.c.e} ${N(k.c,'name','en')} joined the crew!`],'good'));
+  cards.filter(k=>k.type==='gear').forEach(k=>log([`${k.c.e} 裝備了 ${N(k.c,'name','zh')}。`,`${k.c.e} Equipped: ${N(k.c,'name','en')}.`],'sys'));
+  cards.filter(k=>k.type==='event'&&!k.c.choices).forEach(k=>log([`${k.c.e} ${N(k.c,'name','zh')}：${N(k.c,'desc','zh')}`,`${k.c.e} ${N(k.c,'name','en')}: ${N(k.c,'desc','en')}`],'gold'));
+  if(best===3) log(['✨ 傳說降臨！','✨ A Legendary appears!'],'gold');
   $('mOk').onclick=()=>{closeModal(); runChoices(cards.filter(k=>k.type==='event'&&k.c.choices),after)};
   renderUI();
 }
@@ -454,86 +566,98 @@ function showDetail(k){
 function runChoices(list,after){
   if(!list.length){renderUI(); after&&after(); return}
   const k=list.shift(), c=k.c;
-  openModal(`<div class="big">${c.e}</div><h2>${c.name}</h2><p class="center">${c.desc}</p>
-    <div class="btns">${c.choices.map((ch,i)=>`<button data-i="${i}" ${ch.need&&S.gems<ch.need?'disabled':''}>${ch.label}<small>${ch.sub}</small></button>`).join('')}</div>`);
+  openModal(`<div class="big">${c.e}</div><h2>${N(c,'name')}</h2><p class="center">${N(c,'desc')}</p>
+    <div class="btns">${c.choices.map((ch,i)=>`<button data-i="${i}" ${ch.need&&S.gems<ch.need?'disabled':''}>${N(ch,'label')}<small>${N(ch,'sub')}</small></button>`).join('')}</div>`);
   document.querySelectorAll('#modal .btns button').forEach(b=>b.onclick=()=>{
-    const res=c.choices[+b.dataset.i].fx(S);
+    const ch=c.choices[+b.dataset.i], res=ch.fx(S);
     closeModal();
-    if(res&&res.pull){ const card=pullOne('E','hero'); showPulls([card],'扭蛋機轟隆隆……',()=>runChoices(list,after)); }
-    else { log(`${c.e} ${res}`,'gold'); renderUI(); runChoices(list,after); }
+    if(res==='pull'){ const card=pullOne('E','hero'); showPulls([card],tx('扭蛋機轟隆隆……','The machine rumbles…'),()=>runChoices(list,after)); }
+    else { log([`${c.e} ${N(ch,'res','zh')}`,`${c.e} ${N(ch,'res','en')}`],'gold'); renderUI(); runChoices(list,after); }
   });
 }
-$('pull1').onclick=()=>{ if(busy||S.gems<1)return; S.gems-=1; showPulls([pullOne()],'✨ 卡片翻轉……'); };
+$('pull1').onclick=()=>{ if(busy||S.gems<1)return; S.gems-=1; showPulls([pullOne()],tx('✨ 卡片翻轉……','✨ Flipping the card…')); };
 $('pull10').onclick=()=>{
   if(busy||S.gems<10)return; S.gems-=10;
   const cards=[]; for(let i=0;i<9;i++)cards.push(pullOne());
   if(!cards.some(k=>ORDER.indexOf(k.r)>=2)) cards.push(pullOne('E')); else cards.push(pullOne());
-  showPulls(cards,'十連抽！');
+  showPulls(cards,tx('十連抽！','Ten pulls!'));
 };
+
+/* long-press a card to see the other language */
+let lpTimer=null;
+document.addEventListener('pointerdown',e=>{
+  const c=e.target.closest('.card.open'); if(!c) return;
+  clearTimeout(lpTimer);
+  lpTimer=setTimeout(()=>{c.classList.add('showalt');c.dataset.lp='1'},380);
+});
+const endLp=()=>{clearTimeout(lpTimer);document.querySelectorAll('.card.showalt').forEach(c=>{c.classList.remove('showalt');setTimeout(()=>delete c.dataset.lp,50)})};
+['pointerup','pointercancel','dragstart'].forEach(ev=>document.addEventListener(ev,endLp));
+document.addEventListener('contextmenu',e=>{if(e.target.closest('.card'))e.preventDefault()});
 
 /* ---------- battle ---------- */
 function simulate(){
   const f=S.floor, m0=MONSTERS[f-1];
+  const mz=N(m0,'name','zh'), me=N(m0,'name','en');
   const units=team().map(x=>({...x,cur:x.hp,max:x.hp,revived:false}));
   const has=id=>units.some(u=>u.id===id&&u.cur>0);
   const mon={hp:m0.hp,max:m0.hp,atk:m0.atk,rage:false};
   const frames=[]; const snap=(text,cls,hit)=>frames.push({text,cls,hit,mon:{...mon},u:units.map(u=>u.cur)});
+  const sz=u=>shortName(u.h,'zh'), se=u=>shortName(u.h,'en');
   let teamAtk=0;
   if(units.some(u=>u.id==='drill')){teamAtk+=4}
   if(units.some(u=>u.id==='grandma')){teamAtk+=5}
-  snap(`— 第 ${f} 層：${m0.e} ${m0.name} 出現了！ —`,'sys');
-  if(teamAtk) snap(`全隊士氣高昂，攻擊力 +${teamAtk}。`,'good');
-  if(has('typhoon')){const d=Math.round(mon.max*.25);mon.hp-=d;snap(`🌀 颱風假之神宣布停班停課！${m0.name} 失去 ${d} 生命！`,'gold','m')}
+  snap([`— 第 ${f} 層：${m0.e} ${mz} 出現了！ —`,`— Floor ${f}: ${m0.e} The ${me} appears! —`],'sys');
+  if(teamAtk) snap([`全隊士氣高昂，攻擊力 +${teamAtk}。`,`The team is fired up! Attack +${teamAtk}.`],'good');
+  if(has('typhoon')){const d=Math.round(mon.max*.25);mon.hp-=d;snap([`🌀 颱風假之神宣布停班停課！${mz} 失去 ${d} 生命！`,`🌀 The Typhoon God cancels work and school! The ${me} loses ${d} HP!`],'gold','m')}
   let win=false, stunned=null;
-  const short=u=>u.h.name.replace('打工仔騎士・','');
   const hurt=(t,d)=>{
     if(t.id==='guard')d=Math.max(1,d-3);
     t.cur-=d;
-    snap(`${m0.e} ${m0.name} 攻擊 ${short(t)}，造成 ${d} 傷害。`,'bad',units.indexOf(t));
+    snap([`${m0.e} ${mz} 攻擊 ${sz(t)}，造成 ${d} 傷害。`,`${m0.e} The ${me} hits ${se(t)} for ${d} damage.`],'bad',units.indexOf(t));
     if(m0.trait==='drain'){mon.hp=Math.min(mon.max,mon.hp+d)}
     if(t.cur<=0){
-      if(t.id==='engineer'&&!t.revived){t.revived=true;t.cur=Math.ceil(t.max/2);snap('💻 資深工程師重開機了！以一半生命復活。','good')}
-      else snap(`${t.h.e} ${short(t)} 躺平了……`,'bad');
+      if(t.id==='engineer'&&!t.revived){t.revived=true;t.cur=Math.ceil(t.max/2);snap(['💻 資深工程師重開機了！以一半生命復活。','💻 The Engineer reboots! She’s back with half HP.'],'good')}
+      else snap([`${t.h.e} ${sz(t)} 躺平了……`,`${t.h.e} ${se(t)} is down for the count…`],'bad');
     }
   };
   for(let r=1;r<=MAX_ROUNDS;r++){
-    snap(`［第 ${r} 回合］`,'sys');
-    if(m0.trait==='kpi'&&r>1){mon.atk+=3;snap(`🦇 KPI 又往上調了。攻擊力變成 ${mon.atk}。`,'bad')}
+    snap([`［第 ${r} 回合］`,`[Round ${r}]`],'sys');
+    if(m0.trait==='kpi'&&r>1){mon.atk+=3;snap([`🦇 KPI 又往上調了。攻擊力變成 ${mon.atk}。`,`🦇 The KPI goes up again. Attack is now ${mon.atk}.`],'bad')}
     stunned=null;
     if(m0.trait==='meeting'&&r%2===0){
       const alive=units.filter(u=>u.cur>0);
-      if(alive.length){stunned=pick(alive);snap(`🐙 ${short(stunned)} 被拉進會議，這回合無法行動。`,'bad')}
+      if(alive.length){stunned=pick(alive);snap([`🐙 ${sz(stunned)} 被拉進會議，這回合無法行動。`,`🐙 ${se(stunned)} gets pulled into a meeting and can’t act this round.`],'bad')}
     }
-    if(has('boba')){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+5)});snap('🧋 店長發飲料，全隊回復 5。','good')}
-    if(has('grandma')){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+10)});snap('👵 阿嬤端出滷肉飯，全隊回復 10。','good')}
+    if(has('boba')){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+5)});snap(['🧋 店長發飲料，全隊回復 5。','🧋 The Tea Manager hands out drinks. Team heals 5 HP.'],'good')}
+    if(has('grandma')){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+10)});snap(['👵 阿嬤端出滷肉飯，全隊回復 10。','👵 A-má brings out braised pork rice. Team heals 10 HP.'],'good')}
     if(has('clerk')){
       const x=Math.floor(Math.random()*3);
-      if(x===0){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+12)});snap('🏪 店員發了茶葉蛋，全隊回復 12。','good')}
-      else if(x===1){teamAtk+=3;snap('🏪 店員遞上能量飲料，全隊攻擊 +3。','good')}
-      else {mon.hp-=25;snap('🏪 店員丟出一整箱泡麵，造成 25 傷害！','gold','m')}
+      if(x===0){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+12)});snap(['🏪 店員發了茶葉蛋，全隊回復 12。','🏪 The Clerk hands out tea eggs. Team heals 12 HP.'],'good')}
+      else if(x===1){teamAtk+=3;snap(['🏪 店員遞上能量飲料，全隊攻擊 +3。','🏪 The Clerk passes around energy drinks. Team attack +3.'],'good')}
+      else {mon.hp-=25;snap(['🏪 店員丟出一整箱泡麵，造成 25 傷害！','🏪 The Clerk throws a whole box of instant noodles! 25 damage!'],'gold','m')}
     }
     for(const u of units){
       if(u.cur<=0||mon.hp<=0||u===stunned)continue;
-      if(m0.trait==='dodge'&&Math.random()<.25){snap(`${u.h.e} ${short(u)} 的攻擊……被已讀不回了。`,'sys');continue}
-      let a=u.atk+teamAtk, note='';
-      if(u.id==='jie'&&r>=4){a*=2;note='（準時下班！）'}
-      if(u.id==='uber'&&r===1){a*=3;note='（準時送達！）'}
-      if(u.id==='medium'&&u.cur<u.max/2){a*=2;note='（起乩！）'}
-      if(u.id==='fortune'&&Math.random()<.3){a=Math.round(a*2.5);note='（鐵口直斷，暴擊！）'}
-      let hits=1; if(u.id==='intern'&&Math.random()<.25){hits=2;note='（連印兩張！）'}
+      if(m0.trait==='dodge'&&Math.random()<.25){snap([`${u.h.e} ${sz(u)} 的攻擊……被已讀不回了。`,`${u.h.e} ${se(u)} attacks… and gets left on read.`],'sys');continue}
+      let a=u.atk+teamAtk, nz='', ne='';
+      if(u.id==='jie'&&r>=4){a*=2;nz='（準時下班！）';ne=' (Leave on time!)'}
+      if(u.id==='uber'&&r===1){a*=3;nz='（準時送達！）';ne=' (Right on time!)'}
+      if(u.id==='medium'&&u.cur<u.max/2){a*=2;nz='（起乩！）';ne=' (Possessed!)'}
+      if(u.id==='fortune'&&Math.random()<.3){a=Math.round(a*2.5);nz='（鐵口直斷，暴擊！）';ne=' (Never wrong! Critical hit!)'}
+      let hits=1; if(u.id==='intern'&&Math.random()<.25){hits=2;nz='（連印兩張！）';ne=' (Double copy!)'}
       const dmg=a*hits; mon.hp-=dmg;
-      snap(`${u.h.e} ${u.h.name.replace('打工仔騎士・','')} 攻擊，造成 ${dmg} 傷害${note}`,'','m');
+      snap([`${u.h.e} ${sz(u)} 攻擊，造成 ${dmg} 傷害${nz}`,`${u.h.e} ${se(u)} attacks for ${dmg} damage${ne}`],'','m');
     }
     if(mon.hp<=0){win=true;break}
-    if(m0.trait==='boss'&&!mon.rage&&mon.hp<mon.max/2){mon.rage=true;mon.atk+=15;snap('🕴️ 加班之王暴怒了！「今天誰都不准走！」攻擊 +15！','bad')}
+    if(m0.trait==='boss'&&!mon.rage&&mon.hp<mon.max/2){mon.rage=true;mon.atk+=15;snap(['🕴️ 加班之王暴怒了！「今天誰都不准走！」攻擊 +15！','🕴️ The King of Overtime is furious! “Nobody leaves today!” Attack +15!'],'bad')}
     const aoe=(m0.trait==='aoe'&&r%3===0)||(m0.trait==='storm'&&r%2===0);
     if(aoe){
       const d=Math.round(mon.atk*.6);
-      snap(m0.trait==='aoe'?`📊 月底結算！報表砸向全隊！`:`👻 狂風暴雨掃過全隊！`,'bad');
+      snap(m0.trait==='aoe'?['📊 月底結算！報表砸向全隊！','📊 Month-end report! Spreadsheets rain down on the team!']:['👻 狂風暴雨掃過全隊！','👻 Wind and rain sweep over the team!'],'bad');
       units.filter(u=>u.cur>0).forEach(u=>hurt(u,d));
     } else {
       let strikes=m0.trait==='boss'?2:1;
-      if(m0.trait==='bite'&&Math.random()<.3){strikes=2;snap('📎 喀嚓喀嚓！釘書機連咬兩口！','bad')}
+      if(m0.trait==='bite'&&Math.random()<.3){strikes=2;snap(['📎 喀嚓喀嚓！釘書機連咬兩口！','📎 Clack clack! The stapler bites twice!'],'bad')}
       for(let s=0;s<strikes;s++){
         const alive=units.filter(u=>u.cur>0); if(!alive.length)break;
         const t=m0.trait==='weak'?alive.reduce((a,b)=>b.cur<a.cur?b:a):pick(alive);
@@ -541,7 +665,7 @@ function simulate(){
       }
     }
     if(units.every(u=>u.cur<=0))break;
-    if(r===MAX_ROUNDS) snap('🔔 下班鐘響了，怪物還站著。大家默默收拾東西回家……','bad');
+    if(r===MAX_ROUNDS) snap(['🔔 下班鐘響了，怪物還站著。大家默默收拾東西回家……','🔔 The clock-out bell rings, and the monster is still standing. Everyone quietly packs up and goes home…'],'bad');
   }
   return {units,frames,win,m0};
 }
@@ -564,34 +688,35 @@ $('go').onclick=()=>{
   const finish=()=>{
     busy=false;
     Sound.play('lobby');
+    const mn=N(m0,'name');
     if(win){ Sound.sfx.win();
       const reward=floorReward(S.floor);
       S.gems+=reward; S.wins++;
-      log(`🎉 打倒了 ${m0.name}！獲得 💎 ${reward}。`,'gold');
-      if(S.floor===10){S.done=true;renderUI();openModal(`<div class="big">🏖️</div><h2>加班之王倒下了！</h2>
-        <p class="center">整棟大樓的燈一盞一盞熄滅。今天，所有人都準時下班。</p>
-        <p class="summary">抽卡 ${S.pulls} 次・勝 ${S.wins} 場・躺平 ${S.losses} 次・夥伴 ${Object.keys(S.roster).length}/${HEROES.length}</p>
-        <div class="btns"><button id="mAgain">再冒險一次</button><button id="mStay">先躺一下</button></div>`);
+      log([`🎉 打倒了 ${N(m0,'name','zh')}！獲得 💎 ${reward}。`,`🎉 You beat the ${N(m0,'name','en')}! You get 💎 ${reward}.`],'gold');
+      if(S.floor===10){S.done=true;renderUI();openModal(`<div class="big">🏖️</div><h2>${tx('加班之王倒下了！','The King of Overtime is down!')}</h2>
+        <p class="center">${tx('整棟大樓的燈一盞一盞熄滅。今天，所有人都準時下班。','One by one, the lights in the building go out. Today, everyone leaves on time.')}</p>
+        <p class="summary">${tx(`抽卡 ${S.pulls} 次・勝 ${S.wins} 場・躺平 ${S.losses} 次・夥伴 ${Object.keys(S.roster).length}/${HEROES.length}`,`Pulls ${S.pulls} · Wins ${S.wins} · Wipeouts ${S.losses} · Crew ${Object.keys(S.roster).length}/${HEROES.length}`)}</p>
+        <div class="btns"><button id="mAgain">${tx('再冒險一次','Play again')}</button><button id="mStay">${tx('先躺一下','Rest for now')}</button></div>`);
         $('mAgain').onclick=()=>{closeModal();reset()}; $('mStay').onclick=closeModal; return}
       S.floor++;
       renderUI();
-      openModal(`<div class="big">${m0.e}</div><h2>第 ${S.floor-1} 層通過！</h2>
-        <p class="center">獲得 💎 ${reward}。樓梯往下延伸，下一層傳來 ${MONSTERS[S.floor-1].e} 的氣息。</p>
-        <div class="btns"><button id="mOk">繼續</button></div>`);
+      openModal(`<div class="big">${m0.e}</div><h2>${tx(`第 ${S.floor-1} 層通過！`,`Floor ${S.floor-1} cleared!`)}</h2>
+        <p class="center">${tx(`獲得 💎 ${reward}。樓梯往下延伸，下一層傳來 ${MONSTERS[S.floor-1].e} 的氣息。`,`You get 💎 ${reward}. The stairs lead down. Something ${MONSTERS[S.floor-1].e} is waiting on the next floor.`)}</p>
+        <div class="btns"><button id="mOk">${tx('繼續','Continue')}</button></div>`);
       $('mOk').onclick=closeModal;
     } else {
       S.gems+=LOSS_GEMS; S.losses++; Sound.sfx.lose();
-      log(`💤 全員躺平。領到躺平補償金 💎 ${LOSS_GEMS}。抽點新夥伴再來吧！`,'sys');
+      log([`💤 全員躺平。領到躺平補償金 💎 ${LOSS_GEMS}。抽點新夥伴再來吧！`,`💤 Everyone’s down. You get 💎 ${LOSS_GEMS} as comfort pay. Pull some new crew and try again!`],'sys');
       renderUI();
-      openModal(`<div class="big">💤</div><h2>全員躺平</h2>
-        <p class="center">${m0.name} 太強了。大家決定先回家睡覺。<br>補償金 💎 ${LOSS_GEMS} 已發放，抽點新夥伴再來！</p>
-        <div class="btns"><button id="mOk">好啦</button></div>`);
+      openModal(`<div class="big">💤</div><h2>${tx('全員躺平','Total Wipeout')}</h2>
+        <p class="center">${tx(`${mn} 太強了。大家決定先回家睡覺。<br>補償金 💎 ${LOSS_GEMS} 已發放，抽點新夥伴再來！`,`The ${mn} was too strong. Everyone decides to go home and sleep.<br>You get 💎 ${LOSS_GEMS} comfort pay. Pull some new crew and try again!`)}</p>
+        <div class="btns"><button id="mOk">${tx('好啦','Fine…')}</button></div>`);
       $('mOk').onclick=closeModal;
     }
   };
   step();
 };
-$('log').addEventListener('click',()=>{if(busy){fast=true;$('goHint').textContent='快轉中…'}});
+$('log').addEventListener('click',()=>{if(busy){fast=true;$('goHint').textContent=tx('快轉中…','Fast-forwarding…')}});
 
 /* ---------- sound (Web Audio, no external files) ---------- */
 const Sound=(()=>{
@@ -691,57 +816,71 @@ const Sound=(()=>{
   document.addEventListener('visibilitychange',()=>{ if(!ctx) return; if(document.hidden) ctx.suspend(); else if(on) ctx.resume(); });
   return {play,stop,sfx,setOn,isOn:()=>on,init,current:()=>song};
 })();
-function renderSound(){const b=$('soundBtn');b.textContent=Sound.isOn()?'🔊':'🔇';b.setAttribute('aria-label',Sound.isOn()?'關閉聲音':'開啟聲音')}
+function renderSound(){const b=$('soundBtn');b.textContent=Sound.isOn()?'🔊':'🔇';b.setAttribute('aria-label',Sound.isOn()?tx('關閉聲音','Sound off'):tx('開啟聲音','Sound on'))}
 $('soundBtn').onclick=()=>{Sound.init();Sound.setOn(!Sound.isOn());renderSound();if(Sound.isOn())Sound.play(busy?(S.floor===10?'boss':'battle'):'lobby')};
-renderSound();
 
 /* ---------- modal / misc ---------- */
-function openModal(html){$('modal').innerHTML=html;$('overlay').hidden=false;const b=$('modal').querySelector('button:not([disabled])');b&&b.focus()}
-function closeModal(){$('overlay').hidden=true}
+let modalView=null; /* a function that redraws the open modal, so language switches can refresh it */
+function openModal(html){$('modal').innerHTML=html;$('overlay').hidden=false;const b=$('modal').querySelector('button:not([disabled])');b&&b.focus({preventScroll:true});$('modal').scrollTop=0;$('overlay').scrollTop=0}
+function closeModal(){$('overlay').hidden=true;modalView=null}
+
 /* ---------- card detail / dex / help ---------- */
-const TYPES={hero:{list:HEROES,label:'夥伴'},gear:{list:GEAR,label:'裝備'},event:{list:EVENTS,label:'事件'}};
+const TYPES={hero:{list:HEROES},gear:{list:GEAR},event:{list:EVENTS}};
 const owned=(type,id)=>type==='hero'?S.roster[id]:S.seen[id];
 let dexTab='hero';
 function showCard(type,id,fromDex){
+  modalView=()=>showCard(type,id,fromDex);
   const c=TYPES[type].list.find(x=>x.id===id);
-  let tag='', rows='';
+  let tag=null, rows='';
   if(type==='hero'){
     const st=heroStats(id), inTeam=team().some(t=>t.id===id);
-    tag='★'.repeat(st.stars)+'☆'.repeat(5-st.stars);
-    rows=`<dt>星等</dt><dd>${st.stars}★（基礎數值 +${(st.stars-1)*25}%）</dd>
+    tag={k:'stars',n:st.stars};
+    rows=tx(`<dt>星等</dt><dd>${st.stars}★（基礎數值 +${(st.stars-1)*25}%）</dd>
       <dt>目前生命</dt><dd class="num">${st.hp}（含裝備 +${S.bHp}）</dd>
       <dt>目前攻擊</dt><dd class="num">${st.atk}（含裝備 +${S.bAtk}）</dd>
       <dt>狀態</dt><dd>${inTeam?'出戰中':'候補（戰力不在前 4 名）'}</dd>
-      ${st.stars<5?`<dt>下一星</dt><dd>再抽到 1 張就升到 ${st.stars+1}★</dd>`:`<dt>下一星</dt><dd>已滿星，再抽到會換成 💎2</dd>`}`;
+      <dt>下一星</dt><dd>${st.stars<5?`再抽到 1 張就升到 ${st.stars+1}★`:'已滿星，再抽到會換成 💎2'}</dd>`,
+     `<dt>Stars</dt><dd>${st.stars}★ (base stats +${(st.stars-1)*25}%)</dd>
+      <dt>HP now</dt><dd class="num">${st.hp} (gear +${S.bHp})</dd>
+      <dt>ATK now</dt><dd class="num">${st.atk} (gear +${S.bAtk})</dd>
+      <dt>Status</dt><dd>${inTeam?'In the team':'On the bench (not in the top 4)'}</dd>
+      <dt>Next star</dt><dd>${st.stars<5?`Pull 1 more copy to reach ${st.stars+1}★`:'Max stars. Extra copies become 💎2'}</dd>`);
   } else if(type==='gear'){
     const n=S.seen[id]||0;
-    rows=`<dt>已獲得</dt><dd class="num">${n} 件</dd>
+    rows=tx(`<dt>已獲得</dt><dd class="num">${n} 件</dd>
       <dt>累計加成</dt><dd class="num">${[c.atk?`攻擊 +${c.atk*n}`:'',c.hp?`生命 +${c.hp*n}`:''].filter(Boolean).join('・')}</dd>
-      <dt>說明</dt><dd>裝備會疊加，效果套用在全隊。</dd>`;
+      <dt>說明</dt><dd>裝備會疊加，效果套用在全隊。</dd>`,
+     `<dt>Owned</dt><dd class="num">${n}</dd>
+      <dt>Total bonus</dt><dd class="num">${[c.atk?`ATK +${c.atk*n}`:'',c.hp?`HP +${c.hp*n}`:''].filter(Boolean).join(' · ')}</dd>
+      <dt>Note</dt><dd>Gear stacks, and it works for the whole team.</dd>`);
   } else {
-    rows=`<dt>遇到次數</dt><dd class="num">${S.seen[id]||0} 次</dd>
-      ${c.choices?`<dt>選項</dt><dd>${c.choices.map(ch=>`${ch.label}（${ch.sub}）`).join('<br>')}</dd>`:''}`;
+    rows=tx(`<dt>遇到次數</dt><dd class="num">${S.seen[id]||0} 次</dd>`,`<dt>Times seen</dt><dd class="num">${S.seen[id]||0}</dd>`)
+      +(c.choices?`<dt>${tx('選項','Choices')}</dt><dd>${c.choices.map(ch=>`${N(ch,'label')}（${N(ch,'sub')}）`.replace(/（(.*)）/,LANG==='en'?' ($1)':'（$1）')).join('<br>')}</dd>`:'');
   }
-  openModal(`<div class="cards one">${cardHTML({type,c,r:c.r,tag},0)}</div>
+  openModal(`<div class="cards one">${cardHTML({type,c,r:c.r,tag},0)}</div>${lpHint()}
     <dl class="info">${rows}</dl>
-    <div class="btns"><button id="mOk">${fromDex?'返回圖鑑':'關閉'}</button></div>`);
+    <div class="btns"><button id="mOk">${fromDex?tx('返回圖鑑','Back to Cards'):tx('關閉','Close')}</button></div>`);
   $('modal').querySelector('.card').classList.add('open');
   $('mOk').onclick=fromDex?openDex:closeModal;
 }
 function openDex(){
+  modalView=openDex;
   const list=TYPES[dexTab].list;
   const tabs=Object.entries(TYPES).map(([k,v])=>{
     const n=v.list.filter(c=>owned(k,c.id)).length;
-    return `<button role="tab" data-t="${k}" aria-selected="${k===dexTab}">${v.label} ${n}/${v.list.length}</button>`}).join('');
+    return `<button role="tab" data-t="${k}" aria-selected="${k===dexTab}">${typeName(k)} ${n}/${v.list.length}</button>`}).join('');
   const items=list.map(c=>{
     const o=owned(dexTab,c.id);
-    if(!o) return `<button class="it no" style="--rc:${RAR[c.r].css}" disabled><div class="e">❔</div>？？？<br><span class="sub">${RAR[c.r].name}</span></button>`;
-    const sub=dexTab==='hero'?'★'.repeat(o):dexTab==='gear'?`× ${o}`:`遇過 ${o} 次`;
-    return `<button class="it" data-id="${c.id}" style="--rc:${RAR[c.r].css}"><div class="e">${c.e}</div>${c.name.replace('打工仔騎士・','')}<br><span class="sub">${sub}</span></button>`;
+    if(!o) return `<button class="it no" style="--rc:${RAR[c.r].css}" disabled><div class="e">❔</div>？？？<br><span class="sub">${N(RAR[c.r],'name')}</span></button>`;
+    const sub=dexTab==='hero'?'★'.repeat(o):dexTab==='gear'?`× ${o}`:tx(`遇過 ${o} 次`,`Seen ×${o}`);
+    const nm=dexTab==='hero'?shortName(c):N(c,'name');
+    return `<button class="it" data-id="${c.id}" style="--rc:${RAR[c.r].css}"><div class="e">${c.e}</div>${nm}<br><span class="sub">${sub}</span></button>`;
   }).join('');
-  const hint={hero:'點夥伴看詳細資料。出戰的是戰力最高的 4 位。',gear:'裝備會疊加，效果套用在全隊。',event:'抽到過的事件才會出現在這裡。'}[dexTab];
-  openModal(`<h2>圖鑑</h2><div class="tabs" role="tablist">${tabs}</div><div class="dex">${items}</div>
-    <p class="summary">${hint}</p><div class="btns"><button id="mOk">關閉</button></div>`);
+  const hint={hero:tx('點夥伴看詳細資料。出戰的是戰力最高的 4 位。','Tap a crew member for details. The 4 strongest go into battle.'),
+    gear:tx('裝備會疊加，效果套用在全隊。','Gear stacks, and it works for the whole team.'),
+    event:tx('抽到過的事件才會出現在這裡。','Events show up here after you pull them.')}[dexTab];
+  openModal(`<h2>${tx('圖鑑','Card Collection')}</h2><div class="tabs" role="tablist">${tabs}</div><div class="dex">${items}</div>
+    <p class="summary">${hint}</p><div class="btns"><button id="mOk">${tx('關閉','Close')}</button></div>`);
   $('modal').querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{dexTab=b.dataset.t;openDex()});
   $('modal').querySelectorAll('.dex .it[data-id]').forEach(b=>b.onclick=()=>showCard(dexTab,b.dataset.id,true));
   $('mOk').onclick=closeModal;
@@ -752,12 +891,40 @@ $('party').addEventListener('click',e=>{
   const h=e.target.closest('.hero[data-i]'); if(!h)return;
   const t=team()[+h.dataset.i]; if(t) showCard('hero',t.id,false);
 });
-$('helpBtn').onclick=()=>{
-  openModal(`<h2>遊戲規則</h2><div class="help" style="display:flex;flex-direction:column;gap:14px">
+function helpHTML(){
+  const rar=`<div class="rar-row">${ORDER.map(r=>`<span style="--rc:${RAR[r].css}">${N(RAR[r],'name')} ${RAR[r].w}%</span>`).join('')}</div>`;
+  if(LANG==='en') return `<h2>How to Play</h2><div class="help" style="display:flex;flex-direction:column;gap:14px">
+  <section><h3>The basics</h3>
+    <p>Pull cards to build your crew. Press “Go!” and your crew fights on its own. Beat the King of Overtime on Floor 10 to win.</p></section>
+  <section><h3>Pulling cards</h3>${rar}
+    <ul><li>Each card is a <b>crew member</b>, a piece of <b>gear</b>, or an <b>event</b>.</li>
+    <li><b>Pull ×10</b> always gives you at least one Epic or better.</li>
+    <li><b>Pity</b>: if you go 30 pulls without a Legendary, pull 30 is always Legendary. The bottom of the screen shows how many pulls are left.</li></ul></section>
+  <section><h3>Card labels</h3>
+    <ul><li><b>NEW</b>: your first copy of this card. Crew members join your team, and the card is added to your Card Collection.</li>
+    <li><b>Up to N★</b>: you pulled a crew member you already have, so they gain a star.</li>
+    <li><b>Max ★ · 💎2</b>: this crew member already has 5★, so the extra copy turns into 2 gems.</li></ul></section>
+  <section><h3>Stars</h3>
+    <p>Stars are a crew member’s level, up to 5★. Each star adds 25% to their base HP and attack, so a 5★ is about twice as strong as a 1★. Gear bonuses don’t grow with stars.</p></section>
+  <section><h3>Gear and events</h3>
+    <ul><li><b>Gear</b> stacks, and every bonus goes to the whole team.</li>
+    <li><b>Events</b> give you a reward right away, or ask you to choose one of two options.</li></ul></section>
+  <section><h3>Your team</h3>
+    <p>Your 4 strongest crew members go into battle automatically. Everyone else waits on the bench. Tap a crew member to see their details.</p></section>
+  <section><h3>Battles</h3>
+    <ul><li>A battle lasts up to ${MAX_ROUNDS} rounds. If the monster is still standing when time runs out, you lose.</li>
+    <li>Every monster has a special ability. You can read it under its name.</li>
+    <li>Tap the battle log to fast-forward.</li></ul></section>
+  <section><h3>Gems</h3>
+    <ul><li>Clear Floor N and you get N + 1 gems. The mini-boss on Floor 5 gives 3 extra.</li>
+    <li>If your whole team goes down, you get ${LOSS_GEMS} gems as comfort pay.</li></ul></section>
+  <section><h3>Language</h3>
+    <p>Tap “中文” at the top to switch to Chinese. Press and hold any card to see it in Chinese.</p></section>
+  </div><div class="btns"><button id="mOk">Got it</button></div>`;
+  return `<h2>遊戲規則</h2><div class="help" style="display:flex;flex-direction:column;gap:14px">
   <section><h3>怎麼玩</h3>
     <p>抽卡補強冒險團，按「出發！」讓夥伴自動戰鬥。打倒第 10 層的加班之王就通關。</p></section>
-  <section><h3>抽卡</h3>
-    <div class="rar-row"><span style="--rc:var(--C)">普通 55%</span><span style="--rc:var(--R)">稀有 30%</span><span style="--rc:var(--E)">史詩 12%</span><span style="--rc:var(--L)">傳說 3%</span></div>
+  <section><h3>抽卡</h3>${rar}
     <ul><li>每張卡可能是<b>夥伴</b>、<b>裝備</b>或<b>事件</b>。</li>
     <li><b>十連抽</b>至少有一張史詩以上。</li>
     <li><b>保底</b>：連續 30 抽沒出傳說，第 30 抽一定是傳說。畫面下方會顯示還差幾抽。</li></ul></section>
@@ -779,29 +946,54 @@ $('helpBtn').onclick=()=>{
   <section><h3>鑽石</h3>
     <ul><li>通過第 N 層，獲得 N + 1 顆鑽石。第 5 層中頭目多給 3 顆。</li>
     <li>全員躺平時，領到 ${LOSS_GEMS} 顆補償金。</li></ul></section>
-  </div><div class="btns"><button id="mOk">知道了</button></div>`);
-  $('mOk').onclick=closeModal;
-};
-$('resetBtn').onclick=()=>{
-  openModal(`<h2>重新開始？</h2><p class="center">夥伴、裝備和樓層都會清空。</p>
-    <div class="btns"><button id="mYes">重新開始</button><button id="mNo">算了</button></div>`);
-  $('mYes').onclick=()=>{closeModal();reset()}; $('mNo').onclick=closeModal;
-};
-function reset(){S=fresh();$('log').innerHTML='';intro();renderUI()}
-function intro(){
-  log('潮濕的風從洞裡吹出來，帶著烤地瓜的味道。','sys');
-  log('🛡️ 打工仔騎士・阿傑 扛起盾牌，走到你前面。','good');
-  log('抽卡補強隊伍，然後按「出發！」。','sys');
+  <section><h3>語言</h3>
+    <p>點右上角的「EN」切換成英文。長按任何一張卡片，可以看它的英文版。</p></section>
+  </div><div class="btns"><button id="mOk">知道了</button></div>`;
 }
-intro(); renderUI();
+function openHelp(){ modalView=openHelp; openModal(helpHTML()); $('mOk').onclick=closeModal; }
+$('helpBtn').onclick=openHelp;
+function openReset(){
+  modalView=openReset;
+  openModal(`<h2>${tx('重新開始？','Start over?')}</h2><p class="center">${tx('夥伴、裝備和樓層都會清空。','Your crew, gear, and floor progress will all be cleared.')}</p>
+    <div class="btns"><button id="mYes">${tx('重新開始','Start over')}</button><button id="mNo">${tx('算了','Never mind')}</button></div>`);
+  $('mYes').onclick=()=>{closeModal();reset()}; $('mNo').onclick=closeModal;
+}
+$('resetBtn').onclick=openReset;
+function reset(){S=fresh();logLines.length=0;$('log').innerHTML='';intro();renderUI()}
+function intro(){
+  log(['潮濕的風從洞裡吹出來，帶著烤地瓜的味道。','A damp wind blows out of the cave. It smells like roasted sweet potatoes.'],'sys');
+  log(['🛡️ 打工仔騎士・阿傑 扛起盾牌，走到你前面。','🛡️ Jie, Part-Time Knight, lifts his shield and steps in front of you.'],'good');
+  log(['抽卡補強隊伍，然後按「出發！」。','Pull cards to build your team, then press “Go!”.'],'sys');
+}
+
+/* ---------- language switch ---------- */
+function setLang(l){
+  LANG=l; try{localStorage.setItem('clockout-lang',l)}catch(e){}
+  applyStatic(); renderSound(); redrawLog(); renderUI();
+  if(busy) $('goHint').textContent=fast?tx('快轉中…','Fast-forwarding…'):tx('戰鬥中…（點戰鬥紀錄可快轉）','Fighting… (tap the log to skip)');
+  if(!$('overlay').hidden && modalView) modalView();
+  const hint=$('splashHint'); if(hint.dataset.state) hint.textContent=splashHintText(hint.dataset.state);
+}
+$('langBtn').onclick=()=>setLang(other(LANG));
+$('langBtn2').onclick=e=>{e.stopPropagation();setLang(other(LANG))};
+$('langBtn2').addEventListener('pointerdown',e=>e.stopPropagation());
+
+applyStatic(); renderSound(); intro(); renderUI();
+
+/* ---------- splash ---------- */
+function splashHintText(state){
+  return state==='muted'?tx('🔇 聲音已關閉，進入遊戲後可以用右上角的喇叭打開。','🔇 Sound is off. Turn it on with the speaker button after you clock in.')
+    :tx('🔊 進入遊戲後，可以用右上角的喇叭關掉聲音。','🔊 You can turn the sound off with the speaker button later.');
+}
 $('splash').addEventListener('pointerdown',e=>{
-  if(e.target.closest('#startBtn')) return;
+  if(e.target.closest('#startBtn')||e.target.closest('#langBtn2')) return;
   Sound.init();
-  if(!Sound.isOn()){ $('splashHint').textContent='🔇 聲音已關閉，進入遊戲後可以用右上角的喇叭打開。'; return; }
+  const hint=$('splashHint');
+  if(!Sound.isOn()){ hint.dataset.state='muted'; hint.textContent=splashHintText('muted'); return; }
   if(Sound.current()==='title') return;
   const svg=$('splash').querySelector('svg'); svg.replaceWith(svg.cloneNode(true));
   Sound.play('title'); setTimeout(Sound.sfx.bell,1950);
-  $('splashHint').textContent='🔊 進入遊戲後，可以用右上角的喇叭關掉聲音。';
+  hint.dataset.state='on'; hint.textContent=splashHintText('on');
 });
 $('startBtn').onclick=()=>{Sound.init();if(Sound.isOn()){Sound.sfx.punch();Sound.play('lobby')}const sp=$('splash');sp.classList.add('bye');setTimeout(()=>sp.hidden=true,360)};
 $('startBtn').focus();
