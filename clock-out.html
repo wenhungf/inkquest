@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>躺平冒險團</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+body{margin:0}
+[hidden]{display:none!important}
+:root{
+  color-scheme: dark;
+  --bg:#13142b; --panel:#1d2044; --panel2:#262a57; --line:#353a72;
+  --text:#f1efff; --muted:#a3a5cf; --lantern:#ffb347; --lantern-ink:#3a1f00;
+  --hp:#5fd38d; --hp-low:#ff7070; --danger:#ff7070;
+  --C:#b3b8d4; --R:#5aa7ff; --E:#c07bff; --L:#ffcf4a;
+  --display:"Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg);
+  background-image:
+    radial-gradient(600px 300px at 10% -5%, rgba(255,179,71,.14), transparent 70%),
+    radial-gradient(500px 280px at 100% 0%, rgba(192,123,255,.12), transparent 70%);
+  color:var(--text); font-family:var(--body); font-size:15px; line-height:1.5;
+}
+.wrap{max-width:480px;margin:0 auto;padding-inline:16px;padding-block:14px 24px;display:flex;flex-direction:column;gap:12px}
+.num{font-variant-numeric:tabular-nums}
+
+/* top */
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.logo{font-family:var(--display);font-size:24px;letter-spacing:.04em;line-height:1.1}
+.logo small{display:block;font-family:var(--body);font-size:11px;color:var(--muted);letter-spacing:.12em}
+.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.chip{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:13px;white-space:nowrap}
+.chip b{font-family:var(--display);font-weight:400;font-size:15px}
+
+/* floors */
+.floors{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.floors i{height:6px;border-radius:3px;background:var(--line)}
+.floors i.done{background:var(--lantern)}
+.floors i.now{background:var(--text);animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.35}}
+
+/* stage */
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.monster{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center}
+.m-emoji{font-size:48px;line-height:64px;text-align:center;background:var(--panel2);border-radius:14px}
+.m-emoji.hit{animation:shake .25s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.m-name{font-family:var(--display);font-size:19px;line-height:1.2}
+.m-floor{font-size:11px;color:var(--lantern);letter-spacing:.12em}
+.m-quote{font-size:12px;color:var(--muted);margin-top:2px}
+.bar{height:8px;background:#0d0e20;border-radius:4px;overflow:hidden;margin-top:6px}
+.bar>span{display:block;height:100%;background:var(--danger);transition:width .25s}
+.bar.hpb>span{background:var(--hp)}
+.bar.hpb.low>span{background:var(--hp-low)}
+.m-stat{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;margin-top:3px}
+
+.party{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.hero{background:var(--panel2);border-radius:12px;padding:8px 6px;text-align:center;border:1.5px solid transparent;position:relative;min-width:0}
+.hero .e{font-size:28px;line-height:1.2}
+.hero .n{font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero .s{font-size:10px;color:var(--lantern);letter-spacing:.05em;min-height:14px}
+.hero .a{font-size:11px;color:var(--muted)}
+.hero.dead{opacity:.35;filter:grayscale(1)}
+.hero.hit{animation:shake .25s}
+.hero.empty{border:1.5px dashed var(--line);background:transparent;color:var(--muted);font-size:11px;display:flex;align-items:center;justify-content:center;min-height:98px}
+.hero.r-C{border-color:var(--C)}.hero.r-R{border-color:var(--R)}.hero.r-E{border-color:var(--E)}.hero.r-L{border-color:var(--L)}
+
+.log{background:#0e0f24;border-radius:12px;padding:10px 12px;height:150px;overflow-y:auto;font-size:13px;display:flex;flex-direction:column;gap:3px}
+.log p{margin:0}
+.log .sys{color:var(--muted)}
+.log .good{color:var(--hp)}
+.log .bad{color:var(--danger)}
+.log .gold{color:var(--L)}
+
+/* actions */
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button{font-family:var(--display);font-size:17px;border:0;border-radius:14px;padding:12px 10px;cursor:pointer;color:var(--text);background:var(--panel2);transition:transform .08s, filter .15s}
+button:active{transform:scale(.97)}
+button:focus-visible{outline:2px solid var(--lantern);outline-offset:2px}
+button:disabled{opacity:.4;cursor:not-allowed}
+button small{display:block;font-family:var(--body);font-size:11px;opacity:.8}
+.btn-pull{background:linear-gradient(180deg,#3b3f86,#2b2f6b);border:1px solid #5156a8}
+.btn-go{grid-column:1/-1;background:var(--lantern);color:var(--lantern-ink);font-size:20px}
+.btn-go small{opacity:.75}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.foot button{font-family:var(--body);font-size:12px;padding:6px 10px;border-radius:8px;background:transparent;border:1px solid var(--line);color:var(--muted)}
+.buffs{font-size:12px;color:var(--muted)}
+.buffs b{color:var(--text);font-weight:500}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(6,6,18,.82);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10;overflow-y:auto}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;width:100%;max-width:440px;display:flex;flex-direction:column;gap:14px;max-height:100%;overflow-y:auto}
+.modal h2{font-family:var(--display);font-weight:400;font-size:22px;margin:0;text-align:center;text-wrap:balance}
+.modal p{margin:0}
+.modal .btns{display:flex;flex-direction:column;gap:8px}
+.modal .btns button{width:100%}
+
+/* cards */
+.cards{display:grid;gap:8px}
+.cards.one{grid-template-columns:1fr;justify-items:center}
+.cards.ten{grid-template-columns:repeat(5,1fr)}
+.card{perspective:800px;width:100%}
+.cards.one .card{max-width:240px}
+.card-in{position:relative;transition:transform .5s;transform-style:preserve-3d;transform:rotateY(180deg)}
+.card.open .card-in{transform:rotateY(0)}
+.face,.back{backface-visibility:hidden;border-radius:12px}
+.back{position:absolute;inset:0;transform:rotateY(180deg);background:repeating-linear-gradient(45deg,#2b2f6b 0 8px,#252960 8px 16px);border:2px solid #5156a8;display:flex;align-items:center;justify-content:center;font-family:var(--display);color:#8e93d6;font-size:22px}
+.face{background:var(--panel2);border:2px solid var(--rc);padding:12px 10px;text-align:center;display:flex;flex-direction:column;gap:4px;align-items:center;box-shadow:0 0 18px -4px var(--rc)}
+.face .rar{font-size:10px;letter-spacing:.14em;color:var(--rc)}
+.face .e{font-size:52px;line-height:1.15}
+.face .nm{font-family:var(--display);font-size:18px;line-height:1.2}
+.face .ty{font-size:11px;color:var(--muted)}
+.face .st{font-size:12px;color:var(--lantern)}
+.face .ds{font-size:12px;color:var(--text);opacity:.9}
+.face .q{font-size:11.5px;color:var(--muted);font-style:italic}
+.face .tag{font-size:10px;background:var(--rc);color:#111;border-radius:6px;padding:1px 6px}
+.cards.ten .face{padding:6px 2px;gap:1px}
+.cards.ten .face .e{font-size:26px}
+.cards.ten .face .nm{font-size:11px;font-family:var(--body)}
+.cards.ten .face .rar{font-size:8px;letter-spacing:.05em}
+.cards.ten .face .ty,.cards.ten .face .ds,.cards.ten .face .q,.cards.ten .face .st{display:none}
+.cards.ten .face .tag{font-size:8px;padding:0 3px}
+.cards.ten .card-in{min-height:84px}
+.rL .face{animation:gold 1.6s infinite}
+@keyframes gold{50%{box-shadow:0 0 34px 2px var(--L)}}
+.summary{font-size:13px;color:var(--muted);text-align:center}
+
+.dex{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dex .it{font-family:var(--body);font-size:11.5px;line-height:1.35;background:var(--panel2);border-radius:10px;padding:8px 4px;text-align:center;border:1.5px solid var(--rc);color:var(--text)}
+.dex .it .e{font-size:26px;line-height:1.25}
+.dex .it .sub{color:var(--lantern)}
+.dex .it.no{opacity:.35;filter:grayscale(1);border-color:var(--line);cursor:default}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:#0e0f24;border-radius:12px;padding:4px}
+.tabs button{font-family:var(--body);font-size:13px;padding:8px 4px;border-radius:9px;background:transparent;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--panel2);color:var(--text)}
+.info{background:#0e0f24;border-radius:12px;padding:10px 12px;font-size:13px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px}
+.info dt{color:var(--muted)}
+.info dd{margin:0}
+.hero:not(.empty){cursor:pointer}
+.help h3{font-family:var(--display);font-weight:400;font-size:16px;margin:0 0 4px;color:var(--lantern)}
+.help section{display:flex;flex-direction:column;gap:4px}
+.help p,.help li{font-size:13.5px;margin:0}
+.help ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px}
+.help b{font-weight:500;color:var(--text)}
+.help .rar-row{display:flex;flex-wrap:wrap;gap:6px}
+.help .rar-row span{font-size:12px;border:1.5px solid var(--rc);border-radius:999px;padding:2px 9px;color:var(--rc)}
+.center{text-align:center}
+.big{font-size:56px;text-align:center;line-height:1}
+
+
+/* splash */
+.splash{position:fixed;inset:0;z-index:20;background:var(--bg);
+  background-image:radial-gradient(420px 320px at 50% 30%, rgba(255,179,71,.16), transparent 70%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px 16px;text-align:center;transition:opacity .35s}
+.splash.bye{opacity:0;pointer-events:none}
+.splash svg{width:min(200px,52vw);height:auto;overflow:visible}
+.splash .t{font-family:var(--display);font-size:clamp(34px,10vw,44px);letter-spacing:.06em;line-height:1.1;margin:0}
+.splash .slogan{font-family:var(--display);font-size:20px;color:var(--lantern);margin:0}
+.splash .sub{font-size:13px;color:var(--muted);margin:0}
+.splash button{background:var(--lantern);color:var(--lantern-ink);font-size:19px;padding:12px 36px;border-radius:999px;margin-top:6px}
+.clk-min{transform-box:view-box;transform-origin:100px 100px;transform:rotate(0deg);animation:minute 1.6s cubic-bezier(.5,0,.3,1.4) .3s backwards}
+@keyframes minute{from{transform:rotate(-40deg)}}
+.clk-stamp{transform-box:view-box;transform-origin:150px 158px;transform:rotate(-12deg);animation:stamp .35s cubic-bezier(.3,1.6,.5,1) 1.9s backwards}
+@keyframes stamp{from{transform:rotate(-12deg) scale(2.2);opacity:0}}
+.clk-z{animation:zz 2.4s ease-in-out infinite}
+@keyframes zz{50%{transform:translateY(-5px);opacity:.5}}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+}
+@media (max-width:380px){
+  .party{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="splash" id="splash" role="dialog" aria-label="躺平冒險團">
+  <svg viewBox="0 0 200 200" aria-hidden="true">
+    <defs><line id="tk" x1="100" y1="34" x2="100" y2="44" stroke="#a3a5cf" stroke-width="4" stroke-linecap="round"/></defs>
+    <circle cx="100" cy="100" r="78" fill="#262a57" stroke="#ffb347" stroke-width="8"/>
+    <circle cx="100" cy="100" r="66" fill="#1d2044"/>
+    <use href="#tk" transform="rotate(0 100 100)"/><use href="#tk" transform="rotate(30 100 100)"/><use href="#tk" transform="rotate(60 100 100)"/><use href="#tk" transform="rotate(90 100 100)"/><use href="#tk" transform="rotate(120 100 100)"/><use href="#tk" transform="rotate(150 100 100)"/><use href="#tk" transform="rotate(180 100 100)"/><use href="#tk" transform="rotate(210 100 100)"/><use href="#tk" transform="rotate(240 100 100)"/><use href="#tk" transform="rotate(270 100 100)"/><use href="#tk" transform="rotate(300 100 100)"/><use href="#tk" transform="rotate(330 100 100)"/>
+    <line x1="100" y1="100" x2="100" y2="142" stroke="#f1efff" stroke-width="7" stroke-linecap="round"/>
+    <line class="clk-min" x1="100" y1="100" x2="100" y2="46" stroke="#ffb347" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="100" cy="100" r="7" fill="#ffb347"/>
+    <g class="clk-z" fill="#a3a5cf" font-family="Huninn, sans-serif" font-size="16"><text x="160" y="36">z</text><text x="172" y="20" font-size="12">z</text></g>
+    <g class="clk-stamp">
+      <rect x="112" y="140" width="76" height="36" rx="6" fill="#13142b" stroke="#ff7070" stroke-width="4"/>
+      <text x="150" y="166" text-anchor="middle" fill="#ff7070" font-family="Huninn, sans-serif" font-size="21" font-weight="700">18:00</text>
+    </g>
+  </svg>
+  <h1 class="t">躺平冒險團</h1>
+  <p class="slogan">撐到下班，就是勝利。</p>
+  <p class="sub">抽卡就好，打怪交給夥伴。</p>
+  <button id="startBtn">打卡上工</button>
+</div>
+<div class="wrap">
+  <header class="top">
+    <div class="logo">躺平冒險團<small>只要抽卡，其他交給夥伴</small></div>
+    <div class="chips">
+      <span class="chip">💎 <b class="num" id="gems">10</b></span>
+      <span class="chip">第 <b class="num" id="floorNum">1</b> / 10 層</span>
+    </div>
+  </header>
+  <div class="floors" id="floors" aria-label="樓層進度"></div>
+
+  <section class="stage">
+    <div class="monster">
+      <div class="m-emoji" id="mEmoji">🍄</div>
+      <div>
+        <div class="m-floor" id="mFloor">第 1 層</div>
+        <div class="m-name" id="mName"></div>
+        <div class="m-quote" id="mQuote"></div>
+        <div class="bar"><span id="mBar" style="width:100%"></span></div>
+        <div class="m-stat num"><span id="mHp"></span><span id="mAtk"></span></div>
+      </div>
+    </div>
+    <div class="party" id="party"></div>
+    <div class="log" id="log" aria-live="polite"></div>
+  </section>
+
+  <div class="actions">
+    <button class="btn-pull" id="pull1">抽一張<small>💎 1</small></button>
+    <button class="btn-pull" id="pull10">十連抽<small>💎 10・必出史詩以上</small></button>
+    <button class="btn-go" id="go">出發！<small id="goHint">冒險團自動戰鬥</small></button>
+  </div>
+
+  <div class="buffs" id="buffs"></div>
+  <div class="foot">
+    <span id="pity"></span>
+    <span style="display:flex;gap:6px">
+      <button id="helpBtn" aria-label="遊戲規則">？ 規則</button>
+      <button id="dexBtn">圖鑑</button>
+      <button id="resetBtn">重新開始</button>
+    </span>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" hidden><div class="modal" id="modal"></div></div>
+
+<script>
+const RAR = {
+  C:{name:'普通',w:55,css:'var(--C)'},
+  R:{name:'稀有',w:30,css:'var(--R)'},
+  E:{name:'史詩',w:12,css:'var(--E)'},
+  L:{name:'傳說',w:3,css:'var(--L)'}
+};
+const ORDER = ['C','R','E','L'];
+const PITY_MAX = 30;
+
+const HEROES = [
+  {id:'intern',name:'實習生小美',e:'🙋‍♀️',r:'C',hp:22,atk:6,skill:'影印機大師',desc:'每回合 25% 機率攻擊兩次。',q:'「這個要印幾份？全部嗎？好喔。」'},
+  {id:'guard',name:'保全伯伯',e:'👮',r:'C',hp:42,atk:4,skill:'老神在在',desc:'受到的傷害 -3。',q:'「少年欸，登記一下。」'},
+  {id:'uber',name:'外送員阿豪',e:'🛵',r:'C',hp:26,atk:7,skill:'準時送達',desc:'第 1 回合攻擊力 ×3。',q:'「您的餐點到了，麻煩給五星。」'},
+  {id:'jie',name:'打工仔騎士・阿傑',e:'🛡️',r:'R',hp:30,atk:8,skill:'準時下班',desc:'第 4 回合起攻擊力翻倍。',q:'「老闆，這不在我的工作範圍內……好啦我打。」'},
+  {id:'fortune',name:'夜市算命師',e:'🔮',r:'R',hp:24,atk:9,skill:'鐵口直斷',desc:'30% 機率暴擊，傷害 ×2.5。',q:'「你今天……會打贏。五百。」'},
+  {id:'boba',name:'手搖飲店長',e:'🧋',r:'R',hp:28,atk:6,skill:'半糖少冰',desc:'每回合全隊回復 5 生命。',q:'「甜度冰塊？好的，下一位。」'},
+  {id:'drill',name:'退休教官',e:'🎖️',r:'E',hp:50,atk:10,skill:'集合！',desc:'全隊攻擊力 +4。',q:'「頭髮太長！全部給我站好！」'},
+  {id:'medium',name:'廟口乩童',e:'🥁',r:'E',hp:38,atk:12,skill:'起乩',desc:'生命低於一半時，攻擊力 ×2。',q:'「神明說……可以打。」'},
+  {id:'engineer',name:'資深工程師',e:'💻',r:'E',hp:34,atk:14,skill:'重開機',desc:'第一次倒下時，以一半生命復活。',q:'「你有試過關掉再打開嗎？」'},
+  {id:'grandma',name:'阿嬤',e:'👵',r:'L',hp:60,atk:14,skill:'呷飽未',desc:'每回合全隊回復 10 生命，全隊攻擊力 +5。',q:'「瘦成這樣！再吃一碗！」'},
+  {id:'typhoon',name:'颱風假之神',e:'🌀',r:'L',hp:45,atk:20,skill:'停班停課',desc:'戰鬥開始時，敵人失去 25% 生命。',q:'「人事行政總處宣布——」'},
+  {id:'clerk',name:'超商店員',e:'🏪',r:'L',hp:50,atk:16,skill:'什麼都有',desc:'每回合隨機：全隊回血 12／全隊攻擊 +3／丟出 25 點傷害。',q:'「歡迎光臨～需要袋子嗎？」'}
+];
+const GEAR = [
+  {id:'stick',name:'樹枝',e:'🌿',r:'C',atk:1,hp:0,q:'冒險的起點。'},
+  {id:'helmet',name:'機車安全帽',e:'⛑️',r:'C',atk:0,hp:4,q:'記得扣好扣環。'},
+  {id:'slipper',name:'藍白拖',e:'🩴',r:'C',atk:1,hp:2,q:'台灣最強近戰武器。'},
+  {id:'bento',name:'鐵製便當盒',e:'🍱',r:'R',atk:0,hp:8,q:'擋刀也擋子彈。'},
+  {id:'umbrella',name:'自動傘',e:'☂️',r:'R',atk:2,hp:3,q:'在捷運站按下去會被瞪。'},
+  {id:'cooker',name:'大同電鍋',e:'🍚',r:'E',atk:1,hp:15,q:'用了四十年還沒壞。'},
+  {id:'milktea',name:'全糖珍奶',e:'🥤',r:'E',atk:4,hp:0,q:'血糖飆升，戰力也飆升。'},
+  {id:'bonus',name:'年終獎金',e:'🧧',r:'L',atk:6,hp:18,q:'傳說中的道具，很少人見過。'}
+];
+const EVENTS = [
+  {id:'receipt',name:'對中發票',e:'🧾',r:'C',desc:'中了兩百元！換成 💎 1。',fx:s=>{s.gems+=1}},
+  {id:'tudigong',name:'巷口土地公',e:'🙏',r:'C',desc:'拜了一下，全隊生命 +3。',fx:s=>{s.bHp+=3}},
+  {id:'boss_line',name:'老闆傳 LINE',e:'📱',r:'R',desc:'晚上十點，老闆傳來：「在嗎？」',
+    choices:[{label:'已讀不回',sub:'全隊攻擊 +2',fx:s=>{s.bAtk+=2;return '你把手機蓋起來。全隊士氣大振，攻擊 +2。'}},
+             {label:'乖乖回覆',sub:'獲得 💎 3',fx:s=>{s.gems+=3;return '老闆很滿意，發了紅包。💎 +3。'}}]},
+  {id:'balloon',name:'夜市射氣球',e:'🎈',r:'R',desc:'攤販老闆說：「十發一百，射中送大獎！」',
+    choices:[{label:'認真射',sub:'全隊攻擊 +2',fx:s=>{s.bAtk+=2;return '十發中九發，大家都學會了瞄準。攻擊 +2。'}},
+             {label:'去買雞排',sub:'全隊生命 +8',fx:s=>{s.bHp+=8;return '雞排不切要辣。全隊生命 +8。'}}]},
+  {id:'capsule',name:'神秘扭蛋攤',e:'🎰',r:'E',desc:'巷子底有一台會發光的扭蛋機。',
+    choices:[{label:'投 💎 3 轉一次',sub:'必出史詩以上夥伴',need:3,fx:s=>{s.gems-=3;return {pull:true}}},
+             {label:'拿走地上的 💎 2',sub:'穩穩的',fx:s=>{s.gems+=2;return '你撿起鑽石，頭也不回地離開。'}}]},
+  {id:'mazu',name:'媽祖遶境',e:'🏮',r:'E',desc:'鞭炮聲中，全隊攻擊 +3、生命 +6。',fx:s=>{s.bAtk+=3;s.bHp+=6}},
+  {id:'lotto',name:'樂透頭獎',e:'🎉',r:'L',desc:'真的中了！💎 +8。',fx:s=>{s.gems+=8}}
+];
+const MONSTERS = [
+  {name:'發光蘑菇',e:'🍄',hp:45,atk:6,q:'散發著烤地瓜的香味。'},
+  {name:'會咬人的釘書機',e:'📎',hp:380,atk:21,trait:'bite',q:'【連咬】30% 機率攻擊兩次。'},
+  {name:'已讀不回史萊姆',e:'💬',hp:560,atk:26,trait:'dodge',q:'【已讀不回】每次攻擊有 25% 機率落空。'},
+  {name:'無限會議章魚',e:'🐙',hp:800,atk:31,trait:'meeting',q:'【拉進會議】每 2 回合讓一位夥伴無法行動。'},
+  {name:'報表巨人',e:'📊',hp:1100,atk:37,trait:'aoe',q:'中頭目【月底結算】每 3 回合攻擊全隊。'},
+  {name:'KPI 蝙蝠群',e:'🦇',hp:1600,atk:40,trait:'kpi',q:'【比上月更高】每回合攻擊力 +3。'},
+  {name:'奧客惡靈',e:'😡',hp:1850,atk:60,trait:'weak',q:'【專挑軟柿子】總是攻擊生命最低的夥伴。'},
+  {name:'颱風天上班幽靈',e:'👻',hp:2500,atk:66,trait:'storm',q:'【風雨無阻】每 2 回合攻擊全隊。'},
+  {name:'情緒勒索龍',e:'🐉',hp:3150,atk:80,trait:'drain',q:'【我都是為你好】造成傷害的 100% 回復自己。'},
+  {name:'加班之王',e:'🕴️',hp:3900,atk:70,trait:'boss',q:'最終魔王【今天誰都不准走】每回合攻擊兩次，血量減半後暴怒。'}
+];
+const MAX_ROUNDS = 15;
+const LOSS_GEMS = 2;
+const floorReward = f => f+1+(f===5?3:0);
+const H = Object.fromEntries(HEROES.map(h=>[h.id,h]));
+
+/* ---------- state ---------- */
+const KEY='tangping-v2';
+function fresh(){return {gems:10,floor:1,roster:{jie:1},bAtk:0,bHp:0,seen:{},pity:0,pulls:0,wins:0,losses:0,done:false}}
+let S = fresh();
+try{const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(fresh(),JSON.parse(raw));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+const $=id=>document.getElementById(id);
+let busy=false, fast=false;
+
+/* ---------- team ---------- */
+function heroStats(id){
+  const h=H[id], st=S.roster[id], m=1+0.25*(st-1);
+  return {id, h, stars:st, hp:Math.round(h.hp*m)+S.bHp, atk:Math.round(h.atk*m)+S.bAtk};
+}
+function team(){
+  return Object.keys(S.roster).map(heroStats)
+    .sort((a,b)=>(b.atk*3+b.hp)-(a.atk*3+a.hp)).slice(0,4);
+}
+
+/* ---------- render ---------- */
+function log(text,cls=''){
+  const p=document.createElement('p'); p.textContent=text; if(cls)p.className=cls;
+  $('log').appendChild(p); $('log').scrollTop=$('log').scrollHeight;
+  while($('log').children.length>80) $('log').firstChild.remove();
+}
+function renderFloors(){
+  $('floors').innerHTML=Array.from({length:10},(_,i)=>{
+    const f=i+1; return `<i class="${f<S.floor||S.done?'done':f===S.floor?'now':''}"></i>`}).join('');
+}
+function renderMonster(cur){
+  const m=MONSTERS[Math.min(S.floor,10)-1];
+  const hp=cur?cur.hp:m.hp, max=cur?cur.max:m.hp;
+  $('mEmoji').textContent=m.e; $('mName').textContent=m.name; $('mQuote').textContent=m.q;
+  $('mFloor').textContent=S.floor===10?'第 10 層・最終魔王':`第 ${S.floor} 層`;
+  $('mBar').style.width=Math.max(0,hp/max*100)+'%';
+  $('mHp').textContent=`生命 ${Math.max(0,hp)} / ${max}`;
+  $('mAtk').textContent=`攻擊 ${cur?cur.atk:m.atk}`;
+}
+function renderParty(units){
+  const t=units||team().map(x=>({...x,cur:x.hp,max:x.hp}));
+  let html='';
+  for(let i=0;i<4;i++){
+    const u=t[i];
+    if(!u){html+=`<div class="hero empty">空位<br>去抽卡！</div>`;continue}
+    const pct=Math.max(0,u.cur/u.max*100);
+    html+=`<div class="hero r-${u.h.r} ${u.cur<=0?'dead':''}" data-i="${i}">
+      <div class="e">${u.h.e}</div><div class="n">${u.h.name.replace('打工仔騎士・','')}</div>
+      <div class="s">${'★'.repeat(u.stars)}</div>
+      <div class="bar hpb ${pct<35?'low':''}"><span style="width:${pct}%"></span></div>
+      <div class="a num">⚔ ${u.atk}　♥ ${Math.max(0,u.cur)}</div></div>`;
+  }
+  $('party').innerHTML=html;
+}
+function renderUI(){
+  $('gems').textContent=S.gems; $('floorNum').textContent=Math.min(S.floor,10);
+  renderFloors();
+  if(!busy){renderMonster(); renderParty();}
+  $('pull1').disabled=busy||S.gems<1; $('pull10').disabled=busy||S.gems<10;
+  $('go').disabled=busy||S.done;
+  $('goHint').textContent=busy?(fast?'快轉中…':'戰鬥中…（點戰鬥紀錄可快轉）'):S.done?'已通關':`挑戰 ${MONSTERS[S.floor-1].name}`;
+  $('pity').textContent=`再抽 ${PITY_MAX-S.pity} 次必出傳說`;
+  const owned=Object.keys(S.roster).length;
+  $('buffs').innerHTML=`裝備加成（全隊）：攻擊 <b class="num">+${S.bAtk}</b>・生命 <b class="num">+${S.bHp}</b>　｜　夥伴 <b class="num">${owned}</b> / ${HEROES.length}`;
+  save();
+}
+
+/* ---------- gacha ---------- */
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
+function rollRarity(min='C'){
+  S.pity++; S.pulls++;
+  if(S.pity>=PITY_MAX){S.pity=0;return 'L'}
+  const allowed=ORDER.slice(ORDER.indexOf(min));
+  const tot=allowed.reduce((a,r)=>a+RAR[r].w,0); let x=Math.random()*tot;
+  for(const r of allowed){x-=RAR[r].w; if(x<0){if(r==='L')S.pity=0; return r}}
+  return allowed[0];
+}
+function pullOne(min='C',forceType=null){
+  const r=rollRarity(min);
+  let type=forceType;
+  if(!type){const x=Math.random(); type=x<.42?'hero':x<.77?'gear':'event';}
+  let pool=(type==='hero'?HEROES:type==='gear'?GEAR:EVENTS).filter(c=>c.r===r);
+  if(!pool.length){type='hero';pool=HEROES.filter(c=>c.r===r)}
+  const c=pick(pool); const card={type,c,r,tag:''};
+  if(type==='hero'){
+    if(S.roster[c.id]){ if(S.roster[c.id]<5){S.roster[c.id]++;card.tag=`升到 ${S.roster[c.id]}★`} else {S.gems+=2;card.tag='滿星・換 💎2'} }
+    else {S.roster[c.id]=1;card.tag='NEW'}
+  } else if(type==='gear'){
+    S.bAtk+=c.atk; S.bHp+=c.hp;
+  } else if(c.fx){ c.fx(S) }
+  if(type!=='hero'){ if(!S.seen[c.id])card.tag='NEW'; S.seen[c.id]=(S.seen[c.id]||0)+1; }
+  return card;
+}
+function cardHTML(k,i){
+  const {type,c,r,tag}=k;
+  const ty=type==='hero'?'夥伴':type==='gear'?'裝備':'事件';
+  let st='',ds='',q='';
+  if(type==='hero'){st=`生命 ${c.hp}｜攻擊 ${c.atk}`;ds=`【${c.skill}】${c.desc}`;q=c.q}
+  if(type==='gear'){st=[c.atk?`全隊攻擊 +${c.atk}`:'',c.hp?`全隊生命 +${c.hp}`:''].filter(Boolean).join('・');q=c.q}
+  if(type==='event'){ds=c.desc}
+  return `<div class="card r${r}" style="--rc:${RAR[r].css}" data-i="${i}"><div class="card-in">
+    <div class="face"><div class="rar">${RAR[r].name}${ty}</div><div class="e">${c.e}</div>
+    <div class="nm">${c.name}</div>${tag?`<div class="tag">${tag}</div>`:''}
+    ${st?`<div class="st">${st}</div>`:''}${ds?`<div class="ds">${ds}</div>`:''}${q?`<div class="q">${q}</div>`:''}</div>
+    <div class="back">抽</div></div></div>`;
+}
+function showPulls(cards,title,after){
+  const ten=cards.length>1;
+  const best=cards.reduce((a,k)=>Math.max(a,ORDER.indexOf(k.r)),0);
+  openModal(`<h2>${title}</h2><div class="cards ${ten?'ten':'one'}">${cards.map(cardHTML).join('')}</div>
+    ${ten?`<div class="summary" id="sum"></div>`:''}
+    <div class="btns"><button id="mOk">收下</button></div>`);
+  const els=[...document.querySelectorAll('#modal .card')];
+  els.forEach((el,i)=>setTimeout(()=>el.classList.add('open'),250+i*(ten?160:0)));
+  if(ten){
+    const n=r=>cards.filter(k=>k.r===r).length;
+    setTimeout(()=>{$('sum').textContent=`傳說 ${n('L')}・史詩 ${n('E')}・稀有 ${n('R')}・普通 ${n('C')}`},250+cards.length*160);
+    els.forEach((el,i)=>el.addEventListener('click',()=>{ // tap a small card to see details
+      const k=cards[i]; showDetail(k);
+    }));
+  }
+  const newHeroes=cards.filter(k=>k.type==='hero'&&k.tag==='NEW');
+  newHeroes.forEach(k=>log(`${k.c.e} ${k.c.name} 加入了冒險團！`,'good'));
+  cards.filter(k=>k.type==='gear').forEach(k=>log(`${k.c.e} 裝備了 ${k.c.name}。`,'sys'));
+  cards.filter(k=>k.type==='event'&&!k.c.choices).forEach(k=>log(`${k.c.e} ${k.c.name}：${k.c.desc}`,'gold'));
+  if(best===3) log('✨ 傳說降臨！','gold');
+  $('mOk').onclick=()=>{closeModal(); runChoices(cards.filter(k=>k.type==='event'&&k.c.choices),after)};
+  renderUI();
+}
+function showDetail(k){
+  const d=document.createElement('div');
+  d.innerHTML=`<div class="cards one">${cardHTML(k,0)}</div>`;
+  d.querySelector('.card').classList.add('open');
+  const box=$('detailBox')||Object.assign(document.createElement('div'),{id:'detailBox'});
+  box.innerHTML=d.innerHTML; box.style.marginTop='4px';
+  $('sum').after(box);
+}
+function runChoices(list,after){
+  if(!list.length){renderUI(); after&&after(); return}
+  const k=list.shift(), c=k.c;
+  openModal(`<div class="big">${c.e}</div><h2>${c.name}</h2><p class="center">${c.desc}</p>
+    <div class="btns">${c.choices.map((ch,i)=>`<button data-i="${i}" ${ch.need&&S.gems<ch.need?'disabled':''}>${ch.label}<small>${ch.sub}</small></button>`).join('')}</div>`);
+  document.querySelectorAll('#modal .btns button').forEach(b=>b.onclick=()=>{
+    const res=c.choices[+b.dataset.i].fx(S);
+    closeModal();
+    if(res&&res.pull){ const card=pullOne('E','hero'); showPulls([card],'扭蛋機轟隆隆……',()=>runChoices(list,after)); }
+    else { log(`${c.e} ${res}`,'gold'); renderUI(); runChoices(list,after); }
+  });
+}
+$('pull1').onclick=()=>{ if(busy||S.gems<1)return; S.gems-=1; showPulls([pullOne()],'✨ 卡片翻轉……'); };
+$('pull10').onclick=()=>{
+  if(busy||S.gems<10)return; S.gems-=10;
+  const cards=[]; for(let i=0;i<9;i++)cards.push(pullOne());
+  if(!cards.some(k=>ORDER.indexOf(k.r)>=2)) cards.push(pullOne('E')); else cards.push(pullOne());
+  showPulls(cards,'十連抽！');
+};
+
+/* ---------- battle ---------- */
+function simulate(){
+  const f=S.floor, m0=MONSTERS[f-1];
+  const units=team().map(x=>({...x,cur:x.hp,max:x.hp,revived:false}));
+  const has=id=>units.some(u=>u.id===id&&u.cur>0);
+  const mon={hp:m0.hp,max:m0.hp,atk:m0.atk,rage:false};
+  const frames=[]; const snap=(text,cls,hit)=>frames.push({text,cls,hit,mon:{...mon},u:units.map(u=>u.cur)});
+  let teamAtk=0;
+  if(units.some(u=>u.id==='drill')){teamAtk+=4}
+  if(units.some(u=>u.id==='grandma')){teamAtk+=5}
+  snap(`— 第 ${f} 層：${m0.e} ${m0.name} 出現了！ —`,'sys');
+  if(teamAtk) snap(`全隊士氣高昂，攻擊力 +${teamAtk}。`,'good');
+  if(has('typhoon')){const d=Math.round(mon.max*.25);mon.hp-=d;snap(`🌀 颱風假之神宣布停班停課！${m0.name} 失去 ${d} 生命！`,'gold','m')}
+  let win=false, stunned=null;
+  const short=u=>u.h.name.replace('打工仔騎士・','');
+  const hurt=(t,d)=>{
+    if(t.id==='guard')d=Math.max(1,d-3);
+    t.cur-=d;
+    snap(`${m0.e} ${m0.name} 攻擊 ${short(t)}，造成 ${d} 傷害。`,'bad',units.indexOf(t));
+    if(m0.trait==='drain'){mon.hp=Math.min(mon.max,mon.hp+d)}
+    if(t.cur<=0){
+      if(t.id==='engineer'&&!t.revived){t.revived=true;t.cur=Math.ceil(t.max/2);snap('💻 資深工程師重開機了！以一半生命復活。','good')}
+      else snap(`${t.h.e} ${short(t)} 躺平了……`,'bad');
+    }
+  };
+  for(let r=1;r<=MAX_ROUNDS;r++){
+    snap(`［第 ${r} 回合］`,'sys');
+    if(m0.trait==='kpi'&&r>1){mon.atk+=3;snap(`🦇 KPI 又往上調了。攻擊力變成 ${mon.atk}。`,'bad')}
+    stunned=null;
+    if(m0.trait==='meeting'&&r%2===0){
+      const alive=units.filter(u=>u.cur>0);
+      if(alive.length){stunned=pick(alive);snap(`🐙 ${short(stunned)} 被拉進會議，這回合無法行動。`,'bad')}
+    }
+    if(has('boba')){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+5)});snap('🧋 店長發飲料，全隊回復 5。','good')}
+    if(has('grandma')){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+10)});snap('👵 阿嬤端出滷肉飯，全隊回復 10。','good')}
+    if(has('clerk')){
+      const x=Math.floor(Math.random()*3);
+      if(x===0){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+12)});snap('🏪 店員發了茶葉蛋，全隊回復 12。','good')}
+      else if(x===1){teamAtk+=3;snap('🏪 店員遞上能量飲料，全隊攻擊 +3。','good')}
+      else {mon.hp-=25;snap('🏪 店員丟出一整箱泡麵，造成 25 傷害！','gold','m')}
+    }
+    for(const u of units){
+      if(u.cur<=0||mon.hp<=0||u===stunned)continue;
+      if(m0.trait==='dodge'&&Math.random()<.25){snap(`${u.h.e} ${short(u)} 的攻擊……被已讀不回了。`,'sys');continue}
+      let a=u.atk+teamAtk, note='';
+      if(u.id==='jie'&&r>=4){a*=2;note='（準時下班！）'}
+      if(u.id==='uber'&&r===1){a*=3;note='（準時送達！）'}
+      if(u.id==='medium'&&u.cur<u.max/2){a*=2;note='（起乩！）'}
+      if(u.id==='fortune'&&Math.random()<.3){a=Math.round(a*2.5);note='（鐵口直斷，暴擊！）'}
+      let hits=1; if(u.id==='intern'&&Math.random()<.25){hits=2;note='（連印兩張！）'}
+      const dmg=a*hits; mon.hp-=dmg;
+      snap(`${u.h.e} ${u.h.name.replace('打工仔騎士・','')} 攻擊，造成 ${dmg} 傷害${note}`,'','m');
+    }
+    if(mon.hp<=0){win=true;break}
+    if(m0.trait==='boss'&&!mon.rage&&mon.hp<mon.max/2){mon.rage=true;mon.atk+=15;snap('🕴️ 加班之王暴怒了！「今天誰都不准走！」攻擊 +15！','bad')}
+    const aoe=(m0.trait==='aoe'&&r%3===0)||(m0.trait==='storm'&&r%2===0);
+    if(aoe){
+      const d=Math.round(mon.atk*.6);
+      snap(m0.trait==='aoe'?`📊 月底結算！報表砸向全隊！`:`👻 狂風暴雨掃過全隊！`,'bad');
+      units.filter(u=>u.cur>0).forEach(u=>hurt(u,d));
+    } else {
+      let strikes=m0.trait==='boss'?2:1;
+      if(m0.trait==='bite'&&Math.random()<.3){strikes=2;snap('📎 喀嚓喀嚓！釘書機連咬兩口！','bad')}
+      for(let s=0;s<strikes;s++){
+        const alive=units.filter(u=>u.cur>0); if(!alive.length)break;
+        const t=m0.trait==='weak'?alive.reduce((a,b)=>b.cur<a.cur?b:a):pick(alive);
+        hurt(t,mon.atk);
+      }
+    }
+    if(units.every(u=>u.cur<=0))break;
+    if(r===MAX_ROUNDS) snap('🔔 下班鐘響了，怪物還站著。大家默默收拾東西回家……','bad');
+  }
+  return {units,frames,win,m0};
+}
+$('go').onclick=()=>{
+  if(busy||S.done)return;
+  if(!Object.keys(S.roster).length)return;
+  busy=true; fast=false; renderUI();
+  const {units,frames,win,m0}=simulate();
+  let i=0;
+  const step=()=>{
+    if(i>=frames.length){finish();return}
+    const fr=frames[i++];
+    log(fr.text,fr.cls);
+    renderMonster(fr.mon);
+    renderParty(units.map((u,k)=>({...u,cur:fr.u[k]})));
+    if(fr.hit==='m'){const e=$('mEmoji');e.classList.remove('hit');void e.offsetWidth;e.classList.add('hit')}
+    else if(typeof fr.hit==='number'){const e=document.querySelector(`.hero[data-i="${fr.hit}"]`);e&&e.classList.add('hit')}
+    setTimeout(step,fast?40:380);
+  };
+  const finish=()=>{
+    busy=false;
+    if(win){
+      const reward=floorReward(S.floor);
+      S.gems+=reward; S.wins++;
+      log(`🎉 打倒了 ${m0.name}！獲得 💎 ${reward}。`,'gold');
+      if(S.floor===10){S.done=true;renderUI();openModal(`<div class="big">🏖️</div><h2>加班之王倒下了！</h2>
+        <p class="center">整棟大樓的燈一盞一盞熄滅。今天，所有人都準時下班。</p>
+        <p class="summary">抽卡 ${S.pulls} 次・勝 ${S.wins} 場・躺平 ${S.losses} 次・夥伴 ${Object.keys(S.roster).length}/${HEROES.length}</p>
+        <div class="btns"><button id="mAgain">再冒險一次</button><button id="mStay">先躺一下</button></div>`);
+        $('mAgain').onclick=()=>{closeModal();reset()}; $('mStay').onclick=closeModal; return}
+      S.floor++;
+      renderUI();
+      openModal(`<div class="big">${m0.e}</div><h2>第 ${S.floor-1} 層通過！</h2>
+        <p class="center">獲得 💎 ${reward}。樓梯往下延伸，下一層傳來 ${MONSTERS[S.floor-1].e} 的氣息。</p>
+        <div class="btns"><button id="mOk">繼續</button></div>`);
+      $('mOk').onclick=closeModal;
+    } else {
+      S.gems+=LOSS_GEMS; S.losses++;
+      log(`💤 全員躺平。領到躺平補償金 💎 ${LOSS_GEMS}。抽點新夥伴再來吧！`,'sys');
+      renderUI();
+      openModal(`<div class="big">💤</div><h2>全員躺平</h2>
+        <p class="center">${m0.name} 太強了。大家決定先回家睡覺。<br>補償金 💎 ${LOSS_GEMS} 已發放，抽點新夥伴再來！</p>
+        <div class="btns"><button id="mOk">好啦</button></div>`);
+      $('mOk').onclick=closeModal;
+    }
+  };
+  step();
+};
+$('log').addEventListener('click',()=>{if(busy){fast=true;$('goHint').textContent='快轉中…'}});
+
+/* ---------- modal / misc ---------- */
+function openModal(html){$('modal').innerHTML=html;$('overlay').hidden=false;const b=$('modal').querySelector('button:not([disabled])');b&&b.focus()}
+function closeModal(){$('overlay').hidden=true}
+/* ---------- card detail / dex / help ---------- */
+const TYPES={hero:{list:HEROES,label:'夥伴'},gear:{list:GEAR,label:'裝備'},event:{list:EVENTS,label:'事件'}};
+const owned=(type,id)=>type==='hero'?S.roster[id]:S.seen[id];
+let dexTab='hero';
+function showCard(type,id,fromDex){
+  const c=TYPES[type].list.find(x=>x.id===id);
+  let tag='', rows='';
+  if(type==='hero'){
+    const st=heroStats(id), inTeam=team().some(t=>t.id===id);
+    tag='★'.repeat(st.stars)+'☆'.repeat(5-st.stars);
+    rows=`<dt>星等</dt><dd>${st.stars}★（基礎數值 +${(st.stars-1)*25}%）</dd>
+      <dt>目前生命</dt><dd class="num">${st.hp}（含裝備 +${S.bHp}）</dd>
+      <dt>目前攻擊</dt><dd class="num">${st.atk}（含裝備 +${S.bAtk}）</dd>
+      <dt>狀態</dt><dd>${inTeam?'出戰中':'候補（戰力不在前 4 名）'}</dd>
+      ${st.stars<5?`<dt>下一星</dt><dd>再抽到 1 張就升到 ${st.stars+1}★</dd>`:`<dt>下一星</dt><dd>已滿星，再抽到會換成 💎2</dd>`}`;
+  } else if(type==='gear'){
+    const n=S.seen[id]||0;
+    rows=`<dt>已獲得</dt><dd class="num">${n} 件</dd>
+      <dt>累計加成</dt><dd class="num">${[c.atk?`攻擊 +${c.atk*n}`:'',c.hp?`生命 +${c.hp*n}`:''].filter(Boolean).join('・')}</dd>
+      <dt>說明</dt><dd>裝備會疊加，效果套用在全隊。</dd>`;
+  } else {
+    rows=`<dt>遇到次數</dt><dd class="num">${S.seen[id]||0} 次</dd>
+      ${c.choices?`<dt>選項</dt><dd>${c.choices.map(ch=>`${ch.label}（${ch.sub}）`).join('<br>')}</dd>`:''}`;
+  }
+  openModal(`<div class="cards one">${cardHTML({type,c,r:c.r,tag},0)}</div>
+    <dl class="info">${rows}</dl>
+    <div class="btns"><button id="mOk">${fromDex?'返回圖鑑':'關閉'}</button></div>`);
+  $('modal').querySelector('.card').classList.add('open');
+  $('mOk').onclick=fromDex?openDex:closeModal;
+}
+function openDex(){
+  const list=TYPES[dexTab].list;
+  const tabs=Object.entries(TYPES).map(([k,v])=>{
+    const n=v.list.filter(c=>owned(k,c.id)).length;
+    return `<button role="tab" data-t="${k}" aria-selected="${k===dexTab}">${v.label} ${n}/${v.list.length}</button>`}).join('');
+  const items=list.map(c=>{
+    const o=owned(dexTab,c.id);
+    if(!o) return `<button class="it no" style="--rc:${RAR[c.r].css}" disabled><div class="e">❔</div>？？？<br><span class="sub">${RAR[c.r].name}</span></button>`;
+    const sub=dexTab==='hero'?'★'.repeat(o):dexTab==='gear'?`× ${o}`:`遇過 ${o} 次`;
+    return `<button class="it" data-id="${c.id}" style="--rc:${RAR[c.r].css}"><div class="e">${c.e}</div>${c.name.replace('打工仔騎士・','')}<br><span class="sub">${sub}</span></button>`;
+  }).join('');
+  const hint={hero:'點夥伴看詳細資料。出戰的是戰力最高的 4 位。',gear:'裝備會疊加，效果套用在全隊。',event:'抽到過的事件才會出現在這裡。'}[dexTab];
+  openModal(`<h2>圖鑑</h2><div class="tabs" role="tablist">${tabs}</div><div class="dex">${items}</div>
+    <p class="summary">${hint}</p><div class="btns"><button id="mOk">關閉</button></div>`);
+  $('modal').querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{dexTab=b.dataset.t;openDex()});
+  $('modal').querySelectorAll('.dex .it[data-id]').forEach(b=>b.onclick=()=>showCard(dexTab,b.dataset.id,true));
+  $('mOk').onclick=closeModal;
+}
+$('dexBtn').onclick=openDex;
+$('party').addEventListener('click',e=>{
+  if(busy)return;
+  const h=e.target.closest('.hero[data-i]'); if(!h)return;
+  const t=team()[+h.dataset.i]; if(t) showCard('hero',t.id,false);
+});
+$('helpBtn').onclick=()=>{
+  openModal(`<h2>遊戲規則</h2><div class="help" style="display:flex;flex-direction:column;gap:14px">
+  <section><h3>怎麼玩</h3>
+    <p>抽卡補強冒險團，按「出發！」讓夥伴自動戰鬥。打倒第 10 層的加班之王就通關。</p></section>
+  <section><h3>抽卡</h3>
+    <div class="rar-row"><span style="--rc:var(--C)">普通 55%</span><span style="--rc:var(--R)">稀有 30%</span><span style="--rc:var(--E)">史詩 12%</span><span style="--rc:var(--L)">傳說 3%</span></div>
+    <ul><li>每張卡可能是<b>夥伴</b>、<b>裝備</b>或<b>事件</b>。</li>
+    <li><b>十連抽</b>至少有一張史詩以上。</li>
+    <li><b>保底</b>：連續 30 抽沒出傳說，第 30 抽一定是傳說。畫面下方會顯示還差幾抽。</li></ul></section>
+  <section><h3>卡片標籤</h3>
+    <ul><li><b>NEW</b>：第一次抽到這張卡，夥伴會加入冒險團，也會解鎖圖鑑。</li>
+    <li><b>升到 N★</b>：抽到重複的夥伴，星等 +1。</li>
+    <li><b>滿星・換 💎2</b>：夥伴已經 5★，重複的卡換成 2 顆鑽石。</li></ul></section>
+  <section><h3>星星</h3>
+    <p>星星是夥伴的等級，最多 5★。每多一顆星，夥伴的基礎生命和攻擊 +25%，所以 5★ 大約是 1★ 的兩倍強。裝備給的加成不會跟著放大。</p></section>
+  <section><h3>裝備與事件</h3>
+    <ul><li><b>裝備</b>會疊加，加成套用在全隊每一位夥伴。</li>
+    <li><b>事件</b>可能直接給獎勵，也可能讓你二選一。</li></ul></section>
+  <section><h3>編隊</h3>
+    <p>戰力最高的 4 位夥伴自動上場，其他人在候補。點隊伍裡的夥伴可以看詳細資料。</p></section>
+  <section><h3>戰鬥</h3>
+    <ul><li>最多 ${MAX_ROUNDS} 回合，時間到怪物還站著就算輸。</li>
+    <li>每隻怪物都有特殊能力，寫在怪物名字下面。</li>
+    <li>戰鬥中點一下戰鬥紀錄可以快轉。</li></ul></section>
+  <section><h3>鑽石</h3>
+    <ul><li>通過第 N 層，獲得 N + 1 顆鑽石。第 5 層中頭目多給 3 顆。</li>
+    <li>全員躺平時，領到 ${LOSS_GEMS} 顆補償金。</li></ul></section>
+  </div><div class="btns"><button id="mOk">知道了</button></div>`);
+  $('mOk').onclick=closeModal;
+};
+$('resetBtn').onclick=()=>{
+  openModal(`<h2>重新開始？</h2><p class="center">夥伴、裝備和樓層都會清空。</p>
+    <div class="btns"><button id="mYes">重新開始</button><button id="mNo">算了</button></div>`);
+  $('mYes').onclick=()=>{closeModal();reset()}; $('mNo').onclick=closeModal;
+};
+function reset(){S=fresh();$('log').innerHTML='';intro();renderUI()}
+function intro(){
+  log('潮濕的風從洞裡吹出來，帶著烤地瓜的味道。','sys');
+  log('🛡️ 打工仔騎士・阿傑 扛起盾牌，走到你前面。','good');
+  log('抽卡補強隊伍，然後按「出發！」。','sys');
+}
+intro(); renderUI();
+$('startBtn').onclick=()=>{const sp=$('splash');sp.classList.add('bye');setTimeout(()=>sp.hidden=true,360)};
+$('startBtn').focus();
+</script>
+
+</body>
+</html>
