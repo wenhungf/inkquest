@@ -37,6 +37,7 @@ body{
 .logo small{display:block;font-family:var(--body);font-size:11px;color:var(--muted);letter-spacing:.12em}
 .chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .chip{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:13px;white-space:nowrap}
+.chip.snd{font-family:var(--body);font-size:14px;line-height:1.2;color:var(--text);padding:4px 9px;border-radius:999px}
 .chip b{font-family:var(--display);font-weight:400;font-size:15px}
 
 /* floors */
@@ -200,11 +201,13 @@ button small{display:block;font-family:var(--body);font-size:11px;opacity:.8}
   <p class="slogan">撐到下班，就是勝利。</p>
   <p class="sub">抽卡就好，打怪交給夥伴。</p>
   <button id="startBtn">打卡上工</button>
+  <p class="sub" id="splashHint">👆 點一下畫面，開啟音樂</p>
 </div>
 <div class="wrap">
   <header class="top">
     <div class="logo">躺平冒險團<small>只要抽卡，其他交給夥伴</small></div>
     <div class="chips">
+      <button class="chip snd" id="soundBtn" aria-label="關閉聲音">🔊</button>
       <span class="chip">💎 <b class="num" id="gems">10</b></span>
       <span class="chip">第 <b class="num" id="floorNum">1</b> / 10 層</span>
     </div>
@@ -424,7 +427,7 @@ function showPulls(cards,title,after){
     ${ten?`<div class="summary" id="sum"></div>`:''}
     <div class="btns"><button id="mOk">收下</button></div>`);
   const els=[...document.querySelectorAll('#modal .card')];
-  els.forEach((el,i)=>setTimeout(()=>el.classList.add('open'),250+i*(ten?160:0)));
+  els.forEach((el,i)=>setTimeout(()=>{el.classList.add('open');Sound.sfx.flip[cards[i].r]()},250+i*(ten?160:0)));
   if(ten){
     const n=r=>cards.filter(k=>k.r===r).length;
     setTimeout(()=>{$('sum').textContent=`傳說 ${n('L')}・史詩 ${n('E')}・稀有 ${n('R')}・普通 ${n('C')}`},250+cards.length*160);
@@ -545,7 +548,7 @@ function simulate(){
 $('go').onclick=()=>{
   if(busy||S.done)return;
   if(!Object.keys(S.roster).length)return;
-  busy=true; fast=false; renderUI();
+  busy=true; fast=false; renderUI(); Sound.play(S.floor===10?'boss':'battle');
   const {units,frames,win,m0}=simulate();
   let i=0;
   const step=()=>{
@@ -560,7 +563,8 @@ $('go').onclick=()=>{
   };
   const finish=()=>{
     busy=false;
-    if(win){
+    Sound.play('lobby');
+    if(win){ Sound.sfx.win();
       const reward=floorReward(S.floor);
       S.gems+=reward; S.wins++;
       log(`🎉 打倒了 ${m0.name}！獲得 💎 ${reward}。`,'gold');
@@ -576,7 +580,7 @@ $('go').onclick=()=>{
         <div class="btns"><button id="mOk">繼續</button></div>`);
       $('mOk').onclick=closeModal;
     } else {
-      S.gems+=LOSS_GEMS; S.losses++;
+      S.gems+=LOSS_GEMS; S.losses++; Sound.sfx.lose();
       log(`💤 全員躺平。領到躺平補償金 💎 ${LOSS_GEMS}。抽點新夥伴再來吧！`,'sys');
       renderUI();
       openModal(`<div class="big">💤</div><h2>全員躺平</h2>
@@ -588,6 +592,108 @@ $('go').onclick=()=>{
   step();
 };
 $('log').addEventListener('click',()=>{if(busy){fast=true;$('goHint').textContent='快轉中…'}});
+
+/* ---------- sound (Web Audio, no external files) ---------- */
+const Sound=(()=>{
+  let ctx=null, master, music, sfxBus, timer=null, song=null, step=0, next=0;
+  let on=true; try{on=localStorage.getItem('clockout-sound')!=='off'}catch(e){}
+  const mtof=m=>440*Math.pow(2,(m-69)/12);
+  const _=0;
+  const SONGS={
+    lobby:{bpm:96,
+      chords:[48,45,41,43], third:[4,3,4,4],
+      mel:[72,_,_,_,76,_,79,_,76,_,_,_,74,_,72,_, 69,_,_,_,72,_,76,_,74,_,72,_,69,_,_,_,
+           65,_,69,_,72,_,_,_,74,_,72,_,69,_,67,_, 67,_,_,_,71,_,74,_,72,_,_,_,_,_,_,_],
+      bass:[0,6,8,14], stab:[4,12], hat:[2,6,10,14], kick:[0,8], snare:[]},
+    battle:{bpm:144,
+      chords:[45,41,43,40], third:[3,4,4,4],
+      mel:[76,_,76,_,72,_,76,_,79,_,_,_,77,_,76,_, 74,_,72,_,69,_,72,_,74,_,_,_,72,_,69,_,
+           71,_,74,_,79,_,74,_,77,_,76,_,74,_,71,_, 68,_,71,_,76,_,74,_,71,_,68,_,64,_,_,_],
+      bass:[0,2,4,6,8,10,12,14], oct:true, stab:[], hat:[0,2,4,6,8,10,12,14], kick:[0,4,8,12], snare:[4,12]},
+  };
+  SONGS.boss={...SONGS.battle,bpm:160};
+  SONGS.title={bpm:84,
+      chords:[48,41,43,48], third:[4,4,4,4],
+      mel:[79,_,_,_,76,_,_,_,72,_,_,_,76,_,_,_, 77,_,_,_,72,_,_,_,69,_,_,_,72,_,_,_,
+           74,_,_,_,71,_,_,_,67,_,_,_,71,_,74,_, 72,_,_,_,_,_,_,_,79,_,76,_,72,_,_,_],
+      bass:[0,8], stab:[4,12], hat:[0,4,8,12], kick:[], snare:[]};
+  function init(){
+    if(ctx) return;
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+    ctx=new AC();
+    master=ctx.createGain(); master.gain.value=.5; master.connect(ctx.destination);
+    music=ctx.createGain(); music.gain.value=.32; music.connect(master);
+    sfxBus=ctx.createGain(); sfxBus.gain.value=.5; sfxBus.connect(master);
+  }
+  function tone(f,t,dur,type,vol,dest,cut){
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type=type; o.frequency.value=f;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+.01);
+    g.gain.exponentialRampToValueAtTime(.0008,t+dur);
+    if(cut){const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=cut;o.connect(lp);lp.connect(g)} else o.connect(g);
+    g.connect(dest); o.start(t); o.stop(t+dur+.02);
+  }
+  let noiseBuf=null;
+  function noise(t,dur,vol,hp){
+    if(!noiseBuf){noiseBuf=ctx.createBuffer(1,ctx.sampleRate*.3,ctx.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+    const src=ctx.createBufferSource(), f=ctx.createBiquadFilter(), g=ctx.createGain();
+    src.buffer=noiseBuf; f.type='highpass'; f.frequency.value=hp;
+    g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0008,t+dur);
+    src.connect(f); f.connect(g); g.connect(music); src.start(t); src.stop(t+dur+.02);
+  }
+  function kick(t){
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.frequency.setValueAtTime(140,t); o.frequency.exponentialRampToValueAtTime(40,t+.12);
+    g.gain.setValueAtTime(.7,t); g.gain.exponentialRampToValueAtTime(.001,t+.15);
+    o.connect(g); g.connect(music); o.start(t); o.stop(t+.16);
+  }
+  function playStep(sg,i,t){
+    const s16=60/sg.bpm/4, bar=Math.floor(i/16)%4, pos=i%16, root=sg.chords[bar];
+    const m=sg.mel[i%64];
+    if(m){let len=1;while(len<4&&!sg.mel[(i+len)%64])len++;tone(mtof(m),t,len*s16*.95,'square',.12,music,2600)}
+    if(sg.bass.includes(pos)){const oct=sg.oct&&pos%4===2?12:0;tone(mtof(root-12+oct),t,s16*(sg.oct?1.8:3),'triangle',.5,music)}
+    if(sg.stab.includes(pos)){[0,sg.third[bar],7].forEach(n=>tone(mtof(root+12+n),t,s16*1.5,'square',.05,music,1400))}
+    if(sg.hat.includes(pos)) noise(t,.04,.12,7000);
+    if(sg.kick.includes(pos)) kick(t);
+    if(sg.snare.includes(pos)) noise(t,.12,.25,1800);
+  }
+  function tick(){
+    if(!song) return;
+    while(next<ctx.currentTime+.12){ playStep(SONGS[song],step,next); next+=60/SONGS[song].bpm/4; step=(step+1)%64; }
+  }
+  function play(name){
+    init(); if(!ctx) return;
+    if(song===name) return;
+    song=name; step=0; next=ctx.currentTime+.06;
+    if(!timer) timer=setInterval(tick,25);
+    if(on&&ctx.state==='suspended') ctx.resume();
+  }
+  function stop(){song=null}
+  function notes(seq,type='square',vol=.22,gap=.08,dur=.18){
+    if(!ctx||!on) return; const t=ctx.currentTime+.01;
+    seq.forEach((m,k)=>{ if(Array.isArray(m)) m.forEach(x=>tone(mtof(x),t+k*gap,dur*2.5,type,vol*.7,sfxBus,3000)); else tone(mtof(m),t+k*gap,dur,type,vol,sfxBus,3000) });
+  }
+  const sfx={
+    flip:{C:()=>notes([76],'square',.12),R:()=>notes([76,83],'square',.14),E:()=>notes([76,81,88],'square',.16,.07),
+          L:()=>notes([76,79,84,88,91,96],'triangle',.3,.06,.25)},
+    win:()=>notes([72,76,79,84,[72,76,79,84]],'square',.22,.11,.2),
+    lose:()=>notes([67,64,60,55],'triangle',.3,.2,.3),
+    click:()=>notes([88],'triangle',.1,0,.05),
+    bell:()=>{ if(!ctx||!on) return; const t=ctx.currentTime+.01;
+      [[1568,.35,1.6],[2093,.2,1.2],[3136,.08,.6]].forEach(([f,v,d])=>tone(f,t,d,'sine',v,sfxBus)); },
+    punch:()=>{ if(!ctx||!on) return; const t=ctx.currentTime+.01;
+      tone(110,t,.12,'square',.35,sfxBus,600); tone(220,t+.09,.1,'square',.25,sfxBus,900); }
+  };
+  function setOn(v){
+    on=v; try{localStorage.setItem('clockout-sound',v?'on':'off')}catch(e){}
+    if(ctx){ v?ctx.resume():ctx.suspend() }
+  }
+  document.addEventListener('visibilitychange',()=>{ if(!ctx) return; if(document.hidden) ctx.suspend(); else if(on) ctx.resume(); });
+  return {play,stop,sfx,setOn,isOn:()=>on,init,current:()=>song};
+})();
+function renderSound(){const b=$('soundBtn');b.textContent=Sound.isOn()?'🔊':'🔇';b.setAttribute('aria-label',Sound.isOn()?'關閉聲音':'開啟聲音')}
+$('soundBtn').onclick=()=>{Sound.init();Sound.setOn(!Sound.isOn());renderSound();if(Sound.isOn())Sound.play(busy?(S.floor===10?'boss':'battle'):'lobby')};
+renderSound();
 
 /* ---------- modal / misc ---------- */
 function openModal(html){$('modal').innerHTML=html;$('overlay').hidden=false;const b=$('modal').querySelector('button:not([disabled])');b&&b.focus()}
@@ -688,7 +794,16 @@ function intro(){
   log('抽卡補強隊伍，然後按「出發！」。','sys');
 }
 intro(); renderUI();
-$('startBtn').onclick=()=>{const sp=$('splash');sp.classList.add('bye');setTimeout(()=>sp.hidden=true,360)};
+$('splash').addEventListener('pointerdown',e=>{
+  if(e.target.closest('#startBtn')) return;
+  Sound.init();
+  if(!Sound.isOn()){ $('splashHint').textContent='🔇 聲音已關閉，進入遊戲後可以用右上角的喇叭打開。'; return; }
+  if(Sound.current()==='title') return;
+  const svg=$('splash').querySelector('svg'); svg.replaceWith(svg.cloneNode(true));
+  Sound.play('title'); setTimeout(Sound.sfx.bell,1950);
+  $('splashHint').textContent='🔊 進入遊戲後，可以用右上角的喇叭關掉聲音。';
+});
+$('startBtn').onclick=()=>{Sound.init();if(Sound.isOn()){Sound.sfx.punch();Sound.play('lobby')}const sp=$('splash');sp.classList.add('bye');setTimeout(()=>sp.hidden=true,360)};
 $('startBtn').focus();
 </script>
 
