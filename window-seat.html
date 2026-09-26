@@ -383,7 +383,7 @@ mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
       <div class="setrow"><h4>朗讀聲音（旁白 Mia）</h4><select id="voiceSel" class="field" style="margin:0;width:100%" aria-label="朗讀聲音"></select>
         <p class="qnote" style="padding:8px 0 0">對話裡的其他角色會自動換成不同的聲音。</p>
         <p class="qnote" style="padding:6px 0 0" id="voiceNow"></p>
-        <p class="qnote" style="padding:6px 0 0">用 iPhone 的話，到「設定 → 輔助使用 → 閱讀與朗讀 → 聲音 → 英文 → Samantha」下載「增強音質」版本，下載完重新整理這一頁。</p>
+        <p class="qnote" style="padding:6px 0 0">iPhone、iPad 上的網頁只能用系統內建的語音；自己下載的「增強音質」語音 Apple 不開放給網頁使用。在電腦上用 Microsoft Edge 開這一頁，可以選到很自然的 AI 語音（名稱有 Natural 的那幾個）。</p>
         <p class="qnote" style="padding:4px 0 0" id="audioNote"></p></div>
       <div class="setrow"><h4>中文翻譯</h4><div class="seg" id="zhset"><button data-v="0">預設隱藏</button><button data-v="1">預設顯示</button></div></div>
       <div class="setrow"><h4>閱讀進度</h4><div class="seg"><button id="resetBtn">從第一課重新開始</button></div></div>
@@ -1434,7 +1434,7 @@ function fillVoiceSel(){
   const n = $("#voiceNow"), m = VOICES.main; if(!n || !m) return;
   const better = VOICES.all.some(v=>vq(v) > vq(m) && v.lang === m.lang && FEM.test(v.name) === FEM.test(m.name));
   n.innerHTML = `目前使用：<b>${esc(m.name)}（${QLABEL[vq(m)]}）</b>` +
-    (vq(m) === 0 ? (better ? "。清單裡有更好的版本，可以直接切換。" : "。這台裝置還沒有增強音質的英文語音。") : "");
+    (vq(m) === 0 ? (better ? "。清單裡有更好的版本，可以直接切換。" : "。這個瀏覽器只提供一般音質的英文語音。") : "");
 }
 function playBtns(){
   const r = $("#playRead"), t = $("#playTalk");
