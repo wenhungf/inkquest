@@ -1362,7 +1362,7 @@ function prosody(sent, mood, who){
   if(/!["']?$/.test(sent)){ r *= 1.06; p += .08; }
   else if(/\?["']?$/.test(sent)){ p += .07; }
   else if(/\.\.\.$/.test(sent)){ r *= .92; }
-  return {rate:Math.max(.5, Math.min(1.6, r)), pitch:Math.max(.5, Math.min(1.8, p))};
+  return {rate:Math.max(.5, Math.min(1.5, r)), pitch:Math.max(.8, Math.min(1.25, p))};  /* compact voices turn cartoonish outside ~0.8–1.25 */
 }
 function pushTTS(q, it){
   const ss = sentences(it.text), mood = moodOf(it.mood), v = voiceFor(it.who);
@@ -1417,7 +1417,8 @@ function sayQueue(items, mode){
     }
     if(!SYN){ next(); return; }
     const u = new SpeechSynthesisUtterance(x.text);
-    u.lang = "en-US"; if(x.voice) u.voice = x.voice; u.rate = x.rate; u.pitch = x.pitch;
+    if(x.voice){ u.voice = x.voice; u.lang = x.voice.lang; } else u.lang = "en-US";  /* iOS ignores a voice whose lang doesn't match */
+    u.rate = x.rate; u.pitch = x.pitch;
     u.onend = ()=> setTimeout(next, x.gap);
     u.onerror = ()=>{ if(my === qid) setTimeout(next, 50); };
     SYN.speak(u);
