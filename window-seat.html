@@ -1426,6 +1426,14 @@ function sayQueue(items, mode){
   setTimeout(next, 60);
 }
 const say = t => sayQueue([{text:t}]);
+/* iOS unlocks speech only when speak() runs inside a tap. A <select> change isn't a tap,
+   so the first real tap anywhere speaks one silent utterance to unlock it for later. */
+let speechUnlocked = false;
+function unlockSpeech(){
+  if(speechUnlocked || !SYN) return; speechUnlocked = true;
+  try{ const u = new SpeechSynthesisUtterance(" "); u.volume = 0; u.lang = "en-US"; SYN.speak(u); }catch(e){}
+}
+["touchend","click","keydown"].forEach(t=> document.addEventListener(t, unlockSpeech, true));
 
 function fillVoiceSel(){
   const s = $("#voiceSel"); if(!s) return;
