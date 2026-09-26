@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Window Seat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+html{color-scheme:light;-webkit-text-size-adjust:100%;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+img{max-width:100%;}
+[hidden]{display:none!important;}
+</style>
+<style>
+:root{
+  --bg:#F2F4EE; --surface:#FAFBF7; --ink:#1D2A2E; --muted:#56666A; --rule:#D3DBD1;
+  --accent:#2F6F5E; --accent-ink:#FFFFFF; --tint:#DCEAE3;
+  --hl:#F6DD8A; --gr:#BF5038; --gr-tint:#F7E2DB; --cu:#7657A0; --cu-tint:#ECE4F4;
+  --t-fun:#F4C542; --t-feel:#F2A7AD; --t-know:#93CDE3; --t-think:#A9D18E; --chip-ink:#1D2A2E;
+  --pop-bg:#1D2A2E; --pop-ink:#EEF3EF; --pop-muted:#A9B8B4; --pop-accent:#F4C542; --pop-rule:#34464A;
+  --shadow:rgba(29,42,46,.2);
+  --tile:#FBF3DF;
+  --fs:19px;
+  --f-body:'Atkinson Hyperlegible',"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-disp:'Fraunces',Georgia,"PingFang TC","Noto Serif TC",serif;
+  --f-px:'Pixelify Sans',ui-monospace,"PingFang TC",monospace;
+  --f-zh:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#11181A; --surface:#172124; --ink:#E4ECE8; --muted:#98ABA6; --rule:#2A383B;
+    --accent:#72C3A6; --accent-ink:#0E1A17; --tint:#1C332C;
+    --hl:#6E5C1C; --gr:#F08E74; --gr-tint:#3A2521; --cu:#BFA2E6; --cu-tint:#2C2438;
+    --pop-bg:#E7EFEB; --pop-ink:#16201F; --pop-muted:#4C5C59; --pop-accent:#2F6F5E; --pop-rule:#C7D3CE;
+    --shadow:rgba(0,0,0,.55);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#11181A; --surface:#172124; --ink:#E4ECE8; --muted:#98ABA6; --rule:#2A383B;
+  --accent:#72C3A6; --accent-ink:#0E1A17; --tint:#1C332C;
+  --hl:#6E5C1C; --gr:#F08E74; --gr-tint:#3A2521; --cu:#BFA2E6; --cu-tint:#2C2438;
+  --pop-bg:#E7EFEB; --pop-ink:#16201F; --pop-muted:#4C5C59; --pop-accent:#2F6F5E; --pop-rule:#C7D3CE;
+  --shadow:rgba(0,0,0,.55);
+}
+*{box-sizing:border-box;}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:var(--f-body); font-size:var(--fs); line-height:1.7;
+  margin:0; overflow-wrap:break-word;
+}
+button{font:inherit;color:inherit;}
+.px{font-family:var(--f-px);letter-spacing:.08em;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+/* ---------- top bar ---------- */
+#bar{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:30;
+  background:var(--bg); border-bottom:1px solid var(--rule);
+  display:flex; align-items:center; gap:6px; padding:8px 12px;
+}
+.ib{background:none;border:0;padding:8px;cursor:pointer;line-height:0;border-radius:6px;color:var(--ink);position:relative;}
+.ib:hover{background:var(--tint);}
+.ib svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+#barTitle{flex:1;min-width:0;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#barTitle b{font-family:var(--f-px);font-weight:600;color:var(--accent);letter-spacing:.06em;margin-right:4px;}
+.eq{position:absolute;right:3px;top:4px;display:none;gap:1px;align-items:flex-end;height:9px;}
+.ib.on .eq{display:flex;}
+.eq i{display:block;width:2px;background:var(--accent);animation:eq .9s steps(3) infinite;}
+.eq i:nth-child(2){animation-delay:.3s;} .eq i:nth-child(3){animation-delay:.6s;}
+@keyframes eq{0%{height:3px}50%{height:9px}100%{height:5px}}
+.ib.on{color:var(--accent);}
+
+/* ---------- reader ---------- */
+#reader{max-width:41rem;margin:0 auto;padding:26px 18px 30px;}
+.lh{display:flex;gap:16px;align-items:center;margin-bottom:26px;}
+.tile{flex:none;width:64px;height:64px;background:var(--tile);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);padding:9px;display:grid;place-items:center;}
+.tile svg{width:100%;height:100%;display:block;}
+.eyebrow{margin:0 0 4px;font-family:var(--f-px);font-size:13px;letter-spacing:.14em;color:var(--accent);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.chip{font-family:var(--f-zh);font-size:11px;letter-spacing:.04em;padding:1px 8px;border-radius:3px;color:var(--chip-ink);font-weight:600;}
+.t-fun{background:var(--t-fun);} .t-feel{background:var(--t-feel);} .t-know{background:var(--t-know);} .t-think{background:var(--t-think);}
+h1.lt{font-family:var(--f-disp);font-weight:700;font-size:clamp(1.6rem,6vw,2.15rem);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.01em;}
+.lzt{margin:4px 0 0;font-family:var(--f-zh);color:var(--muted);font-size:15px;}
+
+.sec{margin:0 0 34px;scroll-margin-top:70px;}
+.sh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:7px;margin-bottom:16px;}
+.sh .px{font-size:15px;font-weight:600;background:var(--ink);color:var(--bg);padding:1px 8px 0;}
+.shz{font-family:var(--f-zh);font-size:14px;color:var(--muted);}
+.sh .sp{flex:1;}
+.tbtn{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--rule);background:var(--surface);border-radius:4px;padding:5px 10px;font-size:13px;cursor:pointer;font-family:var(--f-zh);}
+.tbtn svg{width:14px;height:14px;fill:currentColor;}
+.tbtn:hover{border-color:var(--accent);}
+.tbtn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+
+.read p{margin:0 0 1em;}
+.read .en{display:block;font-size:1.08em;line-height:1.75;}
+.zh{display:none;font-family:var(--f-zh);font-size:.8em;color:var(--muted);line-height:1.6;margin-top:3px;}
+body.showzh .zh{display:block;}
+.read p.letter-open .en{font-style:italic;}
+.read p.letter-close .en{font-style:italic;text-align:right;}
+.read p.letter-close .zh{text-align:right;}
+.hl{-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-color .2s;}
+.read p.speaking .hl,.ln.speaking .hl{background:linear-gradient(transparent 58%,var(--hl) 58%);}
+.read p{border-left:3px solid transparent;padding-left:10px;margin-left:-13px;transition:border-color .2s;}
+.read p.speaking{border-left-color:var(--accent);}
+
+/* glossed spans */
+.g{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:2px;}
+.g.vo{border-bottom:2px dotted var(--accent);}
+.g.gr{border-bottom:2px solid var(--gr);}
+.g.cu{border-bottom:2px dashed var(--cu);}
+.g.vo:hover{background:var(--tint);} .g.gr:hover{background:var(--gr-tint);} .g.cu:hover{background:var(--cu-tint);}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--f-zh);font-size:12px;color:var(--muted);margin:-4px 0 14px;}
+.legend span::before{content:"";display:inline-block;width:18px;margin-right:5px;vertical-align:middle;}
+.legend .lv1::before{border-bottom:2px dotted var(--accent);}
+.legend .lv2::before{border-bottom:2px solid var(--gr);}
+.legend .lv3::before{border-bottom:2px dashed var(--cu);}
+
+/* words */
+.wl{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;column-gap:22px;}
+.wl li{display:flex;align-items:center;border-bottom:1px solid var(--rule);}
+.wr{flex:1;min-width:0;display:grid;grid-template-columns:auto 1fr auto;column-gap:8px;align-items:baseline;background:none;border:0;text-align:left;padding:9px 2px;cursor:pointer;}
+.wr:hover .wr-w{color:var(--accent);}
+.wr-w{font-family:var(--f-disp);font-weight:700;font-size:1.02em;}
+.wr-kk{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wr-zh{grid-column:1/3;font-family:var(--f-zh);font-size:14px;color:var(--muted);}
+.wr-zh i{font-style:normal;color:var(--accent);margin-right:5px;font-family:var(--f-body);}
+.lv{font-family:var(--f-px);font-size:11px;padding:0 5px;border:1px solid var(--rule);color:var(--muted);grid-row:1;grid-column:3;}
+.lv.hi{border-color:var(--gr);color:var(--gr);}
+.spk{background:none;border:0;cursor:pointer;padding:8px;line-height:0;color:var(--muted);border-radius:4px;}
+.spk:hover{color:var(--accent);background:var(--tint);}
+.spk svg{width:18px;height:18px;fill:currentColor;}
+.note{font-family:var(--f-zh);font-size:12.5px;color:var(--muted);margin:12px 0 0;}
+
+/* grammar */
+.gl{list-style:none;margin:0;padding:0;display:grid;gap:18px;}
+.gi{scroll-margin-top:80px;}
+.gi-t{margin:0 0 4px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;font-family:var(--f-zh);font-weight:700;font-size:1.02em;}
+.gi-n{font-family:var(--f-px);font-weight:600;color:var(--bg);background:var(--gr);min-width:22px;text-align:center;font-size:14px;line-height:22px;}
+.gi-en{font-family:var(--f-body);font-weight:400;font-size:13px;color:var(--muted);}
+.gi-d{margin:0 0 8px;font-family:var(--f-zh);font-size:.86em;line-height:1.75;}
+.gi-d b{color:var(--gr);}
+.gx{list-style:none;margin:0;padding:0 0 0 12px;border-left:2px solid var(--gr-tint);}
+.gx li{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:10px;padding:2px 0;}
+.ex{display:inline-flex;align-items:baseline;gap:6px;background:none;border:0;padding:2px 0;cursor:pointer;text-align:left;}
+.ex svg{width:13px;height:13px;fill:var(--muted);flex:none;transform:translateY(1px);}
+.ex:hover span{color:var(--accent);}
+.exz{font-family:var(--f-zh);font-size:13.5px;color:var(--muted);}
+
+/* talk */
+.where{font-family:var(--f-zh);font-size:14px;color:var(--muted);margin:0 0 12px;font-style:italic;}
+.talk{display:grid;gap:10px;}
+.ln{display:grid;grid-template-columns:72px 1fr auto;column-gap:10px;align-items:start;}
+.who{font-family:var(--f-px);font-size:12.5px;letter-spacing:.04em;padding-top:5px;color:var(--accent);text-align:right;line-height:1.3;}
+.ln.s1 .who{color:var(--gr);}
+.ln.s2 .who{color:var(--cu);}
+.ln-en{display:block;}
+.ln .spk{padding:6px;}
+.ln .zh{font-size:.78em;}
+
+/* ask */
+.al{list-style:none;margin:0;padding:0;counter-reset:q;display:grid;gap:18px;}
+.al li{counter-increment:q;position:relative;padding-left:36px;}
+.al li::before{content:"Q" counter(q);position:absolute;left:0;top:3px;font-family:var(--f-px);font-weight:600;font-size:14px;color:var(--accent);}
+.aq{margin:0;font-weight:700;}
+.frame{margin:8px 0 0;padding:9px 12px;border:1.5px dashed var(--rule);background:var(--surface);font-size:.92em;}
+.frame .px{font-size:11px;color:var(--accent);margin-right:8px;}
+.blank{display:inline-block;width:5em;height:1.1em;border-bottom:1.5px solid var(--muted);vertical-align:-.25em;margin:0 .2em;}
+
+/* nav */
+#nav{max-width:41rem;margin:0 auto;padding:0 18px 44px;display:flex;gap:12px;align-items:center;}
+.navbtn{flex:1;font-family:var(--f-px);font-size:14px;letter-spacing:.06em;padding:12px;border:2px solid var(--ink);background:var(--surface);cursor:pointer;box-shadow:3px 3px 0 var(--ink);}
+.navbtn:hover:not(:disabled){background:var(--tint);}
+.navbtn:active:not(:disabled){transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink);}
+.navbtn:disabled{opacity:.3;cursor:default;box-shadow:none;}
+#progress{font-family:var(--f-px);font-size:13px;color:var(--muted);white-space:nowrap;}
+
+/* ---------- drawer ---------- */
+#scrim{position:fixed;inset:0;background:rgba(10,18,20,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40;}
+#scrim.on{opacity:1;pointer-events:auto;}
+#drawer{position:fixed;top:0;left:0;bottom:0;width:min(90vw,23rem);background:var(--bg);border-right:2px solid var(--ink);transform:translateX(-103%);transition:transform .22s ease;z-index:41;display:flex;flex-direction:column;}
+#drawer.on{transform:none;}
+.d-head{padding:calc(16px + env(safe-area-inset-top,0px)) 16px 12px;display:flex;align-items:center;gap:10px;}
+.d-head p{margin:0;}
+.d-t{font-family:var(--f-disp);font-weight:700;font-size:1.25rem;line-height:1.1;}
+.d-s{font-family:var(--f-px);font-size:11px;letter-spacing:.14em;color:var(--accent);}
+.tabs{display:flex;border-bottom:1px solid var(--rule);padding:0 8px;}
+.tab{flex:1;padding:10px 2px;background:none;border:0;border-bottom:3px solid transparent;font-family:var(--f-zh);font-size:13px;color:var(--muted);cursor:pointer;}
+.tab.on{color:var(--ink);border-bottom-color:var(--accent);font-weight:700;}
+.d-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));}
+.pane{display:none;} .pane.on{display:block;}
+.toc{display:flex;width:100%;gap:12px;align-items:center;text-align:left;background:none;border:0;border-left:3px solid transparent;padding:9px 14px;cursor:pointer;}
+.toc:hover{background:var(--tint);}
+.toc.cur{border-left-color:var(--accent);background:var(--tint);}
+.toc .tile{width:36px;height:36px;padding:5px;border-width:1.5px;box-shadow:2px 2px 0 var(--ink);}
+.toc-n{font-family:var(--f-px);font-size:12px;color:var(--accent);display:block;letter-spacing:.08em;}
+.toc-t{display:block;font-weight:700;font-size:14.5px;line-height:1.3;}
+.toc-z{display:block;font-family:var(--f-zh);font-size:12px;color:var(--muted);}
+.toc.cover-link{border-bottom:1px solid var(--rule);font-family:var(--f-zh);font-size:13.5px;color:var(--muted);padding:12px 16px;}
+.field{display:block;width:calc(100% - 32px);margin:14px 16px 6px;padding:10px 12px;font-size:15px;border:1.5px solid var(--rule);background:var(--surface);color:var(--ink);border-radius:4px;font-family:var(--f-body);}
+.field:focus{outline:none;border-color:var(--accent);}
+.qnote{font-family:var(--f-zh);font-size:12px;color:var(--muted);padding:2px 16px 10px;margin:0;}
+.grp{font-family:var(--f-px);font-size:11.5px;letter-spacing:.12em;color:var(--accent);padding:12px 16px 4px;margin:0;}
+.hit{display:block;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--rule);padding:10px 16px;cursor:pointer;}
+.hit:hover{background:var(--tint);}
+.hit-l{font-family:var(--f-px);font-size:11px;color:var(--accent);display:block;letter-spacing:.06em;}
+.hit-s{font-size:13.5px;line-height:1.5;color:var(--muted);}
+.hit-s b{color:var(--ink);background:var(--hl);font-weight:400;}
+.chips{display:flex;gap:6px;padding:0 16px 8px;flex-wrap:wrap;}
+.fchip{border:1.5px solid var(--rule);background:none;border-radius:20px;padding:4px 11px;font-size:12.5px;cursor:pointer;font-family:var(--f-zh);}
+.fchip.on{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+.br{display:grid;grid-template-columns:1fr auto;gap:2px 10px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--rule);padding:9px 16px;cursor:pointer;}
+.br:hover{background:var(--tint);}
+.br-h{font-family:var(--f-disp);font-weight:700;font-size:15px;}
+.br-h small{font-family:var(--f-body);font-weight:400;font-size:12px;color:var(--muted);margin-left:6px;}
+.br-z{font-family:var(--f-zh);font-size:12.5px;color:var(--muted);grid-column:1;}
+.br-l{font-family:var(--f-px);font-size:11px;color:var(--muted);grid-row:1/3;grid-column:2;align-self:center;}
+.br.open{background:var(--tint);}
+.bx{padding:4px 16px 14px;background:var(--tint);font-size:14px;}
+.bx p{margin:0 0 7px;font-family:var(--f-zh);line-height:1.6;}
+.bx .bx-ex{font-family:var(--f-body);}
+.bx .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.setrow{padding:16px;border-top:1px solid var(--rule);}
+.setrow h4{margin:0 0 9px;font-family:var(--f-zh);font-size:13px;color:var(--muted);font-weight:700;}
+.seg{display:flex;gap:6px;}
+.seg button{flex:1;padding:8px 4px;border:1.5px solid var(--rule);background:none;border-radius:4px;cursor:pointer;font-family:var(--f-zh);font-size:13px;}
+.seg button.on{border-color:var(--accent);background:var(--tint);color:var(--accent);font-weight:700;}
+
+/* ---------- music panel ---------- */
+#mp{position:fixed;z-index:50;top:calc(58px + env(safe-area-inset-top,0px));right:12px;width:min(300px,calc(100vw - 24px));background:var(--surface);border:2px solid var(--ink);box-shadow:5px 5px 0 var(--ink);padding:12px;}
+.mp-h{margin:0 0 8px;font-family:var(--f-px);font-weight:600;font-size:14px;letter-spacing:.1em;display:flex;justify-content:space-between;align-items:baseline;}
+.mp-h span{font-family:var(--f-zh);font-weight:400;font-size:12px;color:var(--muted);letter-spacing:0;}
+.trk{display:grid;grid-template-columns:18px 1fr;column-gap:8px;width:100%;text-align:left;background:none;border:1.5px solid transparent;padding:7px 8px;cursor:pointer;}
+.trk:hover{border-color:var(--rule);}
+.trk.on{border-color:var(--accent);background:var(--tint);}
+.trk-i{grid-row:1/3;font-family:var(--f-px);color:var(--accent);font-size:14px;}
+.trk-n{font-family:var(--f-px);font-size:14px;letter-spacing:.04em;}
+.trk-z{font-family:var(--f-zh);font-size:12px;color:var(--muted);}
+.mp-foot{display:flex;align-items:center;gap:10px;margin-top:10px;font-family:var(--f-zh);font-size:12.5px;color:var(--muted);}
+.mp-foot input{flex:1;accent-color:var(--accent);}
+.mp-off{border:1.5px solid var(--rule);background:none;padding:5px 10px;cursor:pointer;font-family:var(--f-zh);font-size:12.5px;}
+
+/* ---------- popover ---------- */
+#pop{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--pop-bg);color:var(--pop-ink);padding:18px 20px calc(22px + env(safe-area-inset-bottom,0px));box-shadow:0 -8px 28px var(--shadow);transform:translateY(105%);transition:transform .2s ease;max-height:70vh;overflow-y:auto;}
+#pop.on{transform:none;}
+@media (min-width:720px){#pop{left:auto;right:24px;bottom:24px;width:24rem;border-radius:4px;box-shadow:6px 6px 0 var(--shadow);}}
+.p-x{position:absolute;top:10px;right:12px;background:none;border:0;color:var(--pop-muted);font-size:24px;line-height:1;cursor:pointer;padding:4px 8px;}
+.p-tag{display:inline-flex;gap:6px;align-items:center;margin-bottom:8px;}
+.p-tag b{font-family:var(--f-px);font-weight:600;font-size:11px;letter-spacing:.12em;padding:2px 7px;color:#fff;background:#2F6F5E;}
+.p-tag b.gr{background:#BF5038;} .p-tag b.cu{background:#7657A0;}
+.p-tag .lv{border-color:var(--pop-rule);color:var(--pop-muted);}
+.p-tag .lv.hi{border-color:#E07A62;color:#E07A62;}
+.p-h{display:flex;align-items:center;gap:6px;margin:0 30px 0 0;}
+.p-w{font-family:var(--f-disp);font-weight:700;font-size:1.45rem;line-height:1.2;}
+.p-h .spk{color:var(--pop-muted);}
+.p-h .spk:hover{background:transparent;color:var(--pop-accent);}
+.p-kk{margin:2px 0 6px;font-size:14px;color:var(--pop-muted);}
+.p-zh{margin:0 0 8px;font-family:var(--f-zh);font-size:1.05rem;font-weight:700;color:var(--pop-accent);}
+.p-d{margin:0 0 10px;font-family:var(--f-zh);font-size:14.5px;line-height:1.7;}
+.p-d b{color:var(--pop-accent);}
+.p-ex{margin:0;padding-top:10px;border-top:1px solid var(--pop-rule);font-size:15px;}
+.p-ex button{background:none;border:0;padding:0;cursor:pointer;text-align:left;display:inline-flex;gap:6px;align-items:baseline;}
+.p-ex svg{width:13px;height:13px;fill:var(--pop-muted);flex:none;}
+.p-ex span.z{display:block;font-family:var(--f-zh);font-size:13px;color:var(--pop-muted);margin-top:1px;}
+.p-go{margin-top:12px;background:none;border:1.5px solid var(--pop-rule);color:var(--pop-ink);padding:5px 10px;font-family:var(--f-zh);font-size:12.5px;cursor:pointer;}
+
+/* ---------- cover ---------- */
+body.cover #bar,body.cover #reader,body.cover #nav{display:none;}
+#cover{display:none;max-width:34rem;margin:0 auto;padding:30px 18px 44px;text-align:center;flex-direction:column;align-items:center;}
+body.cover #cover{display:flex;}
+.cv-k{font-family:var(--f-px);font-size:12.5px;letter-spacing:.24em;color:var(--accent);margin:0 0 16px;}
+.screen{width:100%;max-width:440px;border:3px solid var(--ink);box-shadow:7px 7px 0 var(--accent);background:#E9D8BD;line-height:0;}
+.screen svg{width:100%;height:auto;display:block;}
+.cv-t{font-family:var(--f-disp);font-weight:700;font-size:clamp(2.6rem,12vw,3.6rem);line-height:1;margin:28px 0 6px;letter-spacing:-.02em;}
+.cv-z{font-family:var(--f-zh);font-size:16px;color:var(--muted);margin:0 0 14px;letter-spacing:.1em;}
+.cv-b{max-width:27rem;margin:0 0 18px;font-size:1rem;line-height:1.65;}
+.cv-b span{display:block;font-family:var(--f-zh);font-size:14px;color:var(--muted);margin-top:4px;}
+.cv-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:0 0 26px;}
+.cv-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+.pbtn{font-family:var(--f-px);font-weight:600;font-size:17px;letter-spacing:.08em;padding:13px 26px;border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);cursor:pointer;background:var(--accent);color:var(--accent-ink);}
+.pbtn.alt{background:var(--surface);color:var(--ink);}
+.pbtn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink);}
+.tap{margin:22px 0 0;font-family:var(--f-zh);font-size:13px;color:var(--muted);}
+.tap .blink{color:var(--accent);margin-right:4px;}
+.blink{animation:blink 1.1s steps(2) infinite;}
+@keyframes blink{50%{opacity:0}}
+.drift{animation:drift 9s ease-in-out infinite alternate;}
+.drift.b{animation-duration:13s;animation-direction:alternate-reverse;}
+@keyframes drift{from{transform:translateX(-4px)}to{transform:translateX(6px)}}
+.steam rect{animation:steam 2.4s steps(4) infinite;}
+.steam rect:nth-child(2){animation-delay:.8s;} .steam rect:nth-child(3){animation-delay:1.6s;}
+@keyframes steam{0%{transform:translateY(2px);opacity:0}30%{opacity:.9}100%{transform:translateY(-4px);opacity:0}}
+.bee{animation:bee 7s steps(28) infinite;}
+@keyframes bee{0%{transform:translate(0,0)}25%{transform:translate(-14px,5px)}50%{transform:translate(-24px,-2px)}75%{transform:translate(-10px,-6px)}100%{transform:translate(0,0)}}
+.wing{animation:blink .25s steps(2) infinite;}
+.zz{animation:zz 3s steps(6) infinite;}
+@keyframes zz{0%{transform:translate(0,2px);opacity:0}20%{opacity:1}100%{transform:translate(3px,-5px);opacity:0}}
+
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,160%);opacity:0;visibility:hidden;background:var(--ink);color:var(--bg);font-family:var(--f-zh);font-size:14px;padding:10px 16px;z-index:70;transition:transform .2s;max-width:calc(100vw - 32px);}
+#toast.on{transform:translate(-50%,0);opacity:1;visibility:visible;}
+mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
+
+@media (max-width:560px){
+  .wl{grid-template-columns:1fr;}
+  .ln{grid-template-columns:1fr auto;}
+  .who{grid-column:1/-1;text-align:left;padding:0;}
+  #reader{padding-top:20px;}
+}
+@media (prefers-reduced-motion:reduce){
+  .drift,.steam rect,.bee,.wing,.zz,.blink,.eq i{animation:none;}
+  #pop,#drawer,#scrim,#toast{transition:none;}
+}
+</style>
+</head>
+<body>
+
+
+<section id="cover">
+  <p class="cv-k">INKQUEST · STARTER READER · A1</p>
+  <div class="screen" id="screen"></div>
+  <h1 class="cv-t">Window Seat</h1>
+  <p class="cv-z">窗邊英文・初級十課</p>
+  <p class="cv-b">Ten short readings about breakfast, cats, rain, bees, and one very slow basil plant. Tap any underlined word for help.<span>十篇短課文，每課 10 個單字、文法、對話和口說題。點畫線的字就會跳出白話解釋和 KK 音標。</span></p>
+  <div class="cv-chips">
+    <span class="chip t-fun">輕鬆活潑 Fun</span><span class="chip t-feel">抒情感性 Feelings</span><span class="chip t-know">新知分享 Discover</span><span class="chip t-think">理性討論 Think</span>
+  </div>
+  <div class="cv-row">
+    <button class="pbtn" id="coverGo"><span class="blink">▶</span> <span id="goLbl">START</span></button>
+    <button class="pbtn alt" id="coverMusic">♪ MUSIC</button>
+  </div>
+  <p class="tap" id="tapHint"><span class="blink">♪</span> 輕觸畫面任一處，開始播放背景音樂 · Tap anywhere for music</p>
+</section>
+
+<div id="bar">
+  <button class="ib" id="menuBtn" aria-label="目錄與單字庫"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  <div id="barTitle"></div>
+  <button class="ib" id="musicBtn" aria-label="背景音樂"><svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg><span class="eq"><i></i><i></i><i></i></span></button>
+  <button class="ib" id="searchBtn" aria-label="搜尋"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+</div>
+
+<main id="reader"></main>
+<div id="nav">
+  <button class="navbtn" id="prevBtn">◀ PREV</button>
+  <span id="progress"></span>
+  <button class="navbtn" id="nextBtn">NEXT ▶</button>
+</div>
+
+<div id="scrim"></div>
+<aside id="drawer" aria-label="目錄、搜尋、單字庫">
+  <div class="d-head">
+    <div class="tile" id="dTile" style="width:40px;height:40px;padding:5px;box-shadow:2px 2px 0 var(--ink)"></div>
+    <div><p class="d-s">INKQUEST · A1</p><p class="d-t">Window Seat</p></div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" data-pane="toc">目錄</button>
+    <button class="tab" data-pane="search">搜尋</button>
+    <button class="tab" data-pane="bank">詞彙庫</button>
+    <button class="tab" data-pane="set">設定</button>
+  </div>
+  <div class="d-body">
+    <div class="pane on" id="pane-toc"></div>
+    <div class="pane" id="pane-search">
+      <input id="q" class="field" type="search" placeholder="搜尋英文或中文，例如 rain、雨傘" autocomplete="off">
+      <p class="qnote" id="qnote">輸入至少兩個字母（或一個中文字）。</p>
+      <div id="hits"></div>
+    </div>
+    <div class="pane" id="pane-bank">
+      <input id="bq" class="field" type="search" placeholder="篩選：英文、中文都可以" autocomplete="off">
+      <div class="chips" id="bankMode">
+        <button class="fchip on" data-m="w">單字</button>
+        <button class="fchip" data-m="g">文法</button>
+        <button class="fchip" data-m="c">文化小知識</button>
+        <button class="fchip" data-m="sort" id="sortBtn">A–Z</button>
+      </div>
+      <p class="qnote" id="bnote"></p>
+      <div id="bank"></div>
+    </div>
+    <div class="pane" id="pane-set">
+      <div class="setrow"><h4>文字大小</h4><div class="seg" id="sizes"><button data-v="17">小</button><button data-v="19">中</button><button data-v="22">大</button></div></div>
+      <div class="setrow"><h4>朗讀速度</h4><div class="seg" id="rates"><button data-v="0.7">慢</button><button data-v="0.85">適中</button><button data-v="1">正常</button></div></div>
+      <div class="setrow"><h4>中文翻譯</h4><div class="seg" id="zhset"><button data-v="0">預設隱藏</button><button data-v="1">預設顯示</button></div></div>
+      <div class="setrow"><h4>閱讀進度</h4><div class="seg"><button id="resetBtn">從第一課重新開始</button></div></div>
+    </div>
+  </div>
+</aside>
+
+<div id="mp" hidden role="dialog" aria-label="背景音樂">
+  <p class="mp-h">8-BIT MUSIC <span>閱讀背景音樂</span></p>
+  <div id="mpList"></div>
+  <div class="mp-foot"><span>音量</span><input type="range" id="vol" min="0" max="100" aria-label="音量"><button class="mp-off" id="mpOff">關閉</button></div>
+</div>
+
+<div id="pop" role="dialog" aria-hidden="true"><button class="p-x" id="popX" aria-label="關閉">×</button><div id="popIn"></div></div>
+<div id="toast" role="status"></div>
+<script>
+/* =========================================================
+   WINDOW SEAT — content
+   Markup in English text: [[shown text|key]]  (key omitted = shown text, lowercased)
+   key prefixes:  g:  grammar note   c:  culture note   (none) vocabulary
+   ========================================================= */
+const THEMES = {
+  fun:   {en:"Fun",      zh:"輕鬆活潑"},
+  feel:  {en:"Feelings", zh:"抒情感性"},
+  know:  {en:"Discover", zh:"新知分享"},
+  think: {en:"Think",    zh:"理性討論"}
+};
+
+const L = [
+/* ---------------- 1 ---------------- */
+{ theme:"fun", icon:"clock", title:"The Usual, Please!", zt:"老樣子，謝謝！",
+  read:[
+    ["[[It is 7:15|g:l1a]]. My [[alarm]] rings. I jump out of bed. Oh no! [[I am|g:l1b]] [[late]] again!",
+     "七點十五分。我的鬧鐘響了。我跳下床。糟了！我又遲到了！"],
+    ["I [[brush]] my teeth. I [[wash]] my face. [[I run|g:l1c]] down the [[street]].",
+     "我刷牙、洗臉，然後沿著街道一路跑。"],
+    ["Auntie Chen has a small [[breakfast]] shop on the [[corner]]. She calls everyone [[“handsome” or “pretty.”|c:handsome]] “Good morning, pretty girl! [[The usual|usual]]?” she asks.",
+     "陳阿姨在街角開了一家小早餐店。她叫每個人「帥哥」或「美女」。「早安，美女！老樣子嗎？」她問。"],
+    ["“Yes, please!” I say. My usual is an [[egg pancake|c:danbing]] and a cup of milk tea.",
+     "「對，麻煩了！」我說。我的老樣子是一份蛋餅和一杯奶茶。"],
+    ["I eat on the bus. The egg pancake is hot. The milk tea is [[sweet]]. My morning is crazy, but my breakfast is [[perfect]].",
+     "我在公車上吃早餐。蛋餅熱熱的，奶茶甜甜的。我的早晨很瘋狂，但我的早餐很完美。"]
+  ],
+  words:["alarm","late","brush","wash","street","corner","breakfast","usual","sweet","perfect"],
+  gram:["g:l1a","g:l1b","g:l1c"],
+  talk:{ where:"早上七點半，陳阿姨的早餐店。", cast:{M:"Mia",A:"Auntie Chen"}, lines:[
+    ["A","Good morning, pretty girl! The usual?","早安，美女！老樣子嗎？"],
+    ["M","Yes, please. And one more milk tea for my brother.","對，麻煩了。再一杯奶茶給我弟弟。"],
+    ["A","Hot or iced?","熱的還是冰的？"],
+    ["M","Iced, please. He likes cold drinks.","冰的，謝謝。他喜歡冷飲。"],
+    ["A","OK! That’s 95 dollars.","好喔！這樣 95 元。"],
+    ["M","Here you are. Thank you!","給您。謝謝！"],
+    ["A","Have a nice day! Don’t be [[late]]!","祝妳有美好的一天！不要遲到喔！"],
+    ["M","Too late, Auntie!","已經來不及了，阿姨！"]
+  ]},
+  ask:[
+    ["What do you usually eat for [[breakfast]]?","你早餐通常吃什麼？","I usually eat ___ and drink ___."],
+    ["Are you a morning person? Why or why not?","你是早起型的人嗎？為什麼？","Yes, I am. I like ___. / No, I’m not. I ___."],
+    ["Is there an “Auntie Chen” in your life? Who is it?","你的生活中有沒有像陳阿姨這樣的人？是誰？","Yes! ___ has a ___ shop. She/He always ___."]
+  ]
+},
+/* ---------------- 2 ---------------- */
+{ theme:"fun", icon:"cat", title:"Mochi Comes to Visit", zt:"麻糬來作客",
+  read:[
+    ["[[There is|g:l2a]] a cat in my [[building]]. Her name is Mochi. She is white and [[round]], [[like|g:l2c]] [[a mochi|c:mochi]].",
+     "我住的大樓裡有一隻貓，她叫麻糬。她白白圓圓的，就像一顆麻糬。"],
+    ["Mochi is not my cat. She lives [[next door]]. But every [[evening]], she comes to my [[window]].",
+     "麻糬不是我的貓，她住在隔壁。可是每天傍晚，她都會來到我的窗邊。"],
+    ["She sits there. She looks at me. She doesn’t say a word. She is a cat.",
+     "她坐在那裡，看著我，一句話也不說。畢竟她是貓嘛。"],
+    ["I [[open]] the window. She walks in like a [[queen]]. She sleeps on my [[sofa]]. She eats my fish [[snacks|snack]].",
+     "我打開窗戶，她像女王一樣走進來。她睡在我的沙發上，吃掉我的魚乾零食。"],
+    ["Then she goes home. No “thank you.” No “goodbye.”",
+     "然後她就回家了。沒有「謝謝」，也沒有「再見」。"],
+    ["Mochi [[can’t talk|g:l2b]], but I know what she thinks: “This is my [[second]] home.”",
+     "麻糬不會說話，但我知道她在想什麼：「這是我的第二個家。」"]
+  ],
+  words:["building","next door","evening","window","round","open","queen","sofa","snack","second"],
+  gram:["g:l2a","g:l2b","g:l2c"],
+  talk:{ where:"傍晚，Mia 在走廊遇到麻糬的主人王先生。", cast:{W:"Mr. Wang",M:"Mia"}, lines:[
+    ["W","Hi, Mia. Is Mochi at your place again?","嗨，Mia。麻糬又跑去妳家了嗎？"],
+    ["M","Yes. She’s on my [[sofa]].","對，她在我的沙發上。"],
+    ["W","Oh no, I’m so sorry!","唉呀，真不好意思！"],
+    ["M","It’s OK. I like her.","沒關係，我喜歡她。"],
+    ["W","Does she eat your food?","她有吃妳的東西嗎？"],
+    ["M","Um… just a little.","嗯……只吃了一點點。"],
+    ["W","That cat! I can come and get her now.","這隻貓喔！我現在可以過去帶她回來。"],
+    ["M","No hurry. She’s asleep.","不急，她睡著了。"]
+  ]},
+  ask:[
+    ["Do you like cats or dogs more? Why?","你比較喜歡貓還是狗？為什麼？","I like ___ more because they are ___."],
+    ["You can have any pet. What pet do you want?","如果你可以養任何寵物，你想養什麼？","I want a ___. It can ___."],
+    ["Do you know your neighbors? What are they like?","你認識你的鄰居嗎？他們是怎樣的人？","Yes. My neighbor is ___. / No, I don’t, but ___."]
+  ]
+},
+/* ---------------- 3 ---------------- */
+{ theme:"feel", icon:"umbrella", title:"Grandma’s Yellow Umbrella", zt:"阿嬤的黃雨傘",
+  read:[
+    ["[[It is raining|g:l3a]] today. I look out the window, and I think of my grandma.",
+     "今天在下雨。我望著窗外，想起了我的阿嬤。"],
+    ["When I [[was|g:l3b]] a little girl, Grandma had a big yellow [[umbrella]]. On [[rainy]] days, she [[walked|walk]] me to school. The street was [[gray]], but under her umbrella, everything was yellow and [[warm]].",
+     "我還是小女孩的時候，阿嬤有一把大大的黃雨傘。下雨天，她會陪我走路去上學。街道灰灰的，可是在她的傘下，一切都是黃色的、暖暖的。"],
+    ["“Rain is good for the [[rice]],” she [[always]] said. I [[didn’t like|g:l3c]] rain. I liked her umbrella.",
+     "「雨水對稻子很好。」她總是這麼說。我不喜歡下雨，我喜歡的是她的傘。"],
+    ["Grandma is gone now. The umbrella is in my [[closet]]. It is old, and it has a small [[hole]].",
+     "阿嬤已經不在了。那把傘收在我的衣櫃裡。它舊了，還有一個小洞。"],
+    ["Today I take it out. I walk to work under the yellow umbrella. I am not a little girl now, but I still [[feel]] warm.",
+     "今天我把它拿出來，撐著這把黃傘走路去上班。我已經不是小女孩了，但我還是覺得好溫暖。"]
+  ],
+  words:["umbrella","rainy","walk","gray","warm","rice","always","closet","hole","feel"],
+  gram:["g:l3a","g:l3b","g:l3c"],
+  talk:{ where:"辦公室門口，同事 Ben 看到 Mia 在收傘。", cast:{B:"Ben",M:"Mia"}, lines:[
+    ["B","Nice [[umbrella]], Mia! Is it new?","好漂亮的傘，Mia！新買的嗎？"],
+    ["M","No, it’s very old. It was my grandma’s.","不是，它很舊了。是我阿嬤的。"],
+    ["B","Oh, I see. It’s so bright!","喔，原來如此。顏色好亮！"],
+    ["M","She loved bright colors.","她很喜歡鮮豔的顏色。"],
+    ["B","Do you miss her?","妳想念她嗎？"],
+    ["M","Yes. On [[rainy]] days, I miss her a lot.","想啊。下雨天我特別想她。"],
+    ["B","Then rainy days are special for you.","那下雨天對妳來說很特別呢。"],
+    ["M","Yes. I think so too.","對啊，我也這麼覺得。"]
+  ]},
+  ask:[
+    ["Do you like [[rainy]] days? Why or why not?","你喜歡下雨天嗎？為什麼？","I like / don’t like rainy days because ___."],
+    ["Do you have an old thing from someone you love? What is it?","你有沒有來自所愛之人的舊東西？是什麼？","I have an old ___. It was my ___’s."],
+    ["What do you remember about your grandparents?","你對祖父母有什麼回憶？","When I was a child, my grandma/grandpa always ___."]
+  ]
+},
+/* ---------------- 4 ---------------- */
+{ theme:"fun", icon:"boba", title:"Night Market Mission", zt:"夜市大任務",
+  read:[
+    ["Tonight, my brother Leo and I have a [[mission]]: eat everything at the [[night market|c:nightmarket]] with only 300 [[dollars|dollar]].",
+     "今晚我和弟弟 Leo 有個任務：只用三百塊，把夜市吃好吃滿。"],
+    ["First stop: [[stinky tofu|c:tofu]]. It [[smells|smell]] bad, but it [[tastes|taste]] great. 60 dollars.",
+     "第一站：臭豆腐。聞起來很臭，吃起來超讚。六十塊。"],
+    ["Next: a big [[fried]] chicken steak. It is [[bigger than|g:l4c]] Leo’s face! 90 dollars.",
+     "下一站：一大塊炸雞排，比 Leo 的臉還大！九十塊。"],
+    ["Then Leo wants [[bubble tea|c:boba]], and I want [[grilled]] corn. We buy [[both]]. 120 dollars.",
+     "接著 Leo 想喝珍珠奶茶，我想吃烤玉米。兩樣都買了。一百二十塊。"],
+    ["“[[How much|g:l4b]] money do we have now?” Leo asks. I [[count]] it. “Thirty dollars.”",
+     "「我們現在還剩多少錢？」Leo 問。我數了數。「三十塊。」"],
+    ["We look at the [[shaved ice|c:ice]]. [[It looks so good|g:l4a]]. We look at each other. We look at our money.",
+     "我們看著剉冰，看起來好好吃。我們看看彼此，再看看手上的錢。"],
+    ["“One shaved ice, two [[spoons|spoon]], please!” [[Mission complete|complete]].",
+     "「一碗剉冰，兩支湯匙，謝謝！」任務完成。"]
+  ],
+  words:["mission","smell","taste","fried","grilled","both","count","spoon","complete","dollar"],
+  gram:["g:l4a","g:l4b","g:l4c"],
+  talk:{ where:"夜市的烤玉米攤前。", cast:{S:"Seller",M:"Mia",L:"Leo"}, lines:[
+    ["S","Hi! What can I get you?","嗨！要點什麼？"],
+    ["M","How much is the [[grilled]] corn?","烤玉米多少錢？"],
+    ["S","Fifty dollars.","五十塊。"],
+    ["M","Hmm… can I have a small one?","嗯……可以給我小支的嗎？"],
+    ["S","Sorry, we only have one size.","抱歉，我們只有一種大小。"],
+    ["L","It [[smells|smell]] so good. Let’s buy it!","聞起來好香，買啦！"],
+    ["M","OK. One grilled corn, please. Not too spicy.","好吧。一支烤玉米，不要太辣。"],
+    ["S","No problem. Here you go!","沒問題，來，給你！"]
+  ]},
+  ask:[
+    ["What is your favorite night market food?","你最喜歡的夜市小吃是什麼？","My favorite is ___. It tastes ___."],
+    ["You have 300 dollars at a night market. What do you buy?","你在夜市有三百塊，會買什麼？","First, I buy ___. Then I buy ___."],
+    ["Stinky tofu: delicious or terrible? Why?","臭豆腐：美味還是可怕？為什麼？","I think it’s ___ because it smells/tastes ___."]
+  ]
+},
+/* ---------------- 5 ---------------- */
+{ theme:"know", icon:"moon", title:"Sleep Is Your Superpower", zt:"睡眠是你的超能力",
+  read:[
+    ["Did you know? People [[spend]] about one-third of their lives [[asleep]]. That is about 25 years!",
+     "你知道嗎？人一生大約有三分之一的時間在睡覺，差不多是二十五年！"],
+    ["Sleep is not a waste of time. [[When you sleep|g:l5a]], your [[brain]] cleans itself. It also [[keeps|keep]] the things you learned today. So if you study English and then sleep, your brain keeps the new words!",
+     "睡覺不是浪費時間。你睡覺的時候，大腦會自己打掃乾淨，還會把你今天學到的東西存起來。所以讀完英文再去睡，大腦就會記住新單字！"],
+    ["[[Adults|adult]] [[need|g:l5c]] seven to nine [[hours|hour]] of sleep every night. But many people only get five or six.",
+     "成年人每晚需要七到九小時的睡眠，但很多人只睡五、六個小時。"],
+    ["Here are three [[tips|tip]]: [[Put your phone away|g:l5b]] one hour before bed. Keep your room [[dark]] and [[cool]]. Go to bed at the same time every night.",
+     "這裡有三個小祕訣：睡前一小時把手機收起來。讓房間保持暗暗的、涼涼的。每天晚上同一個時間上床。"],
+    ["Tonight, give your brain a [[gift]]. Go to sleep early!",
+     "今晚，送你的大腦一份禮物吧。早點睡！"]
+  ],
+  words:["spend","asleep","brain","keep","adult","hour","tip","dark","cool","gift"],
+  gram:["g:l5a","g:l5b","g:l5c"],
+  talk:{ where:"凌晨一點，弟弟 Leo 起床倒水，發現 Mia 還醒著。", cast:{L:"Leo",M:"Mia"}, lines:[
+    ["L","It’s 1 a.m. Why are you still awake?","凌晨一點了，妳怎麼還醒著？"],
+    ["M","I’m watching videos about sleep.","我在看關於睡眠的影片。"],
+    ["L","About sleep? At 1 a.m.?","關於睡眠？在凌晨一點？"],
+    ["M","Yes. [[Adults|adult]] need seven hours, you know.","對啊。你知道嗎，成年人需要睡七個小時。"],
+    ["L","So how many hours do you get?","那妳都睡幾個小時？"],
+    ["M","Um… about five.","呃……大概五小時。"],
+    ["L","Then put your phone away and go to bed!","那就把手機收起來，快去睡！"],
+    ["M","OK, OK. Just one more video.","好啦好啦。再一部就好。"]
+  ]},
+  ask:[
+    ["How many [[hours|hour]] do you sleep every night?","你每晚睡幾個小時？","I usually sleep ___ hours."],
+    ["What do you do before bed?","你睡前都做些什麼？","Before bed, I ___."],
+    ["Do you think phones are bad for sleep? Why?","你覺得手機對睡眠不好嗎？為什麼？","I think / don’t think phones are bad for sleep because ___."]
+  ]
+},
+/* ---------------- 6 ---------------- */
+{ theme:"feel", icon:"letter", title:"A Letter to Ting", zt:"給婷的一封信",
+  read:[
+    ["[[Dear Ting,|c:letter]]","親愛的婷：","letter-open"],
+    ["How are you? It is [[autumn]] in Taipei now. The [[wind]] is cool, and the sky is very blue.",
+     "妳好嗎？台北現在是秋天了。風涼涼的，天空好藍。"],
+    ["Yesterday I [[walked past|g:l6a]] our old school. I stopped at the [[gate]]. I [[remembered|remember]] us. We [[shared|share]] noodles after class. We [[laughed|laugh]] at silly things. We talked about our [[dreams|dream]].",
+     "昨天我經過我們以前的學校，在校門口停了下來。我想起了我們。我們下課後一起分一碗麵，為了傻事笑個不停，還聊著我們的夢想。"],
+    ["Now you live in Canada, and I live in Taipei. We are [[far]] apart, but I think about you a lot.",
+     "現在妳住在加拿大，我住在台北。我們離得好遠，但我常常想起妳。"],
+    ["Do you [[still|g:l6c]] sing in the shower? Do you still hate green peppers?",
+     "妳洗澡的時候還會唱歌嗎？還是一樣討厭青椒嗎？"],
+    ["I [[miss]] you. I [[hope]] [[we can meet again soon|g:l6b]].",
+     "我好想妳。希望我們很快能再見面。"],
+    ["Love,<br>Mia","愛妳的 Mia","letter-close"]
+  ],
+  words:["autumn","wind","gate","remember","share","laugh","dream","far","miss","hope"],
+  gram:["g:l6a","g:l6b","g:l6c"],
+  talk:{ where:"兩週後，Mia 和在加拿大的婷視訊。", cast:{T:"Ting",M:"Mia"}, lines:[
+    ["T","Mia! I got your letter!","Mia！我收到妳的信了！"],
+    ["M","Really? That was fast!","真的嗎？好快喔！"],
+    ["T","I read it three times. I almost cried.","我讀了三遍，差點哭出來。"],
+    ["M","Aw. I really [[miss]] you.","哎呀。我真的好想妳。"],
+    ["T","I miss you too. And yes, I still hate green peppers.","我也想妳。還有，對，我還是討厭青椒。"],
+    ["M","Ha! Some things never change.","哈！有些事永遠不會變。"],
+    ["T","I’m coming home in January. Let’s [[share]] some noodles!","我一月要回台灣，我們一起吃麵吧！"],
+    ["M","It’s a deal!","一言為定！"]
+  ]},
+  ask:[
+    ["Do you have a friend [[far]] away? Where does he or she live?","你有住在遠方的朋友嗎？他住在哪裡？","Yes. My friend ___ lives in ___."],
+    ["What do you [[remember]] about your school days?","你記得學生時代的什麼事？","I remember ___. We always ___."],
+    ["Letters or messages: which do you like more? Why?","寫信和傳訊息，你比較喜歡哪一個？為什麼？","I like ___ more because ___."]
+  ]
+},
+/* ---------------- 7 ---------------- */
+{ theme:"know", icon:"bee", title:"Why Do Bees Dance?", zt:"蜜蜂為什麼跳舞？",
+  read:[
+    ["A bee [[finds|g:l7a]] a [[garden]] full of flowers. She flies home to her [[hive]]. Then she dances!",
+     "一隻蜜蜂發現了一座開滿花的花園。她飛回蜂巢，然後——跳起舞來！"],
+    ["This is not a party. It is a [[message]]. The dance tells the other bees [[where the flowers are|g:l7c]].",
+     "這可不是派對，而是一則訊息。這支舞會告訴其他蜜蜂，花在哪裡。"],
+    ["In the [[waggle dance|c:waggle]], the bee walks in a [[straight]] line and [[shakes|shake]] her body. The [[direction]] of the line [[points|point]] the way to the flowers. [[If she shakes for a long time|g:l7b]], the flowers are far away.",
+     "在「搖擺舞」裡，蜜蜂會沿著一條直線走，同時搖動身體。這條線的方向，指出通往花朵的路。如果她搖很久，就代表花在很遠的地方。"],
+    ["The other bees [[watch]]. Then they fly out and find the flowers. No [[map]]. No phone. Just a dance.",
+     "其他蜜蜂在一旁看著，然後飛出去找到那些花。不用地圖，不用手機，只要一支舞。"],
+    ["Bees are small, but they are very [[smart]].",
+     "蜜蜂雖然小，卻非常聰明。"]
+  ],
+  words:["garden","hive","message","straight","shake","direction","point","watch","map","smart"],
+  gram:["g:l7a","g:l7b","g:l7c"],
+  talk:{ where:"週末，Mia 和 Leo 在公園散步。", cast:{L:"Leo",M:"Mia"}, lines:[
+    ["L","Look! A bee on that flower!","看！那朵花上有蜜蜂！"],
+    ["M","Don’t worry. She’s busy. She doesn’t want you.","別擔心，她很忙，她對你沒興趣。"],
+    ["L","Is it true? Can bees really dance?","真的假的？蜜蜂真的會跳舞？"],
+    ["M","Yes. They dance to tell their friends where the food is.","對啊。牠們跳舞告訴朋友食物在哪裡。"],
+    ["L","So when I dance, what do I tell people?","那我跳舞的時候，是在告訴大家什麼？"],
+    ["M","You tell people to run away.","你是在叫大家快逃。"],
+    ["L","Hey!","喂！"]
+  ]},
+  ask:[
+    ["What other [[smart]] animals do you know?","你還知道哪些聰明的動物？","I think ___ are smart. They can ___."],
+    ["Bees use a dance. How do people send [[messages|message]]?","蜜蜂用跳舞傳訊息，人類用什麼？","People use ___ to send messages."],
+    ["Do you like learning about animals? Why or why not?","你喜歡學習關於動物的知識嗎？為什麼？","Yes / No, because ___."]
+  ]
+},
+/* ---------------- 8 ---------------- */
+{ theme:"think", icon:"phone", title:"Phones at Dinner?", zt:"吃飯可以滑手機嗎？",
+  read:[
+    ["Every Sunday, my family eats dinner [[together]]. Last Sunday, Dad made a new [[rule]]: no phones at the table.",
+     "每個星期天，我們全家都會一起吃晚餐。上星期天，爸爸定了一條新規則：吃飯時不准用手機。"],
+    ["Leo was not happy. “But I need my phone! My friends message me!”",
+     "Leo 很不高興。「可是我需要手機！我朋友會傳訊息給我！」"],
+    ["Mom [[agreed|agree]] [[with|g:l8c]] Dad. “At dinner, we talk to [[each other]], not to our phones.”",
+     "媽媽同意爸爸。「吃飯的時候，我們要跟彼此說話，不是跟手機說話。」"],
+    ["Grandpa asked, “Can I [[check]] the baseball [[score]]?” Everyone laughed.",
+     "爺爺問：「那我可以看一下棒球比分嗎？」大家都笑了。"],
+    ["[[I think|g:l8a]] the rule is good. We talk more now. [[But|g:l8b]] Leo has a point. Sometimes a message is [[important]].",
+     "我覺得這條規則很好，我們現在聊得更多了。但 Leo 說得也有道理，有時候訊息很重要。"],
+    ["[[So|g:l8b]] we made a [[deal]]: phones go in a [[basket]], but we can check them if they [[ring]].",
+     "所以我們達成協議：手機都放進籃子裡，但如果響了，可以拿起來看。"],
+    ["What do you think? Is it a good rule?",
+     "你覺得呢？這是條好規則嗎？"]
+  ],
+  words:["together","rule","agree","each other","check","score","important","deal","basket","ring"],
+  gram:["g:l8a","g:l8b","g:l8c"],
+  talk:{ where:"午休時間，Mia 和同事 Ben 一起吃便當。", cast:{B:"Ben",M:"Mia"}, lines:[
+    ["B","Your family has a no-phone [[rule]]? Wow.","你們家有「不准用手機」的規則？哇。"],
+    ["M","Yes. At first, I didn’t like it. But now I think it’s great.","對。一開始我不喜歡，但現在覺得很棒。"],
+    ["B","Why?","為什麼？"],
+    ["M","We talk more. And Dad tells funny stories.","我們聊得更多了。而且爸爸會講好笑的故事。"],
+    ["B","Hmm, I [[agree]]. Dinner is for talking.","嗯，我同意。吃飯就是要聊天。"],
+    ["B","But I don’t think my family can do that. My dad watches TV at dinner.","但我覺得我們家做不到。我爸吃飯都在看電視。"],
+    ["M","Then make a no-TV rule!","那就定一條不准看電視的規則啊！"],
+    ["B","Ha! You tell him!","哈！那妳去跟他說！"]
+  ]},
+  ask:[
+    ["Do you use your phone at dinner?","你吃飯的時候會用手機嗎？","Yes, I do. I usually ___. / No, I don’t."],
+    ["Do you [[agree]] with Dad’s rule? Why or why not?","你同意爸爸的規則嗎？為什麼？","I agree / don’t agree with Dad because ___."],
+    ["What is one good rule for your home?","你家可以有什麼好規則？","I think a good rule is: ___. It helps us ___."]
+  ]
+},
+/* ---------------- 9 ---------------- */
+{ theme:"feel", icon:"sprout", title:"My Little Basil", zt:"我的小九層塔",
+  read:[
+    ["Last month, I bought a [[tiny]] [[basil|c:basil]] [[plant]] at the market. It was only ten centimeters tall. It had six [[leaves|g:l9b]].",
+     "上個月，我在市場買了一小盆九層塔。它只有十公分高，只有六片葉子。"],
+    ["[[Every morning|g:l9c]], I [[water]] it. I put it by the window, so it can get sun. I talk to it too. Is that [[strange]]?",
+     "每天早上我都幫它澆水。我把它放在窗邊，讓它曬得到太陽。我還會跟它說話。這樣很奇怪嗎？"],
+    ["For two weeks, nothing [[happened|happen]]. I was [[worried]]. Then one morning, I saw two new leaves. Small, bright green, and perfect.",
+     "整整兩個星期，什麼事都沒發生。我好擔心。然後有一天早上，我看到兩片新葉子。小小的、亮綠色的，好完美。"],
+    ["Now my basil has thirty [[leaves|leaf]]. Next week, [[I am going to|g:l9a]] [[cook]] with it. I am going to make basil eggs!",
+     "現在我的九層塔有三十片葉子了。下星期，我要用它來做菜，我要做九層塔烘蛋！"],
+    ["My basil taught me something: good things [[grow]] [[slowly]]. You just need to keep going.",
+     "我的九層塔教會我一件事：好的東西都長得很慢。你只需要繼續走下去。"]
+  ],
+  words:["tiny","plant","leaf","water","strange","happen","worried","grow","cook","slowly"],
+  gram:["g:l9a","g:l9b","g:l9c"],
+  talk:{ where:"星期六早上，媽媽來 Mia 家。", cast:{O:"Mom",M:"Mia"}, lines:[
+    ["O","Mia, what are you doing?","Mia，妳在做什麼？"],
+    ["M","I’m talking to my [[plant]].","我在跟我的植物說話。"],
+    ["O","Does it talk back?","它會回妳話嗎？"],
+    ["M","Not yet. But look, it’s [[growing|grow]]!","還沒。可是妳看，它在長大！"],
+    ["O","Wow, look at all those leaves!","哇，好多葉子喔！"],
+    ["M","I’m going to make basil eggs this weekend.","我這個週末要做九層塔烘蛋。"],
+    ["O","Can I have some?","可以分我吃嗎？"],
+    ["M","Only if you say something nice to my basil.","除非妳跟我的九層塔說點好話。"],
+    ["O","…Hello, basil. You look great today.","……嗨，九層塔。你今天看起來好棒。"]
+  ]},
+  ask:[
+    ["Do you have a [[plant]]? What is it?","你有養植物嗎？是什麼？","Yes, I have a ___. / No, but I want a ___."],
+    ["What skill do you want to [[grow]] slowly, like Mia’s basil?","你想像 Mia 的九層塔一樣，慢慢培養什麼能力？","I want to grow my ___. Every day, I’m going to ___."],
+    ["What are you going to do this weekend?","你這個週末打算做什麼？","This weekend, I’m going to ___."]
+  ]
+},
+/* ---------------- 10 ---------------- */
+{ theme:"think", icon:"shoe", title:"Walk or Ride?", zt:"走路還是騎車？",
+  read:[
+    ["In Taiwan, many people [[ride]] [[scooters|scooter]]. Scooters are fast and [[cheap]]. You can [[park]] them almost anywhere.",
+     "在台灣，很多人騎機車。機車又快又便宜，幾乎到哪裡都能停。"],
+    ["But some cities want more people to walk. Walking is good for your body. It is [[quiet]] and clean. But it is also slow, and in summer, it is very hot.",
+     "但有些城市希望更多人走路。走路對身體好，而且安靜又乾淨。不過走路也很慢，夏天還很熱。"],
+    ["My friend Ben rides a scooter to work. [[It takes|g:l10b]] fifteen minutes. I walk to work. It [[takes|take]] thirty minutes.",
+     "我朋友 Ben 騎機車上班，要十五分鐘。我走路上班，要三十分鐘。"],
+    ["Ben says, “My way is [[faster|g:l10a]].” I say, “My way is [[healthier|healthy]].”",
+     "Ben 說：「我的方式比較快。」我說：「我的方式比較健康。」"],
+    ["Maybe we are both right. The best way [[depends on|depend on]] the [[weather]], the [[distance]], and you.",
+     "也許我們都對。最好的方式，要看天氣、距離，還有你自己。"],
+    ["[[Which is better|g:l10c]] for you: walking or riding?",
+     "對你來說，哪一個比較好：走路還是騎車？"]
+  ],
+  words:["ride","scooter","cheap","park","quiet","healthy","take","weather","distance","depend on"],
+  gram:["g:l10a","g:l10b","g:l10c"],
+  talk:{ where:"下班時突然下起雨，Ben 騎機車經過 Mia 身邊。", cast:{B:"Ben",M:"Mia"}, lines:[
+    ["B","Mia, it’s raining! Do you want a [[ride]]?","Mia，下雨了！要不要載妳？"],
+    ["M","No, thanks. I have my yellow umbrella.","不用了，謝謝。我有我的黃雨傘。"],
+    ["B","But walking in the rain is so slow.","可是在雨中走路好慢耶。"],
+    ["M","Slow is OK. I like it.","慢慢來也不錯，我喜歡。"],
+    ["B","My [[scooter]] is faster.","我的機車比較快。"],
+    ["M","Maybe. But look at you. You’re all wet!","也許吧。可是你看看你，全身都濕了！"],
+    ["B","…OK, you win today.","……好啦，今天算妳贏。"]
+  ]},
+  ask:[
+    ["How do you get to work or school? How long does it take?","你怎麼去上班或上學？要多久？","I ___ to work. It takes ___ minutes."],
+    ["Which is better for you: walking or riding? Why?","對你來說，走路和騎車哪個比較好？為什麼？","I think ___ is better because it’s ___er."],
+    ["Should cities build more [[sidewalks|c:sidewalk]]? Why or why not?","城市應該蓋更多人行道嗎？為什麼？","I think cities should / shouldn’t ___ because ___."]
+  ]
+}
+];
+
+/* ---------------- VOCABULARY (100) ----------------
+   w word · pos · kk KK音標 · lv CEFR (approx.) · zh 中文 · d 白話解釋 · ex/exz example */
+const VOCAB = {
+/* L1 */
+"alarm":{w:"alarm",pos:"n.",kk:"[əˋlɑrm]",lv:"A2",zh:"鬧鐘",d:"叫你起床的那個東西。完整說法是 alarm clock。",ex:"My alarm rings at 6:30.",exz:"我的鬧鐘六點半響。"},
+"late":{w:"late",pos:"adj.",kk:"[let]",lv:"A1",zh:"遲到的、晚的",d:"比該到的時間還晚。相反詞是 early（早）。",ex:"Sorry, I’m late!",exz:"抱歉，我遲到了！"},
+"brush":{w:"brush",pos:"v.",kk:"[brʌʃ]",lv:"A1",zh:"刷",d:"用刷子刷。brush my teeth 就是刷牙。",ex:"I brush my teeth after dinner.",exz:"我晚餐後刷牙。"},
+"wash":{w:"wash",pos:"v.",kk:"[wɑʃ]",lv:"A1",zh:"洗",d:"用水把東西弄乾淨。wash my face 洗臉，wash my hands 洗手。",ex:"Wash your hands before you eat.",exz:"吃飯前要洗手。"},
+"street":{w:"street",pos:"n.",kk:"[strit]",lv:"A1",zh:"街道",d:"城市裡兩旁有房子、店家的路。",ex:"There are many shops on this street.",exz:"這條街上有很多店。"},
+"corner":{w:"corner",pos:"n.",kk:"[ˋkɔrnɚ]",lv:"A1",zh:"轉角、角落",d:"兩條路相交的地方。on the corner 就是「在街角」。",ex:"The shop is on the corner.",exz:"那家店在轉角。"},
+"breakfast":{w:"breakfast",pos:"n.",kk:"[ˋbrɛkfəst]",lv:"A1",zh:"早餐",d:"早上吃的第一餐。注意念 brek-fəst，不是 break-fast。",ex:"What do you eat for breakfast?",exz:"你早餐吃什麼？"},
+"usual":{w:"usual",pos:"adj.",kk:"[ˋjuʒʊəl]",lv:"A2",zh:"平常的；老樣子",d:"平常都會這樣的。the usual 就是「老樣子、照舊」，點餐超好用！",ex:"I’ll have the usual, please.",exz:"我要老樣子，謝謝。"},
+"sweet":{w:"sweet",pos:"adj.",kk:"[swit]",lv:"A1",zh:"甜的；貼心的",d:"像糖一樣的味道。也可以形容人很貼心：You’re so sweet!",ex:"This cake is too sweet.",exz:"這個蛋糕太甜了。"},
+"perfect":{w:"perfect",pos:"adj.",kk:"[ˋpɝfɪkt]",lv:"A2",zh:"完美的",d:"好到找不出缺點。",ex:"The weather is perfect today.",exz:"今天天氣好完美。"},
+/* L2 */
+"building":{w:"building",pos:"n.",kk:"[ˋbɪldɪŋ]",lv:"A1",zh:"大樓、建築物",d:"有牆有屋頂的房子，常指公寓大樓或辦公大樓。",ex:"My office is in a tall building.",exz:"我的辦公室在一棟高樓裡。"},
+"next door":{w:"next door",pos:"adv.",kk:"[ˋnɛkst ˋdor]",lv:"A1",zh:"在隔壁",d:"就在旁邊那一戶。the girl next door 就是「隔壁女孩」。",ex:"My best friend lives next door.",exz:"我最好的朋友住我隔壁。"},
+"evening":{w:"evening",pos:"n.",kk:"[ˋivnɪŋ]",lv:"A1",zh:"傍晚、晚上",d:"大約下午五、六點到睡前。Good evening 是見面打招呼；Good night 是道別或睡前說的。",ex:"Good evening, everyone!",exz:"大家晚安！（見面時）"},
+"window":{w:"window",pos:"n.",kk:"[ˋwɪndo]",lv:"A1",zh:"窗戶",d:"牆上可以看到外面的玻璃。",ex:"Please open the window.",exz:"請打開窗戶。"},
+"round":{w:"round",pos:"adj.",kk:"[raʊnd]",lv:"A1",zh:"圓的",d:"像球或圓圈的形狀。",ex:"The moon is round tonight.",exz:"今晚的月亮是圓的。"},
+"open":{w:"open",pos:"v.",kk:"[ˋopən]",lv:"A1",zh:"打開",d:"讓東西不再關著。相反詞是 close（關）。",ex:"Open your book to page 10.",exz:"把書翻到第十頁。"},
+"queen":{w:"queen",pos:"n.",kk:"[kwin]",lv:"A2",zh:"女王、皇后",d:"國家的女性統治者。貓常被說像女王，因為很有架子！",ex:"She acts like a queen.",exz:"她表現得像個女王。"},
+"sofa":{w:"sofa",pos:"n.",kk:"[ˋsofə]",lv:"A1",zh:"沙發",d:"客廳裡軟軟的長椅子。",ex:"Dad is sleeping on the sofa.",exz:"爸爸在沙發上睡覺。"},
+"snack":{w:"snack",pos:"n.",kk:"[snæk]",lv:"A2",zh:"點心、零食",d:"正餐之間吃的小東西。",ex:"I eat a snack at 3 p.m.",exz:"我下午三點吃點心。"},
+"second":{w:"second",pos:"adj.",kk:"[ˋsɛkənd]",lv:"A1",zh:"第二的",d:"排在第一後面。當名詞時是「秒」：Wait a second! 等一下！",ex:"This is my second cup of coffee.",exz:"這是我的第二杯咖啡。"},
+/* L3 */
+"umbrella":{w:"umbrella",pos:"n.",kk:"[ʌmˋbrɛlə]",lv:"A1",zh:"雨傘",d:"下雨時撐的傘。重音在第二音節：um-BREL-la。",ex:"Take an umbrella. It’s raining.",exz:"帶把傘吧，在下雨。"},
+"rainy":{w:"rainy",pos:"adj.",kk:"[ˋrenɪ]",lv:"A1",zh:"下雨的",d:"rain（雨）+ y ＝ 有雨的。同樣的變化：sunny 晴朗的、windy 風大的。",ex:"I stay home on rainy days.",exz:"下雨天我待在家。"},
+"walk":{w:"walk",pos:"v.",kk:"[wɔk]",lv:"A1",zh:"走路；陪……走",d:"用腳走。walk someone to school 是「陪某人走去學校」。l 不發音喔！",ex:"I walk my dog every evening.",exz:"我每天傍晚遛狗。"},
+"gray":{w:"gray",pos:"adj.",kk:"[gre]",lv:"A1",zh:"灰色的",d:"黑和白中間的顏色。英式拼法是 grey。",ex:"The sky is gray today.",exz:"今天天空灰灰的。"},
+"warm":{w:"warm",pos:"adj.",kk:"[wɔrm]",lv:"A1",zh:"溫暖的",d:"不冷也不太熱，很舒服的溫度；也能形容感覺很溫馨。",ex:"This soup is warm and good.",exz:"這碗湯熱熱的，很好喝。"},
+"rice":{w:"rice",pos:"n.",kk:"[raɪs]",lv:"A1",zh:"米、稻子、飯",d:"英文不分米、稻、飯，都叫 rice。不可數，不加 s。",ex:"We eat rice every day.",exz:"我們每天吃飯。"},
+"always":{w:"always",pos:"adv.",kk:"[ˋɔlwez]",lv:"A1",zh:"總是",d:"每一次都這樣。放在一般動詞前面：She always said…",ex:"He is always late.",exz:"他總是遲到。"},
+"closet":{w:"closet",pos:"n.",kk:"[ˋklɑzɪt]",lv:"A2",zh:"衣櫃、儲物櫃",d:"放衣服或雜物的櫃子（美式說法）。",ex:"My shoes are in the closet.",exz:"我的鞋子在衣櫃裡。"},
+"hole":{w:"hole",pos:"n.",kk:"[hol]",lv:"A2",zh:"洞",d:"東西破掉、空掉的地方。和 whole（全部的）發音一樣！",ex:"My sock has a hole.",exz:"我的襪子破了一個洞。"},
+"feel":{w:"feel",pos:"v.",kk:"[fil]",lv:"A1",zh:"感覺",d:"feel + 形容詞 ＝ 覺得……：I feel happy / tired / warm。",ex:"I feel tired today.",exz:"我今天覺得好累。"},
+/* L4 */
+"mission":{w:"mission",pos:"n.",kk:"[ˋmɪʃən]",lv:"B1",zh:"任務",d:"一定要完成的重要工作。課文裡是開玩笑的說法。",ex:"Our mission: find the best noodles in town.",exz:"我們的任務：找出城裡最好吃的麵。"},
+"smell":{w:"smell",pos:"v.",kk:"[smɛl]",lv:"A1",zh:"聞起來",d:"用鼻子感覺到的味道。smell good 好香、smell bad 很臭。",ex:"The bread smells good.",exz:"麵包聞起來好香。"},
+"taste":{w:"taste",pos:"v.",kk:"[test]",lv:"A1",zh:"吃起來、嚐起來",d:"用舌頭感覺到的味道。",ex:"This soup tastes a little salty.",exz:"這湯喝起來有點鹹。"},
+"fried":{w:"fried",pos:"adj.",kk:"[fraɪd]",lv:"A2",zh:"油炸的；炒的",d:"放進熱油裡炸的。fried chicken 炸雞；fried rice 則是炒飯。",ex:"I love fried chicken.",exz:"我超愛炸雞。"},
+"grilled":{w:"grilled",pos:"adj.",kk:"[grɪld]",lv:"A2",zh:"烤的",d:"放在架子上用火烤的。grilled corn 烤玉米。",ex:"Grilled fish is healthy.",exz:"烤魚很健康。"},
+"both":{w:"both",pos:"pron.",kk:"[boθ]",lv:"A1",zh:"兩者都",d:"兩個都要、兩個都是。",ex:"I like both cats and dogs.",exz:"貓和狗我都喜歡。"},
+"count":{w:"count",pos:"v.",kk:"[kaʊnt]",lv:"A1",zh:"數、計算",d:"一個一個算數量。",ex:"Can you count to ten in English?",exz:"你會用英文從一數到十嗎？"},
+"spoon":{w:"spoon",pos:"n.",kk:"[spun]",lv:"A1",zh:"湯匙",d:"喝湯、吃冰用的餐具。",ex:"Can I have a spoon, please?",exz:"可以給我一支湯匙嗎？"},
+"complete":{w:"complete",pos:"adj.",kk:"[kəmˋplit]",lv:"A2",zh:"完成的",d:"全部做完了。Mission complete! 任務完成，遊戲裡很常見。",ex:"The work is complete.",exz:"工作完成了。"},
+"dollar":{w:"dollar",pos:"n.",kk:"[ˋdɑlɚ]",lv:"A1",zh:"元（錢的單位）",d:"台幣也可以說 dollars：100 NT dollars（新台幣一百元）。",ex:"It’s 50 dollars.",exz:"這個五十元。"},
+/* L5 */
+"spend":{w:"spend",pos:"v.",kk:"[spɛnd]",lv:"A2",zh:"花（時間、錢）",d:"把時間或錢用在某件事上。過去式是 spent。",ex:"I spend two hours on my phone every day.",exz:"我每天花兩小時滑手機。"},
+"asleep":{w:"asleep",pos:"adj.",kk:"[əˋslip]",lv:"A2",zh:"睡著的",d:"正在睡覺的狀態。fall asleep 是「睡著」這個動作。",ex:"The baby is asleep.",exz:"寶寶睡著了。"},
+"brain":{w:"brain",pos:"n.",kk:"[bren]",lv:"A2",zh:"大腦",d:"頭裡面負責思考、記憶的器官。",ex:"Your brain needs sleep.",exz:"你的大腦需要睡眠。"},
+"keep":{w:"keep",pos:"v.",kk:"[kip]",lv:"A1",zh:"保留；保持",d:"把東西留著不丟；或讓東西維持某個狀態：keep your room dark。",ex:"Keep the change.",exz:"零錢不用找了。"},
+"adult":{w:"adult",pos:"n.",kk:"[əˋdʌlt]",lv:"A2",zh:"成年人",d:"長大的人，通常是 18 歲以上。相反是 child（小孩）。",ex:"Tickets for adults are 200 dollars.",exz:"成人票兩百元。"},
+"hour":{w:"hour",pos:"n.",kk:"[aʊr]",lv:"A1",zh:"小時",d:"六十分鐘。h 不發音，所以要說 an hour，不是 a hour。",ex:"I sleep eight hours a night.",exz:"我一晚睡八小時。"},
+"tip":{w:"tip",pos:"n.",kk:"[tɪp]",lv:"A2",zh:"小祕訣；小費",d:"有用的小建議。也可以是給服務生的小費。",ex:"Here’s a tip: drink water in the morning.",exz:"給你一個小祕訣：早上喝杯水。"},
+"dark":{w:"dark",pos:"adj.",kk:"[dɑrk]",lv:"A1",zh:"暗的",d:"沒什麼光線。相反是 bright（亮的）。",ex:"It gets dark at 6 p.m. in winter.",exz:"冬天晚上六點天就黑了。"},
+"cool":{w:"cool",pos:"adj.",kk:"[kul]",lv:"A1",zh:"涼爽的；很酷",d:"有一點冷但很舒服；口語也可以是「很酷」。",ex:"The room is cool and quiet.",exz:"房間涼爽又安靜。"},
+"gift":{w:"gift",pos:"n.",kk:"[gɪft]",lv:"A2",zh:"禮物",d:"送給別人的東西，和 present 意思一樣。",ex:"This is a gift for you.",exz:"這是給你的禮物。"},
+/* L6 */
+"autumn":{w:"autumn",pos:"n.",kk:"[ˋɔtəm]",lv:"A1",zh:"秋天",d:"夏天和冬天中間的季節。美國人也常說 fall。字尾的 n 不發音。",ex:"I love autumn in Taipei.",exz:"我愛台北的秋天。"},
+"wind":{w:"wind",pos:"n.",kk:"[wɪnd]",lv:"A1",zh:"風",d:"流動的空氣。形容詞 windy 是「風很大的」。",ex:"The wind is strong today.",exz:"今天風很大。"},
+"gate":{w:"gate",pos:"n.",kk:"[get]",lv:"A2",zh:"大門、閘門",d:"圍牆或學校的出入口。機場的登機門也叫 gate。",ex:"Meet me at the school gate.",exz:"在校門口等我。"},
+"remember":{w:"remember",pos:"v.",kk:"[rɪˋmɛmbɚ]",lv:"A1",zh:"記得、想起",d:"腦中還留著過去的事。相反是 forget（忘記）。",ex:"I remember your birthday.",exz:"我記得你的生日。"},
+"share":{w:"share",pos:"v.",kk:"[ʃɛr]",lv:"A2",zh:"分享、共用",d:"把東西分給別人一起用、一起吃。",ex:"Let’s share a pizza.",exz:"我們合吃一個披薩吧。"},
+"laugh":{w:"laugh",pos:"v.",kk:"[læf]",lv:"A1",zh:"笑",d:"發出笑聲。laugh at 是「因為……而笑」。gh 在這裡念 [f]！",ex:"We laughed all night.",exz:"我們笑了一整晚。"},
+"dream":{w:"dream",pos:"n.",kk:"[drim]",lv:"A1",zh:"夢想；夢",d:"晚上做的夢，或心裡很想實現的目標。",ex:"My dream is to visit Japan.",exz:"我的夢想是去日本玩。"},
+"far":{w:"far",pos:"adj.",kk:"[fɑr]",lv:"A1",zh:"遠的",d:"距離很長。far apart 是「相隔很遠」。相反是 near / close。",ex:"Is the station far from here?",exz:"車站離這裡遠嗎？"},
+"miss":{w:"miss",pos:"v.",kk:"[mɪs]",lv:"A1",zh:"想念；錯過",d:"想念某人；也可以是錯過：miss the bus 沒趕上公車。",ex:"I miss my family.",exz:"我想念我的家人。"},
+"hope":{w:"hope",pos:"v.",kk:"[hop]",lv:"A1",zh:"希望",d:"心裡想要某件好事發生。",ex:"I hope it’s sunny tomorrow.",exz:"希望明天是晴天。"},
+/* L7 */
+"garden":{w:"garden",pos:"n.",kk:"[ˋgɑrdn̩]",lv:"A1",zh:"花園",d:"種花、種菜的地方。",ex:"My grandma has a small garden.",exz:"我阿嬤有一座小花園。"},
+"hive":{w:"hive",pos:"n.",kk:"[haɪv]",lv:"B2",zh:"蜂巢",d:"蜜蜂住的家。這個字超出初級程度，認得就好。",ex:"There are thousands of bees in a hive.",exz:"一個蜂巢裡有好幾千隻蜜蜂。"},
+"message":{w:"message",pos:"n.",kk:"[ˋmɛsɪdʒ]",lv:"A1",zh:"訊息",d:"傳給別人的話。也可以當動詞：message me 傳訊息給我。",ex:"I got your message.",exz:"我收到你的訊息了。"},
+"straight":{w:"straight",pos:"adj.",kk:"[stret]",lv:"A2",zh:"直的",d:"沒有彎曲。go straight 是「直走」，問路很常用。",ex:"Go straight and turn left.",exz:"直走然後左轉。"},
+"shake":{w:"shake",pos:"v.",kk:"[ʃek]",lv:"A2",zh:"搖動",d:"快速地左右或上下動。shake hands 是「握手」。",ex:"Shake the bottle before you drink.",exz:"喝之前先搖一搖瓶子。"},
+"direction":{w:"direction",pos:"n.",kk:"[dəˋrɛkʃən]",lv:"B1",zh:"方向",d:"往哪一邊。比較難的字，先認得就好。",ex:"Which direction is the station?",exz:"車站在哪個方向？"},
+"point":{w:"point",pos:"v.",kk:"[pɔɪnt]",lv:"A2",zh:"指向",d:"用手指或東西朝某個方向指。point the way 是「指出路」。",ex:"She points to the door.",exz:"她指著門。"},
+"watch":{w:"watch",pos:"v.",kk:"[wɑtʃ]",lv:"A1",zh:"看、觀看",d:"專心看著會動的東西，例如 watch TV 看電視。",ex:"We watch a movie on Fridays.",exz:"我們每週五看電影。"},
+"map":{w:"map",pos:"n.",kk:"[mæp]",lv:"A1",zh:"地圖",d:"畫出地方和路線的圖。",ex:"Can you show me on the map?",exz:"你可以在地圖上指給我看嗎？"},
+"smart":{w:"smart",pos:"adj.",kk:"[smɑrt]",lv:"A2",zh:"聰明的",d:"頭腦很好。smartphone 就是「聰明的手機」。",ex:"Dolphins are smart animals.",exz:"海豚是聰明的動物。"},
+/* L8 */
+"together":{w:"together",pos:"adv.",kk:"[təˋgɛðɚ]",lv:"A1",zh:"一起",d:"和別人一同做。",ex:"Let’s eat together.",exz:"我們一起吃吧。"},
+"rule":{w:"rule",pos:"n.",kk:"[rul]",lv:"A2",zh:"規則",d:"大家必須遵守的規定。make a rule 是「定規則」。",ex:"No phones in class. That’s the rule.",exz:"上課不能用手機，這是規定。"},
+"agree":{w:"agree",pos:"v.",kk:"[əˋgri]",lv:"A2",zh:"同意",d:"和別人想法一樣。相反是 disagree。注意不能說 I am agree！",ex:"I agree with you.",exz:"我同意你。"},
+"each other":{w:"each other",pos:"pron.",kk:"[itʃ ˋʌðɚ]",lv:"A2",zh:"彼此、互相",d:"兩人或多人之間互相做某件事。",ex:"We help each other.",exz:"我們互相幫忙。"},
+"check":{w:"check",pos:"v.",kk:"[tʃɛk]",lv:"A1",zh:"查看、檢查",d:"看一下確認。check my phone 就是「看手機」。",ex:"Can you check the time?",exz:"你可以看一下時間嗎？"},
+"score":{w:"score",pos:"n.",kk:"[skor]",lv:"A2",zh:"比分、分數",d:"比賽或考試得到的分數。",ex:"What’s the score? Three to two!",exz:"比數多少？三比二！"},
+"important":{w:"important",pos:"adj.",kk:"[ɪmˋpɔrtn̩t]",lv:"A1",zh:"重要的",d:"很需要注意、不能忽略的。",ex:"Sleep is important.",exz:"睡眠很重要。"},
+"deal":{w:"deal",pos:"n.",kk:"[dil]",lv:"B1",zh:"協議、約定",d:"雙方都同意的安排。It’s a deal! 一言為定！",ex:"OK, let’s make a deal.",exz:"好，我們來談個條件吧。"},
+"basket":{w:"basket",pos:"n.",kk:"[ˋbæskɪt]",lv:"A2",zh:"籃子",d:"用來裝東西的容器。basketball 就是「籃」＋「球」。",ex:"Put the apples in the basket.",exz:"把蘋果放進籃子裡。"},
+"ring":{w:"ring",pos:"v.",kk:"[rɪŋ]",lv:"A2",zh:"（鈴聲、電話）響",d:"發出鈴聲。當名詞是「戒指」。",ex:"My phone is ringing!",exz:"我的手機在響！"},
+/* L9 */
+"tiny":{w:"tiny",pos:"adj.",kk:"[ˋtaɪnɪ]",lv:"A2",zh:"很小的",d:"比 small 更小，小小的。",ex:"The kitten is tiny.",exz:"小貓好小一隻。"},
+"plant":{w:"plant",pos:"n.",kk:"[plænt]",lv:"A1",zh:"植物",d:"花、草、樹都是 plant。當動詞是「種植」。",ex:"I have three plants in my room.",exz:"我房間有三盆植物。"},
+"leaf":{w:"leaf",pos:"n.",kk:"[lif]",lv:"A2",zh:"葉子",d:"植物上綠色、扁扁的部分。複數是 leaves。",ex:"The leaves turn red in autumn.",exz:"秋天葉子會變紅。"},
+"water":{w:"water",pos:"v.",kk:"[ˋwɔtɚ]",lv:"A1",zh:"澆水",d:"water 當名詞是「水」，當動詞是「給植物澆水」。",ex:"Don’t forget to water the flowers.",exz:"別忘了幫花澆水。"},
+"strange":{w:"strange",pos:"adj.",kk:"[strendʒ]",lv:"A2",zh:"奇怪的",d:"和平常不一樣，讓人覺得怪怪的。",ex:"That’s a strange noise.",exz:"那聲音好奇怪。"},
+"happen":{w:"happen",pos:"v.",kk:"[ˋhæpən]",lv:"A2",zh:"發生",d:"事情出現、發生。What happened? 發生什麼事了？",ex:"What happened to your phone?",exz:"你的手機怎麼了？"},
+"worried":{w:"worried",pos:"adj.",kk:"[ˋwɝɪd]",lv:"A2",zh:"擔心的",d:"心裡不安，怕有壞事發生。I’m worried about… 我很擔心……",ex:"Don’t be worried. It’s OK.",exz:"別擔心，沒事的。"},
+"grow":{w:"grow",pos:"v.",kk:"[gro]",lv:"A1",zh:"生長、成長",d:"變大、變高。人、植物、能力都可以 grow。",ex:"Children grow fast.",exz:"小孩長得很快。"},
+"cook":{w:"cook",pos:"v.",kk:"[kʊk]",lv:"A1",zh:"煮、做菜",d:"用火把食物煮熟。有趣的是：cook 當名詞是廚師，cooker 反而是鍋具！",ex:"My dad cooks dinner on Sundays.",exz:"我爸每週日煮晚餐。"},
+"slowly":{w:"slowly",pos:"adv.",kk:"[ˋslolɪ]",lv:"A1",zh:"慢慢地",d:"slow（慢的）+ ly ＝ 慢慢地，用來形容動作。",ex:"Please speak slowly.",exz:"請說慢一點。"},
+/* L10 */
+"ride":{w:"ride",pos:"v.",kk:"[raɪd]",lv:"A1",zh:"騎、搭乘",d:"騎腳踏車、機車，或搭車。當名詞時，give someone a ride 是「載某人一程」。",ex:"I ride my bike to school.",exz:"我騎腳踏車上學。"},
+"scooter":{w:"scooter",pos:"n.",kk:"[ˋskutɚ]",lv:"A2",zh:"機車（速克達）",d:"台灣街上最常見的交通工具。motorcycle 通常指比較大台的重機。",ex:"My mom rides a scooter to work.",exz:"我媽騎機車上班。"},
+"cheap":{w:"cheap",pos:"adj.",kk:"[tʃip]",lv:"A1",zh:"便宜的",d:"價錢低。相反是 expensive（貴的）。",ex:"This T-shirt is really cheap.",exz:"這件T恤好便宜。"},
+"park":{w:"park",pos:"v.",kk:"[pɑrk]",lv:"A1",zh:"停車",d:"把車停好。當名詞是「公園」。",ex:"You can’t park here.",exz:"你不能停在這裡。"},
+"quiet":{w:"quiet",pos:"adj.",kk:"[ˋkwaɪət]",lv:"A1",zh:"安靜的",d:"沒有什麼聲音。注意和 quite（相當）拼法不同！",ex:"The library is quiet.",exz:"圖書館很安靜。"},
+"healthy":{w:"healthy",pos:"adj.",kk:"[ˋhɛlθɪ]",lv:"A1",zh:"健康的",d:"對身體好的；或身體很好的。比較級是 healthier。",ex:"Fruit is healthy food.",exz:"水果是健康的食物。"},
+"take":{w:"take",pos:"v.",kk:"[tek]",lv:"A1",zh:"花費（時間）",d:"take 的意思很多，這裡是「需要多少時間」。",ex:"The trip takes two hours.",exz:"這趟路要兩個小時。"},
+"weather":{w:"weather",pos:"n.",kk:"[ˋwɛðɚ]",lv:"A1",zh:"天氣",d:"晴天、雨天、冷、熱，都是 weather。",ex:"How’s the weather today?",exz:"今天天氣怎麼樣？"},
+"distance":{w:"distance",pos:"n.",kk:"[ˋdɪstəns]",lv:"B1",zh:"距離",d:"兩個地方之間有多遠。比較難的字，先認得就好。",ex:"The distance is about three kilometers.",exz:"距離大約三公里。"},
+"depend on":{w:"depend on",pos:"v.",kk:"[dɪˋpɛnd ɑn]",lv:"B1",zh:"取決於、要看",d:"結果要看某件事而定。單獨一句 It depends. 就是「看情況」，超好用！",ex:"It depends on the weather.",exz:"要看天氣。"}
+};
+
+/* ---------------- GRAMMAR ---------------- */
+const GRAM = {
+"g:l1a":{t:"It is + time",zt:"用 It is 說時間",d:"說時間時，英文用 <b>It is</b> 開頭。這個 it 沒有「它」的意思，只是幫句子補一個主詞。7:15 念作 <i>seven fifteen</i>。",ex:[["It is 7:15.","現在七點十五分。"],["It is Monday today.","今天星期一。"]]},
+"g:l1b":{t:"be verbs: am / is / are",zt:"be 動詞：am / is / are",d:"<b>I</b> 配 am；<b>he / she / it</b> 配 is；<b>you / we / they</b> 配 are。be 動詞後面常接形容詞，描述狀態。中文說「我遲到」，英文不能只說 <i>I late</i>，一定要加 am。",ex:[["I am late.","我遲到了。"],["The tea is sweet.","茶很甜。"],["You are early!","你好早！"]]},
+"g:l1c":{t:"Simple present for routines",zt:"現在簡單式：每天的習慣",d:"每天都會做的事，用<b>動詞原形</b>就好：I run, I eat, I brush。雖然故事講的是今天，但這些是「每天都這樣」的日常。",ex:[["I eat breakfast on the bus.","我在公車上吃早餐。"],["We walk to school every day.","我們每天走路上學。"]]},
+"g:l2a":{t:"There is / There are",zt:"There is / There are「有」",d:"說「某個地方<b>有</b>某樣東西」時：一個用 <b>There is</b>，很多個用 <b>There are</b>。不要說 <i>There have</i>。",ex:[["There is a cat in my building.","我的大樓裡有一隻貓。"],["There are two cafés on my street.","我家那條街上有兩家咖啡店。"]]},
+"g:l2b":{t:"can / can’t",zt:"can / can’t「會、能夠」",d:"<b>can + 動詞原形</b>，表示「會、能夠」。否定是 can’t（= cannot）。can 後面的動詞不加 s：She can swim（不是 <i>can swims</i>）。",ex:[["Mochi can’t talk.","麻糬不會說話。"],["I can make coffee.","我會煮咖啡。"]]},
+"g:l2c":{t:"Two meanings of like",zt:"like 的兩種意思",d:"like 當動詞是「<b>喜歡</b>」：I like cats。放在名詞前面，意思是「<b>像……一樣</b>」：like a queen 像女王一樣。",ex:[["She walks like a queen.","她走路像女王一樣。"],["I like milk tea.","我喜歡奶茶。"]]},
+"g:l3a":{t:"Present continuous: be + V-ing",zt:"現在進行式「正在……」",d:"描述<b>現在這一刻</b>正在發生的事：<b>am / is / are + 動詞ing</b>。",ex:[["It is raining now.","現在正在下雨。"],["I am reading a book.","我正在看書。"]]},
+"g:l3b":{t:"was / were",zt:"be 動詞過去式：was / were",d:"說過去的狀態：<b>I / he / she / it</b> 用 was，<b>you / we / they</b> 用 were。",ex:[["When I was a child, I was shy.","我小時候很害羞。"],["We were in Tainan last week.","我們上週在台南。"]]},
+"g:l3c":{t:"Simple past and didn’t",zt:"過去簡單式與 didn’t",d:"過去發生的事，動詞改成過去式：walk→walked，like→liked。有些是不規則的：have→<b>had</b>，say→<b>said</b>。否定用 <b>didn’t + 原形</b>：I didn’t like rain（不是 <i>didn’t liked</i>）。",ex:[["She walked me to school.","她陪我走路上學。"],["I didn’t eat breakfast today.","我今天沒吃早餐。"]]},
+"g:l4a":{t:"Sense verbs + adjective",zt:"感官動詞 + 形容詞",d:"<b>look</b>（看起來）、<b>smell</b>（聞起來）、<b>taste</b>（吃起來）、<b>sound</b>（聽起來）後面直接加<b>形容詞</b>。要說 It tastes good，不是 <i>tastes well</i>。",ex:[["It smells bad, but it tastes great.","聞起來很臭，但吃起來很讚。"],["It looks so good.","看起來好好吃。"],["That sounds fun!","聽起來很好玩！"]]},
+"g:l4b":{t:"How much…? / How many…?",zt:"How much / How many「多少」",d:"問<b>價錢</b>或<b>不可數</b>的量用 How much：How much is it? 問<b>可數</b>的數量用 How many：How many spoons?",ex:[["How much is the grilled corn?","烤玉米多少錢？"],["How many people are there?","那裡有多少人？"]]},
+"g:l4c":{t:"Comparatives: -er than",zt:"比較級「比……更」",d:"短的形容詞加 <b>-er</b>，再加 <b>than</b>。big → bigger（要重複 g），cheap → cheaper。",ex:[["The chicken is bigger than Leo’s face.","雞排比 Leo 的臉還大。"],["Tea is cheaper than coffee here.","這裡的茶比咖啡便宜。"]]},
+"g:l5a":{t:"When + sentence",zt:"When「當……的時候」",d:"<b>when</b> 帶出「什麼時候」。放在句首時，後面用逗號隔開；放在句中就不用逗號。",ex:[["When I’m tired, I drink coffee.","我累的時候會喝咖啡。"],["I call my mom when I get home.","我到家時會打給媽媽。"]]},
+"g:l5b":{t:"Imperatives",zt:"祈使句：直接請人做事",d:"用<b>動詞原形開頭</b>，不用主詞：Put… / Keep… / Go…。想客氣一點就加 please。叫人不要做，用 <b>Don’t</b>。",ex:[["Go to bed early.","早點睡。"],["Please close the door.","請關門。"],["Don’t be late!","不要遲到！"]]},
+"g:l5c":{t:"need",zt:"need「需要」",d:"<b>need + 名詞</b>：I need sleep。<b>need + to + 動詞</b>：I need to sleep。主詞是 he / she 要加 s：She needs a break。",ex:[["Adults need seven hours of sleep.","成年人需要七小時的睡眠。"],["I need to study tonight.","我今晚需要讀書。"]]},
+"g:l6a":{t:"Past -ed: three sounds",zt:"過去式 -ed 的三種念法",d:"規則動詞的過去式加 -ed，但念法有三種：<br>① 在 p、k、s、sh、ch、f 音後面念 <b>[t]</b>：walked、laughed、stopped<br>② 在母音和其他有聲的音後面念 <b>[d]</b>：shared、remembered<br>③ 在 t、d 後面念 <b>[ɪd]</b>：wanted、needed",ex:[["I walked past the school.","我走過學校。"],["We shared noodles.","我們分著吃麵。"],["She wanted tea.","她想要喝茶。"]]},
+"g:l6b":{t:"I hope + sentence",zt:"I hope + 句子「我希望……」",d:"hope 後面可以直接接一個<b>完整的句子</b>，中間的 that 常常省略。",ex:[["I hope we can meet again soon.","希望我們很快能再見面。"],["I hope you like it.","希望你會喜歡。"]]},
+"g:l6c":{t:"still",zt:"still「還是、仍然」",d:"表示情況到現在都沒改變。放在<b>一般動詞前面</b>、<b>be 動詞後面</b>：Do you still sing? / She is still here.",ex:[["I still love this song.","我還是好愛這首歌。"],["Are you still hungry?","你還餓嗎？"]]},
+"g:l7a":{t:"he / she / it + verb-s",zt:"第三人稱單數，動詞加 s",d:"主詞是 <b>he / she / it</b> 或「一隻、一個」時，現在式動詞要加 s：she finds、it tells。字尾是「子音 + y」改成 <b>-ies</b>：fly → flies；字尾是 s、sh、ch、x 加 <b>-es</b>：watch → watches。",ex:[["A bee finds a garden.","一隻蜜蜂發現了一座花園。"],["She flies home.","她飛回家。"],["My dad watches TV.","我爸在看電視。"]]},
+"g:l7b":{t:"If + present",zt:"If「如果……」",d:"<b>If</b> 後面用現在式，說出一個條件，再接結果。",ex:[["If she shakes for a long time, the flowers are far away.","如果她搖很久，花就在很遠的地方。"],["If you’re tired, go to bed.","如果你累了，就去睡吧。"]]},
+"g:l7c":{t:"Embedded questions",zt:"藏在句子裡的問句",d:"直接問是 Where <b>are the flowers</b>?（動詞在前）。但問句放進句子裡，要變回正常順序：tell me where <b>the flowers are</b>（主詞在前）。台灣學生很常在這裡說錯喔！",ex:[["Do you know where the station is?","你知道車站在哪裡嗎？"],["I don’t know what time it is.","我不知道現在幾點。"]]},
+"g:l8a":{t:"I think… / I don’t think…",zt:"I think / I don’t think 表達意見",d:"<b>I think + 句子</b> ＝ 我覺得……。要說「我覺得<b>不</b>……」，英文習慣否定 think：I don’t think it’s a good idea，比 <i>I think it’s not…</i> 自然。",ex:[["I think the rule is good.","我覺得這條規則很好。"],["I don’t think phones are bad.","我不覺得手機不好。"]]},
+"g:l8b":{t:"but and so",zt:"but 和 so：連接想法",d:"<b>but</b>（但是）連接相反的想法；<b>so</b>（所以）說出結果。",ex:[["I like the rule, but Leo doesn’t.","我喜歡這條規則，但 Leo 不喜歡。"],["It was late, so I went to bed.","時間很晚了，所以我去睡了。"]]},
+"g:l8c":{t:"agree with",zt:"agree with「同意」",d:"<b>agree with + 人 / 意見</b>。agree 本身就是動詞，不要說 <i>I am agree</i>。",ex:[["Mom agreed with Dad.","媽媽同意爸爸。"],["I agree with you.","我同意你。"],["I don’t agree.","我不同意。"]]},
+"g:l9a":{t:"be going to",zt:"be going to「打算要……」",d:"說已經計畫好的未來：<b>am / is / are + going to + 動詞原形</b>。",ex:[["I am going to cook with it.","我要用它來做菜。"],["We are going to visit Grandma this weekend.","我們這週末要去看阿嬤。"],["Is it going to rain?","會下雨嗎？"]]},
+"g:l9b":{t:"Irregular plurals",zt:"不規則複數：leaf → leaves",d:"大部分名詞加 s 就變複數，但 f / fe 結尾的常變成 <b>-ves</b>：leaf → leaves、knife → knives、life → lives。還有完全不規則的：child → children、tooth → <b>teeth</b>（第一課的 brush my teeth！）",ex:[["One leaf, two leaves.","一片葉子，兩片葉子。"],["I brush my teeth.","我刷牙。"]]},
+"g:l9c":{t:"Time words and tense",zt:"時間詞決定動詞時態",d:"英文的動詞會跟著時間改變：<b>Every morning</b> → 現在式 I water；<b>Last month</b> → 過去式 I bought；<b>Next week</b> → I’m going to。看到時間詞，就知道動詞怎麼變。",ex:[["Every day I walk to work.","我每天走路上班。"],["Yesterday I took the bus.","我昨天搭公車。"],["Tomorrow I’m going to ride my bike.","我明天要騎腳踏車。"]]},
+"g:l10a":{t:"Comparatives: -er, more, better",zt:"比較級：-er / more / better",d:"短的形容詞加 <b>-er</b>：fast → faster。「子音 + y」結尾改成 <b>-ier</b>：healthy → healthier。長的形容詞前面加 <b>more</b>：more important。不規則：good → <b>better</b>，bad → <b>worse</b>。",ex:[["My way is faster.","我的方式比較快。"],["Walking is healthier.","走路比較健康。"],["Is coffee better than tea?","咖啡比茶好嗎？"]]},
+"g:l10b":{t:"It takes + time",zt:"It takes + 時間「要花多久」",d:"說做某件事需要多久：<b>It takes (me) + 時間 (+ to 動詞)</b>。",ex:[["It takes fifteen minutes.","要十五分鐘。"],["It takes me an hour to get home.","我回家要花一個小時。"]]},
+"g:l10c":{t:"Which is better, A or B?",zt:"Which「哪一個比較好？」",d:"在兩個選項中選一個，用 <b>which</b>。回答時可以說：I think A is better because…",ex:[["Which is better, tea or coffee?","茶和咖啡，哪個比較好？"],["Which do you like, cats or dogs?","貓和狗，你喜歡哪一個？"]]}
+};
+
+/* ---------------- CULTURE NOTES ---------------- */
+const CULT = {
+"c:handsome":{h:"“handsome” / “pretty”",zh:"帥哥、美女",d:"台灣店家常叫客人「帥哥」、「美女」，聽起來很親切。英語國家比較少這樣叫陌生人，店員通常說 “Hi there!” 或 “What can I get you?”"},
+"c:danbing":{h:"egg pancake",zh:"蛋餅",d:"台灣早餐店的經典。英文沒有固定名稱，常說 egg pancake 或 egg crepe。"},
+"c:mochi":{h:"mochi",zh:"麻糬",d:"英文直接借用日文 mochi。軟軟 QQ、圓圓白白的，很適合當貓的名字。"},
+"c:nightmarket":{h:"night market",zh:"夜市",d:"台灣各地晚上的小吃市集。英文直接叫 night market，是外國旅客最愛的行程之一。"},
+"c:tofu":{h:"stinky tofu",zh:"臭豆腐",d:"發酵過的豆腐，聞起來臭、吃起來香。stinky 就是「臭臭的」。"},
+"c:boba":{h:"bubble tea",zh:"珍珠奶茶",d:"也叫 boba tea 或 pearl milk tea。台灣發明，紅遍全世界！"},
+"c:ice":{h:"shaved ice",zh:"剉冰",d:"把冰刨成細細的，再加上紅豆、芋圓等配料。英文叫 shaved ice。"},
+"c:letter":{h:"Dear… / Love,",zh:"英文書信格式",d:"開頭寫 Dear + 名字 + 逗號。結尾給親近的人寫 Love,，一般場合寫 Best, 或 Regards,，再換行寫上自己的名字。"},
+"c:waggle":{h:"waggle dance",zh:"搖擺舞",d:"科學家弗里希（Karl von Frisch）發現蜜蜂用這種舞溝通，在 1973 年得到諾貝爾獎。直線的角度代表「花和太陽」的相對方向；搖擺的時間越長，花就越遠。"},
+"c:basil":{h:"basil",zh:"九層塔",d:"台灣常見的九層塔，其實是 Thai basil（泰國羅勒），和義大利麵用的 sweet basil 不太一樣。九層塔烘蛋可以說 basil omelet。"},
+"c:sidewalk":{h:"sidewalk",zh:"人行道",d:"美式英文叫 sidewalk，英式叫 pavement。台灣的騎樓可以說 arcade 或 covered walkway。"}
+};
+/* =========================================================
+   WINDOW SEAT — app
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem("ws-"+k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem("ws-"+k, JSON.stringify(v)); }catch(e){} }
+};
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const norm = s => String(s).toLowerCase().replace(/[’‘]/g,"'");
+const pad = n => String(n).padStart(2,"0");
+const RX = /\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]/g;
+const plain = s => String(s).replace(RX,"$1").replace(/<br>/g," ");
+function kind(k){ return k.startsWith("g:") ? "gr" : k.startsWith("c:") ? "cu" : "vo"; }
+function mk(s){
+  return esc(s).replace(/&lt;br&gt;/g,"<br>").replace(RX,(m,disp,key)=>{
+    key = key || disp.toLowerCase();
+    return `<span class="g ${kind(key)}" role="button" tabindex="0" data-k="${esc(key)}">${disp}</span>`;
+  });
+}
+const frame = s => esc(s).replace(/_{3}/g,'<span class="blank"></span>');
+const gid = k => "g-" + k.slice(2);
+
+/* lesson index for each note */
+L.forEach((l,i)=>{
+  l.words.forEach(k=>{ if(VOCAB[k] && VOCAB[k].l === undefined) VOCAB[k].l = i; });
+  l.gram.forEach(k=>{ if(GRAM[k]) GRAM[k].l = i; });
+  const all = l.read.map(p=>p[0]).concat(l.talk.lines.map(x=>x[1]), l.ask.map(a=>a[0])).join(" ");
+  for(const m of all.matchAll(RX)){ const k = m[2]; if(k && CULT[k] && CULT[k].l === undefined) CULT[k].l = i; }
+});
+
+/* ---------------- icons ---------------- */
+const SVGI = {
+  spk:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>',
+  play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>',
+  stop:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12v12H6z"/></svg>'
+};
+const PAL = {k:"#2A2F33",w:"#FFFFFF",y:"#F4C542",g:"#4E9A5B",G:"#7BC57F",o:"#B8793F",r:"#D9674E",b:"#8FCBE3",p:"#F2A1A8",s:"#C9C2B3"};
+const ICONS = {
+  clock:[".rr....rr.","rr.kkkk.rr","..kwwwwk..",".kwwwkwwk.",".kwwwkwwk.",".kwwwkkwk.",".kwwwwwwk.","..kwwwwk..","...kkkk...","..k....k.."],
+  cat:["k........k","kk......kk","kpk....kpk","kwwkkkkwwk","kwwwwwwwwk","kwkwwwwkwk","kwwwppwwwk","kwwwwwwwwk",".kwwwwwwk.","..kkkkkk.."],
+  umbrella:["....kk....","..kyyyyk..",".kyyyyyyk.","kyyyyyyyyk","kkkkkkkkkk","....k.....","....k.....","b...k...b.","..k.k.....","...k......"],
+  boba:["......k...",".....k....",".kkkkkkkk.",".kwwwwwwk.",".koooooook",".kooooook.","..kokokok.","..koookok.","..kkokokk.","...kkkkk.."],
+  moon:["..yyy.....",".yyy...kkk","yyy.....k.","yyy....k..","yyy...kkk.","yyy.......",".yyy......","..yyyy..y.","...yyyyyy.",".........."],
+  letter:["..........","kkkkkkkkkk","kwkwwwwkwk","kwwkwwkwwk","kwwwkkwwwk","kwwwwrwwwk","kwwwwwwwwk","kkkkkkkkkk","..........",".........."],
+  bee:["..bb..bb..","..bbb.bb..","...kkkk...","..kyykyyk.",".kyykyykk.",".kyykyykkk",".kyykyykk.","..kyykyyk.","...kkkk...",".........."],
+  phone:["..kkkkkk..","..kbbbbk..","..kbwwbk..","..kbbbbk..","..kbwwbk..","..kbbbbk..","..kbbbbk..","..kkwwkk..","..kkkkkk..",".........."],
+  sprout:["..........",".GG....GG.","GGGG..GGGG",".gggggggg.","....gg....","....gg....",".rrrrrrrr.","..rrrrrr..","..rrrrrr..","...rrrr..."],
+  shoe:["..........","..........",".kkkk.....",".kwwk.....",".kwwwkk...",".kwrwwwkk.",".kwwwwwwwk",".kkkkkkkkk",".sssssssss",".........."]
+};
+function pix(name){
+  let r = "";
+  ICONS[name].forEach((row,y)=>{
+    let x = 0;
+    while(x < row.length){
+      const c = row[x];
+      if(c === "."){ x++; continue; }
+      let w = 1; while(row[x+w] === c) w++;
+      r += `<rect x="${x}" y="${y}" width="${w}" height="1" fill="${PAL[c]}"/>`;
+      x += w;
+    }
+  });
+  return `<svg viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
+}
+
+/* ---------------- cover scene (96 × 64 pixels) ---------------- */
+function scene(){
+  const C = {WALL:"#E9D8BD",STRIPE:"#E2CFAF",FRAME:"#7A5638",FRAMED:"#5C3F28",SKY1:"#8FCBE3",SKY2:"#B3DDEC",SKY3:"#D6EEF3",SUN:"#F4C542",W:"#FFFFFF",B1:"#B7C4C9",B2:"#9EAEB5",BW:"#F7E7A1",SILL:"#B9885C",SILLD:"#8E6443",POT:"#C8613F",POTD:"#9E4A30",LEAF:"#4E9A5B",LEAFL:"#7BC57F",CAT:"#FAFAF7",CATS:"#D9D6CE",INK:"#2A2F33",PINK:"#F2A1A8",MUG:"#3E7C6D",TEA:"#C89A6A",PAGE:"#FFFDF6",LINE:"#C9C2B3",RED:"#D9674E",UMB:"#F2C14E",UMBD:"#C99A2E",SEAT:"#3E7C6D",SEATL:"#5FA08F",SEAM:"#2F6356",BLUE:"#93CDE3"};
+  const R = (x,y,w,h,c) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
+  let s = R(0,0,96,64,C.WALL);
+  for(let x=4; x<96; x+=8) s += R(x,0,1,46,C.STRIPE);
+  s += R(20,4,56,38,C.FRAME);
+  let sky = R(22,6,52,10,C.SKY1)+R(22,16,52,10,C.SKY2)+R(22,26,52,14,C.SKY3);
+  sky += R(62,8,4,1,C.SUN)+R(61,9,6,1,C.SUN)+R(60,10,8,4,C.SUN)+R(61,14,6,1,C.SUN)+R(62,15,4,1,C.SUN);
+  sky += `<g class="drift">${R(27,11,10,2,C.W)+R(29,9,5,2,C.W)+R(25,13,14,2,C.W)}</g>`;
+  sky += `<g class="drift b">${R(50,20,11,2,C.W)+R(52,18,5,2,C.W)+R(48,22,15,1,C.W)}</g>`;
+  [[22,31,7,9,"B1"],[29,27,7,13,"B2"],[36,33,8,7,"B1"],[44,25,7,15,"B2"],[51,30,9,10,"B1"],[60,28,7,12,"B2"],[67,32,7,8,"B1"]].forEach(b=> sky += R(b[0],b[1],b[2],b[3],C[b[4]]));
+  [[24,33],[26,35],[31,29],[33,31],[31,33],[38,35],[41,35],[45,27],[45,30],[49,33],[53,32],[56,34],[62,30],[64,33],[69,34],[71,36]].forEach(p=> sky += R(p[0],p[1],1,1,C.BW));
+  sky += `<g class="bee">${R(68,20,3,2,C.SUN)+R(69,20,1,2,C.INK)+R(71,21,1,1,C.INK)}<g class="wing">${R(68,18,1,2,C.W)+R(70,18,1,2,C.W)}</g></g>`;
+  s += `<clipPath id="glass"><rect x="22" y="6" width="52" height="34"/></clipPath><g clip-path="url(#glass)">${sky}</g>`;
+  s += R(47,6,2,34,C.FRAME) + R(20,40,56,2,C.FRAMED);
+  s += R(16,42,64,3,C.SILL) + R(16,45,64,1,C.SILLD);
+  /* basil */
+  s += R(27,31,1,6,C.LEAF)+R(24,33,3,2,C.LEAFL)+R(28,31,3,2,C.LEAFL)+R(25,35,2,2,C.LEAF)+R(28,34,3,2,C.LEAF)+R(26,29,2,3,C.LEAFL);
+  s += R(24,37,7,1,C.POTD)+R(25,38,5,4,C.POT);
+  /* Mochi, asleep */
+  s += R(32,36,13,6,C.INK)+R(39,33,8,6,C.INK)+R(39,31,4,3,C.INK)+R(43,31,4,3,C.INK)+R(30,38,4,4,C.INK)+R(29,36,3,3,C.INK);
+  s += R(33,37,11,5,C.CAT)+R(40,34,6,5,C.CAT)+R(40,32,2,2,C.CAT)+R(44,32,2,2,C.CAT)+R(31,39,2,3,C.CAT)+R(30,37,1,2,C.CAT)+R(31,37,1,1,C.CAT);
+  s += R(41,33,1,1,C.PINK)+R(44,33,1,1,C.PINK)+R(41,36,1,1,C.INK)+R(44,36,1,1,C.INK)+R(42,37,2,1,C.PINK)+R(33,41,11,1,C.CATS);
+  s += `<g class="zz">${R(47,28,3,1,C.INK)+R(48,29,1,1,C.INK)+R(47,30,3,1,C.INK)}</g>`;
+  /* milk tea */
+  s += `<g class="steam">${R(56,33,1,2,C.W)+R(58,31,1,2,C.W)+R(57,34,1,2,C.W)}</g>`;
+  s += R(55,37,5,5,C.MUG)+R(56,37,3,1,C.TEA)+R(60,38,1,1,C.MUG)+R(61,38,1,3,C.MUG)+R(60,40,1,1,C.MUG);
+  /* open book */
+  s += R(63,41,13,1,C.RED)+R(64,39,5,2,C.PAGE)+R(70,39,5,2,C.PAGE)+R(69,39,1,2,C.LINE)+R(65,40,3,1,C.LINE)+R(71,40,3,1,C.LINE);
+  /* seat */
+  s += R(12,45,11,6,C.PINK)+R(13,46,9,1,"#F7C6CA")+R(67,46,10,5,C.BLUE)+R(68,47,8,1,"#BFE2EF");
+  s += R(8,50,80,5,C.SEATL)+R(8,55,80,9,C.SEAT)+R(8,55,80,1,C.SEAM);
+  /* Grandma's umbrella */
+  s += R(82,27,1,2,C.INK)+R(81,29,3,2,C.UMB)+R(80,31,5,11,C.UMB)+R(81,42,3,3,C.UMB)+R(82,31,1,11,C.UMBD)+R(80,36,5,1,C.UMBD);
+  s += R(82,45,1,9,C.INK)+R(82,54,1,3,C.FRAMED)+R(83,56,2,1,C.FRAMED)+R(85,54,1,3,C.FRAMED);
+  return `<svg viewBox="0 0 96 64" shape-rendering="crispEdges" role="img" aria-label="窗邊座位：睡著的白貓、一盆九層塔、一杯奶茶、一本打開的書和一把黃雨傘">${s}</svg>`;
+}
+
+/* ---------------- 8-bit music ---------------- */
+const Music = (()=>{
+  const TR = [
+    {n:"Morning Walk", z:"晨間散步・輕快", bpm:112, hat:true, lw:"p25", lg:0.18, bg:0.281,
+     lead:"E5 _ G5 _ C6 _ G5 E5 | D5 _ G5 _ B5 _ A5 G5 | C5 _ E5 _ A5 _ G5 E5 | F5 _ A5 _ G5 F5 E5 D5 | E5 _ G5 _ C6 _ D6 E6 | D6 _ B5 _ G5 _ A5 B5 | A5 _ F5 A5 G5 _ D5 F5 | E5 _ D5 _ C5 _ - -",
+     bass:"C3 - G3 - C3 - G3 - | G2 - D3 - G2 - D3 - | A2 - E3 - A2 - E3 - | F2 - C3 - F2 - C3 - | C3 - G3 - C3 - G3 - | G2 - D3 - G2 - D3 - | F2 - C3 - G2 - D3 - | C3 - G3 - C3 - - -"},
+    {n:"Rainy Window", z:"雨天窗邊・抒情", bpm:84, hat:false, lw:"square", lg:0.126, bg:0.247,
+     lead:"A4 _ C5 _ E5 _ _ _ | F5 _ E5 _ C5 _ _ _ | E5 _ G5 _ C5 _ D5 _ | B4 _ _ _ D5 _ _ _ | A4 _ C5 _ E5 _ A5 _ | G5 _ F5 _ E5 _ C5 _ | D5 _ B4 _ D5 _ G5 _ | E5 _ _ _ A4 _ _ _",
+     bass:"A2 E3 A3 E3 A2 E3 A3 E3 | F2 C3 F3 C3 F2 C3 F3 C3 | C3 G3 C4 G3 C3 G3 C4 G3 | G2 D3 G3 D3 G2 D3 G3 D3 | A2 E3 A3 E3 A2 E3 A3 E3 | F2 C3 F3 C3 F2 C3 F3 C3 | G2 D3 G3 D3 G2 D3 G3 D3 | A2 E3 A3 E3 A2 E3 A3 E3"},
+    {n:"Night Market", z:"夜市小跑步・活潑", bpm:128, hat:true, lw:"p25", lg:0.18, bg:0.297,
+     lead:"C5 F5 A5 F5 C6 _ A5 _ | D5 F5 A#5 _ A5 G5 F5 _ | E5 G5 C6 _ A#5 A5 G5 _ | A5 _ F5 _ C5 _ - - | D5 F5 A5 D6 _ C6 A5 _ | A#5 _ A5 G5 F5 _ D5 _ | C5 E5 G5 A#5 A5 G5 E5 _ | F5 _ A5 _ F5 _ - -",
+     bass:"F2 F3 C3 F3 F2 F3 C3 F3 | A#1 A#2 F2 A#2 A#1 A#2 F2 A#2 | C2 C3 G2 C3 C2 C3 G2 C3 | F2 F3 C3 F3 F2 F3 C3 F3 | D2 D3 A2 D3 D2 D3 A2 D3 | A#1 A#2 F2 A#2 A#1 A#2 F2 A#2 | C2 C3 G2 C3 C2 C3 G2 C3 | F2 F3 C3 F3 F2 - - -"},
+    {n:"Tea Break", z:"午後茶點・悠閒", bpm:100, hat:true, lw:"p25", lg:0.162, bg:0.264,
+     lead:"B4 _ D5 G5 _ _ F#5 G5 | E5 _ G5 B5 _ _ A5 G5 | E5 _ C5 E5 G5 _ E5 _ | F#5 _ A5 _ D5 _ _ _ | B4 D5 G5 _ B5 _ A5 G5 | G5 _ E5 _ B4 _ E5 G5 | E5 _ G5 _ F#5 _ A5 _ | G5 _ _ _ - - - -",
+     bass:"G2 - D3 - G2 - D3 - | E2 - B2 - E2 - B2 - | C3 - G2 - C3 - G2 - | D3 - A2 - D3 - A2 - | G2 - D3 - G2 - D3 - | E2 - B2 - E2 - B2 - | C3 - G2 - D3 - A2 - | G2 - D3 - G2 - - -"}
+  ];
+  function midi(n){ const m = /^([A-G])(#?)(\d)$/.exec(n); return 12*(+m[3]+1) + {C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]] + (m[2]?1:0); }
+  function parse(str){
+    const t = str.split(/\s+/).filter(x=>x && x!=="|"); const ev = {}; let last = null;
+    t.forEach((k,i)=>{ if(k==="-"){ last=null; return; } if(k==="_"){ if(last) last.len++; return; } last = {m:midi(k), len:1}; ev[i] = last; });
+    return {n:t.length, ev};
+  }
+  TR.forEach(t=>{ t.L = parse(t.lead); t.B = parse(t.bass); });
+  let ctx=null, out=null, lp=null, timer=null, cur=-1, step=0, nextT=0, noise=null, p25=null, ducked=false;
+  let vol = store.get("vol", 60) / 100;
+  let keeper = null;
+  function silentWav(){
+    const n = 4000, buf = new ArrayBuffer(44+n), v = new DataView(buf), w = (o,s)=>{ for(let i=0;i<s.length;i++) v.setUint8(o+i,s.charCodeAt(i)); };
+    w(0,"RIFF"); v.setUint32(4,36+n,true); w(8,"WAVE"); w(12,"fmt "); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+    v.setUint32(24,8000,true); v.setUint32(28,8000,true); v.setUint16(32,1,true); v.setUint16(34,8,true); w(36,"data"); v.setUint32(40,n,true);
+    for(let i=0;i<n;i++) v.setUint8(44+i,128);
+    let s = ""; new Uint8Array(buf).forEach(b=> s += String.fromCharCode(b));
+    return "data:audio/wav;base64," + btoa(s);
+  }
+  function unlockIOS(){
+    try{ if(navigator.audioSession) navigator.audioSession.type = "playback"; }catch(e){}
+    try{
+      if(!keeper){ keeper = new Audio(silentWav()); keeper.loop = true; keeper.setAttribute("playsinline",""); keeper.volume = 0.01; }
+      const pr = keeper.play(); if(pr && pr.catch) pr.catch(()=>{});
+    }catch(e){}
+  }
+  function init(){
+    const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return false;
+    ctx = new AC(); out = ctx.createGain(); lp = ctx.createBiquadFilter();
+    lp.type = "lowpass"; lp.frequency.value = 3200; lp.connect(out); out.connect(ctx.destination);
+    const N = 40, re = new Float32Array(N), im = new Float32Array(N);
+    for(let n=1;n<N;n++) re[n] = (2/(n*Math.PI)) * Math.sin(n*Math.PI*.25);
+    p25 = ctx.createPeriodicWave(re, im);
+    noise = ctx.createBuffer(1, ctx.sampleRate*.05, ctx.sampleRate);
+    const d = noise.getChannelData(0); for(let i=0;i<d.length;i++) d[i] = Math.random()*2-1;
+    applyVol(); return true;
+  }
+  function applyVol(){ if(out) out.gain.setTargetAtTime(vol*(ducked?.3:1)*1.65, ctx.currentTime, .08); }
+  function note(t, m, dur, type, peak){
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    if(type==="p25") o.setPeriodicWave(p25); else o.type = type;
+    o.frequency.value = 440*Math.pow(2,(m-69)/12);
+    g.gain.setValueAtTime(.0001,t); g.gain.linearRampToValueAtTime(peak,t+.01);
+    g.gain.setTargetAtTime(peak*.55,t+.02,.12); g.gain.setTargetAtTime(.0001,t+Math.max(.04,dur-.03),.025);
+    o.connect(g); g.connect(lp); o.start(t); o.stop(t+dur+.25);
+  }
+  function hat(t){
+    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    s.buffer = noise; f.type = "highpass"; f.frequency.value = 7000;
+    g.gain.setValueAtTime(.035,t); g.gain.exponentialRampToValueAtTime(.001,t+.04);
+    s.connect(f); f.connect(g); g.connect(out); s.start(t); s.stop(t+.05);
+  }
+  function tick(){
+    const T = TR[cur], sd = 60/T.bpm/2;
+    while(nextT < ctx.currentTime + .15){
+      const a = T.L.ev[step % T.L.n], b = T.B.ev[step % T.B.n];
+      if(a) note(nextT, a.m, a.len*sd*.95, T.lw, T.lg);
+      if(b) note(nextT, b.m, b.len*sd*.9, "triangle", T.bg);
+      if(T.hat && step % 2 === 1) hat(nextT);
+      nextT += sd; step++;
+    }
+  }
+  function play(i){
+    if(!ctx && !init()){ toast("這個瀏覽器無法播放音樂"); return; }
+    unlockIOS();
+    const r = ctx.resume(); clearInterval(timer);
+    setTimeout(()=>{ if(cur >= 0 && ctx.state !== "running") toast("瀏覽器擋住了音樂：請再點一下 ♪，並確認手機沒有開靜音"); }, 700);
+    if(r && r.catch) r.catch(()=>{});
+    cur = i; step = 0; nextT = ctx.currentTime + .08;
+    tick(); timer = setInterval(tick, 25); store.set("trk", i); ui();
+  }
+  function stop(){ clearInterval(timer); timer = null; cur = -1; if(keeper) keeper.pause(); ui(); }
+  function wake(){ if(ctx && cur >= 0 && ctx.state !== "running"){ unlockIOS(); ctx.resume(); } }
+  function ui(){
+    $("#musicBtn").classList.toggle("on", cur >= 0);
+    $$(".trk").forEach(b=> b.classList.toggle("on", +b.dataset.t === cur));
+    $("#coverMusic").textContent = cur >= 0 ? "♪ " + TR[cur].n.toUpperCase() : "♪ MUSIC";
+  }
+  document.addEventListener("visibilitychange", ()=>{
+    if(!ctx || cur < 0) return;
+    if(document.hidden){ clearInterval(timer); ctx.suspend(); }
+    else { ctx.resume().then(()=>{ nextT = ctx.currentTime + .05; timer = setInterval(tick,25); }); }
+  });
+  return {
+    TR, play, stop, wake,
+    get cur(){ return cur; },
+    get state(){ return ctx ? ctx.state : "none"; },
+    setVol(v){ vol = v; store.set("vol", Math.round(v*100)); if(ctx) applyVol(); },
+    get vol(){ return vol; },
+    duck(on){ ducked = on; if(ctx) applyVol(); }
+  };
+})();
+
+/* ---------------- speech ---------------- */
+const SYN = window.speechSynthesis || null;
+let voice = null, qid = 0, playing = null;
+let rate = store.get("rate", .85);
+function pickVoice(){
+  if(!SYN) return;
+  const vs = SYN.getVoices();
+  voice = vs.find(v=>/^en[-_]US/i.test(v.lang) && /Samantha|Google US English|Aria|Jenny|Ava|Allison/i.test(v.name))
+       || vs.find(v=>/^en[-_]US/i.test(v.lang)) || vs.find(v=>/^en/i.test(v.lang)) || null;
+}
+if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
+const speakable = t => plain(t).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/_{3}/g,"blank").replace(/…/g,"...");
+function stopSpeech(){
+  qid++; if(SYN) SYN.cancel();
+  $$(".speaking").forEach(e=>e.classList.remove("speaking"));
+  playing = null; Music.duck(false); playBtns();
+}
+function sayQueue(items, mode){
+  if(!SYN){ toast("這個瀏覽器不支援朗讀功能"); return; }
+  stopSpeech(); const my = ++qid; let k = 0; playing = mode || "one"; playBtns(); Music.duck(true);
+  const next = ()=>{
+    if(my !== qid) return;
+    $$(".speaking").forEach(e=>e.classList.remove("speaking"));
+    if(k >= items.length){ playing = null; Music.duck(false); playBtns(); return; }
+    const it = items[k++];
+    const u = new SpeechSynthesisUtterance(speakable(it.text));
+    u.lang = "en-US"; if(voice) u.voice = voice; u.rate = rate; u.pitch = it.pitch || 1;
+    u.onend = ()=> setTimeout(next, it.gap || 250);
+    u.onerror = ()=>{ if(my === qid) setTimeout(next, 50); };
+    if(it.el){ it.el.classList.add("speaking"); if(items.length > 1) it.el.scrollIntoView({block:"nearest", behavior:"smooth"}); }
+    SYN.speak(u);
+  };
+  setTimeout(next, 60);
+}
+const say = t => sayQueue([{text:t}]);
+function playBtns(){
+  const r = $("#playRead"), t = $("#playTalk");
+  if(r) r.innerHTML = playing === "read" ? SVGI.stop + "<span>Stop 停止</span>" : SVGI.play + "<span>Listen 朗讀</span>";
+  if(t) t.innerHTML = playing === "talk" ? SVGI.stop + "<span>Stop 停止</span>" : SVGI.play + "<span>Play all 播放對話</span>";
+}
+
+/* ---------------- render ---------------- */
+let cur = store.get("pos", 0); if(!(cur >= 0 && cur < L.length)) cur = 0;
+let showZh = !!store.get("zhdef", false);
+const PITCH = [1.08, .88, 1.22];
+
+function secHead(id, en, zh, tools){
+  return `<section class="sec" id="sec-${id}"><div class="sh"><span class="px">${en}</span><span class="shz">${zh}</span><span class="sp"></span>${tools||""}</div>`;
+}
+function render(i){
+  stopSpeech(); closePop();
+  cur = i; store.set("pos", i);
+  const l = L[i], th = THEMES[l.theme];
+  $("#barTitle").innerHTML = `<b>L${pad(i+1)}</b>${esc(l.title)}`;
+  let h = `<header class="lh"><div class="tile">${pix(l.icon)}</div><div>
+    <p class="eyebrow">LESSON ${pad(i+1)} <span class="chip t-${l.theme}">${th.zh} ${th.en}</span></p>
+    <h1 class="lt">${esc(l.title)}</h1><p class="lzt">${esc(l.zt)}</p></div></header>`;
+
+  h += secHead("read","READ","課文",
+    `<button class="tbtn" id="playRead"></button><button class="tbtn${showZh?" on":""}" id="zhBtn" aria-pressed="${showZh}">中文</button>`);
+  h += `<p class="legend"><span class="lv1">單字</span><span class="lv2">文法</span><span class="lv3">文化</span>點一下看解釋</p><div class="read">`;
+  h += l.read.map((p,j)=>`<p class="rp ${p[2]||""}" data-i="${j}"><span class="en"><span class="hl">${mk(p[0])}</span></span><span class="zh">${esc(p[1])}</span></p>`).join("");
+  h += `</div></section>`;
+
+  h += secHead("words","WORDS","單字 10");
+  h += `<ul class="wl">` + l.words.map(k=>{
+    const v = VOCAB[k], hi = /B/.test(v.lv);
+    return `<li><button class="wr" data-k="${esc(k)}"><span class="wr-w">${esc(v.w)}</span><span class="wr-kk">${esc(v.kk)}</span><span class="lv${hi?" hi":""}">${v.lv}</span><span class="wr-zh"><i>${v.pos}</i>${esc(v.zh)}</span></button><button class="spk" data-say="${esc(v.w)}" aria-label="聽 ${esc(v.w)}">${SVGI.spk}</button></li>`;
+  }).join("") + `</ul><p class="note">音標為 KK 音標。等級為 CEFR 約略參考；標紅色的 B1、B2 字超出初級程度，認得就好。</p></section>`;
+
+  h += secHead("gram","GRAMMAR","文法");
+  h += `<ol class="gl">` + l.gram.map((k,n)=>{
+    const g = GRAM[k];
+    return `<li class="gi" id="${gid(k)}"><p class="gi-t"><span class="gi-n">${n+1}</span>${esc(g.zt)}<span class="gi-en">${esc(g.t)}</span></p><p class="gi-d">${g.d}</p><ul class="gx">` +
+      g.ex.map(e=>`<li><button class="ex" data-say="${esc(e[0])}">${SVGI.spk}<span>${esc(e[0])}</span></button><span class="exz">${esc(e[1])}</span></li>`).join("") + `</ul></li>`;
+  }).join("") + `</ol></section>`;
+
+  const cast = Object.keys(l.talk.cast);
+  h += secHead("talk","TALK","對話練習", `<button class="tbtn" id="playTalk"></button>`);
+  h += `<p class="where">${esc(l.talk.where)}</p><div class="talk">` + l.talk.lines.map((ln,j)=>{
+    const s = cast.indexOf(ln[0]);
+    return `<div class="ln s${s}" data-j="${j}"><span class="who">${esc(l.talk.cast[ln[0]])}</span><div><span class="ln-en"><span class="hl">${mk(ln[1])}</span></span><span class="zh">${esc(ln[2])}</span></div><button class="spk" data-line="${j}" aria-label="聽這句">${SVGI.spk}</button></div>`;
+  }).join("") + `</div></section>`;
+
+  h += secHead("ask","YOUR TURN","說說你的看法");
+  h += `<ol class="al">` + l.ask.map((a,j)=>`<li data-a="${j}"><p class="aq">${mk(a[0])}</p><p class="zh">${esc(a[1])}</p><p class="frame"><span class="px">TRY</span>${frame(a[2])}</p></li>`).join("") + `</ol></section>`;
+
+  $("#reader").innerHTML = h;
+  playBtns();
+  $("#prevBtn").disabled = i === 0;
+  $("#nextBtn").disabled = i === L.length-1;
+  $("#progress").textContent = `${pad(i+1)} / ${L.length}`;
+  $$(".toc[data-i]").forEach(b=>b.classList.toggle("cur", +b.dataset.i === i));
+  try{ history.replaceState(null, "", "#l" + (i+1)); }catch(e){}
+}
+function go(i, then){
+  render(i);
+  if(then) requestAnimationFrame(then); else window.scrollTo(0,0);
+}
+function setZh(on){
+  showZh = on; document.body.classList.toggle("showzh", on);
+  const b = $("#zhBtn"); if(b){ b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); }
+}
+
+/* ---------------- popover ---------------- */
+const pop = $("#pop");
+function popHTML(k){
+  const t = kind(k);
+  if(t === "vo"){
+    const v = VOCAB[k]; if(!v) return "";
+    return `<div class="p-tag"><b>單字 WORD</b><span class="lv${/B/.test(v.lv)?" hi":""}">${v.lv}</span></div>
+      <div class="p-h"><span class="p-w">${esc(v.w)}</span><button class="spk" data-say="${esc(v.w)}" aria-label="聽發音">${SVGI.spk}</button></div>
+      <p class="p-kk">${esc(v.kk)} · ${v.pos}</p><p class="p-zh">${esc(v.zh)}</p><p class="p-d">${esc(v.d)}</p>
+      <p class="p-ex"><button data-say="${esc(v.ex)}">${SVGI.spk}<span>${esc(v.ex)}</span></button><span class="z">${esc(v.exz)}</span></p>`;
+  }
+  if(t === "gr"){
+    const g = GRAM[k]; if(!g) return "";
+    return `<div class="p-tag"><b class="gr">文法 GRAMMAR</b></div><div class="p-h"><span class="p-w" style="font-family:var(--f-zh);font-size:1.2rem">${esc(g.zt)}</span></div>
+      <p class="p-kk">${esc(g.t)}</p><p class="p-d">${g.d}</p>
+      <p class="p-ex"><button data-say="${esc(g.ex[0][0])}">${SVGI.spk}<span>${esc(g.ex[0][0])}</span></button><span class="z">${esc(g.ex[0][1])}</span></p>
+      <button class="p-go" data-jump="${gid(k)}">看完整文法說明 ↓</button>`;
+  }
+  const c = CULT[k]; if(!c) return "";
+  return `<div class="p-tag"><b class="cu">文化 CULTURE</b></div><div class="p-h"><span class="p-w">${esc(c.h)}</span><button class="spk" data-say="${esc(c.h)}" aria-label="聽發音">${SVGI.spk}</button></div>
+    <p class="p-zh">${esc(c.zh)}</p><p class="p-d">${esc(c.d)}</p>`;
+}
+function openPop(k){
+  const h = popHTML(k); if(!h) return;
+  $("#popIn").innerHTML = h; pop.classList.add("on"); pop.setAttribute("aria-hidden","false");
+}
+function closePop(){ pop.classList.remove("on"); pop.setAttribute("aria-hidden","true"); }
+$("#popX").onclick = closePop;
+pop.addEventListener("click", e=>{
+  const s = e.target.closest("[data-say]"); if(s){ say(s.dataset.say); return; }
+  const j = e.target.closest("[data-jump]");
+  if(j){ closePop(); const el = document.getElementById(j.dataset.jump); if(el){ el.scrollIntoView({block:"start",behavior:"smooth"}); } }
+});
+
+/* ---------------- reader events ---------------- */
+$("#reader").addEventListener("click", e=>{
+  const g = e.target.closest(".g"); if(g){ openPop(g.dataset.k); return; }
+  const sp = e.target.closest("[data-say]"); if(sp){ say(sp.dataset.say); return; }
+  const wr = e.target.closest(".wr"); if(wr){ openPop(wr.dataset.k); return; }
+  const ln = e.target.closest("[data-line]");
+  if(ln){ const l = L[cur], j = +ln.dataset.line, x = l.talk.lines[j];
+    sayQueue([{text:x[1], pitch:PITCH[Object.keys(l.talk.cast).indexOf(x[0])], el:ln.closest(".ln")}]); return; }
+  if(e.target.closest("#zhBtn")){ setZh(!showZh); return; }
+  if(e.target.closest("#playRead")){
+    if(playing === "read"){ stopSpeech(); return; }
+    sayQueue(L[cur].read.map((p,j)=>({text:p[0], el:$(`.rp[data-i="${j}"]`), gap:500})), "read"); return;
+  }
+  if(e.target.closest("#playTalk")){
+    if(playing === "talk"){ stopSpeech(); return; }
+    const l = L[cur], cast = Object.keys(l.talk.cast);
+    sayQueue(l.talk.lines.map((x,j)=>({text:x[1], pitch:PITCH[cast.indexOf(x[0])], el:$(`.ln[data-j="${j}"]`), gap:450})), "talk"); return;
+  }
+});
+$("#reader").addEventListener("keydown", e=>{
+  if((e.key === "Enter" || e.key === " ") && e.target.classList.contains("g")){ e.preventDefault(); openPop(e.target.dataset.k); }
+});
+$("#prevBtn").onclick = ()=>{ if(cur > 0) go(cur-1); };
+$("#nextBtn").onclick = ()=>{ if(cur < L.length-1) go(cur+1); };
+
+/* ---------------- drawer ---------------- */
+function openDrawer(pane){
+  $("#drawer").classList.add("on"); $("#scrim").classList.add("on");
+  if(pane) switchPane(pane);
+}
+function closeDrawer(){ $("#drawer").classList.remove("on"); $("#scrim").classList.remove("on"); }
+function switchPane(p){
+  $$(".tab").forEach(t=>t.classList.toggle("on", t.dataset.pane === p));
+  $$(".pane").forEach(x=>x.classList.toggle("on", x.id === "pane-" + p));
+  if(p === "search") setTimeout(()=>$("#q").focus(), 60);
+  if(p === "bank") buildBank();
+}
+$$(".tab").forEach(t=> t.onclick = ()=>switchPane(t.dataset.pane));
+$("#menuBtn").onclick = ()=>openDrawer("toc");
+$("#searchBtn").onclick = ()=>openDrawer("search");
+$("#scrim").onclick = closeDrawer;
+
+function buildToc(){
+  let h = `<button class="toc cover-link" id="toCover">← 回到封面 Title screen</button>`;
+  L.forEach((l,i)=>{
+    const th = THEMES[l.theme];
+    h += `<button class="toc${i===cur?" cur":""}" data-i="${i}"><span class="tile">${pix(l.icon)}</span><span><span class="toc-n">LESSON ${pad(i+1)} · <span class="chip t-${l.theme}" style="font-size:10px">${th.zh}</span></span><span class="toc-t">${esc(l.title)}</span><span class="toc-z">${esc(l.zt)}</span></span></button>`;
+  });
+  $("#pane-toc").innerHTML = h;
+}
+$("#pane-toc").addEventListener("click", e=>{
+  if(e.target.closest("#toCover")){ closeDrawer(); showCover(); return; }
+  const b = e.target.closest(".toc[data-i]"); if(b){ closeDrawer(); leaveCover(); go(+b.dataset.i); }
+});
+
+/* search */
+const DOCS = [];
+L.forEach((l,i)=>{
+  l.read.forEach((p,j)=>DOCS.push({i, sel:`.rp[data-i="${j}"]`, lab:"課文", en:plain(p[0]), zh:p[1]}));
+  l.talk.lines.forEach((x,j)=>DOCS.push({i, sel:`.ln[data-j="${j}"]`, lab:"對話", en:plain(x[1]), zh:x[2]}));
+  l.ask.forEach((a,j)=>DOCS.push({i, sel:`.al li[data-a="${j}"]`, lab:"說說看", en:plain(a[0]), zh:a[1]}));
+  l.gram.forEach(k=>GRAM[k].ex.forEach(e=>DOCS.push({i, sel:"#"+gid(k), lab:"文法例句", en:e[0], zh:e[1]})));
+});
+function snip(text, q){
+  const t = norm(text), at = t.indexOf(q); if(at < 0) return esc(text.slice(0,90));
+  const a = Math.max(0, at-38), b = Math.min(text.length, at+q.length+50);
+  return (a>0?"…":"") + esc(text.slice(a,at)) + "<b>" + esc(text.slice(at,at+q.length)) + "</b>" + esc(text.slice(at+q.length,b)) + (b<text.length?"…":"");
+}
+function search(){
+  const raw = $("#q").value.trim(), q = norm(raw), cjk = /[㐀-鿿]/.test(raw);
+  if(q.length < (cjk ? 1 : 2)){ $("#hits").innerHTML = ""; $("#qnote").textContent = "輸入至少兩個字母（或一個中文字）。"; return; }
+  const words = Object.keys(VOCAB).filter(k=>{ const v = VOCAB[k]; return norm(v.w).includes(q) || v.zh.includes(raw); });
+  const docs = DOCS.filter(d=> norm(d.en).includes(q) || d.zh.includes(raw));
+  let h = "";
+  if(words.length){
+    h += `<p class="grp">WORDS 單字</p>` + words.slice(0,10).map(k=>{ const v = VOCAB[k];
+      return `<button class="hit" data-word="${esc(k)}"><span class="hit-l">LESSON ${pad(v.l+1)}</span><span class="hit-s"><b>${esc(v.w)}</b> ${esc(v.kk)}　${esc(v.zh)}</span></button>`; }).join("");
+  }
+  if(docs.length){
+    h += `<p class="grp">IN THE LESSONS 課文內容</p>` + docs.slice(0,60).map(d=>{
+      const inEn = norm(d.en).includes(q);
+      return `<button class="hit" data-i="${d.i}" data-sel='${d.sel}' data-zh="${inEn?0:1}"><span class="hit-l">LESSON ${pad(d.i+1)} · ${d.lab}</span><span class="hit-s">${inEn ? snip(d.en,q) : snip(d.zh,raw)}</span></button>`;
+    }).join("");
+  }
+  $("#hits").innerHTML = h;
+  $("#qnote").textContent = words.length + docs.length ? `找到 ${words.length} 個單字、${docs.length} 處課文內容。` : "沒有找到。換個字試試看？";
+}
+$("#q").addEventListener("input", search);
+function highlightIn(root, q){
+  const nq = norm(q), tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [];
+  while(tw.nextNode()) nodes.push(tw.currentNode);
+  let first = null;
+  nodes.forEach(n=>{
+    const t = n.nodeValue, nt = norm(t); let at = nt.indexOf(nq); if(at < 0) return;
+    const f = document.createDocumentFragment(); let pos = 0;
+    while(at >= 0){ f.append(t.slice(pos,at)); const m = document.createElement("mark"); m.className = "hit-m"; m.textContent = t.slice(at,at+nq.length); f.append(m); if(!first) first = m; pos = at+nq.length; at = nt.indexOf(nq,pos); }
+    f.append(t.slice(pos)); n.parentNode.replaceChild(f,n);
+  });
+  return first;
+}
+$("#hits").addEventListener("click", e=>{
+  const w = e.target.closest("[data-word]"); if(w){ openPop(w.dataset.word); return; }
+  const b = e.target.closest(".hit[data-i]"); if(!b) return;
+  const q = $("#q").value.trim();
+  closeDrawer(); leaveCover();
+  go(+b.dataset.i, ()=>{
+    if(b.dataset.zh === "1") setZh(true);
+    const el = $(b.dataset.sel); if(!el) return;
+    const m = highlightIn(el, q);
+    (m || el).scrollIntoView({block:"center", behavior:"smooth"});
+  });
+});
+
+/* word bank */
+let bMode = "w", bSort = "az";
+function buildBank(){
+  const raw = $("#bq").value.trim(), q = norm(raw);
+  let rows;
+  if(bMode === "w") rows = Object.keys(VOCAB).map(k=>{ const v = VOCAB[k]; return {k, h:v.w, sub:v.kk, z:`${v.pos} ${v.zh}`, l:v.l}; });
+  else if(bMode === "g") rows = Object.keys(GRAM).map(k=>{ const g = GRAM[k]; return {k, h:g.zt, sub:"", z:g.t, l:g.l}; });
+  else rows = Object.keys(CULT).map(k=>{ const c = CULT[k]; return {k, h:c.h, sub:"", z:c.zh, l:c.l}; });
+  if(q) rows = rows.filter(r=> norm(r.h).includes(q) || norm(r.z).includes(q));
+  if(bSort === "az" && bMode !== "g") rows.sort((a,b)=>a.h.localeCompare(b.h,"en"));
+  else rows.sort((a,b)=>a.l-b.l);
+  const noun = {w:"個單字", g:"個文法重點", c:"則文化小知識"}[bMode];
+  $("#bnote").textContent = `${rows.length} ${noun}` + (bMode==="w" ? "・點一下展開解釋" : "");
+  $("#sortBtn").textContent = bSort === "az" ? "排序：A–Z" : "排序：依課次";
+  $("#sortBtn").hidden = bMode === "g";
+  $("#bank").innerHTML = rows.map(r=>`<button class="br" data-k="${esc(r.k)}"><span class="br-h">${esc(r.h)}${r.sub?`<small>${esc(r.sub)}</small>`:""}</span><span class="br-z">${esc(r.z)}</span><span class="br-l">L${pad(r.l+1)}</span></button><div class="bx" hidden></div>`).join("");
+}
+function bankDetail(k){
+  const t = kind(k);
+  if(t === "vo"){ const v = VOCAB[k];
+    return `<p>${esc(v.d)}</p><p class="bx-ex"><button class="ex" data-say="${esc(v.ex)}">${SVGI.spk}<span>${esc(v.ex)}</span></button><br><span class="exz">${esc(v.exz)}</span></p>
+      <div class="row"><button class="tbtn" data-say="${esc(v.w)}">${SVGI.spk}<span>發音</span></button><button class="tbtn" data-goto="${v.l}" data-sel="#sec-words">到第 ${v.l+1} 課 →</button></div>`; }
+  if(t === "gr"){ const g = GRAM[k];
+    return `<p>${g.d}</p>` + g.ex.map(e=>`<p class="bx-ex"><button class="ex" data-say="${esc(e[0])}">${SVGI.spk}<span>${esc(e[0])}</span></button> <span class="exz">${esc(e[1])}</span></p>`).join("") +
+      `<div class="row"><button class="tbtn" data-goto="${g.l}" data-sel="#${gid(k)}">到第 ${g.l+1} 課 →</button></div>`; }
+  const c = CULT[k];
+  return `<p>${esc(c.d)}</p><div class="row"><button class="tbtn" data-goto="${c.l}" data-sel='.g[data-k="${k}"]'>到第 ${c.l+1} 課 →</button></div>`;
+}
+$("#bq").addEventListener("input", buildBank);
+$("#bankMode").addEventListener("click", e=>{
+  const b = e.target.closest(".fchip"); if(!b) return;
+  if(b.dataset.m === "sort"){ bSort = bSort === "az" ? "lesson" : "az"; }
+  else { bMode = b.dataset.m; $$("#bankMode .fchip[data-m]").forEach(x=>x.classList.toggle("on", x === b)); }
+  buildBank();
+});
+$("#bank").addEventListener("click", e=>{
+  const s = e.target.closest("[data-say]"); if(s){ say(s.dataset.say); return; }
+  const g = e.target.closest("[data-goto]");
+  if(g){ closeDrawer(); leaveCover(); const sel = g.dataset.sel;
+    go(+g.dataset.goto, ()=>{ const el = $(sel); if(el){ el.scrollIntoView({block:"center",behavior:"smooth"}); if(el.classList.contains("g")) openPop(el.dataset.k); } }); return; }
+  const r = e.target.closest(".br"); if(!r) return;
+  const bx = r.nextElementSibling, open = !r.classList.contains("open");
+  r.classList.toggle("open", open); bx.hidden = !open;
+  if(open && !bx.innerHTML) bx.innerHTML = bankDetail(r.dataset.k);
+});
+
+/* settings */
+let fs = store.get("fs", 19);
+function applyFs(){ document.documentElement.style.setProperty("--fs", fs+"px"); $$("#sizes button").forEach(b=>b.classList.toggle("on", +b.dataset.v === fs)); }
+$("#sizes").onclick = e=>{ const b = e.target.closest("button"); if(!b) return; fs = +b.dataset.v; store.set("fs", fs); applyFs(); };
+function applyRate(){ $$("#rates button").forEach(b=>b.classList.toggle("on", +b.dataset.v === rate)); }
+$("#rates").onclick = e=>{ const b = e.target.closest("button"); if(!b) return; rate = +b.dataset.v; store.set("rate", rate); applyRate(); say("This is how fast I read."); };
+function applyZhDef(){ const d = store.get("zhdef", false); $$("#zhset button").forEach(b=>b.classList.toggle("on", !!+b.dataset.v === !!d)); }
+$("#zhset").onclick = e=>{ const b = e.target.closest("button"); if(!b) return; const v = !!+b.dataset.v; store.set("zhdef", v); setZh(v); applyZhDef(); };
+$("#resetBtn").onclick = ()=>{ store.set("pos", 0); closeDrawer(); leaveCover(); go(0); toast("已回到第一課"); };
+
+/* music panel */
+$("#mpList").innerHTML = Music.TR.map((t,i)=>`<button class="trk" data-t="${i}"><span class="trk-i">${i+1}</span><span class="trk-n">${t.n}</span><span class="trk-z">${t.z} · ${t.bpm} BPM</span></button>`).join("");
+$("#vol").value = Math.round(Music.vol*100);
+$("#vol").addEventListener("input", e=> Music.setVol(e.target.value/100));
+$("#mpList").onclick = e=>{ const b = e.target.closest(".trk"); if(!b) return; const t = +b.dataset.t; if(Music.cur === t) Music.stop(); else Music.play(t); };
+$("#mpOff").onclick = ()=> Music.stop();
+function toggleMp(){ $("#mp").hidden = !$("#mp").hidden; }
+$("#musicBtn").onclick = e=>{ e.stopPropagation(); toggleMp(); };
+$("#coverMusic").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(store.get("trk",0)); toggleMp(); };
+document.addEventListener("click", e=>{
+  if(!$("#mp").hidden && !e.target.closest("#mp") && !e.target.closest("#musicBtn") && !e.target.closest("#coverMusic")) $("#mp").hidden = true;
+  if(pop.classList.contains("on") && !e.target.closest("#pop") && !e.target.closest(".g") && !e.target.closest(".wr") && !e.target.closest("[data-word]")) closePop();
+});
+
+/* cover */
+function showCover(){
+  stopSpeech(); document.body.classList.add("cover"); window.scrollTo(0,0);
+  $("#goLbl").textContent = cur > 0 ? `CONTINUE · L${pad(cur+1)}` : "START";
+  try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){}
+}
+function leaveCover(){ document.body.classList.remove("cover"); }
+$("#coverGo").onclick = ()=>{ leaveCover(); go(cur); };
+
+/* keys */
+document.addEventListener("keydown", e=>{
+  if(e.key === "Escape"){ closePop(); closeDrawer(); $("#mp").hidden = true; return; }
+  if(/INPUT|TEXTAREA/.test(document.activeElement.tagName) || document.body.classList.contains("cover") || $("#drawer").classList.contains("on")) return;
+  if(e.key === "ArrowRight" && cur < L.length-1) go(cur+1);
+  if(e.key === "ArrowLeft" && cur > 0) go(cur-1);
+});
+
+let tt = null;
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(()=>t.classList.remove("on"), 2400); }
+
+window.addEventListener("hashchange", ()=>{
+  const m = /^#l(\d+)$/.exec(location.hash);
+  if(m && +m[1] >= 1 && +m[1] <= L.length && +m[1]-1 !== cur){ leaveCover(); go(+m[1]-1); }
+});
+
+/* first press anywhere on the title screen starts the music (browsers block autoplay until then) */
+let autoMusicDone = false;
+function autoMusic(e){
+  if(autoMusicDone || !document.body.classList.contains("cover")) return;
+  if(e.type === "keydown" && !/^(Enter| |Spacebar)$/.test(e.key)) return;
+  autoMusicDone = true;
+  if(Music.cur < 0) Music.play(store.get("trk", 0));
+  const h = $("#tapHint"); if(h) h.hidden = true;
+}
+document.addEventListener("touchend", autoMusic, true);
+document.addEventListener("click", autoMusic, true);
+document.addEventListener("keydown", autoMusic, true);
+/* any later tap re-wakes a context the browser suspended */
+["touchend","click","keydown"].forEach(t=> document.addEventListener(t, ()=>Music.wake(), true));
+
+/* boot */
+$("#screen").innerHTML = scene();
+$("#dTile").innerHTML = pix("sprout");
+applyFs(); applyRate(); applyZhDef(); setZh(showZh);
+buildToc();
+const hm = /^#l(\d+)$/.exec(location.hash);
+if(hm && +hm[1] >= 1 && +hm[1] <= L.length){ render(+hm[1]-1); }
+else { render(cur); showCover(); }
+
+</script>
+</body>
+</html>
