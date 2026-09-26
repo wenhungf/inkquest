@@ -380,6 +380,11 @@ mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
     <div class="pane" id="pane-set">
       <div class="setrow"><h4>文字大小</h4><div class="seg" id="sizes"><button data-v="17">小</button><button data-v="19">中</button><button data-v="22">大</button></div></div>
       <div class="setrow"><h4>朗讀速度</h4><div class="seg" id="rates"><button data-v="0.7">慢</button><button data-v="0.85">適中</button><button data-v="1">正常</button></div></div>
+      <div class="setrow"><h4>朗讀聲音（旁白 Mia）</h4><select id="voiceSel" class="field" style="margin:0;width:100%" aria-label="朗讀聲音"></select>
+        <p class="qnote" style="padding:8px 0 0">對話裡的其他角色會自動換成不同的聲音。</p>
+        <p class="qnote" style="padding:6px 0 0" id="voiceNow"></p>
+        <p class="qnote" style="padding:6px 0 0">用 iPhone 的話，到「設定 → 輔助使用 → 閱讀與朗讀 → 聲音 → 英文 → Samantha」下載「增強音質」版本，下載完重新整理這一頁。</p>
+        <p class="qnote" style="padding:4px 0 0" id="audioNote"></p></div>
       <div class="setrow"><h4>中文翻譯</h4><div class="seg" id="zhset"><button data-v="0">預設隱藏</button><button data-v="1">預設顯示</button></div></div>
       <div class="setrow"><h4>閱讀進度</h4><div class="seg"><button id="resetBtn">從第一課重新開始</button></div></div>
     </div>
@@ -907,6 +912,191 @@ const CULT = {
 "c:sidewalk":{h:"sidewalk",zh:"人行道",d:"美式英文叫 sidewalk，英式叫 pavement。台灣的騎樓可以說 arcade 或 covered walkway。"}
 };
 /* =========================================================
+   DELIVERY — how each paragraph and line should sound.
+   "mood: note" — the mood word drives browser read-aloud;
+   the note is direction for a voice actor or an AI voice.
+   ========================================================= */
+const CAST = {
+  "Mia":         {g:"f", p:1.00, r:1.00, desc:"Mia — woman, mid-20s, narrator. Warm, a little clumsy, quick to laugh."},
+  "Auntie Chen": {g:"f", p:0.92, r:1.04, desc:"Auntie Chen — woman, 50s, runs the breakfast shop. Loud, cheerful, motherly."},
+  "Mr. Wang":    {g:"m", p:0.86, r:0.94, desc:"Mr. Wang — man, 60s, Mochi's owner. Polite, slightly embarrassed."},
+  "Ben":         {g:"m", p:0.96, r:1.02, desc:"Ben — man, late 20s, Mia's coworker. Easygoing, likes to tease."},
+  "Leo":         {g:"m", p:1.10, r:1.06, desc:"Leo — Mia's younger brother, about 19. Energetic, dramatic."},
+  "Seller":      {g:"m", p:0.90, r:1.05, desc:"Seller — man, 40s, night-market stall. Busy, brisk, friendly."},
+  "Ting":        {g:"f", p:1.10, r:1.02, desc:"Ting — woman, mid-20s, Mia's old friend, now in Canada. Bright, emotional."},
+  "Mom":         {g:"f", p:0.95, r:0.97, desc:"Mom — woman, 50s. Dry humor, loving."}
+};
+
+/* mood word -> browser speech [rate multiplier, pitch] */
+const MOOD = {
+  cheerful:[1.05,1.12], excited:[1.12,1.2], panicked:[1.16,1.16], bright:[1.03,1.08], friendly:[1.0,1.05],
+  warm:[0.95,1.0], gentle:[0.9,0.98], tender:[0.86,0.95], nostalgic:[0.87,0.95], wistful:[0.86,0.92], sad:[0.84,0.9],
+  hopeful:[0.93,1.05], playful:[1.05,1.1], teasing:[1.0,1.08], amused:[1.0,1.08], deadpan:[0.92,0.9],
+  curious:[1.0,1.1], surprised:[1.08,1.2], apologetic:[0.95,1.02], calm:[0.95,1.0], sleepy:[0.84,0.92],
+  annoyed:[1.06,0.95], grumpy:[0.98,0.88], firm:[0.94,0.92], proud:[1.0,1.06], triumphant:[1.06,1.15],
+  thoughtful:[0.9,0.97], informative:[0.97,1.0], worried:[1.02,1.03], relieved:[0.95,1.0], shy:[0.95,1.05]
+};
+
+const DELIVERY = [
+/* 1 */ { read:[
+  "panicked: the alarm goes off; build to a breathless “Oh no!”",
+  "panicked: quick, clipped sentences, like running while talking",
+  "cheerful: slow down and smile; give Auntie Chen’s greeting a loud, warm, sing-song voice",
+  "bright: happy, easy; this is the best part of the morning",
+  "cheerful: content and cozy; land softly on “perfect”"],
+  talk:[
+  "cheerful: loud, sing-song shop greeting",
+  "friendly: polite but in a hurry",
+  "bright: a quick, practical question",
+  "friendly: easy, already reaching for her wallet",
+  "cheerful: brisk, counting change",
+  "friendly: grateful, already moving",
+  "playful: calling after her as she leaves",
+  "playful: laughing, over her shoulder"]},
+/* 2 */ { read:[
+  "warm: a fond introduction, like showing a photo",
+  "playful: a little mystery on “But every evening”",
+  "deadpan: slow, dry humor; pause before “She is a cat.”",
+  "amused: stately, royal rhythm for the queen",
+  "deadpan: mock-offended",
+  "tender: soft smile on the last line"],
+  talk:[
+  "apologetic: a little embarrassed",
+  "friendly: relaxed, not bothered",
+  "apologetic: sincere “Oh no”",
+  "warm: reassuring",
+  "curious: suspicious, eyebrows up",
+  "shy: guilty, hesitant “Um…”",
+  "amused: laughing, shaking his head",
+  "gentle: almost a whisper; the cat is asleep"]},
+/* 3 */ { read:[
+  "wistful: quiet, looking out a rainy window",
+  "nostalgic: slow; let the yellow and the warmth glow",
+  "tender: Grandma’s words in a slightly older, loving voice",
+  "sad: soft and simple; do not rush",
+  "hopeful: a warm lift on “I still feel warm”"],
+  talk:[
+  "cheerful: easy compliment",
+  "warm: proud of it",
+  "surprised: “oh, I see” with interest",
+  "tender: fond memory",
+  "gentle: a careful, kind question",
+  "wistful: honest, a little sad",
+  "warm: kind, understanding",
+  "hopeful: small smile"]},
+/* 4 */ { read:[
+  "excited: a mission briefing, like a game announcer",
+  "playful: disgusted on “smells bad”, delighted on “tastes great”",
+  "surprised: amazed at the size",
+  "cheerful: bouncing from stall to stall",
+  "worried: Leo is nervous; Mia counts slowly",
+  "deadpan: dramatic pauses between the three looks",
+  "triumphant: victory! “Mission complete” like a video game"],
+  talk:[
+  "cheerful: busy vendor, loud over the crowd",
+  "curious: checking the price",
+  "calm: matter-of-fact",
+  "hopeful: trying to bargain",
+  "apologetic: friendly but firm",
+  "excited: can’t wait",
+  "amused: giving in",
+  "cheerful: handing it over"]},
+/* 5 */ { read:[
+  "surprised: fun-fact energy on “That is about 25 years!”",
+  "informative: clear and curious, like a friendly science video",
+  "calm: a little concerned on “only get five or six”",
+  "friendly: advice to a friend, counting the tips",
+  "sleepy: soft, slow send-off"],
+  talk:[
+  "sleepy: groggy and confused",
+  "calm: whispering, caught",
+  "surprised: can’t believe it",
+  "proud: a little know-it-all",
+  "teasing: he knows the answer",
+  "shy: sheepish",
+  "firm: stern but loving",
+  "playful: whiny, bargaining"]},
+/* 6 */ { read:[
+  "tender: soft, the start of a letter",
+  "warm: calm and bright, describing the weather",
+  "nostalgic: slow down; each memory its own small smile",
+  "wistful: a little sad on “far apart”",
+  "playful: teasing smile",
+  "tender: quiet and heartfelt",
+  "warm: signing off with love"],
+  talk:[
+  "excited: bursting with news",
+  "surprised: happy surprise",
+  "tender: emotional, voice a bit shaky",
+  "tender: soft",
+  "playful: laughing through happy tears",
+  "amused: fond laugh",
+  "excited: big plans",
+  "cheerful: “It’s a deal!” with a grin"]},
+/* 7 */ { read:[
+  "excited: storyteller’s reveal on “Then she dances!”",
+  "curious: set up the mystery, then answer it",
+  "informative: clear and step by step",
+  "thoughtful: quiet wonder on “Just a dance.”",
+  "warm: admiring"],
+  talk:[
+  "excited: pointing, a little scared",
+  "calm: amused and relaxed",
+  "curious: sincere question",
+  "friendly: explaining",
+  "curious: honest and a little hopeful",
+  "deadpan: completely straight face",
+  "annoyed: offended"]},
+/* 8 */ { read:[
+  "calm: setting the scene",
+  "annoyed: Leo complains, whiny on his line",
+  "firm: Mom is calm but firm",
+  "amused: Grandpa hopeful, then everyone laughs",
+  "thoughtful: weighing both sides",
+  "relieved: problem solved",
+  "curious: turn to the listener; a real question"],
+  talk:[
+  "surprised: impressed",
+  "thoughtful: honest about changing her mind",
+  "curious: short and interested",
+  "cheerful: remembering Dad’s stories",
+  "friendly: agreeing",
+  "grumpy: resigned sigh",
+  "playful: an obvious solution",
+  "amused: laughing"]},
+/* 9 */ { read:[
+  "warm: small, simple beginning",
+  "shy: a little embarrassed on “Is that strange?”",
+  "worried: slow and anxious; lift with joy at the new leaves",
+  "excited: proud plans",
+  "tender: the lesson; slow and sincere"],
+  talk:[
+  "curious: peeking into the room",
+  "playful: not embarrassed at all",
+  "teasing: dry",
+  "proud: pointing at the plant",
+  "surprised: genuinely impressed",
+  "excited: big plans",
+  "hopeful: sweet asking voice",
+  "teasing: a deal with conditions",
+  "deadpan: awkward, reluctant sweetness"]},
+/* 10 */ { read:[
+  "informative: matter-of-fact",
+  "thoughtful: listing good and bad",
+  "calm: a simple comparison",
+  "playful: two friendly rivals",
+  "thoughtful: fair and balanced",
+  "curious: an open question to the listener"],
+  talk:[
+  "friendly: raised voice over the rain",
+  "cheerful: happy with her umbrella",
+  "teasing: trying to convince her",
+  "calm: content",
+  "proud: a little boastful",
+  "teasing: laughing at him",
+  "grumpy: defeated, but laughing"]}
+];
+/* =========================================================
    WINDOW SEAT — app
    ========================================================= */
 const $ = s => document.querySelector(s);
@@ -1119,41 +1309,133 @@ const Music = (()=>{
   };
 })();
 
-/* ---------------- speech ---------------- */
+/* ---------------- speech ----------------
+   Order of preference for every paragraph / dialogue line:
+   1. a recorded clip listed in audio/manifest.json   (audio/L01-read-01.mp3 …)
+   2. the browser's voice, sentence by sentence, shaped by DELIVERY moods and CAST voices */
 const SYN = window.speechSynthesis || null;
-let voice = null, qid = 0, playing = null;
+let qid = 0, playing = null;
 let rate = store.get("rate", .85);
+let voiceURI = store.get("voiceURI", "");
+const VOICES = {all:[], f:[], m:[], main:null};
+const FEM = /Samantha|Ava|Allison|Susan|Zira|Aria|Jenny|Michelle|Emma|Joanna|Salli|Kendra|Kimberly|Ivy|Karen|Moira|Tessa|Victoria|Serena|Kate|Fiona|Veena|Libby|Sonia|Natasha|Nicky|Sara|Female|Google US English/i;
+const MAL = /Alex|Daniel|Tom|Aaron|Arthur|Rishi|David|Mark|Guy|Ryan|Eric|Christopher|Matthew|Joey|Justin|Brian|Oliver|Gordon|Lee|Evan|Nathan|Male/i;
+const NOVELTY = /Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Deranged|Good News|Hysterical|Jester|Junior|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Ralph|Fred|Kathy|Princess|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley/i;
+/* 0 normal, 1 enhanced, 2 premium — iPhone gives enhanced voices the same name, so read the voiceURI too */
+function vq(v){
+  const s = (v.voiceURI || "") + " " + v.name;
+  if(/premium|高品質|優質/i.test(s)) return 2;
+  if(/enhanced|增強|加強|Natural|Neural|Online/i.test(s)) return 1;
+  return 0;
+}
+const QLABEL = ["一般音質", "增強音質", "高品質"];
 function pickVoice(){
   if(!SYN) return;
-  const vs = SYN.getVoices();
-  voice = vs.find(v=>/^en[-_]US/i.test(v.lang) && /Samantha|Google US English|Aria|Jenny|Ava|Allison/i.test(v.name))
-       || vs.find(v=>/^en[-_]US/i.test(v.lang)) || vs.find(v=>/^en/i.test(v.lang)) || null;
+  const us = v => /^en[-_]US/i.test(v.lang) ? 0 : 1;
+  const hq = v => 2 - vq(v);
+  const vs = SYN.getVoices().filter(v=>/^en/i.test(v.lang) && !NOVELTY.test(v.name)).sort((a,b)=>us(a)-us(b) || hq(a)-hq(b));
+  VOICES.all = vs;
+  VOICES.f = vs.filter(v=>FEM.test(v.name));
+  VOICES.m = vs.filter(v=>!FEM.test(v.name) && MAL.test(v.name));
+  VOICES.main = vs.find(v=>v.voiceURI === voiceURI)
+    || vs.find(v=>us(v)===0 && /Samantha|Google US English|Aria|Jenny|Ava|Allison/i.test(v.name))
+    || VOICES.f[0] || vs[0] || null;
+  fillVoiceSel();
+}
+function voiceFor(who){
+  if(!who || who === "Mia" || !CAST[who]) return VOICES.main;
+  const g = CAST[who].g, pool = (g === "f" ? VOICES.f : VOICES.m).filter(v=>v !== VOICES.main);
+  if(!pool.length) return VOICES.main;
+  const same = Object.keys(CAST).filter(n=>n !== "Mia" && CAST[n].g === g);
+  return pool[same.indexOf(who) % pool.length];
 }
 if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
 const speakable = t => plain(t).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/_{3}/g,"blank").replace(/…/g,"...");
+function sentences(t){
+  const s = speakable(t).replace(/\b([ap])\.m\./g,"$1_m_");
+  return (s.match(/[^.!?]+(?:[.!?]+["']?|$)/g) || [s]).map(x=>x.replace(/([ap])_m_/g,"$1.m.").trim()).filter(Boolean);
+}
+const moodOf = s => String(s||"").split(":")[0].trim();
+function prosody(sent, mood, who){
+  const m = MOOD[mood] || [1,1], c = CAST[who] || {p:1, r:1};
+  let r = rate * m[0] * c.r, p = m[1] * c.p;
+  if(/!["']?$/.test(sent)){ r *= 1.06; p += .08; }
+  else if(/\?["']?$/.test(sent)){ p += .07; }
+  else if(/\.\.\.$/.test(sent)){ r *= .92; }
+  return {rate:Math.max(.5, Math.min(1.6, r)), pitch:Math.max(.5, Math.min(1.8, p))};
+}
+function pushTTS(q, it){
+  const ss = sentences(it.text), mood = moodOf(it.mood), v = voiceFor(it.who);
+  ss.forEach((s,n)=>{
+    const pr = prosody(s, mood, it.who), last = n === ss.length-1;
+    const gap = last ? (it.gap || 250) : /\.\.\.$/.test(s) ? 450 : /\?["']?$/.test(s) ? 320 : /!["']?$/.test(s) ? 220 : 260;
+    q.push({text:s, el:it.el, gap, voice:v, rate:pr.rate, pitch:pr.pitch});
+  });
+}
+
+/* recorded clips */
+const CLIPS = new Set();
+const clipId = (i, sec, j) => `L${pad(i+1)}-${sec}-${pad(j+1)}`;
+const player = new Audio(); player.preload = "auto";
+try{
+  fetch("audio/manifest.json", {cache:"no-cache"}).then(r=>r.ok ? r.json() : null).then(j=>{
+    if(!j) return;
+    (Array.isArray(j) ? j : (j.files || [])).forEach(f=>CLIPS.add(String(f).replace(/\.mp3$/i,"")));
+    const n = $("#audioNote"); if(n && CLIPS.size) n.textContent = `已載入 ${CLIPS.size} 個錄音檔，有錄音的段落會優先播放錄音。`;
+  }).catch(()=>{});
+}catch(e){}
+
 function stopSpeech(){
   qid++; if(SYN) SYN.cancel();
+  try{ player.pause(); }catch(e){}
   $$(".speaking").forEach(e=>e.classList.remove("speaking"));
   playing = null; Music.duck(false); playBtns();
 }
 function sayQueue(items, mode){
-  if(!SYN){ toast("這個瀏覽器不支援朗讀功能"); return; }
-  stopSpeech(); const my = ++qid; let k = 0; playing = mode || "one"; playBtns(); Music.duck(true);
+  const hasClip = items.some(it=>it.clip && CLIPS.has(it.clip));
+  if(!SYN && !hasClip){ toast("這個瀏覽器不支援朗讀功能"); return; }
+  stopSpeech(); const my = ++qid; playing = mode || "one"; playBtns(); Music.duck(true);
+  const q = [];
+  items.forEach(it=>{ if(it.clip && CLIPS.has(it.clip)) q.push({audio:it.clip, el:it.el, gap:it.gap || 250, it}); else pushTTS(q, it); });
+  let k = 0;
+  const clear = ()=>$$(".speaking").forEach(e=>e.classList.remove("speaking"));
   const next = ()=>{
     if(my !== qid) return;
-    $$(".speaking").forEach(e=>e.classList.remove("speaking"));
-    if(k >= items.length){ playing = null; Music.duck(false); playBtns(); return; }
-    const it = items[k++];
-    const u = new SpeechSynthesisUtterance(speakable(it.text));
-    u.lang = "en-US"; if(voice) u.voice = voice; u.rate = rate; u.pitch = it.pitch || 1;
-    u.onend = ()=> setTimeout(next, it.gap || 250);
+    if(k >= q.length){ clear(); playing = null; Music.duck(false); playBtns(); return; }
+    const x = q[k++];
+    if(!x.el) clear();
+    else if(!x.el.classList.contains("speaking")){ clear(); x.el.classList.add("speaking"); if(q.length > 1) x.el.scrollIntoView({block:"nearest", behavior:"smooth"}); }
+    if(x.audio){
+      let failed = false;
+      const fail = ()=>{ if(failed || my !== qid) return; failed = true; const sub = []; pushTTS(sub, x.it); q.splice(k, 0, ...sub); next(); };
+      player.onended = ()=>{ if(my === qid) setTimeout(next, x.gap); };
+      player.onerror = fail;
+      player.src = `audio/${x.audio}.mp3`;
+      player.playbackRate = rate < .8 ? .85 : 1;
+      const pr = player.play(); if(pr && pr.catch) pr.catch(fail);
+      return;
+    }
+    if(!SYN){ next(); return; }
+    const u = new SpeechSynthesisUtterance(x.text);
+    u.lang = "en-US"; if(x.voice) u.voice = x.voice; u.rate = x.rate; u.pitch = x.pitch;
+    u.onend = ()=> setTimeout(next, x.gap);
     u.onerror = ()=>{ if(my === qid) setTimeout(next, 50); };
-    if(it.el){ it.el.classList.add("speaking"); if(items.length > 1) it.el.scrollIntoView({block:"nearest", behavior:"smooth"}); }
     SYN.speak(u);
   };
   setTimeout(next, 60);
 }
 const say = t => sayQueue([{text:t}]);
+
+function fillVoiceSel(){
+  const s = $("#voiceSel"); if(!s) return;
+  if(!VOICES.all.length){ s.innerHTML = `<option>（這個瀏覽器沒有英文語音）</option>`; s.disabled = true; return; }
+  s.disabled = false;
+  s.innerHTML = VOICES.all.map((v,i)=>`<option value="${i}"${v === VOICES.main ? " selected" : ""}>${esc(v.name)} · ${esc(v.lang)} · ${QLABEL[vq(v)]}</option>`).join("");
+  const n = $("#voiceNow"), m = VOICES.main; if(!n || !m) return;
+  const better = VOICES.all.some(v=>vq(v) > vq(m) && v.lang === m.lang && FEM.test(v.name) === FEM.test(m.name));
+  n.innerHTML = `目前使用：<b>${esc(m.name)}（${QLABEL[vq(m)]}）</b>` +
+    (vq(m) === 0 ? (better ? "。清單裡有更好的版本，可以直接切換。" : "。這台裝置還沒有增強音質的英文語音。") : "");
+}
 function playBtns(){
   const r = $("#playRead"), t = $("#playTalk");
   if(r) r.innerHTML = playing === "read" ? SVGI.stop + "<span>Stop 停止</span>" : SVGI.play + "<span>Listen 朗讀</span>";
@@ -1163,7 +1445,6 @@ function playBtns(){
 /* ---------------- render ---------------- */
 let cur = store.get("pos", 0); if(!(cur >= 0 && cur < L.length)) cur = 0;
 let showZh = !!store.get("zhdef", false);
-const PITCH = [1.08, .88, 1.22];
 
 function secHead(id, en, zh, tools){
   return `<section class="sec" id="sec-${id}"><div class="sh"><span class="px">${en}</span><span class="shz">${zh}</span><span class="sp"></span>${tools||""}</div>`;
@@ -1264,16 +1545,16 @@ $("#reader").addEventListener("click", e=>{
   const wr = e.target.closest(".wr"); if(wr){ openPop(wr.dataset.k); return; }
   const ln = e.target.closest("[data-line]");
   if(ln){ const l = L[cur], j = +ln.dataset.line, x = l.talk.lines[j];
-    sayQueue([{text:x[1], pitch:PITCH[Object.keys(l.talk.cast).indexOf(x[0])], el:ln.closest(".ln")}]); return; }
+    sayQueue([{text:x[1], who:l.talk.cast[x[0]], mood:DELIVERY[cur].talk[j], clip:clipId(cur,"talk",j), el:ln.closest(".ln")}]); return; }
   if(e.target.closest("#zhBtn")){ setZh(!showZh); return; }
   if(e.target.closest("#playRead")){
     if(playing === "read"){ stopSpeech(); return; }
-    sayQueue(L[cur].read.map((p,j)=>({text:p[0], el:$(`.rp[data-i="${j}"]`), gap:500})), "read"); return;
+    sayQueue(L[cur].read.map((p,j)=>({text:p[0], who:"Mia", mood:DELIVERY[cur].read[j], clip:clipId(cur,"read",j), el:$(`.rp[data-i="${j}"]`), gap:550})), "read"); return;
   }
   if(e.target.closest("#playTalk")){
     if(playing === "talk"){ stopSpeech(); return; }
-    const l = L[cur], cast = Object.keys(l.talk.cast);
-    sayQueue(l.talk.lines.map((x,j)=>({text:x[1], pitch:PITCH[cast.indexOf(x[0])], el:$(`.ln[data-j="${j}"]`), gap:450})), "talk"); return;
+    const l = L[cur];
+    sayQueue(l.talk.lines.map((x,j)=>({text:x[1], who:l.talk.cast[x[0]], mood:DELIVERY[cur].talk[j], clip:clipId(cur,"talk",j), el:$(`.ln[data-j="${j}"]`), gap:450})), "talk"); return;
   }
 });
 $("#reader").addEventListener("keydown", e=>{
@@ -1422,6 +1703,7 @@ function applyFs(){ document.documentElement.style.setProperty("--fs", fs+"px");
 $("#sizes").onclick = e=>{ const b = e.target.closest("button"); if(!b) return; fs = +b.dataset.v; store.set("fs", fs); applyFs(); };
 function applyRate(){ $$("#rates button").forEach(b=>b.classList.toggle("on", +b.dataset.v === rate)); }
 $("#rates").onclick = e=>{ const b = e.target.closest("button"); if(!b) return; rate = +b.dataset.v; store.set("rate", rate); applyRate(); say("This is how fast I read."); };
+$("#voiceSel").addEventListener("change", e=>{ const v = VOICES.all[+e.target.value]; if(!v) return; voiceURI = v.voiceURI; store.set("voiceURI", voiceURI); pickVoice(); say("Hi, I'm Mia. Nice to meet you!"); });
 function applyZhDef(){ const d = store.get("zhdef", false); $$("#zhset button").forEach(b=>b.classList.toggle("on", !!+b.dataset.v === !!d)); }
 $("#zhset").onclick = e=>{ const b = e.target.closest("button"); if(!b) return; const v = !!+b.dataset.v; store.set("zhdef", v); setZh(v); applyZhDef(); };
 $("#resetBtn").onclick = ()=>{ store.set("pos", 0); closeDrawer(); leaveCover(); go(0); toast("已回到第一課"); };
