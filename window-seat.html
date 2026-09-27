@@ -199,7 +199,7 @@ body.showzh .zh{display:block;}
 .toc-t{display:block;font-weight:700;font-size:14.5px;line-height:1.3;}
 .toc-z{display:block;font-family:var(--f-zh);font-size:12px;color:var(--muted);}
 .toc.cover-link{border-bottom:1px solid var(--rule);font-family:var(--f-zh);font-size:13.5px;color:var(--muted);padding:12px 16px;}
-.field{display:block;width:calc(100% - 32px);margin:14px 16px 6px;padding:10px 12px;font-size:15px;border:1.5px solid var(--rule);background:var(--surface);color:var(--ink);border-radius:4px;font-family:var(--f-body);}
+.field{display:block;width:calc(100% - 32px);margin:14px 16px 6px;padding:10px 12px;font-size:16px;border:1.5px solid var(--rule);background:var(--surface);color:var(--ink);border-radius:4px;font-family:var(--f-body);}
 .field:focus{outline:none;border-color:var(--accent);}
 .qnote{font-family:var(--f-zh);font-size:12px;color:var(--muted);padding:2px 16px 10px;margin:0;}
 .grp{font-family:var(--f-px);font-size:11.5px;letter-spacing:.12em;color:var(--accent);padding:12px 16px 4px;margin:0;}
@@ -298,6 +298,141 @@ body.cover #cover{display:flex;}
 .zz{animation:zz 3s steps(6) infinite;}
 @keyframes zz{0%{transform:translate(0,2px);opacity:0}20%{opacity:1}100%{transform:translate(3px,-5px);opacity:0}}
 
+
+/* iPhone zooms the whole page when a form field is under 16px; keep them all at 16px */
+input,textarea,select{font-size:max(16px,1em);}
+
+/* ---------- about ---------- */
+.cv-copy{margin:30px 0 0;font-size:12.5px;color:var(--muted);letter-spacing:.02em;}
+.tab{white-space:nowrap;}
+.ab{padding:18px 18px 10px;font-family:var(--f-zh);font-size:14.5px;line-height:1.8;}
+.ab-art{border:2px solid var(--ink);box-shadow:4px 4px 0 var(--accent);line-height:0;margin-bottom:18px;background:#E9D8BD;}
+.ab-art svg{width:100%;height:auto;display:block;}
+.ab-brand{margin:0;font-family:var(--f-disp);font-weight:700;font-size:1.9rem;line-height:1.1;}
+.ab-brand span{color:var(--accent);}
+.ab-slogan{margin:4px 0 0;font-family:var(--f-disp);font-style:italic;font-size:1.05rem;}
+.ab-sub{margin:0 0 6px;color:var(--muted);font-size:13.5px;}
+.ab h4{margin:22px 0 6px;font-size:15px;padding-bottom:4px;border-bottom:2px solid var(--ink);}
+.ab p{margin:0 0 10px;}
+.ab p b{color:var(--accent);}
+.ab-note{background:var(--tint);padding:8px 12px;font-weight:700;}
+.ab-info{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:13.5px;}
+.ab-info dt{color:var(--muted);}
+.ab-info dd{margin:0;}
+.ab-copy{margin-top:18px !important;font-size:12.5px;color:var(--muted);}
+/* ---------- homework ---------- */
+.hwcta{margin-top:10px;}
+.hwopen{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--surface);border:2px solid var(--ink);box-shadow:5px 5px 0 var(--accent);padding:14px 16px;cursor:pointer;}
+.hwopen:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--accent);}
+.hw-plant{flex:none;width:44px;height:55px;background:var(--tile);border:1.5px solid var(--ink);padding:3px 4px;}
+.hw-plant svg,.hw-pot svg,#dTile svg{width:100%;height:100%;display:block;}
+.hwo-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+.hwo-t .px{font-size:12px;color:var(--accent);letter-spacing:.14em;}
+.hwo-t b{font-family:var(--f-zh);font-size:1.05rem;}
+.hwo-s{font-family:var(--f-zh);font-size:12.5px;color:var(--muted);}
+.hwo-n{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+.hwo-n .px{font-size:14px;color:var(--ink);}
+.bar{display:block;width:64px;height:8px;border:1.5px solid var(--ink);background:var(--bg);}
+.bar i{display:block;height:100%;background:var(--t-fun);}
+.toc-star{margin-left:auto;align-self:center;font-size:12px;color:var(--muted);white-space:nowrap;}
+.toc{align-items:center;}
+
+body.hwon{overflow:hidden;}
+#hw{position:fixed;top:0;left:0;right:0;height:100%;z-index:55;background:var(--bg);display:flex;flex-direction:column;}
+#hw[hidden]{display:none;}
+.hw-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+.hw-top{flex:none;z-index:2;background:var(--bg);border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:8px;padding:calc(8px + env(safe-area-inset-top,0px)) 12px 8px;}
+.hw-top .ib{font-size:18px;line-height:1;padding:8px 10px;}
+.hw-top .px{margin:0;font-size:13px;color:var(--accent);letter-spacing:.14em;}
+.hw-in{max-width:41rem;margin:0 auto;padding:20px 18px calc(50px + env(safe-area-inset-bottom,0px));}
+.hw-hero{display:flex;gap:16px;align-items:center;margin-bottom:14px;}
+.hw-pot{flex:none;width:76px;height:95px;background:var(--tile);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);padding:5px 7px;}
+.hw-hero h2{margin:0;font-family:var(--f-disp);font-size:1.5rem;line-height:1.15;}
+.hw-hero h2 span{display:block;font-family:var(--f-zh);font-size:14px;font-weight:400;color:var(--muted);margin-top:2px;}
+.hw-meta{margin:8px 0 2px;font-family:var(--f-zh);font-size:13px;color:var(--muted);}
+.hw-meta .px{color:var(--ink);font-size:14px;}
+.hw-plantn{margin:0;font-family:var(--f-zh);font-size:13px;color:var(--muted);}
+.hw-plantn b{color:var(--accent);}
+.hw-intro{font-family:var(--f-zh);font-size:14.5px;line-height:1.75;background:var(--surface);border:1.5px dashed var(--rule);padding:12px 14px;margin:0 0 22px;}
+.hw-day{margin-bottom:20px;}
+.hw-dh{margin:0 0 8px;font-family:var(--f-zh);font-size:14px;color:var(--muted);display:flex;align-items:baseline;gap:10px;}
+.hw-dh .px{font-size:13px;font-weight:600;background:var(--ink);color:var(--bg);padding:1px 7px 0;letter-spacing:.1em;}
+.hwt{border:1.5px solid var(--rule);background:var(--surface);margin-bottom:8px;}
+.hwt.done{border-color:var(--accent);}
+.hwt summary{list-style:none;display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;}
+.hwt summary::-webkit-details-marker{display:none;}
+.star{flex:none;width:34px;height:34px;border:2px solid var(--ink);background:var(--bg);color:var(--rule);font-size:18px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0;}
+.star.on{background:var(--t-fun);color:var(--chip-ink);animation:pop .35s steps(3);}
+@keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+.hwt-i{flex:none;width:22px;height:22px;color:var(--accent);}
+.hwt-i svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.hwt-t{flex:1;min-width:0;display:flex;flex-direction:column;}
+.hwt-t b{font-family:var(--f-zh);font-size:15.5px;line-height:1.35;}
+.hwt.done .hwt-t b{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--accent);}
+.hwt-t span{font-family:var(--f-zh);font-size:12px;color:var(--muted);}
+.hwt-t em{font-style:normal;color:var(--gr);}
+.chev{flex:none;font-size:22px;color:var(--muted);transition:transform .15s;}
+.hwt[open] .chev{transform:rotate(90deg);}
+.hwt-b{padding:2px 14px 14px 56px;font-family:var(--f-zh);font-size:14.5px;line-height:1.7;}
+.hwt-b .why{margin:0 0 8px;}
+.hwt-b .steps{margin:0 0 10px;padding-left:1.3em;}
+.hwt-b .steps li{margin:2px 0;}
+.tip{margin:10px 0;padding:9px 12px;background:var(--tint);font-size:14px;}
+.tip .px{font-size:11px;color:var(--accent);margin-right:8px;letter-spacing:.1em;}
+.hwdone{margin-top:4px;}
+.hwex{margin:6px 0 10px;padding-left:1.2em;font-family:var(--f-body);}
+.hwlab{margin:6px 0 2px;font-size:13px;color:var(--muted);}
+.hwta{display:block;width:100%;font:inherit;font-family:var(--f-body);font-size:16px;padding:8px 10px;border:1.5px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:3px;resize:vertical;margin:4px 0 8px;}
+.hwta:focus{outline:none;border-color:var(--accent);}
+.hwgrid{display:grid;gap:2px;margin-bottom:6px;}
+.hwrow{display:grid;grid-template-columns:6.5em 1fr;gap:8px;align-items:center;}
+.hwrow span{font-family:var(--f-disp);font-weight:700;font-size:14.5px;}
+.hwrow .hwta{margin:2px 0;}
+.hwq{padding-left:1.3em;margin:6px 0;} .hwq p{margin:0;font-family:var(--f-body);font-weight:700;}
+.hwq p.hwlab{font-weight:400;margin:2px 0 0;}
+.fc{margin:8px 0 10px;}
+.fc-card{border:2px solid var(--ink);background:var(--tile);color:#1D2A2E;padding:16px;text-align:center;display:flex;flex-direction:column;gap:2px;min-height:118px;justify-content:center;}
+.fc-card .px{font-size:11px;color:#56666A;}
+.fc-card b{font-family:var(--f-disp);font-size:1.7rem;}
+.fc-card span{font-size:14px;color:#56666A;font-family:var(--f-body);}
+.fc-card em{font-style:normal;font-weight:700;color:#2F6F5E;font-size:1.1rem;}
+.fc-row{display:flex;gap:8px;justify-content:center;margin-top:8px;}
+.fc-end{margin:0 0 8px;}
+.qi{margin:10px 0 14px;}
+.qs{margin:0 0 6px;font-family:var(--f-body);font-size:15.5px;}
+.qs .px{font-size:12px;color:var(--accent);margin-right:8px;}
+.qo{display:flex;flex-wrap:wrap;gap:6px;}
+.qb{border:1.5px solid var(--rule);background:var(--bg);padding:6px 12px;cursor:pointer;font-family:var(--f-body);font-size:15px;border-radius:3px;}
+.qb:hover:not(:disabled){border-color:var(--accent);}
+.qb.right{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+.qb.wrong{background:var(--gr-tint);border-color:var(--gr);color:var(--gr);text-decoration:line-through;}
+.qb.dim{opacity:.45;}
+.qb:disabled{cursor:default;}
+.qe{margin:6px 0 0;font-size:13.5px;color:var(--muted);}
+.qz-end{font-weight:700;} .qz-end .px{margin-right:8px;color:var(--accent);}
+.hw-badges{margin-top:30px;}
+.bdg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.bd{border:1.5px dashed var(--rule);padding:10px 6px;text-align:center;display:flex;flex-direction:column;gap:2px;opacity:.55;}
+.bd.on{opacity:1;border:2px solid var(--ink);background:var(--surface);box-shadow:3px 3px 0 var(--t-fun);}
+.bd .px{font-size:18px;color:var(--muted);} .bd.on .px{color:#C99A2E;}
+.bd b{font-family:var(--f-zh);font-size:13px;} .bd small{font-family:var(--f-zh);font-size:11px;color:var(--muted);line-height:1.35;}
+.hw-close2{display:block;margin:22px auto 0;}
+.hwjump{display:flex;align-items:center;gap:10px;width:100%;margin:-10px 0 24px;padding:10px 14px;background:var(--tint);border:1.5px solid var(--accent);color:var(--ink);font-family:var(--f-zh);font-size:14.5px;cursor:pointer;text-align:left;}
+.hwjump .px{font-size:13px;color:var(--accent);}
+.hwjump .sp{flex:1;}
+.hwjump:hover{background:var(--surface);}
+.pspk{float:right;margin:2px -6px 0 6px;padding:6px;}
+.spk.live{color:var(--accent);background:var(--tint);}
+.read p.speaking .pspk{color:var(--accent);}
+.hw-note{margin-top:24px;font-family:var(--f-zh);font-size:12.5px;color:var(--muted);line-height:1.7;}
+@media (max-width:560px){
+  .hwt-b{padding-left:14px;}
+  .bdg{grid-template-columns:repeat(2,1fr);}
+  .hwrow{grid-template-columns:1fr;gap:0;}
+  .hwo-s{display:none;}
+}
+@media (prefers-reduced-motion:reduce){.star.on{animation:none;}}
+
 #toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,160%);opacity:0;visibility:hidden;background:var(--ink);color:var(--bg);font-family:var(--f-zh);font-size:14px;padding:10px 16px;z-index:70;transition:transform .2s;max-width:calc(100vw - 32px);}
 #toast.on{transform:translate(-50%,0);opacity:1;visibility:visible;}
 mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
@@ -331,6 +466,7 @@ mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
     <button class="pbtn alt" id="coverMusic">♪ MUSIC</button>
   </div>
   <p class="tap" id="tapHint"><span class="blink">♪</span> 輕觸畫面任一處，開始播放背景音樂 · Tap anywhere for music</p>
+  <p class="cv-copy">© 2026 Wen-Hung Fang. All rights reserved.</p>
 </section>
 
 <div id="bar">
@@ -358,6 +494,7 @@ mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
     <button class="tab" data-pane="search">搜尋</button>
     <button class="tab" data-pane="bank">詞彙庫</button>
     <button class="tab" data-pane="set">設定</button>
+    <button class="tab" data-pane="about">有關</button>
   </div>
   <div class="d-body">
     <div class="pane on" id="pane-toc"></div>
@@ -377,6 +514,33 @@ mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
       <p class="qnote" id="bnote"></p>
       <div id="bank"></div>
     </div>
+    <div class="pane" id="pane-about">
+      <div class="ab">
+        <div class="ab-art" id="abArt"></div>
+        <p class="ab-brand">Ink<span>Quest</span></p>
+        <p class="ab-slogan">Every quest begins with a story.</p>
+        <p class="ab-sub">每一段冒險，都從一個故事開始。</p>
+
+        <h4>學英文，可以好玩一點</h4>
+        <p>很多人對英文的記憶，是背不完的單字表和寫不完的考卷。InkQuest 想換個方式：先給你一個好故事，讓你想知道接下來會發生什麼事，英文就在不知不覺中跟著進來了。</p>
+        <p>互動遊戲書、分級讀本、角色扮演遊戲、桌遊……做法很多，想法只有一個：<b>先讓人投入，學習就會自然發生。</b></p>
+
+        <h4>關於這本《Window Seat》</h4>
+        <p>這是 InkQuest 寫給初學者的第一本小課本。主角 Mia 是個普通的台灣上班族：早上趕著出門、傍晚被鄰居的貓造訪、下雨天想起阿嬤。十篇短短的課文，都是生活裡的一小段時光。</p>
+        <p>不用一次全部看懂。點一下不認識的字，聽一聽、念一念，一天一點點就好。就像 Mia 窗邊那盆九層塔：好的東西，都是慢慢長大的。</p>
+        <p class="ab-note">念錯沒關係，說出口就是進步。</p>
+
+        <h4>版本資訊</h4>
+        <dl class="ab-info">
+          <dt>書名</dt><dd>Window Seat 窗邊英文・初級十課</dd>
+          <dt>版本</dt><dd>1.0・2026 年 9 月</dd>
+          <dt>內容</dt><dd id="abStats"></dd>
+          <dt>作者</dt><dd>Wen-Hung Fang</dd>
+          <dt>製作</dt><dd>Created with Claude</dd>
+        </dl>
+        <p class="ab-copy">© 2026 Wen-Hung Fang. All rights reserved.</p>
+      </div>
+    </div>
     <div class="pane" id="pane-set">
       <div class="setrow"><h4>文字大小</h4><div class="seg" id="sizes"><button data-v="17">小</button><button data-v="19">中</button><button data-v="22">大</button></div></div>
       <div class="setrow"><h4>朗讀速度</h4><div class="seg" id="rates"><button data-v="0.7">慢</button><button data-v="0.85">適中</button><button data-v="1">正常</button></div></div>
@@ -386,6 +550,10 @@ mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
         <p class="qnote" style="padding:6px 0 0">iPhone、iPad 上的網頁只能用系統內建的語音；自己下載的「增強音質」語音 Apple 不開放給網頁使用。在電腦上用 Microsoft Edge 開這一頁，可以選到很自然的 AI 語音（名稱有 Natural 的那幾個）。</p>
         <p class="qnote" style="padding:4px 0 0" id="audioNote"></p></div>
       <div class="setrow"><h4>中文翻譯</h4><div class="seg" id="zhset"><button data-v="0">預設隱藏</button><button data-v="1">預設顯示</button></div></div>
+      <div class="setrow"><h4>作業進度備份</h4>
+        <p class="qnote" style="padding:0 0 8px">進度存在這台裝置的瀏覽器裡，可能被系統清掉。按「備份」會產生一串進度碼，存起來；換手機或資料不見時，貼回來按「還原」。</p>
+        <input id="hwCode" class="field" style="margin:0 0 8px;width:100%" placeholder="進度碼會出現在這裡" autocomplete="off">
+        <div class="seg"><button id="hwBak">備份</button><button id="hwRes">還原</button><button id="hwClr">清除作業進度</button></div></div>
       <div class="setrow"><h4>閱讀進度</h4><div class="seg"><button id="resetBtn">從第一課重新開始</button></div></div>
     </div>
   </div>
@@ -398,6 +566,7 @@ mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
 </div>
 
 <div id="pop" role="dialog" aria-hidden="true"><button class="p-x" id="popX" aria-label="關閉">×</button><div id="popIn"></div></div>
+<div id="hw" hidden role="dialog" aria-label="自習作業"></div>
 <div id="toast" role="status"></div>
 <script>
 /* =========================================================
@@ -1097,6 +1266,487 @@ const DELIVERY = [
   "grumpy: defeated, but laughing"]}
 ];
 /* =========================================================
+   HOMEWORK — 12 small tasks per lesson, laid out over 7 days.
+   Progress lives in this browser only (a nice extra, not a record).
+   ========================================================= */
+
+/* ---- lesson-specific material ---- */
+const HW_LOCAL = [
+/* 1 */ { photo:"拍下你的早餐（或任何一餐）。",
+  photoEx:["This is my breakfast.","I have an egg pancake and black tea.","It is hot and good."],
+  sign:"早餐店的菜單、便利商店的咖啡機，很多都有英文。",
+  signEx:["Egg Pancake 蛋餅","Milk Tea 奶茶","Hot / Iced 熱／冰","Latte 拿鐵"],
+  signDo:"找 3 個英文品項，在心裡用英文點一次：One ___, please.",
+  diary:"This morning, I ___. For breakfast, I ate ___." },
+/* 2 */ { photo:"拍一隻貓、狗，或住家附近的小動物（寵物照片也可以）。",
+  photoEx:["This is my neighbor’s dog.","He is brown and small.","He is like a teddy bear."],
+  sign:"社區公告、公園、寵物店的標語。",
+  signEx:["No Pets Allowed 禁止攜帶寵物","Please Clean Up After Your Dog 請清理狗便","Keep Off the Grass 請勿踐踏草皮"],
+  signDo:"找一個標語，用英文說它是什麼意思：This sign says ___.",
+  diary:"Today I saw ___. It was ___." },
+/* 3 */ { photo:"拍一樣有回憶的舊東西，或下雨天的街景。",
+  photoEx:["This is my old watch.","It was my dad’s.","I feel warm when I see it."],
+  sign:"下雨天的車站、捷運站、百貨公司門口。",
+  signEx:["Caution: Wet Floor 小心地滑","Umbrella Bags 雨傘套","Watch Your Step 小心腳步"],
+  signDo:"找到一個和天氣或安全有關的標語，大聲念一次。",
+  diary:"When I was a child, I ___. Today I ___." },
+/* 4 */ { photo:"拍一樣夜市小吃，或今天吃的任何點心。",
+  photoEx:["This is stinky tofu.","It smells bad, but it tastes great.","It was 60 dollars."],
+  sign:"飲料店菜單是最棒的英文教材！",
+  signEx:["Bubble Milk Tea 珍珠奶茶","Half Sugar 半糖","Less Ice 少冰","Large / Medium 大杯／中杯","Cash Only 只收現金"],
+  signDo:"在心裡用英文點一杯你最愛的飲料：One large ___, half sugar, less ice, please.（或找朋友扮店員練習）",
+  diary:"Tonight I ate ___. It tasted ___." },
+/* 5 */ { photo:"拍你睡前的床邊或書桌（不用拍到自己）。",
+  photoEx:["This is my bed.","I put my phone away at 11 p.m.","I sleep seven hours."],
+  sign:"捷運、藥局、圖書館。",
+  signEx:["Quiet Please 請保持安靜","Priority Seat 博愛座","Open 24 Hours 24小時營業"],
+  signDo:"找一個標語，想想它為什麼要寫英文、寫給誰看。",
+  diary:"Last night I slept ___ hours. Today I feel ___." },
+/* 6 */ { photo:"拍一個有回憶的地方（學校、老街、公園），或一張舊照片。",
+  photoEx:["This is my old school.","I remember my friends.","We laughed a lot here."],
+  sign:"郵局和郵筒上都有英文。",
+  signEx:["Post Office 郵局","Stamps 郵票","School Zone 學校區域"],
+  signDo:"看看郵筒上寫的英文，猜猜紅色和綠色郵筒有什麼不同。",
+  diary:"Dear ___, How are you? I miss ___. Love, ___" },
+/* 7 */ { photo:"拍一朵花、一隻小昆蟲，或公園的一角。",
+  photoEx:["This is a small yellow flower.","A bee is on it.","The bee is busy."],
+  sign:"公園、動物園、植物園的告示牌。",
+  signEx:["Do Not Pick the Flowers 請勿摘花","Please Do Not Feed the Animals 請勿餵食動物","Exit 出口"],
+  signDo:"找一個「Do not / Please」開頭的句子，這就是第 5 課學的祈使句！",
+  diary:"Today I learned ___. It was interesting because ___." },
+/* 8 */ { photo:"拍今天的晚餐餐桌（不用拍到人）。",
+  photoEx:["This is my dinner.","I ate with my family.","We did not use our phones."],
+  sign:"餐廳、電影院、咖啡店。",
+  signEx:["Please Turn Off Your Phone 請關閉手機","No Outside Food or Drinks 禁止外食","Please Wait to Be Seated 請稍候帶位","Free Wi-Fi 免費無線網路"],
+  signDo:"找一條店家的「規則」，說說你同不同意：I agree / don’t agree with this rule because ___.",
+  diary:"At dinner today, I ___. I think ___." },
+/* 9 */ { photo:"拍一盆植物，或任何正在慢慢長大的東西。",
+  photoEx:["This is my plant.","It has ten leaves.","It grows slowly."],
+  sign:"花市、超市的蔬果區。",
+  signEx:["Fresh 新鮮","Organic Vegetables 有機蔬菜","Basil 九層塔／羅勒"],
+  signDo:"在超市找 3 種蔬菜水果的英文名字。",
+  diary:"This week, I am going to ___." },
+/* 10 */ { photo:"拍你上班或上學的路，或你的交通工具。",
+  photoEx:["This is my scooter.","It takes 15 minutes to get to work.","It is faster than the bus."],
+  sign:"捷運站和馬路上到處都是英文。",
+  signEx:["Exit 出口","Transfer 轉乘","Scooter Parking 機車停車","No Parking 禁止停車"],
+  signDo:"通勤時找 3 個英文標示，記下來，下次上課跟老師分享。",
+  diary:"Today I ___ to work. It took ___ minutes." }
+];
+
+/* ---- grammar quiz: [sentence, options (first = correct), 白話說明] ---- */
+const HW_QUIZ = [
+/* 1 */ [["It ___ 7:30.",["is","am","are"],"說時間用 It is。"],
+  ["I ___ late again!",["am","is","are"],"I 配 am。"],
+  ["The milk tea ___ sweet.",["is","are","am"],"一杯奶茶是單數，用 is。"],
+  ["I ___ my teeth every morning.",["brush","brushes","brushing"],"每天的習慣，I 後面用動詞原形。"],
+  ["We ___ tired today.",["are","is","am"],"we 配 are。"]],
+/* 2 */ [["There ___ a cat in my building.",["is","are","have"],"一隻貓，單數用 There is。"],
+  ["There ___ two sofas in the room.",["are","is","has"],"兩張沙發，複數用 There are。"],
+  ["Mochi can’t ___.",["talk","talks","talking"],"can / can’t 後面接動詞原形。"],
+  ["She walks ___ a queen.",["like","likes","liking"],"放在名詞前面的 like 是「像……一樣」，不變化。"],
+  ["I ___ cats. They are cute.",["like","am like","likes"],"「喜歡」的 like 是動詞，前面不加 am。"]],
+/* 3 */ [["Look! It ___ raining now.",["is","was","are"],"現在正在發生：is + V-ing。"],
+  ["When I ___ a child, I was shy.",["was","were","am"],"小時候是過去，I 配 was。"],
+  ["We ___ in Tainan last week.",["were","was","are"],"last week 是過去，we 配 were。"],
+  ["I didn’t ___ rain.",["like","liked","likes"],"didn’t 後面一定用原形。"],
+  ["Yesterday, Grandma ___ me to school.",["walked","walks","walk"],"Yesterday 是過去，動詞加 -ed。"]],
+/* 4 */ [["The stinky tofu smells ___.",["bad","badly","bads"],"smell、taste、look 後面接形容詞。"],
+  ["This soup tastes ___.",["good","well","goods"],"要說 tastes good，不說 tastes well。"],
+  ["___ is the grilled corn?",["How much","How many","What many"],"問價錢用 How much。"],
+  ["___ spoons do we need?",["How many","How much","How long"],"湯匙可以一支一支數，用 How many。"],
+  ["The chicken is ___ than Leo’s face.",["bigger","more big","big"],"big 的比較級是 bigger（g 要重複）。"]],
+/* 5 */ [["___ you sleep, your brain cleans itself.",["When","What","Who"],"「當……的時候」用 When。"],
+  ["___ your phone away before bed.",["Put","Puts","Putting"],"祈使句用動詞原形開頭。"],
+  ["___ be late!",["Don’t","Not","No"],"叫人不要做，用 Don’t + 原形。"],
+  ["Adults ___ seven hours of sleep.",["need","needs","needing"],"Adults 是複數，need 不加 s。"],
+  ["She ___ a break.",["needs","need","needing"],"She 是第三人稱單數，needs 要加 s。"]],
+/* 6 */ [["Yesterday I ___ past our old school.",["walked","walk","walking"],"Yesterday 是過去，用 walked。"],
+  ["哪一個 -ed 念 [ɪd]？",["wanted","laughed","shared"],"t、d 結尾的動詞，-ed 念 [ɪd]：wanted。"],
+  ["I hope ___ can meet again soon.",["we","we are","to we"],"hope 後面直接接完整句子：we can meet…"],
+  ["Do you ___ sing in the shower?",["still","yet","ago"],"「還是、仍然」用 still，放在動詞前。"],
+  ["She is ___ here.",["still","yet","ago"],"still 放在 be 動詞後面。"]],
+/* 7 */ [["A bee ___ a garden.",["finds","find","finding"],"A bee 是單數，finds 要加 s。"],
+  ["She ___ home to her hive.",["flies","flys","fly"],"fly → flies（y 改 ies）。"],
+  ["My dad ___ TV every night.",["watches","watchs","watch"],"ch 結尾加 es：watches。"],
+  ["If you’re tired, ___ to bed.",["go","goes","going"],"結果的部分是祈使句，用原形 go。"],
+  ["Do you know where ___?",["the station is","is the station","the station are"],"問句放進句子裡，順序變回「主詞 + 動詞」。"]],
+/* 8 */ [["I ___ phones are bad.",["don’t think","think not","am not think"],"英文習慣說 I don’t think…"],
+  ["I like the rule, ___ Leo doesn’t.",["but","so","because"],"相反的想法用 but。"],
+  ["It was late, ___ I went to bed.",["so","but","or"],"說結果用 so。"],
+  ["Mom agreed ___ Dad.",["with","to","on"],"同意某人：agree with。"],
+  ["I ___ with you.",["agree","am agree","agreeing"],"agree 本身就是動詞，不加 am。"]],
+/* 9 */ [["I am going to ___ with it.",["cook","cooks","cooking"],"be going to 後面接原形。"],
+  ["We ___ going to visit Grandma.",["are","is","am"],"we 配 are。"],
+  ["One leaf, two ___.",["leaves","leafs","leafes"],"leaf 的複數是 leaves。"],
+  ["I brush my ___.",["teeth","tooths","teeths"],"tooth 的複數是 teeth。"],
+  ["Last month, I ___ a basil plant.",["bought","buy","am going to buy"],"Last month 是過去，buy → bought。"]],
+/* 10 */ [["My scooter is ___ than the bus.",["faster","more fast","fastest"],"短形容詞加 -er：faster。"],
+  ["Walking is ___ than riding.",["healthier","healthyer","healthyest"],"y 結尾改成 -ier：healthier。"],
+  ["Is coffee ___ than tea?",["better","gooder","more good"],"good 的比較級是 better。"],
+  ["It ___ me an hour to get home.",["takes","spends","uses"],"花多少時間：It takes (me) + 時間。"],
+  ["___ is better, tea or coffee?",["Which","What","Who"],"兩個選一個用 Which。"]]
+];
+
+/* ---- the 12 tasks ---- */
+const HW_TASKS = [
+  {id:"read",   day:1, min:10, icon:"mic",   t:"朗讀課文，錄音傳給老師", tags:["發音","流暢度"], send:true},
+  {id:"cards",  day:1, min:5,  icon:"cards", t:"單字閃卡", tags:["單字記憶"]},
+  {id:"write",  day:2, min:15, icon:"pen",   t:"用 10 個單字造句", tags:["寫作","單字運用"], send:true},
+  {id:"quiz",   day:2, min:5,  icon:"quiz",  t:"文法小測驗", tags:["文法"]},
+  {id:"shadow", day:3, min:10, icon:"wave",  t:"Shadowing 跟讀練習", tags:["聽力","語調","連音"]},
+  {id:"signs",  day:3, min:10, icon:"eye",   t:"生活中的英文偵探", tags:["閱讀","生活應用"]},
+  {id:"talk",   day:4, min:15, icon:"chat",  t:"找人練習對話", tags:["口說","對話反應"], send:true},
+  {id:"opinion",day:5, min:10, icon:"bulb",  t:"說說你的看法：寫下來或錄音", tags:["表達意見","組織句子"], send:true},
+  {id:"photo",  day:5, min:10, icon:"cam",   t:"拍一張照片，用英文描述", tags:["描述","生活連結"], send:true},
+  {id:"diary",  day:6, min:10, icon:"book",  t:"英文小日記", tags:["寫作","口說"], send:true},
+  {id:"again",  day:7, min:10, icon:"mic",   t:"再錄一次，和第一天比一比", tags:["發音","自信"], send:true},
+  {id:"next",   day:7, min:5,  icon:"door",  t:"預習下一課", tags:["閱讀","猜字能力"]}
+];
+const HW_N = HW_TASKS.length;
+const HW_DAYS = [
+  "先開口念出來，再認識單字。",
+  "把單字變成你自己的句子。",
+  "用耳朵學，也用眼睛找英文。",
+  "今天找一個練習夥伴。",
+  "說出你的想法，也拍下你的生活。",
+  "寫幾句今天的事，一句也算數。",
+  "回頭聽聽自己進步了多少。"
+];
+const HW_ICON = {
+  mic:'<path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  cards:'<rect x="3" y="6" width="13" height="15" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v13"/>',
+  pen:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/>',
+  quiz:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17.5v.5"/>',
+  wave:'<path d="M3 12h2M7 8v8M11 5v14M15 8v8M19 11v2"/>',
+  eye:'<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/>',
+  chat:'<path d="M4 5h12v9H8l-4 3z"/><path d="M16 9h4v8l-3-2h-6v-1"/>',
+  bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3z"/>',
+  cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>',
+  door:'<path d="M5 21V4h10v17M15 12h.01M15 4l4 2v15h-4"/>'
+};
+const hwIcon = k => `<svg viewBox="0 0 24 24" aria-hidden="true">${HW_ICON[k]}</svg>`;
+
+/* ---- basil growth: total stars -> stage ---- */
+const PLANT = [
+  {at:0,   n:"種子",       e:"Seed"},
+  {at:1,   n:"發芽了",     e:"Sprout"},
+  {at:6,   n:"兩片新葉",   e:"First leaves"},
+  {at:15,  n:"小幼苗",     e:"Seedling"},
+  {at:30,  n:"越長越高",   e:"Growing"},
+  {at:50,  n:"枝葉茂密",   e:"Bushy"},
+  {at:70,  n:"高高的九層塔", e:"Tall"},
+  {at:95,  n:"開花了",     e:"Flowering"},
+  {at:120, n:"可以做九層塔烘蛋了！", e:"Harvest"}
+];
+const plantStage = s => { let k = 0; PLANT.forEach((p,i)=>{ if(s >= p.at) k = i; }); return k; };
+function plantSVG(k){
+  const R = (x,y,w,h,c) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
+  const G = "#4E9A5B", GL = "#7BC57F", POT = "#C8613F", POTD = "#9E4A30", SOIL = "#5A3B25";
+  let s = "";
+  const hts = [0,2,4,6,8,10,12,13,13], pairs = [0,1,1,2,3,4,5,6,6];
+  const top = 15 - hts[k];
+  if(k === 0) s += R(7,13,2,2,"#8E6443") + R(6,14,4,1,"#6B4A30");
+  if(k > 0) s += R(7,top,2,hts[k],G);
+  for(let p=0; p<pairs[k]; p++){
+    const y = 13 - p*2, w = k >= 5 ? 3 : 2, c = p % 2 ? G : GL;
+    s += R(7-w,y,w,1,c) + R(9,y,w,1,c);
+    if(k >= 5) s += R(7-w+1,y-1,w-1,1,c) + R(9,y-1,w-1,1,c);
+  }
+  if(k >= 1 && k < 7) s += R(6,top-1,1,1,GL) + R(9,top-1,1,1,GL);
+  if(k >= 7) s += R(7,top-2,2,2,"#F4F0FA") + R(6,top-1,1,1,"#C9B8E8") + R(9,top-1,1,1,"#C9B8E8") + R(7,top-3,2,1,"#C9B8E8");
+  if(k === 8) s += R(1,2,1,1,"#F4C542") + R(14,4,1,1,"#F4C542") + R(2,8,1,1,"#F4C542") + R(13,1,1,1,"#F4C542");
+  s += R(3,15,10,1,POTD) + R(4,15,8,1,SOIL) + R(4,16,8,4,POT) + R(5,20,6,0,POT) + R(4,19,8,1,POTD);
+  return `<svg viewBox="0 0 16 20" shape-rendering="crispEdges" aria-hidden="true">${s}</svg>`;
+}
+
+/* ---- achievements ---- */
+const BADGES = [
+  {id:"first",  n:"第一步",     e:"First Step",    d:"完成第一個作業"},
+  {id:"voice",  n:"勇敢開口",   e:"Brave Voice",   d:"完成一個錄音作業"},
+  {id:"writer", n:"小作家",     e:"Pen Pal",       d:"完成一個寫作作業"},
+  {id:"detect", n:"英文偵探",   e:"Sign Detective",d:"在生活中找到英文"},
+  {id:"ace",    n:"文法小達人", e:"Grammar Ace",   d:"文法小測驗 5 題全對"},
+  {id:"week",   n:"一週達成",   e:"Week Complete", d:"完成一課的全部作業"},
+  {id:"half",   n:"走了一半",   e:"Halfway",       d:"完成 5 課的全部作業"},
+  {id:"grad",   n:"窗邊畢業生", e:"Graduate",      d:"完成 10 課的全部作業"}
+];
+
+/* ---- state ---- */
+let HW = {}, HWTXT = {}, HWQ = {}, HWB = [];
+function hwLoad(){
+  HW = store.get("hw", {}) || {}; HWTXT = store.get("hwtxt", {}) || {};
+  HWQ = store.get("hwq", {}) || {}; HWB = store.get("badges", []) || [];
+}
+function hwSave(){ store.set("hw", HW); store.set("hwq", HWQ); store.set("badges", HWB); }
+const hwDone = i => (HW[i] && HW[i].t) || [];
+const hwCount = i => hwDone(i).length;
+const hwTotal = () => L.reduce((s,_,i)=>s + hwCount(i), 0);
+const hwAll = () => HW_TASKS.map(t=>t.id);
+
+function hwSet(i, id, on){
+  const before = plantStage(hwTotal());
+  let filled = [];
+  if(on){
+    /* a student jumping ahead probably did the earlier lessons in class — count them as done */
+    for(let j=0; j<i; j++) if(!HW[j]){ HW[j] = {t:hwAll(), a:1}; filled.push(j+1); }
+  }
+  const cur = new Set(hwDone(i));
+  on ? cur.add(id) : cur.delete(id);
+  HW[i] = {t:[...cur]};
+  hwSave();
+  if(on) toast("★ 完成！做得好");
+  if(filled.length) toast(`第 ${filled[0]}${filled.length>1?`–${filled[filled.length-1]}`:""} 課也幫你標記完成了`);
+  const after = plantStage(hwTotal());
+  if(on && after > before) toast(`🌱 九層塔長大了：${PLANT[after].n}`);
+  hwBadges();
+  hwRefresh(i);
+}
+
+function hwBadges(){
+  const got = new Set(HWB), earn = [];
+  const all = L.map((_,i)=>hwDone(i));
+  /* activity badges count only lessons the student actually ticked, not ones filled in automatically */
+  const real = L.map((_,i)=>HW[i] && !HW[i].a ? hwDone(i) : []);
+  const any = id => real.some(d=>d.includes(id));
+  const full = all.filter(d=>d.length >= HW_N).length;
+  const test = {
+    first: real.some(d=>d.length),
+    voice: any("read") || any("again") || any("talk"),
+    writer: any("write") || any("diary"),
+    detect: any("signs"),
+    ace: Object.values(HWQ).some(v=>v >= 5),
+    week: real.some(d=>d.length >= HW_N), half: full >= 5, grad: full >= 10
+  };
+  BADGES.forEach(b=>{ if(test[b.id] && !got.has(b.id)){ HWB.push(b.id); earn.push(b); } });
+  if(earn.length){ hwSave(); toast(`🏅 解鎖成就：${earn.map(b=>b.n).join("、")}`); }
+}
+
+/* ---- lesson-page call to action ---- */
+function hwCTA(i){
+  const n = hwCount(i);
+  return `<section class="sec hwcta"><button class="hwopen" id="hwOpen">
+    <span class="hw-plant">${plantSVG(plantStage(hwTotal()))}</span>
+    <span class="hwo-t"><span class="px">HOMEWORK</span><b>本課自習作業</b><span class="hwo-s">一週 12 個小任務，一天約 15 分鐘</span></span>
+    <span class="hwo-n"><span class="px">★ ${n}/${HW_N}</span><span class="bar"><i style="width:${Math.round(n/HW_N*100)}%"></i></span></span>
+  </button></section>`;
+}
+
+/* ---- task bodies ---- */
+function hwBody(i, t){
+  const l = L[i], x = HW_LOCAL[i], next = L[i+1];
+  const ta = (n, ph, rows=3) => `<textarea class="hwta" data-key="${i}-${t.id}-${n}" rows="${rows}" placeholder="${esc(ph)}">${esc(HWTXT[`${i}-${t.id}-${n}`]||"")}</textarea>`;
+  const copy = `<button class="tbtn hwcopy" data-copy="${i}-${t.id}">複製內容，傳給老師</button>`;
+  switch(t.id){
+  case "read": return {why:"大聲念出來，是把英文從「看得懂」變成「說得出口」的第一步。今天的錄音是你的起點，第七天會再錄一次比較。",
+    steps:["先按課文上方的 Listen 朗讀，完整聽一遍。","自己念兩遍，卡住的字點一下聽發音。","第三遍用手機內建的「語音備忘錄」錄下來。","把錄音檔傳給老師。"],
+    tip:"不用完美，念完就是勝利！念錯了不要重來，繼續往下念就好。老師想聽的是你現在的樣子。"};
+  case "cards": return {why:"每天花幾分鐘把單字「叫出來」，比看十遍更記得住。",
+    steps:["看英文，先在心裡說出中文意思。","按「翻面」確認答案。記得就按「記得」；還不熟就按「放到後面再考」，這張卡會排到最後面再出現一次。","十個都記得就完成了！"],
+    extra:`<div class="fc" data-i="${i}"></div>`,
+    tip:"忘記是正常的，大腦就是靠「忘記 → 想起來」變強的。"};
+  case "write": return {why:"用自己的生活造句，單字才會真正變成你的。",
+    steps:["每個單字寫一個句子，最好和你的生活有關。","不會的地方先用中文寫，上課時一起問老師。","寫完按「複製內容」，貼給老師。"],
+    extra:`<div class="hwgrid">${l.words.map((k,n)=>`<label class="hwrow"><span>${esc(VOCAB[k].w)}</span>${ta(n,"例如："+VOCAB[k].ex,1)}</label>`).join("")}</div>${copy}`,
+    tip:"短句就很好！像 I like rice. 就是一個完整又正確的句子。"};
+  case "quiz": return {why:"把這課的文法用出來，錯了也有白話說明。",
+    steps:["每題選一個答案，馬上就知道對錯。","看完說明再往下一題。"],
+    extra:`<div class="qz" data-i="${i}"></div>`,
+    tip:"錯的題目最有價值，它剛好告訴你下次要注意什麼。"};
+  case "shadow": return {why:"Shadowing（影子跟讀）是模仿母語者的節奏和語調，聽力和口說一起練。",
+    steps:["到設定把朗讀速度調成「慢」。","按課文每一段旁邊的喇叭，只聽那一段，聽完照著念一次，連語氣都模仿。也可以用「Listen 朗讀」一路播，想跟念時按「暫停」。","熟了以後試試「同步跟讀」：聲音一出來，你晚半秒跟著念，像影子一樣。","對話的每一句旁邊也有喇叭，挑一個角色來模仿。"],
+    tip:"模仿語調比每個字都念對更重要。想像你在演一齣戲！"};
+  case "signs": return {why:`台灣雖然沒什麼講英文的環境，但很多標語都有中英對照。${x.sign}`,
+    steps:["出門時留意有英文的標語、菜單或看板。","拍下來，或把英文記在手機裡。",x.signDo],
+    extra:`<ul class="hwex">${x.signEx.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`,
+    tip:"一天找到一個就很棒了。練習時在心裡說，或說給朋友聽就好，不用跟店員講英文；等出國或遇到外國朋友時，這些句子就派上用場了！"};
+  case "talk": return {why:"真正的對話需要回應別人，這是自己念課文練不到的。",
+    steps:["找家人、朋友或同事，各演一個角色，把「對話練習」念兩次。","交換角色再念一次。","試著改一個小地方，例如換成別的飲料、別的價錢。","能錄下來更好，傳給老師聽聽。"],
+    tip:"找不到人也沒關係：可以一人分飾兩角，或讓頁面念一個角色、你念另一個。"};
+  case "opinion": return {why:"說出自己的想法，是從「背課文」走到「用英文溝通」的關鍵一步。",
+    steps:["從下面三題挑 1–3 題。","每題都附了一個「句型」，照著填空開頭就好，再多寫幾句，或錄 30 秒。","寫好後複製傳給老師，或把錄音傳給老師。"],
+    extra:`<ol class="hwq">${l.ask.map((a,n)=>`<li><p>${esc(plain(a[0]))}</p><p class="hwlab">句型：${frame(a[2])}</p>${ta(n,"寫在這裡…",2)}</li>`).join("")}</ol>${copy}`,
+    tip:"想法比文法重要。老師會幫你把句子修得更漂亮，你只要敢說出來。"};
+  case "photo": return {why:"把課文的英文和你的真實生活連在一起，這樣記得最牢。",
+    steps:[x.photo,"寫 2–3 句英文描述照片。","把照片和句子一起傳給老師。"],
+    extra:`<p class="hwlab">可以參考：</p><ul class="hwex">${x.photoEx.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>${ta(0,"This is my ___.",3)}${copy}`,
+    tip:"照片不用好看，重點是那是「你的」生活。"};
+  case "diary": return {why:"每天用英文記一點小事，是最不費力、也最持久的練習。",
+    steps:["寫 3–5 句今天發生的一件小事，或錄 30 秒。","可以用下面的句型開頭。","寫好後複製傳給老師。"],
+    extra:`<p class="hwlab">句型：${esc(x.diary)}</p>${ta(0,x.diary,4)}${copy}`,
+    tip:"一句也算數！今天只寫得出 I am tired. 也是一篇日記。"};
+  case "again": return {why:"跟第一天的錄音比一比，你會聽到自己的進步。",
+    steps:["再完整聽一次課文。","再錄一次朗讀。","把兩個錄音都聽一遍：哪裡變流暢了？","把新的錄音傳給老師，也可以說說你的感覺。"],
+    tip:"進步常常很小，但一定聽得出來。給自己一點掌聲！"};
+  case "next": return next ? {why:"先看過一次，上課時會輕鬆很多。",
+    steps:[`打開第 ${i+2} 課〈${next.title}〉，聽一次課文朗讀，不用看中文。`,"從標題和圖示猜猜這課在講什麼。","找出 3 個你已經認識的單字。"],
+    extra:`<button class="tbtn" data-gonext="${i+1}">前往第 ${i+2} 課 →</button>`,
+    tip:"看不懂很正常，預習的目的只是先「打個招呼」。"}
+    : {why:"最後一課了！回頭看看，你已經走了好遠。",
+    steps:["挑一課你最喜歡的，再念一次。","翻出你第 1 課的錄音，和現在比一比。","告訴老師：你最喜歡哪一課？為什麼？"],
+    extra:`<button class="tbtn" data-gonext="0">回到第 1 課 →</button>`,
+    tip:"十課都走完了。Good things grow slowly — 你做到了。"};
+  }
+}
+
+/* ---- overlay ---- */
+let hwLesson = 0;
+function openHW(i){
+  hwLesson = i; stopSpeech(); closePop();
+  $("#hw").hidden = false; document.body.classList.add("hwon");
+  hwRender(); $("#hwScroll").scrollTop = 0; hwFit();
+}
+function closeHW(){ $("#hw").hidden = true; hwBlur(); document.body.classList.remove("hwon"); render(hwLesson); window.scrollTo(0, document.body.scrollHeight); }
+function hwRender(){
+  const i = hwLesson, done = new Set(hwDone(i)), tot = hwTotal(), k = plantStage(tot);
+  const nextAt = PLANT[k+1] ? PLANT[k+1].at - tot : 0;
+  let h = `<div class="hw-top"><button class="ib" id="hwX" aria-label="關閉">✕</button><p class="px">LESSON ${pad(i+1)} · HOMEWORK</p></div>
+  <div class="hw-scroll" id="hwScroll"><div class="hw-in">
+  <header class="hw-hero"><div class="hw-pot">${plantSVG(k)}</div><div>
+    <h2>${esc(L[i].title)}<span>本週小任務</span></h2>
+    <p class="hw-meta"><span class="px">★ ${done.size}/${HW_N}</span> 這一課　·　全部 <span class="px">★ ${tot}</span></p>
+    <p class="hw-plantn">你的九層塔：<b>${PLANT[k].n}</b>${nextAt>0?`（再 ${nextAt} 顆星就會長大）`:""}</p>
+  </div></header>
+  <p class="hw-intro">一天一點點，大約 15 分鐘就好。<b>不用照順序，也不用完美</b>，今天想做哪個就先做哪個，做完就按星星打勾。標了「傳給老師」的，用 LINE 或 IG 私訊傳過來就可以。</p>`;
+  for(let d=1; d<=7; d++){
+    h += `<section class="hw-day"><p class="hw-dh"><span class="px">DAY ${d}</span>${esc(HW_DAYS[d-1])}</p>`;
+    HW_TASKS.filter(t=>t.day===d).forEach(t=>{
+      const on = done.has(t.id), b = hwBody(i,t);
+      h += `<details class="hwt${on?" done":""}" data-id="${t.id}"><summary>
+        <button class="star${on?" on":""}" data-star="${t.id}" aria-label="${on?"取消完成":"標記完成"}" aria-pressed="${on}">★</button>
+        <span class="hwt-i">${hwIcon(t.icon)}</span>
+        <span class="hwt-t"><b>${esc(t.t)}</b><span>${t.min} 分鐘 · ${t.tags.map(esc).join("、")}${t.send?' · <em>傳給老師</em>':""}</span></span>
+        <span class="chev">›</span></summary>
+        <div class="hwt-b"><p class="why">${b.why}</p><ol class="steps">${b.steps.map(s=>`<li>${s}</li>`).join("")}</ol>${b.extra||""}
+        <p class="tip"><span class="px">TIP</span>${b.tip}</p>
+        <button class="tbtn hwdone${on?" on":""}" data-star="${t.id}">${on?"已完成 ★":"完成了，給自己一顆星 ★"}</button></div></details>`;
+    });
+    h += `</section>`;
+  }
+  const got = new Set(HWB);
+  h += `<section class="hw-badges"><p class="hw-dh"><span class="px">BADGES</span>成就</p><div class="bdg">${BADGES.map(b=>`<div class="bd${got.has(b.id)?" on":""}"><span class="px">${got.has(b.id)?"★":"?"}</span><b>${b.n}</b><small>${b.d}</small></div>`).join("")}</div></section>
+  <p class="hw-note">作業進度只存在這台裝置的瀏覽器裡，換手機或清除瀏覽資料就會不見。可以到「設定」備份進度。真正的進步在你的錄音和句子裡，星星只是小獎勵 😊</p>
+  <button class="pbtn alt hw-close2" id="hwX2">回到課文</button></div></div>`;
+  $("#hw").innerHTML = h;
+  $$("#hw .fc").forEach(fcInit);
+  $$("#hw .qz").forEach(qzInit);
+}
+function hwRefresh(i){
+  if(!$("#hw").hidden && hwLesson === i){
+    const open = $$("#hw details[open]").map(d=>d.dataset.id), y = $("#hwScroll").scrollTop;
+    hwRender(); open.forEach(id=>{ const d = $(`#hw details[data-id="${id}"]`); if(d) d.open = true; }); $("#hwScroll").scrollTop = y;
+  }
+  if(typeof buildToc === "function") buildToc();
+}
+
+/* ---- flashcards ---- */
+function fcInit(el){
+  const i = +el.dataset.i, ws = L[i].words.slice(); let n = 0, flip = false, known = 0;
+  const draw = ()=>{
+    if(n >= ws.length){ el.innerHTML = `<p class="fc-end">${known}/${ws.length} 個記得 🎉 ${known<ws.length?"沒記住的明天再看一次就好。":"全部記得，太棒了！"}</p><button class="tbtn" data-fc="again">再練一次</button>`; return; }
+    const v = VOCAB[ws[n]];
+    el.innerHTML = `<div class="fc-card${flip?" flip":""}"><span class="px">還剩 ${ws.length-n} 張</span><b>${esc(v.w)}</b><span>${esc(v.kk)}</span>${flip?`<em>${esc(v.pos)} ${esc(v.zh)}</em>`:""}</div>
+      <div class="fc-row">${flip?`<button class="tbtn" data-fc="no">還不熟，放到後面再考</button><button class="tbtn on" data-fc="yes">記得 ✓</button>`:`<button class="tbtn" data-fc="say">${SVGI.spk}<span>發音</span></button><button class="tbtn on" data-fc="flip">翻面</button>`}</div>`;
+  };
+  el.onclick = e=>{
+    const b = e.target.closest("[data-fc]"); if(!b) return; const a = b.dataset.fc;
+    if(a === "say") say(VOCAB[ws[n]].w);
+    if(a === "flip") flip = true;
+    if(a === "yes"){ known++; n++; flip = false; }
+    if(a === "no"){ ws.push(ws[n]); ws.splice(n,1); flip = false; }
+    if(a === "again"){ n = 0; known = 0; flip = false; }
+    draw();
+  };
+  draw();
+}
+
+/* ---- quiz ---- */
+function qzInit(el){
+  const i = +el.dataset.i, items = HW_QUIZ[i];
+  const order = items.map(q=>q[1].map((o,k)=>k).sort(()=>Math.random()-.5));
+  const ans = items.map(()=>-1);
+  const draw = ()=>{
+    const answered = ans.filter(a=>a>=0).length, right = ans.filter(a=>a===0).length;
+    el.innerHTML = items.map((q,n)=>`<div class="qi"><p class="qs"><span class="px">Q${n+1}</span>${esc(q[0]).replace("___",'<span class="blank"></span>')}</p><div class="qo">${order[n].map(k=>{
+      const st = ans[n] < 0 ? "" : k === 0 ? " right" : k === ans[n] ? " wrong" : " dim";
+      return `<button class="qb${st}" data-q="${n}" data-k="${k}"${ans[n]>=0?" disabled":""}>${esc(q[1][k])}</button>`;
+    }).join("")}</div>${ans[n]>=0?`<p class="qe">${ans[n]===0?"✓ 答對了！":"✗ 差一點！"}${esc(q[2])}</p>`:""}</div>`).join("") +
+    (answered === items.length ? `<p class="qz-end"><span class="px">${right}/${items.length}</span>${right===items.length?"全對，太厲害了！":"錯的題目看一下說明，再試一次會更熟。"}</p><button class="tbtn" data-q="retry">再做一次</button>` : "");
+  };
+  el.onclick = e=>{
+    const b = e.target.closest("[data-q]"); if(!b) return;
+    if(b.dataset.q === "retry"){ ans.fill(-1); order.forEach(o=>o.sort(()=>Math.random()-.5)); draw(); return; }
+    const n = +b.dataset.q; if(ans[n] >= 0) return; ans[n] = +b.dataset.k; draw();
+    if(ans.every(a=>a>=0)){
+      const right = ans.filter(a=>a===0).length;
+      HWQ[i] = Math.max(HWQ[i]||0, right); hwSave();
+      if(!hwDone(i).includes("quiz")) setTimeout(()=>hwSet(i,"quiz",true), 600); else hwBadges();
+    }
+  };
+  draw();
+}
+
+/* ---- events ---- */
+function hwInit(){
+  hwLoad();
+  const hw = $("#hw");
+  hw.addEventListener("click", e=>{
+    if(e.target.closest("#hwX, #hwX2")){ closeHW(); return; }
+    const s = e.target.closest("[data-star]");
+    if(s){ e.preventDefault(); e.stopPropagation(); const id = s.dataset.star, on = !hwDone(hwLesson).includes(id);
+      hwSet(hwLesson, id, on); return; }
+    const c = e.target.closest("[data-copy]");
+    if(c){
+      const [li, tid] = c.dataset.copy.split("-"), t = HW_TASKS.find(x=>x.id===tid);
+      const vals = $$(`#hw textarea[data-key^="${li}-${tid}-"]`).map((a,n)=>{
+        const v = a.value.trim(); if(!v) return "";
+        if(tid === "write") return `${n+1}. ${v}`;
+        if(tid === "opinion") return `Q${n+1}. ${plain(L[+li].ask[n][0])}\n${v}`;
+        return v; }).filter(Boolean);
+      if(!vals.length){ toast("先寫一點內容再複製喔"); return; }
+      const text = `【Window Seat 第 ${+li+1} 課・${t.t}】\n` + vals.join("\n");
+      const done = ()=>toast("已複製！貼到 LINE 或 IG 傳給老師");
+      try{ navigator.clipboard.writeText(text).then(done, ()=>fallbackCopy(text)); }catch(err){ fallbackCopy(text); }
+      return;
+    }
+    const g = e.target.closest("[data-gonext]");
+    if(g){ $("#hw").hidden = true; document.body.classList.remove("hwon"); go(+g.dataset.gonext); }
+  });
+  hw.addEventListener("focusout", ()=>setTimeout(()=>{ window.scrollTo(window.scrollX, window.scrollY); hwFit(); }, 60));
+  hw.addEventListener("input", e=>{
+    const a = e.target.closest(".hwta"); if(!a) return;
+    HWTXT[a.dataset.key] = a.value; store.set("hwtxt", HWTXT);
+  });
+}
+/* iOS keyboards shift the page; pin the overlay to the visible viewport so the ✕ bar stays reachable */
+function hwFit(){
+  const v = window.visualViewport, el = $("#hw"); if(!el || el.hidden) return;
+  if(!v){ el.style.top = "0px"; el.style.height = ""; return; }
+  el.style.top = v.offsetTop + "px"; el.style.height = v.height + "px";
+}
+function hwBlur(){ const el = $("#hw"); el.style.top = ""; el.style.height = ""; }
+if(window.visualViewport){ visualViewport.addEventListener("resize", hwFit); visualViewport.addEventListener("scroll", hwFit); }
+function fallbackCopy(text){
+  const t = document.createElement("textarea"); t.value = text; t.style.position = "fixed"; t.style.opacity = "0";
+  document.body.appendChild(t); t.select();
+  let ok = false; try{ ok = document.execCommand("copy"); }catch(e){}
+  t.remove(); toast(ok ? "已複製！貼到 LINE 或 IG 傳給老師" : "無法自動複製，請長按文字框手動複製");
+}
+
+/* ---- backup code ---- */
+function hwBackup(){
+  const data = {v:1, hw:HW, q:HWQ, b:HWB};
+  return "WS1-" + btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+}
+function hwRestore(code){
+  try{
+    const d = JSON.parse(decodeURIComponent(escape(atob(code.trim().replace(/^WS1-/,"")))));
+    if(!d || typeof d.hw !== "object") throw 0;
+    HW = d.hw; HWQ = d.q || {}; HWB = d.b || []; hwSave(); buildToc(); render(cur); return true;
+  }catch(e){ return false; }
+}
+/* =========================================================
    WINDOW SEAT — app
    ========================================================= */
 const $ = s => document.querySelector(s);
@@ -1132,7 +1782,9 @@ L.forEach((l,i)=>{
 const SVGI = {
   spk:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>',
   play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>',
-  stop:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12v12H6z"/></svg>'
+  stop:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12v12H6z"/></svg>',
+  pause:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>',
+  restart:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>'
 };
 const PAL = {k:"#2A2F33",w:"#FFFFFF",y:"#F4C542",g:"#4E9A5B",G:"#7BC57F",o:"#B8793F",r:"#D9674E",b:"#8FCBE3",p:"#F2A1A8",s:"#C9C2B3"};
 const ICONS = {
@@ -1385,29 +2037,43 @@ try{
   }).catch(()=>{});
 }catch(e){}
 
+/* the queue can be paused and resumed; pausing cancels the current sentence and resumes from it */
+let Q = null;
+function clearSpeaking(){ $$(".speaking").forEach(e=>e.classList.remove("speaking")); }
 function stopSpeech(){
   qid++; if(SYN) SYN.cancel();
   try{ player.pause(); }catch(e){}
-  $$(".speaking").forEach(e=>e.classList.remove("speaking"));
+  clearSpeaking(); Q = null;
   playing = null; Music.duck(false); playBtns();
 }
+function pauseSpeech(){
+  if(!Q || Q.paused) return;
+  qid++; Q.paused = true; Q.k = Math.max(0, Q.k - 1);
+  if(SYN) SYN.cancel(); try{ player.pause(); }catch(e){}
+  Music.duck(false); playBtns();
+}
+function resumeSpeech(){ if(Q && Q.paused){ Q.paused = false; runQueue(); } }
 function sayQueue(items, mode){
   const hasClip = items.some(it=>it.clip && CLIPS.has(it.clip));
   if(!SYN && !hasClip){ toast("這個瀏覽器不支援朗讀功能"); return; }
-  stopSpeech(); const my = ++qid; playing = mode || "one"; playBtns(); Music.duck(true);
+  stopSpeech();
   const q = [];
   items.forEach(it=>{ if(it.clip && CLIPS.has(it.clip)) q.push({audio:it.clip, el:it.el, gap:it.gap || 250, it}); else pushTTS(q, it); });
-  let k = 0;
-  const clear = ()=>$$(".speaking").forEach(e=>e.classList.remove("speaking"));
+  Q = {q, k:0, mode:mode || "one", paused:false};
+  runQueue();
+}
+function runQueue(){
+  const my = ++qid, S = Q, q = S.q;
+  playing = S.mode; playBtns(); Music.duck(true);
   const next = ()=>{
     if(my !== qid) return;
-    if(k >= q.length){ clear(); playing = null; Music.duck(false); playBtns(); return; }
-    const x = q[k++];
-    if(!x.el) clear();
-    else if(!x.el.classList.contains("speaking")){ clear(); x.el.classList.add("speaking"); if(q.length > 1) x.el.scrollIntoView({block:"nearest", behavior:"smooth"}); }
+    if(S.k >= q.length){ clearSpeaking(); Q = null; playing = null; Music.duck(false); playBtns(); return; }
+    const x = q[S.k++];
+    if(!x.el) clearSpeaking();
+    else if(!x.el.classList.contains("speaking")){ clearSpeaking(); x.el.classList.add("speaking"); if(q.length > 1) x.el.scrollIntoView({block:"nearest", behavior:"smooth"}); }
     if(x.audio){
       let failed = false;
-      const fail = ()=>{ if(failed || my !== qid) return; failed = true; const sub = []; pushTTS(sub, x.it); q.splice(k, 0, ...sub); next(); };
+      const fail = ()=>{ if(failed || my !== qid) return; failed = true; const sub = []; pushTTS(sub, x.it); q.splice(S.k, 0, ...sub); next(); };
       player.onended = ()=>{ if(my === qid) setTimeout(next, x.gap); };
       player.onerror = fail;
       player.src = `audio/${x.audio}.mp3`;
@@ -1419,7 +2085,7 @@ function sayQueue(items, mode){
     const u = new SpeechSynthesisUtterance(x.text);
     if(x.voice){ u.voice = x.voice; u.lang = x.voice.lang; } else u.lang = "en-US";  /* iOS ignores a voice whose lang doesn't match */
     u.rate = x.rate; u.pitch = x.pitch;
-    u.onend = ()=> setTimeout(next, x.gap);
+    u.onend = ()=>{ if(my === qid) setTimeout(next, x.gap); };
     u.onerror = ()=>{ if(my === qid) setTimeout(next, 50); };
     SYN.speak(u);
   };
@@ -1446,9 +2112,20 @@ function fillVoiceSel(){
     (vq(m) === 0 ? (better ? "。清單裡有更好的版本，可以直接切換。" : "。這個瀏覽器只提供一般音質的英文語音。") : "");
 }
 function playBtns(){
-  const r = $("#playRead"), t = $("#playTalk");
-  if(r) r.innerHTML = playing === "read" ? SVGI.stop + "<span>Stop 停止</span>" : SVGI.play + "<span>Listen 朗讀</span>";
-  if(t) t.innerHTML = playing === "talk" ? SVGI.stop + "<span>Stop 停止</span>" : SVGI.play + "<span>Play all 播放對話</span>";
+  const set = (id, mode, label)=>{
+    const b = $(id); if(!b) return;
+    const mine = Q && Q.mode === mode;
+    b.innerHTML = !mine ? SVGI.play + `<span>${label}</span>`
+      : Q.paused ? SVGI.play + "<span>Resume 繼續</span>" : SVGI.pause + "<span>Pause 暫停</span>";
+    b.classList.toggle("on", !!mine && !Q.paused);
+    const r = $(id + "Re"); if(r) r.hidden = !mine;
+  };
+  $$("[data-para],[data-line]").forEach(b=>{
+    const live = !!Q && Q.mode === (b.dataset.para !== undefined ? "p"+b.dataset.para : "t"+b.dataset.line);
+    if(b.classList.contains("live") !== live){ b.classList.toggle("live", live); b.innerHTML = live ? SVGI.stop : SVGI.spk; b.setAttribute("aria-label", live ? "停止" : "聽這一段"); }
+  });
+  set("#playRead", "read", "Listen 朗讀");
+  set("#playTalk", "talk", "Play all 播放對話");
 }
 
 /* ---------------- render ---------------- */
@@ -1465,12 +2142,13 @@ function render(i){
   $("#barTitle").innerHTML = `<b>L${pad(i+1)}</b>${esc(l.title)}`;
   let h = `<header class="lh"><div class="tile">${pix(l.icon)}</div><div>
     <p class="eyebrow">LESSON ${pad(i+1)} <span class="chip t-${l.theme}">${th.zh} ${th.en}</span></p>
-    <h1 class="lt">${esc(l.title)}</h1><p class="lzt">${esc(l.zt)}</p></div></header>`;
+    <h1 class="lt">${esc(l.title)}</h1><p class="lzt">${esc(l.zt)}</p></div></header>` +
+    (hwCount(i) ? `<button class="hwjump" id="hwJump"><span class="px">★ ${hwCount(i)}/${HW_N}</span>繼續本課作業<span class="sp"></span>→</button>` : "");
 
   h += secHead("read","READ","課文",
-    `<button class="tbtn" id="playRead"></button><button class="tbtn${showZh?" on":""}" id="zhBtn" aria-pressed="${showZh}">中文</button>`);
+    `<button class="tbtn" id="playRead"></button><button class="tbtn" id="playReadRe" hidden aria-label="從頭朗讀">${SVGI.restart}<span>從頭</span></button><button class="tbtn${showZh?" on":""}" id="zhBtn" aria-pressed="${showZh}">中文</button>`);
   h += `<p class="legend"><span class="lv1">單字</span><span class="lv2">文法</span><span class="lv3">文化</span>點一下看解釋</p><div class="read">`;
-  h += l.read.map((p,j)=>`<p class="rp ${p[2]||""}" data-i="${j}"><span class="en"><span class="hl">${mk(p[0])}</span></span><span class="zh">${esc(p[1])}</span></p>`).join("");
+  h += l.read.map((p,j)=>`<p class="rp ${p[2]||""}" data-i="${j}"><button class="spk pspk" data-para="${j}" aria-label="聽這一段">${SVGI.spk}</button><span class="en"><span class="hl">${mk(p[0])}</span></span><span class="zh">${esc(p[1])}</span></p>`).join("");
   h += `</div></section>`;
 
   h += secHead("words","WORDS","單字 10");
@@ -1487,7 +2165,7 @@ function render(i){
   }).join("") + `</ol></section>`;
 
   const cast = Object.keys(l.talk.cast);
-  h += secHead("talk","TALK","對話練習", `<button class="tbtn" id="playTalk"></button>`);
+  h += secHead("talk","TALK","對話練習", `<button class="tbtn" id="playTalk"></button><button class="tbtn" id="playTalkRe" hidden aria-label="從頭播放">${SVGI.restart}<span>從頭</span></button>`);
   h += `<p class="where">${esc(l.talk.where)}</p><div class="talk">` + l.talk.lines.map((ln,j)=>{
     const s = cast.indexOf(ln[0]);
     return `<div class="ln s${s}" data-j="${j}"><span class="who">${esc(l.talk.cast[ln[0]])}</span><div><span class="ln-en"><span class="hl">${mk(ln[1])}</span></span><span class="zh">${esc(ln[2])}</span></div><button class="spk" data-line="${j}" aria-label="聽這句">${SVGI.spk}</button></div>`;
@@ -1496,6 +2174,7 @@ function render(i){
   h += secHead("ask","YOUR TURN","說說你的看法");
   h += `<ol class="al">` + l.ask.map((a,j)=>`<li data-a="${j}"><p class="aq">${mk(a[0])}</p><p class="zh">${esc(a[1])}</p><p class="frame"><span class="px">TRY</span>${frame(a[2])}</p></li>`).join("") + `</ol></section>`;
 
+  h += hwCTA(i);
   $("#reader").innerHTML = h;
   playBtns();
   $("#prevBtn").disabled = i === 0;
@@ -1554,14 +2233,23 @@ $("#reader").addEventListener("click", e=>{
   const wr = e.target.closest(".wr"); if(wr){ openPop(wr.dataset.k); return; }
   const ln = e.target.closest("[data-line]");
   if(ln){ const l = L[cur], j = +ln.dataset.line, x = l.talk.lines[j];
-    sayQueue([{text:x[1], who:l.talk.cast[x[0]], mood:DELIVERY[cur].talk[j], clip:clipId(cur,"talk",j), el:ln.closest(".ln")}]); return; }
+    if(Q && Q.mode === "t"+j){ stopSpeech(); return; }
+    sayQueue([{text:x[1], who:l.talk.cast[x[0]], mood:DELIVERY[cur].talk[j], clip:clipId(cur,"talk",j), el:ln.closest(".ln")}], "t"+j); return; }
+  if(e.target.closest("#hwOpen")){ openHW(cur); return; }
   if(e.target.closest("#zhBtn")){ setZh(!showZh); return; }
+  const pp = e.target.closest("[data-para]");
+  if(pp){ const j = +pp.dataset.para;
+    if(Q && Q.mode === "p"+j){ stopSpeech(); return; }   /* tap again to stop */
+    sayQueue([{text:L[cur].read[j][0], who:"Mia", mood:DELIVERY[cur].read[j], clip:clipId(cur,"read",j), el:pp.closest(".rp")}], "p"+j); return; }
+  if(e.target.closest("#hwJump")){ openHW(cur); return; }
+  const rr = e.target.closest("#playReadRe, #playTalkRe");
+  if(rr){ stopSpeech(); (rr.id === "playReadRe" ? $("#playRead") : $("#playTalk")).click(); return; }
   if(e.target.closest("#playRead")){
-    if(playing === "read"){ stopSpeech(); return; }
+    if(Q && Q.mode === "read"){ Q.paused ? resumeSpeech() : pauseSpeech(); return; }
     sayQueue(L[cur].read.map((p,j)=>({text:p[0], who:"Mia", mood:DELIVERY[cur].read[j], clip:clipId(cur,"read",j), el:$(`.rp[data-i="${j}"]`), gap:550})), "read"); return;
   }
   if(e.target.closest("#playTalk")){
-    if(playing === "talk"){ stopSpeech(); return; }
+    if(Q && Q.mode === "talk"){ Q.paused ? resumeSpeech() : pauseSpeech(); return; }
     const l = L[cur];
     sayQueue(l.talk.lines.map((x,j)=>({text:x[1], who:l.talk.cast[x[0]], mood:DELIVERY[cur].talk[j], clip:clipId(cur,"talk",j), el:$(`.ln[data-j="${j}"]`), gap:450})), "talk"); return;
   }
@@ -1593,7 +2281,7 @@ function buildToc(){
   let h = `<button class="toc cover-link" id="toCover">← 回到封面 Title screen</button>`;
   L.forEach((l,i)=>{
     const th = THEMES[l.theme];
-    h += `<button class="toc${i===cur?" cur":""}" data-i="${i}"><span class="tile">${pix(l.icon)}</span><span><span class="toc-n">LESSON ${pad(i+1)} · <span class="chip t-${l.theme}" style="font-size:10px">${th.zh}</span></span><span class="toc-t">${esc(l.title)}</span><span class="toc-z">${esc(l.zt)}</span></span></button>`;
+    h += `<button class="toc${i===cur?" cur":""}" data-i="${i}"><span class="tile">${pix(l.icon)}</span><span><span class="toc-n">LESSON ${pad(i+1)} · <span class="chip t-${l.theme}" style="font-size:10px">${th.zh}</span></span><span class="toc-t">${esc(l.title)}</span><span class="toc-z">${esc(l.zt)}</span></span><span class="toc-star px">★${hwCount(i)}</span></button>`;
   });
   $("#pane-toc").innerHTML = h;
 }
@@ -1742,14 +2430,21 @@ $("#coverGo").onclick = ()=>{ leaveCover(); go(cur); };
 
 /* keys */
 document.addEventListener("keydown", e=>{
-  if(e.key === "Escape"){ closePop(); closeDrawer(); $("#mp").hidden = true; return; }
+  if(e.key === "Escape"){ if(!$("#hw").hidden){ closeHW(); return; } closePop(); closeDrawer(); $("#mp").hidden = true; return; }
+  if(!$("#hw").hidden) return;
   if(/INPUT|TEXTAREA/.test(document.activeElement.tagName) || document.body.classList.contains("cover") || $("#drawer").classList.contains("on")) return;
   if(e.key === "ArrowRight" && cur < L.length-1) go(cur+1);
   if(e.key === "ArrowLeft" && cur > 0) go(cur-1);
 });
 
-let tt = null;
-function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(()=>t.classList.remove("on"), 2400); }
+/* messages queue up so a burst (star, plant, badge) shows one after another */
+const toastQ = []; let toastBusy = false;
+function toast(msg){ if(toastQ[toastQ.length-1] !== msg) toastQ.push(msg); if(!toastBusy) toastNext(); }
+function toastNext(){
+  const t = $("#toast"); if(!toastQ.length){ toastBusy = false; t.classList.remove("on"); return; }
+  toastBusy = true; t.textContent = toastQ.shift(); t.classList.add("on");
+  setTimeout(()=>{ t.classList.remove("on"); setTimeout(toastNext, 220); }, 2200);
+}
 
 window.addEventListener("hashchange", ()=>{
   const m = /^#l(\d+)$/.exec(location.hash);
@@ -1772,8 +2467,20 @@ document.addEventListener("keydown", autoMusic, true);
 ["touchend","click","keydown"].forEach(t=> document.addEventListener(t, ()=>Music.wake(), true));
 
 /* boot */
+hwInit();
 $("#screen").innerHTML = scene();
-$("#dTile").innerHTML = pix("sprout");
+$("#abArt").innerHTML = scene().replace('id="glass"','id="glass2"').replace("url(#glass)","url(#glass2)");
+$("#abStats").textContent = `${L.length} 課・${Object.keys(VOCAB).length} 個單字・${Object.keys(GRAM).length} 個文法重點・${L.reduce((s,l)=>s+l.talk.lines.length,0)} 句對話・${L.length*HW_N} 顆作業星星`;
+$("#dTile").innerHTML = plantSVG(plantStage(hwTotal()));
+
+/* homework backup / reset in settings */
+$("#hwBak").onclick = ()=>{ const code = hwBackup(); $("#hwCode").value = code;
+  try{ navigator.clipboard.writeText(code).then(()=>toast("進度碼已複製，貼到記事本或傳給自己保存"), ()=>{ $("#hwCode").select(); toast("請長按文字框複製進度碼"); }); }catch(e){ $("#hwCode").select(); } };
+$("#hwRes").onclick = ()=>{ const v = $("#hwCode").value; if(!v.trim()){ toast("先把進度碼貼到框裡"); return; }
+  toast(hwRestore(v) ? "進度已還原 ★" : "進度碼好像不完整，請再貼一次"); };
+let clearArm = false;
+$("#hwClr").onclick = e=>{ if(!clearArm){ clearArm = true; e.target.textContent = "再按一次確認清除"; setTimeout(()=>{ clearArm = false; e.target.textContent = "清除作業進度"; }, 3000); return; }
+  HW = {}; HWQ = {}; HWB = []; hwSave(); store.set("hwtxt", {}); HWTXT = {}; buildToc(); render(cur); e.target.textContent = "清除作業進度"; clearArm = false; toast("作業進度已清除"); };
 applyFs(); applyRate(); applyZhDef(); setZh(showZh);
 buildToc();
 const hm = /^#l(\d+)$/.exec(location.hash);
