@@ -1,0 +1,1416 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>Lamplight Readers · Level 1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jersey+15&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F5EFE3; --card:#FBF7EF; --ink:#2B2536; --muted:#6D6478; --rule:#E2D8C6; --shade:rgba(43,37,54,.06);
+  --lv:#C0823A; --lv-soft:#F1DDBF; --hl:#F6E3B8; --ok:#4E8A5B; --no:#B5524A; --stamp:#B5524A;
+  --f-body:'Literata',Georgia,"PingFang TC","Noto Serif TC","Microsoft JhengHei",serif;
+  --f-dot:'Jersey 15',"PingFang TC","Noto Sans TC",sans-serif;
+  --f-zh:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+  --fs:19px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){color-scheme:dark;
+    --paper:#1C1A25; --card:#24212F; --ink:#EDE6D6; --muted:#A79FB3; --rule:#383345; --shade:rgba(0,0,0,.25);
+    --lv:#E3A95C; --lv-soft:#3A2E22; --hl:#4A3B24; --ok:#8CC596; --no:#E08A80; --stamp:#E08A80;}
+}
+:root[data-theme="dark"]{color-scheme:dark;
+  --paper:#1C1A25; --card:#24212F; --ink:#EDE6D6; --muted:#A79FB3; --rule:#383345; --shade:rgba(0,0,0,.25);
+  --lv:#E3A95C; --lv-soft:#3A2E22; --hl:#4A3B24; --ok:#8CC596; --no:#E08A80; --stamp:#E08A80;}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:var(--fs);line-height:1.75;}
+button{font:inherit;color:inherit;}
+input,textarea,select{font-size:max(16px,1em);}
+[hidden]{display:none !important;}
+.zh,.zhs{font-family:var(--f-zh);}
+.dot{font-family:var(--f-dot);font-weight:400;letter-spacing:.03em;}
+svg.px{width:1em;height:1em;image-rendering:pixelated;}
+
+/* ---------- cover ---------- */
+#cover{position:fixed;inset:0;z-index:50;background:#141222;color:#F3EBDD;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(20px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom));overflow:auto;cursor:pointer;}
+body:not(.cover) #cover{display:none;}
+body.cover{overflow:hidden;}
+#cover .stage{width:min(100%,720px);border-radius:14px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.5);line-height:0;}
+#cover canvas{width:100%;height:auto;display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
+#cover .ck{font-family:var(--f-dot);font-size:15px;letter-spacing:.14em;color:#E3A95C;margin:22px 0 4px;text-align:center;}
+#cover h1{font-family:var(--f-dot);font-weight:400;font-size:clamp(2.6rem,11vw,4.2rem);line-height:1;margin:0;letter-spacing:.02em;text-align:center;}
+#cover .cz{font-family:var(--f-zh);font-size:16px;opacity:.85;margin:8px 0 18px;text-align:center;letter-spacing:.08em;}
+#cover .go{font-family:var(--f-dot);font-size:20px;letter-spacing:.06em;background:#E3A95C;color:#1C1A25;border:0;border-radius:30px;padding:10px 26px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.35);}
+#cover .go:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+#cover .cm{font-family:var(--f-dot);font-size:14px;letter-spacing:.1em;opacity:.7;margin-top:14px;}
+#cover .cc{font-family:var(--f-zh);font-size:12px;opacity:.5;margin-top:18px;}
+
+/* ---------- top bar ---------- */
+.bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:6px;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top));background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);}
+.ib{width:42px;height:42px;border:0;background:transparent;border-radius:12px;display:grid;place-items:center;cursor:pointer;flex:none;}
+.ib:hover{background:var(--shade);}
+.ib svg{width:22px;height:22px;fill:currentColor;}
+.ib.on{color:var(--lv);}
+.brand{font-family:var(--f-dot);font-size:20px;letter-spacing:.04em;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;}
+.brand small{font-size:15px;color:var(--lv);margin-left:6px;}
+
+main{max-width:42rem;margin:0 auto;padding:18px 18px 90px;}
+
+/* ---------- home ---------- */
+.lib{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:16px 16px 14px;margin:6px 0 22px;position:relative;overflow:hidden;}
+.lib:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--lv);}
+.libh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.libh b{font-family:var(--f-dot);font-weight:400;font-size:22px;letter-spacing:.04em;}
+.libh span{font-family:var(--f-zh);font-size:13px;color:var(--muted);}
+.stamps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:12px 0 10px;}
+.st{aspect-ratio:1;border:2px dashed var(--rule);border-radius:50%;display:grid;place-items:center;font-family:var(--f-dot);font-size:18px;color:var(--rule);cursor:pointer;background:none;padding:0;}
+.st.on{border:3px double var(--stamp);color:var(--stamp);transform:rotate(-12deg);}
+.st.on svg{width:58%;height:58%;}
+.st.new{animation:thump .5s cubic-bezier(.2,1.6,.4,1);}
+@keyframes thump{0%{transform:scale(2.2) rotate(-30deg);opacity:0}100%{transform:scale(1) rotate(-12deg);opacity:1}}
+.libs{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--f-zh);font-size:13.5px;color:var(--muted);}
+.libs b{font-family:var(--f-dot);font-weight:400;font-size:20px;color:var(--ink);margin-right:3px;}
+.hh{font-family:var(--f-dot);font-weight:400;font-size:22px;letter-spacing:.05em;margin:8px 0 10px;}
+.cards{display:grid;gap:10px;}
+.card{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;text-align:left;width:100%;background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:12px 14px;cursor:pointer;}
+.card:hover{border-color:var(--lv);}
+.ico{width:48px;height:48px;border-radius:10px;background:var(--lv-soft);display:grid;place-items:center;}
+.ico svg{width:34px;height:34px;}
+.cn{font-family:var(--f-dot);font-size:19px;line-height:1.2;display:block;}
+.cz2{font-family:var(--f-zh);font-size:13.5px;color:var(--muted);display:block;line-height:1.5;}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.tag{font-family:var(--f-zh);font-size:11.5px;line-height:1;padding:4px 7px;border-radius:20px;background:var(--shade);color:var(--muted);white-space:nowrap;}
+.tag.t{background:var(--lv-soft);color:var(--ink);}
+.cr{font-family:var(--f-dot);font-size:14px;color:var(--muted);text-align:right;line-height:1.2;}
+.cr .ok{color:var(--stamp);font-size:22px;display:block;}
+
+/* ---------- story ---------- */
+.sk{font-family:var(--f-dot);font-size:15px;letter-spacing:.12em;color:var(--lv);margin:4px 0 2px;}
+.story h1{font-family:var(--f-dot);font-weight:400;font-size:clamp(2.1rem,8vw,2.9rem);line-height:1.05;margin:0 0 4px;letter-spacing:.02em;}
+.story .szt{font-family:var(--f-zh);font-size:17px;color:var(--muted);margin:0 0 10px;letter-spacing:.06em;}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px;}
+.intro{font-family:var(--f-zh);font-size:15px;line-height:1.85;color:var(--muted);background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:12px 14px;margin:0 0 16px;}
+.by{font-family:var(--f-body);font-style:italic;font-size:14px;color:var(--muted);display:block;margin-top:6px;}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 18px;position:sticky;top:59px;z-index:5;padding:8px 0;background:var(--paper);}
+.pb{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);background:var(--card);border-radius:24px;padding:7px 14px;cursor:pointer;font-family:var(--f-zh);font-size:14.5px;line-height:1.2;}
+.pb svg{width:16px;height:16px;fill:currentColor;}
+.pb.on{background:var(--lv);border-color:var(--lv);color:#fff;}
+.pb.sel{border-color:var(--lv);box-shadow:0 0 0 3px var(--lv-soft);}
+.pp{position:relative;padding-left:40px;margin:0 0 1.05em;}
+.pspk{position:absolute;left:0;top:.2em;width:30px;height:30px;border-radius:50%;border:1px solid var(--rule);background:var(--card);display:grid;place-items:center;cursor:pointer;padding:0;color:var(--muted);}
+.pspk svg{width:15px;height:15px;fill:currentColor;}
+.pspk.live{background:var(--lv);border-color:var(--lv);color:#fff;}
+.pp .en{margin:0;}
+.pp .en .t{border-radius:4px;transition:background .25s;-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 2px;margin:0 -2px;}
+.pp.speaking .en .t{background:var(--hl);}
+.pp .zh{margin:.35em 0 0;font-size:.8em;line-height:1.8;color:var(--muted);display:none;}
+body.showzh .pp .zh{display:block;}
+.g{cursor:pointer;border-bottom:2px dotted var(--lv);}
+.g.cu{border-bottom-style:dashed;border-bottom-color:var(--muted);}
+.g:focus-visible{outline:2px solid var(--lv);outline-offset:2px;}
+.flash{animation:flash 1.8s ease;}
+@keyframes flash{0%,40%{background:var(--hl)}100%{background:transparent}}
+.end{text-align:center;font-family:var(--f-dot);font-size:22px;letter-spacing:.2em;color:var(--lv);margin:28px 0 20px;}
+.box{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:16px;margin:0 0 18px;}
+.bh{font-family:var(--f-dot);font-size:20px;letter-spacing:.04em;margin:0;}
+.bz{font-family:var(--f-zh);font-size:13px;color:var(--muted);margin:0 0 10px;}
+.q{margin:14px 0 0;}
+.qt{margin:0 0 6px;font-weight:600;font-size:.95em;}
+.qo{display:grid;gap:6px;}
+.qo button{text-align:left;border:1px solid var(--rule);background:var(--paper);border-radius:10px;padding:8px 12px;cursor:pointer;font-size:.9em;line-height:1.45;}
+.qo button.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--paper));}
+.qo button.wrong{border-color:var(--no);background:color-mix(in srgb,var(--no) 12%,var(--paper));text-decoration:line-through;}
+.qx{font-family:var(--f-zh);font-size:14px;line-height:1.75;margin:6px 0 0;color:var(--muted);}
+.qx b{color:var(--ink);}
+.done{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;}
+.bigst{font-family:var(--f-dot);font-size:21px;letter-spacing:.05em;background:var(--lv);color:#fff;border:0;border-radius:30px;padding:10px 24px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.18);}
+.bigst[disabled]{background:transparent;color:var(--stamp);box-shadow:none;border:3px double var(--stamp);transform:rotate(-3deg);cursor:default;}
+.done small{font-family:var(--f-zh);font-size:13px;color:var(--muted);}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:10px;}
+.nav button{flex:1;max-width:48%;border:1px solid var(--rule);background:var(--card);border-radius:14px;padding:10px 12px;cursor:pointer;text-align:left;line-height:1.3;}
+.nav button:last-child{text-align:right;margin-left:auto;}
+.nav small{display:block;font-family:var(--f-zh);font-size:12px;color:var(--muted);}
+.nav span{font-family:var(--f-dot);font-size:17px;}
+
+/* ---------- popover ---------- */
+#pop{position:fixed;left:0;right:0;bottom:0;z-index:40;transform:translateY(110%);transition:transform .25s ease;display:flex;justify-content:center;pointer-events:none;}
+#pop.on{transform:none;}
+#pop .in{pointer-events:auto;width:min(100%,40rem);background:var(--card);border:1px solid var(--rule);border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.18);padding:16px 18px max(18px,env(safe-area-inset-bottom));max-height:60vh;overflow:auto;}
+.ph{display:flex;align-items:center;gap:4px 10px;flex-wrap:wrap;position:relative;padding-right:140px;min-height:42px;}
+.pw{font-family:var(--f-body);font-weight:600;font-size:1.3em;}
+.pk{font-family:"Lucida Sans Unicode","Arial Unicode MS",var(--f-body);color:var(--muted);font-size:.95em;}
+.lvb{font-family:var(--f-dot);font-size:14px;padding:1px 8px;border-radius:12px;background:var(--shade);color:var(--muted);}
+.lvb.hi{background:var(--lv-soft);color:var(--ink);}
+.px2{position:absolute;right:-6px;top:-4px;display:flex;gap:2px;}
+.pz{font-family:var(--f-zh);font-size:17px;margin:6px 0 2px;}
+.pd{font-family:var(--f-zh);font-size:14.5px;line-height:1.8;color:var(--muted);margin:0;}
+.pn{font-family:var(--f-zh);font-size:12.5px;color:var(--muted);margin:8px 0 0;}
+.star svg{width:22px;height:22px;}
+.star.on{color:#D9A21B;}
+
+/* ---------- drawer ---------- */
+#scrim{position:fixed;inset:0;background:rgba(15,10,25,.4);z-index:30;opacity:0;pointer-events:none;transition:opacity .2s;}
+#scrim.on{opacity:1;pointer-events:auto;}
+#drawer{position:fixed;top:0;bottom:0;left:0;width:min(92vw,26rem);z-index:35;background:var(--paper);border-right:1px solid var(--rule);transform:translateX(-102%);transition:transform .25s ease;display:flex;flex-direction:column;}
+#drawer.on{transform:none;}
+.dtop{display:flex;align-items:center;gap:6px;padding:10px 10px 0;padding-top:max(10px,env(safe-area-inset-top));}
+.dtop b{font-family:var(--f-dot);font-weight:400;font-size:20px;flex:1;}
+.tabs{display:flex;gap:4px;padding:8px 10px;border-bottom:1px solid var(--rule);overflow-x:auto;}
+.tabs button{border:0;background:transparent;border-radius:20px;padding:6px 12px;cursor:pointer;font-family:var(--f-zh);font-size:14px;white-space:nowrap;}
+.tabs button.on{background:var(--lv);color:#fff;}
+.pane{flex:1;overflow:auto;padding:14px 14px max(30px,env(safe-area-inset-bottom));font-size:16px;}
+.toc a{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:8px 6px;border-radius:10px;color:inherit;text-decoration:none;cursor:pointer;}
+.toc a:hover,.toc a.cur{background:var(--shade);}
+.toc svg{width:28px;height:28px;}
+.toc .n{font-family:var(--f-dot);font-size:17px;line-height:1.2;}
+.toc .z{font-family:var(--f-zh);font-size:12.5px;color:var(--muted);display:block;}
+.toc .ok{color:var(--stamp);font-family:var(--f-dot);}
+.sbox{width:100%;border:1px solid var(--rule);background:var(--card);border-radius:12px;padding:10px 12px;color:var(--ink);font-family:var(--f-body);}
+.res{margin-top:12px;display:grid;gap:8px;}
+.res a{display:block;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:8px 10px;cursor:pointer;color:inherit;text-decoration:none;font-size:15px;line-height:1.55;}
+.res small{display:block;font-family:var(--f-dot);font-size:13px;color:var(--lv);letter-spacing:.06em;}
+.res mark{background:var(--hl);color:inherit;border-radius:3px;}
+.hint{font-family:var(--f-zh);font-size:13.5px;color:var(--muted);line-height:1.75;}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 16px;}
+.seg button{border:1px solid var(--rule);background:var(--card);border-radius:20px;padding:6px 13px;cursor:pointer;font-family:var(--f-zh);font-size:14px;}
+.seg button.on{border-color:var(--lv);box-shadow:0 0 0 3px var(--lv-soft);}
+.lab{font-family:var(--f-zh);font-size:14px;font-weight:600;margin:0;}
+select.sbox{appearance:auto;}
+.wl{display:grid;gap:4px;}
+.wl h4{font-family:var(--f-dot);font-weight:400;font-size:16px;color:var(--lv);margin:12px 0 2px;letter-spacing:.04em;}
+.wl a{display:flex;gap:8px;align-items:baseline;padding:5px 6px;border-radius:8px;cursor:pointer;color:inherit;text-decoration:none;}
+.wl a:hover{background:var(--shade);}
+.wl a b{font-weight:600;}
+.wl a span{font-family:var(--f-zh);font-size:13.5px;color:var(--muted);}
+.wl a i{margin-left:auto;font-style:normal;color:#D9A21B;}
+.about p{font-family:var(--f-zh);font-size:14.5px;line-height:1.85;margin:0 0 12px;}
+.about .big{font-family:var(--f-dot);font-size:26px;line-height:1.1;margin:4px 0 2px;}
+.about .mot{font-family:var(--f-body);font-style:italic;color:var(--muted);margin:0 0 14px;}
+.about ul{font-family:var(--f-zh);font-size:14px;line-height:1.8;padding-left:1.2em;margin:0 0 12px;}
+.danger{border:1px solid var(--no);color:var(--no);background:transparent;border-radius:20px;padding:6px 14px;cursor:pointer;font-family:var(--f-zh);font-size:14px;}
+
+/* ---------- music panel ---------- */
+#mp{position:fixed;top:62px;right:10px;z-index:25;width:min(92vw,20rem);background:var(--card);border:1px solid var(--rule);border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.2);padding:12px;}
+.trk{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;width:100%;text-align:left;border:1px solid transparent;background:transparent;border-radius:12px;padding:8px;cursor:pointer;}
+.trk:hover{background:var(--shade);}
+.trk .pl{width:34px;height:34px;border-radius:50%;background:var(--lv);color:#fff;display:grid;place-items:center;font-size:13px;}
+.trk.on{border-color:var(--lv);}
+.trk.on .pl{background:var(--ink);color:var(--paper);}
+.trk .tn{font-family:var(--f-dot);font-size:17px;display:block;line-height:1.2;}
+.trk .tz{font-family:var(--f-zh);font-size:12.5px;color:var(--muted);display:block;}
+.vol{display:flex;align-items:center;gap:10px;margin:8px 4px 2px;font-family:var(--f-zh);font-size:13px;color:var(--muted);}
+.vol input{flex:1;accent-color:var(--lv);}
+
+#toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom));transform:translate(-50%,30px);opacity:0;transition:all .25s;z-index:60;background:var(--ink);color:var(--paper);font-family:var(--f-zh);font-size:14.5px;padding:10px 16px;border-radius:24px;max-width:90vw;text-align:center;pointer-events:none;}
+#toast.on{opacity:1;transform:translate(-50%,0);}
+@media (max-width:480px){ .cr{display:none} .card{grid-template-columns:44px 1fr} .ico{width:44px;height:44px} main{padding:14px 16px 90px} }
+@media (prefers-reduced-motion:reduce){ *{transition:none !important;animation:none !important;} }
+</style>
+</head>
+<body>
+
+
+<div id="cover" role="button" tabindex="0" aria-label="開始">
+  <div class="stage"><canvas id="cv" width="320" height="180" aria-label="夜晚的書桌：窗外下著雨，檯燈亮著，桌上有打開的書和一杯冒著熱氣的茶"></canvas></div>
+  <p class="ck" id="cvK"></p>
+  <h1>Lamplight Readers</h1>
+  <p class="cz" id="cvZ"></p>
+  <button class="go" id="goBtn">Open the book 開始閱讀</button>
+  <p class="cm" id="coverMusic">♪ TAP ANYWHERE FOR MUSIC</p>
+  <p class="cc">© 2026 Wen-Hung Fang. All rights reserved.</p>
+</div>
+
+<header class="bar">
+  <button class="ib" id="menuBtn" aria-label="選單"><svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg></button>
+  <div class="brand" id="brand" role="button" tabindex="0">Lamplight <small id="brandLv"></small></div>
+  <button class="ib" id="musicBtn" aria-label="音樂"><svg viewBox="0 0 24 24"><path d="M12 3v10.6A4 4 0 1 0 14 17V7h4V3h-6z"/></svg></button>
+  <button class="ib" id="setBtn" aria-label="設定"><svg viewBox="0 0 24 24"><path d="M9.2 5h2.1l4.6 13h-2.2l-1.1-3.3H7.8L6.7 18H4.6L9.2 5zm-.8 7.9h3.9L10.3 7l-1.9 5.9zM17 11h1.6l2.9 7h-1.7l-.6-1.6h-2.8l-.6 1.6h-1.7l2.9-7zm-.1 4.1h1.9l-.9-2.6-1 2.6z"/></svg></button>
+</header>
+
+<div id="mp" hidden>
+  <div id="tracks"></div>
+  <div class="vol"><span>音量</span><input type="range" id="vol" min="0" max="100" aria-label="音量"><button class="pb" id="mStop">停止</button></div>
+</div>
+
+<main id="main"></main>
+
+<div id="scrim"></div>
+<aside id="drawer" aria-label="選單">
+  <div class="dtop"><b>Lamplight Readers</b><button class="ib" id="dClose" aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg></button></div>
+  <nav class="tabs" id="tabs">
+    <button data-p="toc" class="on">目錄</button><button data-p="find">搜尋</button><button data-p="words">詞彙</button><button data-p="set">設定</button><button data-p="about">有關</button>
+  </nav>
+  <div class="pane" id="p-toc"><div class="toc" id="toc"></div></div>
+  <div class="pane" id="p-find" hidden>
+    <input class="sbox" id="q" type="search" placeholder="搜尋英文或中文…" autocomplete="off">
+    <div class="res" id="res"><p class="hint">可以搜尋故事內容、中文翻譯和詞彙。</p></div>
+  </div>
+  <div class="pane" id="p-words" hidden>
+    <div class="seg" id="wseg"><button data-w="all" class="on">全部詞彙</button><button data-w="star">★ 我的收藏</button></div>
+    <div class="wl" id="wl"></div>
+  </div>
+  <div class="pane" id="p-set" hidden>
+    <p class="lab">文字大小</p>
+    <div class="seg" id="sizes"><button data-v="17">小</button><button data-v="19">中</button><button data-v="21">大</button><button data-v="23">特大</button></div>
+    <p class="lab">朗讀速度</p>
+    <div class="seg" id="rates"><button data-v="0.7">慢</button><button data-v="0.85">稍慢</button><button data-v="1">正常</button></div>
+    <p class="lab">朗讀聲音</p>
+    <select class="sbox" id="voiceSel" aria-label="朗讀聲音"></select>
+    <p class="hint" id="voiceNow" style="margin:6px 0 4px"></p>
+    <p class="hint" style="margin:0 0 16px">iPhone 小提醒：Safari 只能用手機內建的聲音，下載的「增強音質」聲音網頁用不到。</p>
+    <p class="lab">打開故事時</p>
+    <div class="seg" id="zhset"><button data-v="0">只顯示英文</button><button data-v="1">英文＋中文</button></div>
+    <p class="lab">外觀</p>
+    <div class="seg" id="themes"><button data-v="auto">跟著系統</button><button data-v="light">淺色</button><button data-v="dark">深色</button></div>
+    <p class="lab">閱讀紀錄</p>
+    <p class="hint" style="margin:4px 0 8px">借書證的印章、收藏的單字都存在這台裝置的瀏覽器裡。換手機或清除瀏覽資料就會不見。</p>
+    <button class="danger" id="resetBtn">清除閱讀紀錄</button>
+  </div>
+  <div class="pane about" id="p-about" hidden></div>
+</aside>
+
+<div id="pop" aria-hidden="true"><div class="in" id="popIn"></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* LAMPLIGHT READERS · LEVEL 1 — settings */
+const LEVEL = {
+  n:1, cefr:"A1", prefix:"lr1-", audio:"lr1-audio/",
+  zh:"燈下小書・第一級", kicker:"INKQUEST · LEVEL 1 · A1",
+  version:"1.0・2026 年 9 月",
+  /* above this CEFR rank a word is flagged in the popover */
+  rank:1,
+  tracks:[
+    {n:"Lamplight", z:"燈下・電鋼琴與鐘聲", bpm:72, swing:.12, parts:[
+      {p:"ep", s:"F3+A3+C4+E4 _ _ _ _ _ _ _ | E3+G3+B3+D4 _ _ _ _ _ _ _ | D3+F3+A3+C4 _ _ _ _ _ _ _ | C3+E3+G3+B3 _ _ _ _ _ _ _ | F3+A3+C4+E4 _ _ _ _ _ _ _ | E3+G3+B3+D4 _ _ _ _ _ _ _ | D3+F3+A3+E4 _ _ _ _ _ _ _ | G3+C4+D4+F4 _ _ _ _ _ _ _", strum:.028},
+      {p:"bass", s:"F2 _ _ _ C3 _ _ _ | E2 _ _ _ B2 _ _ _ | D2 _ _ _ A2 _ _ _ | C2 _ _ _ G2 _ _ _ | F2 _ _ _ C3 _ _ _ | E2 _ _ _ B2 _ _ _ | D2 _ _ _ A2 _ _ _ | G2 _ _ _ D3 _ _ _"},
+      {p:"bell", s:"- - A5 _ G5 _ E5 _ | - - G5 _ _ _ D5 _ | - - F5 _ E5 _ C5 _ | E5 _ _ _ _ _ - - | - - A5 _ C6 _ A5 _ | G5 _ _ _ E5 _ - - | F5 _ E5 _ D5 _ C5 _ | D5 _ _ _ _ _ - -"}]},
+    {n:"Rain on Glass", z:"窗上的雨・鋪底與鐘聲琶音", bpm:66, swing:0, parts:[
+      {p:"pad", s:"A2+E3+G3+B3+C4 _ _ _ _ _ _ _ | F2+C3+E3+A3 _ _ _ _ _ _ _ | C3+G3+B3+E4 _ _ _ _ _ _ _ | G2+D3+E3+B3 _ _ _ _ _ _ _ | A2+E3+G3+B3+C4 _ _ _ _ _ _ _ | F2+C3+E3+A3 _ _ _ _ _ _ _ | C3+G3+B3+E4 _ _ _ _ _ _ _ | E3+G#3+B3+D4 _ _ _ _ _ _ _"},
+      {p:"bell", s:"E5 A5 B5 C6 B5 A5 E5 C5 | C5 F5 A5 E6 A5 F5 C5 A4 | E5 G5 B5 D6 B5 G5 E5 D5 | D5 G5 B5 E6 B5 G5 D5 B4 | E5 A5 B5 C6 B5 A5 E5 C5 | C5 F5 A5 E6 A5 F5 C5 A4 | E5 G5 B5 D6 B5 G5 E5 D5 | E5 G#5 B5 D6 B5 G#5 E5 D5", vel:.55},
+      {p:"bass", s:"A1 _ _ _ _ _ _ _ | F1 _ _ _ _ _ _ _ | C2 _ _ _ _ _ _ _ | G1 _ _ _ _ _ _ _ | A1 _ _ _ _ _ _ _ | F1 _ _ _ _ _ _ _ | C2 _ _ _ _ _ _ _ | E2 _ _ _ _ _ _ _", vel:.8}]},
+    {n:"Library Clock", z:"圖書館的時鐘・木琴", bpm:92, swing:.1, parts:[
+      {p:"mar", s:"D4 A4 F#5 A4 C#5 A4 F#5 A4 | B3 F#4 D5 F#4 A4 F#4 D5 F#4 | G3 D4 B4 D4 F#4 D4 B4 D4 | A3 E4 D5 E4 G4 E4 D5 E4 | D4 A4 F#5 A4 C#5 A4 F#5 A4 | B3 F#4 D5 F#4 A4 F#4 D5 F#4 | G3 D4 B4 D4 F#4 D4 B4 D4 | A3 E4 C#5 E4 G4 E4 C#5 E4", vel:.8},
+      {p:"bass", s:"D2 _ _ _ D2 _ A2 _ | B1 _ _ _ B1 _ F#2 _ | G1 _ _ _ G1 _ D2 _ | A1 _ _ _ A1 _ E2 _ | D2 _ _ _ D2 _ A2 _ | B1 _ _ _ B1 _ F#2 _ | G1 _ _ _ G1 _ D2 _ | A1 _ _ _ A1 _ C#2 _"},
+      {p:"ep", s:"- - - - F#5 _ E5 _ | D5 _ _ _ - - - - | - - - - B5 _ A5 _ | A5 _ _ _ - - - - | - - - - F#5 _ A5 _ | B5 _ A5 _ F#5 _ - - | - - - - D5 _ E5 _ | C#5 _ _ _ - - - -", vel:.7}]}
+  ],
+  /* 12×12 pixel icons, one per story id */
+  icons:{
+    roll:["............",".kkkkkkkkkk.",".kwwwwwwwwk.",".kwrrwwwwwk.",".kwrrwwwwwk.",".kwwwrrwwwk.",".kwwwrrwwwk.",".kwwwwwrrwk.",".kwwwwwrrwk.",".kwwwwwwwwk.",".kkkkkkkkkk.","............"],
+    ghost:["............",".k........k.",".kok....kok.",".kokkkkkkok.",".kooooooook.",".koykooykok.",".kooooooook.",".kooooppook.",".kwoooooowk.","..kooooook..","...kkkkkk...","............"],
+    robot:[".....kk.....",".....rr.....","..kkkkkkkk..","..kssssssk..","..ksyssysk..","..kssssssk..","..kskkkksk..","..kkkkkkkk..","...kbbbbk...","..kkbbbbkk..","...kbbbbk...","...kk..kk..."],
+    newyear:["............","..kkkkkkkk..","..krrrrrrk..","..krrrrrrk..","..kryyyyrk..","..kryrryrk..","..kryrryrk..","..kryyyyrk..","..krrrrrrk..","..krrrrrrk..","..kkkkkkkk..","............"],
+    umbrella:["....kkkk....","..kkyyyykk..",".kyyyyyyyyk.","kyyyyyyyyyyk","kkkkkkkkkkkk",".....kk.....",".....kk.....",".....kk.....",".....kk.gg..",".....kk.gGg.","..k..kk.gg..","...kkk......"],
+    window:["kkkkkkkkkkkk","kBBBBkkbbbbk","kBwBBkkbbbbk","kBBBBkkbbbbk","kBBBBkkbbbbk","kkkkkkkkkkkk","kBBBBkkbbbbk","kBBBBkkbbbbk","kGGGGkkGGGGk","kkkkkkkkkkkk","nnnnnnnnnnnn","............"],
+    dragon:["............","..k.....k...","..kk...kk...","..kBkkkBk...",".kBBBBBBBk..",".kBBwkBBBBk.",".kBBkkBBBBBk",".kBBBBBBBBBk","..kBBBBrrrrk","..kBBBBBkkk.","...kBBBk....","...kkkkk...."],
+    bank:["............","....kkkk....","..kkyyyykk..","..kyyyyyyk..",".kyyykkyyyk.",".kyykyyyyyk.",".kyyykkyyyk.",".kyyyyykyyk.",".kyyykkyyyk.","..kyyyyyyk..","..kkyyyykk..","....kkkk...."],
+    taipei:[".....k......",".....l......","....klk.....","....klk.....","...klllk....","....klk.....","...klllk....","....klk.....","...klllk....","...klllk....","..klllllk...","kkkkkkkkkkkk"],
+    bus:["............",".kkkkkkkkkk.",".kBBBBBBBBk.",".kyykyykyyk.",".kyykyykyyk.",".kBBBBBBBBk.",".kBBBBBBBBk.",".kkkkkkkkkk.","..kk....kk..","..kk....kk..","............","............"]
+  },
+  /* public-domain sources, shown on the About page */
+  credits:[
+    "“The Open Window” — Saki (H. H. Munro), in Beasts and Super-Beasts, 1914",
+    "“The Reluctant Dragon” — Kenneth Grahame, in Dream Days, 1898",
+    "“My Financial Career” — Stephen Leacock, in Literary Lapses, 1910"
+  ]
+};
+
+/* =========================================================
+   LAMPLIGHT READERS · LEVEL 1 (A1) — stories
+   Markup: [[shown text|key]]  (key omitted = shown text, lowercased)
+   key prefix c: = culture note, otherwise a glossary word
+   paras: [english, chinese, mood]
+   ========================================================= */
+const S = [
+/* ---------------- 1 ---------------- */
+{ id:"roll", thread:"dnd", kind:"orig", title:"Roll the Dice", zt:"擲骰子吧", voice:"f",
+  by:"InkQuest original",
+  intro:"四個下班後的同事，第一次玩《龍與地下城》。賣鞋的佩佩今晚是個拿大劍的戰士，可是骰子不太給面子。",
+  paras:[
+    ["Friday, 8:30 p.m. Four people sit around a table in a small room above a coffee shop. There are chips, cola, pencils, and a lot of paper.",
+     "星期五晚上八點半。四個人圍坐在咖啡店樓上小房間的桌子旁。桌上有洋芋片、可樂、鉛筆，還有一大堆紙。","calm"],
+    ["Kai works in IT. He fixes our computers. But tonight he is not Kai. Tonight he is the [[Dungeon Master|c:dm]].",
+     "阿凱在資訊部上班，負責修我們的電腦。可是今晚他不是阿凱。今晚他是地下城主。","playful"],
+    ["“You are in a dark [[cave]],” he says in a low voice. “Water drips. Something moves in the [[shadows|shadow]].”",
+     "「你們在一個漆黑的洞穴裡。」他壓低聲音說。「水滴答滴答地落下。陰影裡有東西在動。」","thoughtful"],
+    ["Amber laughs. “I’m scared already!” Amber sells phones on the first floor. Tonight she is a [[wizard]].",
+     "安柏笑了。「我已經開始怕了！」安柏在一樓賣手機。今晚她是個巫師。","cheerful"],
+    ["Jun is an [[accountant]]. He never talks at work. Tonight he is a [[bard]]. He sings — badly.",
+     "阿俊是會計。他上班從來不說話。今晚他是吟遊詩人。他會唱歌——唱得很難聽。","amused"],
+    ["And me? I sell shoes. Tonight I am Pei the Brave, a [[fighter]] with a very big [[sword]].",
+     "那我呢？我賣鞋。今晚我是勇者佩佩，一個拿著超大把劍的戰士。","proud"],
+    ["A small green face jumps out of the dark. “A [[goblin]]!” says Kai. “Pei, it’s your turn. [[Roll]] the die.”",
+     "一張綠色的小臉從黑暗中跳出來。「是哥布林！」阿凱說。「佩佩，輪到妳了。擲骰子。」","excited"],
+    ["I pick up the [[twenty-sided die|c:d20]]. My hands are cold. It’s only a game, but my heart is beating fast.",
+     "我拿起那顆二十面骰。我的手好冰。明明只是遊戲，我的心卻跳得好快。","nervous"],
+    ["“You need a ten or more,” says Kai. I roll. The die jumps across the table, hits a cola can, and stops.",
+     "「妳要擲到十以上。」阿凱說。我擲出骰子。骰子在桌上跳過去，撞到一罐可樂，停了下來。","nervous"],
+    ["One.",
+     "一。","deadpan"],
+    ["Nobody moves. Then Kai smiles. “Oh no. Your sword flies out of your hand. It hits the [[ceiling]]. A rock falls… on your head.”",
+     "沒有人動。接著阿凱笑了。「糟糕。妳的劍從手裡飛出去，撞到洞頂。一塊石頭掉下來……砸在妳頭上。」","teasing"],
+    ["“Ouch!” I say. “And the goblin?” “The goblin laughs so hard it falls down,” says Kai. “Now it can’t get up.”",
+     "「好痛！」我說。「那哥布林呢？」「哥布林笑到跌倒。」阿凱說。「現在牠爬不起來了。」","amused"],
+    ["Amber laughs so hard she almost falls off her chair, just like the goblin. Jun sings a song about my poor head. I laugh until I cry.",
+     "安柏笑到差點從椅子上摔下來，跟那隻哥布林一樣。阿俊唱了一首歌，歌頌我可憐的頭。我笑到流眼淚。","excited"],
+    ["We play for hours. We don’t find any gold. We don’t meet a dragon. But at midnight, nobody wants to go home.",
+     "我們玩了好幾個小時。我們沒找到任何金子，也沒遇到龍。可是到了午夜，沒有人想回家。","warm"],
+    ["“Same time next Friday?” asks Kai. Four hands go up.",
+     "「下週五同一時間？」阿凱問。四隻手舉了起來。","hopeful"]
+  ],
+  quiz:[
+    ["What is Kai’s job in the game?", ["A wizard","The Dungeon Master","A fighter"], 1, "阿凱白天在資訊部上班，玩遊戲時是地下城主，負責說故事和扮演怪物。"],
+    ["What number does Pei roll?", ["One","Ten","Twenty"], 0, "她擲出 1，是二十面骰最糟的點數。"],
+    ["How does the night end?", ["They find the gold.","Everyone goes home early.","They all want to play again."], 2, "“Four hands go up.” 四個人都舉手，下週五還要再玩。"]
+  ]
+},
+/* ---------------- 2 ---------------- */
+{ id:"ghost", thread:"", kind:"orig", title:"The Night Market Ghost", zt:"夜市鬼影", voice:"f",
+  by:"InkQuest original",
+  intro:"夜市烤魷魚攤每天晚上都少一隻魷魚。隔壁說是鬼月的好兄弟，阿惠決定躲起來看個清楚。",
+  paras:[
+    ["Every night at six, Ah-Hui lights her [[grill]]. She brings fifty [[squid]], and by midnight they are all gone. But when she [[counts|count]] her money, she only has enough for forty-nine. Every night, one squid is missing. The market is busy, and she never sees who takes it.",
+     "每天晚上六點，阿惠點起烤爐。她每晚帶五十隻魷魚，到了午夜全部賣光。可是她一數錢，只有四十九隻的錢。每天晚上都少一隻魷魚。夜市人很多，她從來沒看到是誰拿走的。","curious"],
+    ["“It’s a ghost,” says Mr. Lin. He sells [[stinky tofu|c:stinky]] at the next [[stall]]. “It’s [[Ghost Month|c:ghostmonth]]. The ghosts are hungry.”",
+     "「是鬼啦。」林先生說。他在隔壁攤賣臭豆腐。「現在是鬼月，好兄弟肚子餓。」","deadpan"],
+    ["“Ghosts don’t eat squid,” says Ah-Hui.",
+     "「鬼才不吃魷魚。」阿惠說。","annoyed"],
+    ["“Everybody eats squid,” says Mr. Lin.",
+     "「大家都吃魷魚啊。」林先生說。","deadpan"],
+    ["On Friday, after the market closes, Ah-Hui doesn’t go home. She puts one squid on the warm grill, turns off the lights, and [[hides|hide]] under her table with a [[flashlight]]. The market is empty. A plastic bag flies down the street. Somewhere, a dog [[barks|bark]].",
+     "星期五，夜市收攤以後，阿惠沒有回家。她在還溫溫的烤爐上放了一隻魷魚，關掉燈，拿著手電筒躲到桌子底下。夜市空蕩蕩的。一個塑膠袋被風吹過街道。遠處有一隻狗在叫。","thoughtful"],
+    ["Tap. Tap. Tap.",
+     "噠。噠。噠。","nervous"],
+    ["A small shadow climbs onto the grill. It [[grabs|grab]] a squid. The squid is bigger than the shadow.",
+     "一個小小的影子爬上烤爐。它叼走一隻魷魚。魷魚比影子還大。","nervous"],
+    ["Ah-Hui turns on the flashlight. It’s a [[kitten]] — tiny, orange, and very thin. The squid hangs from its mouth like a long brown [[beard]].",
+     "阿惠打開手電筒。是一隻小貓——小小的、橘色的、瘦巴巴的。魷魚從牠嘴裡垂下來，像一把長長的褐色鬍子。","surprised"],
+    ["The kitten doesn’t run. It looks at her with big yellow eyes. “Meow,” it says, but the squid is in its mouth, so it sounds like “Mmmf.”",
+     "小貓沒有逃。牠用黃色的大眼睛看著她。「喵。」牠說，可是嘴裡叼著魷魚，所以聽起來像「嗯唔」。","amused"],
+    ["Ah-Hui laughs. “So you are the ghost.”",
+     "阿惠笑了。「原來你就是那個鬼。」","warm"],
+    ["The next night there is a new sign on the stall: GRILLED SQUID — $100. GHOST EATS FREE. Under the table, in a box with an old towel, the kitten sleeps. Its [[belly]] is round and full.",
+     "隔天晚上，攤子上多了一塊新招牌：烤魷魚一百元。鬼免費。桌子底下，一個鋪著舊毛巾的紙箱裡，小貓睡得正熟，肚子圓滾滾、飽飽的。","cheerful"],
+    ["People take photos. They buy squid. They come back with friends. Soon Ah-Hui cooks eighty squid a night.",
+     "大家拍照，買魷魚，還帶朋友回來。沒多久，阿惠一個晚上要烤八十隻魷魚。","bright"],
+    ["Mr. Lin watches the long line. “I want a ghost too,” he says.",
+     "林先生看著長長的人龍。「我也想要一隻鬼。」他說。","deadpan"]
+  ],
+  quiz:[
+    ["What is Ah-Hui’s problem?", ["Somebody takes her money.","Fifty squid are gone, but she only sells forty-nine.","Nobody buys her squid."], 1, "五十隻魷魚都不見了，錢卻只有四十九隻的份，所以有一隻是被偷吃的。"],
+    ["How does Ah-Hui find the “ghost”?", ["She asks Mr. Lin.","She leaves one squid out and hides.","She puts a camera on the stall."], 1, "收攤後她在烤爐上放一隻魷魚當誘餌，躲在桌子底下等。"],
+    ["What happens to Ah-Hui’s business?", ["It gets better.","It closes.","It moves to a new market."], 0, "大家來拍照、帶朋友來，她一晚要烤八十隻魷魚。"]
+  ]
+},
+/* ---------------- 3 ---------------- */
+{ id:"robot", thread:"", kind:"orig", title:"Robot at the Front Desk", zt:"櫃台機器人", voice:"f",
+  by:"InkQuest original",
+  intro:"老旅館來了一個新櫃台：會說六種語言、從不生氣的機器人 R-8。唯一的問題是，它把每句話都當真。",
+  paras:[
+    ["Hotel Sunny is small and old, but it has something new: a robot at the front desk. Its name is R-8. It speaks six languages. It never sleeps. It never gets angry. It also takes everything [[literally|c:literal]].",
+     "陽光旅館又小又舊，不過有一樣新東西：櫃台的機器人。它叫 R-8。它會說六種語言，從不睡覺，也從不生氣。它還會把每一句話都照字面理解。","informative"],
+    ["At nine in the morning, a man comes in from the street. He is wet from head to toe. “Wow,” he says. “It’s [[raining cats and dogs|c:catsdogs]] out there!”",
+     "早上九點，一個男人從街上走進來。他從頭濕到腳。「哇，」他說，「外面在下貓下狗耶！」","cheerful"],
+    ["R-8’s eyes turn red. “Danger! Animals are falling from the sky! I am calling the [[zoo]].”",
+     "R-8 的眼睛變成紅色。「危險！天上在掉動物！我現在打電話給動物園。」","panicked"],
+    ["“No, no!” says Ms. Lee, the [[manager]]. She runs out of the office. “R-8, it means it’s raining very hard.” “Oh,” says R-8. “Then I will not call the zoo.”",
+     "「不不不！」經理李小姐說。她從辦公室跑出來。「R-8，那是說雨下得很大。」「喔，」R-8 說，「那我就不打給動物園了。」","deadpan"],
+    ["At noon, an old woman arrives with three big [[suitcases|suitcase]]. “Young man,” she says to R-8, “can you [[give me a hand|c:hand]]?”",
+     "中午，一位老太太帶著三個大行李箱來了。「年輕人，」她對 R-8 說，「可以幫我一把嗎？」","warm"],
+    ["R-8 looks at its metal hand. It looks at the woman. Then — click — it takes off its hand and gives it to her.",
+     "R-8 看看自己的金屬手，又看看老太太。然後——喀——它把手拆下來，遞給她。","deadpan"],
+    ["The woman screams. Ms. Lee runs out of the office again. “Carry her bags, R-8. That’s what she means.”",
+     "老太太尖叫。李小姐又從辦公室衝出來。「幫她提行李，R-8。她是這個意思。」","panicked"],
+    ["At two in the morning, a young [[guest]] comes down to the [[lobby]]. His eyes are red. “I can’t sleep,” he says. “And I’m so hungry I could [[eat a horse|c:horse]].”",
+     "凌晨兩點，一個年輕房客下樓到大廳。他的眼睛紅紅的。「我睡不著，」他說，「而且我餓到可以吃下一匹馬。」","tired"],
+    ["R-8 thinks for a long time. Its lights go on and off. Then it opens a small door in its chest. Inside, there are two pieces of bread.",
+     "R-8 想了很久，身上的燈一閃一閃。然後它打開胸前的一扇小門。裡面有兩片麵包。","thoughtful"],
+    ["“We do not have a horse,” says R-8. “But I can make [[toast]].”",
+     "「我們沒有馬，」R-8 說，「但我可以烤吐司。」","deadpan"],
+    ["The young man laughs so hard he sits down on the floor.",
+     "年輕人笑到直接坐在地上。","amused"],
+    ["In the morning, Ms. Lee finds them there. The guest is asleep on the sofa. There are toast [[crumbs|crumb]] everywhere. “R-8,” she says, “what happened here?”",
+     "早上，李小姐發現他們還在大廳。房客在沙發上睡著了，到處都是吐司屑。「R-8，」她說，「這裡發生了什麼事？」","curious"],
+    ["R-8’s eyes turn a happy yellow. “I am a front desk robot,” it says. “And last night, I was also a toaster.”",
+     "R-8 的眼睛變成開心的黃色。「我是櫃台機器人，」它說，「而昨天晚上，我也是一台烤麵包機。」","proud"]
+  ],
+  quiz:[
+    ["Why does R-8 want to call the zoo?", ["A dog is in the lobby.","It thinks animals are falling from the sky.","A guest asks it to."], 1, "它把 raining cats and dogs（傾盆大雨）當成真的在下貓狗。"],
+    ["What does the old woman really want?", ["Help with her bags","A robot hand","A room key"], 0, "give me a hand 是「幫我一下」，她要人幫忙提行李。"],
+    ["What does R-8 give the hungry guest?", ["A horse","Soup","Toast"], 2, "它胸前的小門裡有麵包，可以烤吐司。"]
+  ]
+},
+/* ---------------- 4 ---------------- */
+{ id:"newyear", thread:"women", age:30, kind:"orig", title:"The New Year Question", zt:"過年那個問題", voice:"f",
+  by:"InkQuest original",
+  intro:"除夕圍爐，三十二歲的佳怡知道那個問題一定會來，就像桌上一定會有魚。這一次，她準備好了。",
+  paras:[
+    ["It is [[Lunar New Year’s Eve|c:cny]]. Twelve people sit around one round table. There is fish, chicken, hot pot, and too many questions.",
+     "今天是除夕。十二個人圍著一張圓桌坐。桌上有魚、有雞、有火鍋，還有太多問題。","warm"],
+    ["Chia-yi is thirty-two. She knows the big question is coming. It comes every year, like the fish.",
+     "佳怡三十二歲。她知道那個大問題就要來了。它每年都會來，就像桌上的魚一樣。","wistful"],
+    ["Aunt Mei puts down her [[chopsticks]]. “Chia-yi,” she says, loud and sweet. “When are you getting [[married|marry]]?”",
+     "美阿姨放下筷子。「佳怡啊，」她的聲音又大聲又甜，「妳什麼時候要結婚？」","teasing"],
+    ["The table goes quiet. Chia-yi’s mother looks down at her rice. Her little cousin Yu-ting, fifteen years old, stops eating.",
+     "整桌安靜下來。佳怡的媽媽低頭看著碗裡的飯。她十五歲的小表妹雨婷停下了筷子。","nervous"],
+    ["Chia-yi smiles. She is ready. “Maybe next year, Auntie,” she says. “Maybe never. I don’t know.”",
+     "佳怡笑了。她準備好了。「也許明年吧，阿姨，」她說，「也許永遠不會。我不知道。」","calm"],
+    ["“Never?” Aunt Mei’s eyes go wide. “But who takes care of you?”",
+     "「永遠不會？」美阿姨睜大眼睛。「那誰來照顧妳？」","surprised"],
+    ["“I do,” says Chia-yi. “I have a good job. I have my own [[apartment]]. I have a cat named Tofu and a ticket to Japan in March.”",
+     "「我自己啊，」佳怡說，「我有不錯的工作，有自己的房子，有一隻叫豆腐的貓，還有一張三月去日本的機票。」","proud"],
+    ["She picks up a piece of fish and puts it in Aunt Mei’s bowl. “I’m happy, Auntie. Really. More fish?”",
+     "她夾起一塊魚，放進美阿姨的碗裡。「我很快樂，阿姨，真的。再吃點魚？」","warm"],
+    ["Uncle Chen laughs. Aunt Mei opens her mouth, then closes it. She eats the fish.",
+     "陳叔叔笑出聲來。美阿姨張開嘴，又閉上。她吃了那塊魚。","amused"],
+    ["After dinner, Chia-yi gives her parents two [[red envelopes|c:hongbao]]. Her father counts the money twice and [[pretends|pretend]] not to cry.",
+     "晚飯後，佳怡給爸媽兩個紅包。她爸爸把錢數了兩遍，假裝自己沒有要哭。","tender"],
+    ["Later, she washes the dishes in the kitchen. Yu-ting comes in and dries the bowls. For a long time, Yu-ting doesn’t say anything.",
+     "後來，佳怡在廚房洗碗。雨婷走進來幫忙擦碗。雨婷很久都沒說話。","gentle"],
+    ["Then, very quietly: “[[Jie|c:jie]]? When I’m thirty-two, I want to be like you.”",
+     "然後，她很小聲地說：「姊？等我三十二歲，我想要跟妳一樣。」","shy"],
+    ["Chia-yi hands her another bowl. “No,” she says with a smile. “When you’re thirty-two, be like Yu-ting. I hear she’s great.”",
+     "佳怡又遞給她一個碗。「不要喔，」她笑著說，「等妳三十二歲，就當雨婷。我聽說她很棒。」","tender"]
+  ],
+  quiz:[
+    ["What is the “big question”?", ["When is she getting married?","How much money does she make?","Where does she live?"], 0, "美阿姨問：“When are you getting married?”"],
+    ["What does Chia-yi give her parents?", ["A cat","Two red envelopes","A ticket to Japan"], 1, "她給爸媽兩個紅包。"],
+    ["What does Chia-yi want for Yu-ting?", ["To get married young","To be exactly like Chia-yi","To be herself"], 2, "“Be like Yu-ting.” 她希望表妹做自己。"]
+  ]
+},
+/* ---------------- 5 ---------------- */
+{ id:"umbrella", thread:"love", kind:"orig", title:"The Wrong Umbrella", zt:"拿錯的傘", voice:"f",
+  by:"InkQuest original",
+  intro:"下雨天的咖啡店，門口的傘架上有兩把一模一樣的黑傘。其實拿錯一把傘沒什麼大不了——除非傘上掛著比傘更重要的東西。",
+  paras:[
+    ["Rain hits the windows of the Blue Door Café. Inside, it smells like coffee and wet shoes.",
+     "雨打在藍門咖啡館的窗上。店裡聞起來有咖啡和濕鞋子的味道。","calm"],
+    ["Yun sits by the window with a book. At the next table, a man in a gray [[sweater]] works on his laptop. He drinks his coffee too fast. Twice he [[burns|burn]] his tongue. Twice Yun tries not to laugh.",
+     "小芸坐在窗邊看書。隔壁桌，一個穿灰色毛衣的男生在用筆電。他咖啡喝得太快，燙到舌頭兩次。小芸也忍笑忍了兩次。","amused"],
+    ["By the door, in the [[umbrella stand]], there are two black umbrellas. They look the same.",
+     "門邊的傘架上，插著兩把黑傘。它們看起來一模一樣。","calm"],
+    ["At five o’clock, the rain stops. The man looks at his watch, says a bad word, and runs out. He takes an umbrella.",
+     "五點鐘，雨停了。那個男生看了看手錶，罵了一句髒話，衝了出去。他拿走一把傘。","panicked"],
+    ["At six, the rain starts again. Yun takes the other umbrella and walks out. At the door, she opens it. Something small hits her nose. A green plastic [[dinosaur]] hangs from the [[handle]].",
+     "六點，又下起雨來。小芸拿了另一把傘走出去。在門口，她把傘撐開。有個小東西打到她的鼻子。一隻綠色的塑膠恐龍掛在傘柄上。","surprised"],
+    ["This is not her umbrella. Her umbrella is yellow inside, like sunshine. It was a gift from her mother.",
+     "這不是她的傘。她的傘裡面是黃色的，像陽光一樣。那是媽媽送她的禮物。","wistful"],
+    ["Across the city, the rain finds the man too. He opens his umbrella and looks up at a yellow sky.",
+     "在城市的另一頭，雨也追上了那個男生。他撐開傘，抬頭看見一片黃色的天空。","gentle"],
+    ["The next day, at five o’clock, Yun goes back to the Blue Door Café with the dinosaur umbrella. She doesn’t really want to see the man again. That’s what she tells herself.",
+     "隔天五點，小芸帶著那把恐龍傘回到藍門咖啡館。她其實沒有很想再見到那個男生。她是這樣告訴自己的。","teasing"],
+    ["He is already there, by the door. He has a black umbrella in his hand. He looks [[nervous]]. Then he sees the dinosaur, and he smiles.",
+     "他已經在那裡了，就站在門邊。他手裡拿著一把黑傘，看起來很緊張。接著他看到那隻恐龍，笑了。","nervous"],
+    ["“I think this is yours,” he says. “It’s yellow inside. Very… happy.”",
+     "「我想這是妳的，」他說，「裡面是黃色的。很……開心。」","shy"],
+    ["“And I think this is yours,” says Yun. She holds up the dinosaur. “He’s very cute.”",
+     "「那我想這是你的。」小芸說。她把恐龍舉起來。「他很可愛。」","playful"],
+    ["The man’s face turns red. “My [[niece]] gave it to me. She’s six. His name is Steve.”",
+     "男生的臉紅了。「是我姪女送我的。她六歲。他叫史蒂夫。」","shy"],
+    ["Yun laughs. Outside, the sun is out. There is no rain today, and nobody needs an umbrella.",
+     "小芸笑了。外面出太陽了。今天沒有下雨，誰都不需要傘。","bright"],
+    ["“Coffee?” he asks. “Yes,” says Yun. “But this time, drink it slowly.”",
+     "「喝杯咖啡？」他問。「好啊，」小芸說，「不過這次，慢慢喝。」","playful"]
+  ],
+  quiz:[
+    ["How does Yun know it’s the wrong umbrella?", ["It is red.","It has a dinosaur on it.","It is broken."], 1, "傘柄上掛著一隻綠色塑膠恐龍。"],
+    ["Who gave the man the dinosaur?", ["His mother","Yun","His niece"], 2, "他六歲的姪女送的，恐龍叫 Steve。"],
+    ["What does Yun say at the end?", ["Drink it slowly.","Give me my umbrella.","It’s raining again."], 0, "她記得他一直燙到舌頭。"]
+  ]
+},
+/* ---------------- 6 ---------------- */
+{ id:"window", thread:"", kind:"classic", title:"The Open Window", zt:"敞開的窗", voice:"f",
+  by:"Saki (H. H. Munro), 1914 · retold",
+  intro:"英國作家薩基最有名的短篇。一個神經緊張的男人到鄉下休養，遇見一位非常冷靜的十五歲少女，和一扇在十月還開著的窗。",
+  paras:[
+    ["Framton Nuttel is a [[nervous]] man. His doctor tells him, “Go to the [[countryside]]. Rest. Meet quiet people.” So Framton goes to a small village. His sister gives him letters for people there.",
+     "法蘭頓．納托是個容易緊張的人。醫生告訴他：「去鄉下吧。好好休息，認識一些安靜的人。」於是法蘭頓來到一個小村莊。他姊姊給了他幾封信，要他帶去給那裡的人。","calm"],
+    ["Today he visits Mrs. Sappleton’s house. Her [[niece]], Vera, meets him in the sitting room. Vera is fifteen, and she is very calm.",
+     "今天他來拜訪沙波頓太太家。她的姪女薇拉在客廳接待他。薇拉十五歲，非常冷靜。","calm"],
+    ["“My aunt is coming down soon,” says Vera. “Do you know anything about her?” “No,” says Framton. “Nothing.”",
+     "「我阿姨馬上就下樓了，」薇拉說，「你對她有什麼了解嗎？」「沒有，」法蘭頓說，「什麼都不知道。」","curious"],
+    ["“Then you don’t know about her great [[tragedy]],” says Vera. She looks at the big window. It is open. It is October, and the afternoon is cold.",
+     "「那你一定不知道她的大悲劇。」薇拉說。她看著那扇大窗。窗是開著的。現在是十月，下午很冷。","thoughtful"],
+    ["“Three years ago today, her husband and her two brothers went out through that window. They went hunting. They never came back. They fell into a [[swamp]]. Nobody ever found them.”",
+     "「三年前的今天，她先生和她的兩個弟弟從那扇窗出去打獵。他們再也沒有回來。他們掉進了沼澤。沒有人找到他們。」","sad"],
+    ["Vera’s voice becomes soft. “My poor aunt thinks they are coming back. So every day, she leaves that window open until dark.”",
+     "薇拉的聲音變輕了。「我可憐的阿姨以為他們會回來。所以她每天都讓那扇窗開著，一直到天黑。」","wistful"],
+    ["Framton feels cold. Then Mrs. Sappleton comes in, busy and cheerful. “I hope you don’t mind the open window,” she says. “My husband and brothers are out hunting. They always come in this way.”",
+     "法蘭頓覺得背脊發涼。這時沙波頓太太走了進來，忙碌又開朗。「希望你不介意窗戶開著，」她說，「我先生和弟弟們出去打獵了。他們總是從這裡進來。」","cheerful"],
+    ["She talks and talks about birds and hunting. Framton talks about his health. Mrs. Sappleton isn’t listening. Her eyes keep going to the window.",
+     "她滔滔不絕地聊鳥、聊打獵。法蘭頓聊他的身體狀況。沙波頓太太沒在聽，她的眼睛一直飄向窗戶。","cheerful"],
+    ["Then she says, “Here they are at last!”",
+     "接著她說：「他們終於回來了！」","excited"],
+    ["Framton turns to Vera. Vera is staring out of the window. Her face is white with fear.",
+     "法蘭頓轉頭看薇拉。薇拉正盯著窗外，嚇得臉色發白。","nervous"],
+    ["Framton turns around. Three men are walking across the grass toward the window. They carry guns. A brown dog follows them. One of them is singing.",
+     "法蘭頓轉過身。三個男人正穿過草地朝窗戶走來。他們拿著槍，後面跟著一隻棕色的狗。其中一個人在唱歌。","nervous"],
+    ["Framton [[grabs|grab]] his hat and runs — out of the door, down the road, past a man on a bicycle. He doesn’t stop.",
+     "法蘭頓抓起帽子就跑——衝出大門、沿著路跑、跑過一個騎腳踏車的人。他一步也沒停。","panicked"],
+    ["“Who was that strange man?” asks Mr. Sappleton, coming in through the window.",
+     "「剛剛那個怪人是誰？」沙波頓先生一邊從窗戶走進來一邊問。","curious"],
+    ["“He’s afraid of dogs,” says Vera calmly. “Once, in India, wild dogs chased him all night. He never forgot it.”",
+     "「他怕狗，」薇拉平靜地說，「有一次在印度，一群野狗追了他一整晚。他一直忘不了。」","calm"],
+    ["Vera loves a good story. And she can [[make one up|make up]] in five minutes.",
+     "薇拉很愛好故事。而且她五分鐘就能編出一個。","amused"]
+  ],
+  quiz:[
+    ["Why does Mrs. Sappleton leave the window open?", ["She is waiting for her husband and brothers to come home from hunting.","She likes cold air.","Her dog goes out that way."], 0, "她先生和弟弟們去打獵，都是從窗戶進出。他們根本沒有出事。"],
+    ["Is Vera’s story true?", ["Yes, all of it.","No, she makes it up.","We don’t know."], 1, "三個人好好地走回來了。悲劇是薇拉當場編的。"],
+    ["Why does Framton run away?", ["He is afraid of dogs.","He thinks he sees ghosts.","He is late for the train."], 1, "他相信了薇拉的故事，以為看到了三年前死去的人。至於「怕狗」，也是薇拉編的。"]
+  ]
+},
+/* ---------------- 7 ---------------- */
+{ id:"dragon", thread:"", kind:"classic", title:"The Reluctant Dragon", zt:"不想打架的龍", voice:"m",
+  by:"Kenneth Grahame, 1898 · retold",
+  intro:"《柳林中的風聲》作者格雷厄姆寫的故事。一條愛寫詩、不想打架的龍，一位不想殺詩人的屠龍騎士，和一個想出妙計的男孩。",
+  paras:[
+    ["Long ago, a boy lives with his parents on a farm near the [[hills]]. He reads a lot of books. He knows all about kings, [[knights|knight]], and dragons.",
+     "很久以前，有個男孩和爸媽住在山丘旁的農場。他讀了很多書，對國王、騎士和龍無所不知。","calm"],
+    ["One evening his father runs home, white in the face. “There’s a [[monster]] in the cave on the hill! It’s long, and it has [[scales|scale]] and a tail!”",
+     "一天傍晚，他爸爸臉色發白地跑回家。「山上的洞裡有怪物！牠長長的，身上有鱗片，還有尾巴！」","panicked"],
+    ["“Oh, it’s probably a dragon,” says the boy. “I’ll go and see.”",
+     "「喔，那大概是一條龍吧，」男孩說，「我去看看。」","calm"],
+    ["The dragon is lying in front of the cave. It is big and blue and very [[relaxed]]. When it sees the boy, it smiles.",
+     "龍躺在洞口前。牠又大又藍，看起來非常放鬆。牠看到男孩，就笑了。","warm"],
+    ["“Hello,” says the dragon. “Please don’t hurt me. I don’t fight. I don’t eat people. I like [[poetry]], and I like looking at the sky.”",
+     "「你好，」龍說，「請不要傷害我。我不打架，也不吃人。我喜歡詩，也喜歡看天空。」","gentle"],
+    ["The boy and the dragon become friends. Every evening the boy visits, and the dragon reads its poems. They are not very good poems, but the boy [[claps|clap]] anyway.",
+     "男孩和龍成了朋友。每天傍晚男孩都去找牠，龍就念自己寫的詩。那些詩寫得不太好，但男孩還是會拍手。","amused"],
+    ["But the people in the village are afraid. They send for a knight — Saint George, the most famous dragon fighter in the land.",
+     "可是村裡的人很害怕。他們請來一位騎士——聖喬治，全國最有名的屠龍英雄。","nervous"],
+    ["“Saint George is coming to fight you,” says the boy. “What can we do?” “Nothing,” says the dragon. “I don’t fight. I’ll just stay in my cave.”",
+     "「聖喬治要來跟你打，」男孩說，「我們該怎麼辦？」「什麼也不做，」龍說，「我不打架。我就待在洞裡好了。」","worried"],
+    ["But the village wants a fight. So the boy talks to Saint George. George is a kind man. He doesn’t really want to kill a poet.",
+     "可是村民想看一場決鬥。於是男孩去找聖喬治談。喬治是個好人。他其實也不想殺一個詩人。","thoughtful"],
+    ["The boy has an idea. “Let’s have a fight,” he says. “But a [[fake]] one.”",
+     "男孩想到一個主意。「我們來打一場吧，」他說，「但是是假的。」","playful"],
+    ["The next day, the whole village comes to watch. The dragon [[roars|roar]] and breathes a little smoke. George rides at him with his long [[spear]]. Nobody gets hurt.",
+     "隔天，全村的人都來看。龍大吼一聲，吐出一點點煙。喬治舉著長矛騎馬衝向牠。沒有人受傷。","excited"],
+    ["At the end, George touches the dragon with his spear — very, very gently — and the dragon falls down.",
+     "最後，喬治用長矛碰了龍一下——非常、非常輕——龍就倒下了。","playful"],
+    ["“The dragon is beaten!” shouts George. “And now he is a good dragon. He will live with us.”",
+     "「龍被打敗了！」喬治大喊，「現在牠是一條好龍了。牠會跟我們住在一起。」","triumphant"],
+    ["That night there is a big dinner in the village. The dragon sits at the table and reads a poem. Everyone claps. Even the boy’s father.",
+     "那天晚上，村裡辦了一場盛大的晚宴。龍坐在餐桌旁念了一首詩。大家都拍手。連男孩的爸爸也拍了。","warm"]
+  ],
+  quiz:[
+    ["What does the dragon like?", ["Fighting and gold","Poetry and the sky","Eating sheep"], 1, "“I like poetry, and I like looking at the sky.”"],
+    ["What is the boy’s idea?", ["Run away with the dragon","A fake fight","Hide the dragon in the cave"], 1, "“Let’s have a fight… But a fake one.”"],
+    ["What happens after the fight?", ["The dragon flies away.","George kills the dragon.","The dragon joins the village."], 2, "晚宴上龍坐在餐桌旁念詩，大家都拍手。"]
+  ]
+},
+/* ---------------- 8 ---------------- */
+{ id:"bank", thread:"", kind:"classic", title:"My Financial Career", zt:"我的理財生涯", voice:"m",
+  by:"Stephen Leacock, 1910 · retold",
+  intro:"加拿大幽默作家李卡克的經典短文。一個一走進銀行就腿軟的人，第一次去開戶。",
+  paras:[
+    ["When I go into a bank, I get scared. The [[clerks|clerk]] scare me. The little windows scare me. Money scares me.",
+     "我一走進銀行就害怕。行員讓我害怕，那些小窗口讓我害怕，錢也讓我害怕。","nervous"],
+    ["But I get a [[raise]] at work. Now I earn fifty dollars a month, and I think, “A bank is the only place for it.”",
+     "可是我加薪了。現在我一個月賺五十塊，我心想：「這筆錢只能放銀行了。」","hopeful"],
+    ["So I walk in with fifty-six dollars in my pocket. My legs [[shake]]. I think I must see the [[manager]] to open an [[account]].",
+     "於是我口袋裡帶著五十六塊走進去。我的腿在發抖。我以為開戶一定要見經理。","nervous"],
+    ["“Can I see the manager?” I ask. Then I add, “Alone.” I don’t know why I say “alone.”",
+     "「我可以見經理嗎？」我問。接著我又補了一句：「單獨見。」我也不知道自己為什麼要說「單獨」。","nervous"],
+    ["The manager takes me into a small room and closes the door. He looks worried. “Are you a [[detective]]?” he asks. “No,” I say. “I am not a detective.”",
+     "經理帶我進一個小房間，關上門。他看起來很擔心。「你是偵探嗎？」他問。「不是，」我說，「我不是偵探。」","worried"],
+    ["“Then you must be a very rich man,” he says. Now he looks happy. “You want to put in a lot of money.”",
+     "「那你一定是個大富翁，」他說。這下他看起來很高興。「你想存一大筆錢。」","cheerful"],
+    ["“Yes,” I [[whisper]]. “Fifty-six dollars.”",
+     "「對，」我小聲說，「五十六塊。」","shy"],
+    ["The manager stands up and opens the door. “Mr. Montgomery,” he calls. “This gentleman is opening an account. He is putting in fifty-six dollars. Good morning.”",
+     "經理站起來，打開門。「蒙哥馬利先生，」他喊道，「這位先生要開戶，存五十六塊。再見。」","deadpan"],
+    ["I go to the window and push the money at the clerk. My face is hot. My hands are wet.",
+     "我走到窗口，把錢推給行員。我的臉在發燙，手心都是汗。","nervous"],
+    ["Then someone gives me a [[checkbook|c:check]]. I want to take out six dollars for today. But I am so nervous, I write fifty-six.",
+     "接著有人給我一本支票簿。我本來想領六塊錢當今天的花用。可是我太緊張了，寫成了五十六。","panicked"],
+    ["The clerk looks at the check. “What? You’re taking it all out again?”",
+     "行員看了看支票。「什麼？你又要全部領出來？」","surprised"],
+    ["Everyone in the bank turns and looks at me. I feel stupid, but I can’t say so. “Yes,” I say. “All of it.”",
+     "銀行裡的每個人都轉過來看我。我覺得自己好蠢，但我說不出口。「對，」我說，「全部。」","nervous"],
+    ["The clerk counts out the money. “How do you want it?” “In fifties,” I say. He gives me one fifty-dollar bill. “And the six?” “In sixes,” I say.",
+     "行員把錢數出來。「你要怎麼拿？」「五十的，」我說。他給我一張五十元鈔票。「那六塊呢？」「六塊的。」我說。","deadpan"],
+    ["I walk out. The big door shuts behind me with a loud [[bang]]. Behind it, I can hear people laughing.",
+     "我走出去。大門在我身後「砰」地一聲關上。門後，我聽得到大家在笑。","sad"],
+    ["I don’t go to banks now. I keep my money in my pocket and my [[savings]] in a sock.",
+     "現在我不去銀行了。我把錢放在口袋，積蓄放在襪子裡。","deadpan"]
+  ],
+  quiz:[
+    ["Why does the manager think the man is rich?", ["He wears nice clothes.","He asks to see the manager alone.","He has a big bag."], 1, "單獨要求見經理，經理先以為他是偵探，後來又以為他要存一大筆錢。"],
+    ["What mistake does the man make?", ["He writes fifty-six, not six.","He loses his money.","He goes to the wrong bank."], 0, "他想領六塊，卻寫成五十六，等於把剛存的錢全部領出來。"],
+    ["Where does he keep his savings now?", ["In the bank","In a sock","Under his bed"], 1, "“my savings in a sock.”"]
+  ]
+},
+/* ---------------- 9 ---------------- */
+{ id:"taipei", thread:"", kind:"guide", title:"One Day in Taipei", zt:"台北一日遊", voice:"f",
+  by:"InkQuest travel guide",
+  intro:"如果外國朋友只有一天可以逛台北，你會帶他去哪裡？這是一份從早餐店排到夜市的行程，順便學會用英文介紹自己的城市。",
+  paras:[
+    ["You have one day in Taipei. Put on [[comfortable]] shoes. Here’s the plan.",
+     "你在台北只有一天。穿上好走的鞋子。行程在這裡。","bright"],
+    ["7:30 a.m. — Breakfast. Find a breakfast shop with a long line. Order hot [[soy milk]] and a [[shaobing youtiao|c:shaobing]]. It costs less than a cup of coffee.",
+     "早上七點半，早餐。找一家大排長龍的早餐店。點一杯熱豆漿和一套燒餅油條。價錢比一杯咖啡還便宜。","cheerful"],
+    ["8:30 a.m. — The MRT. Buy an [[EasyCard|c:easycard]] at any station. Tap it and go. The MRT is fast, clean, and quiet. One rule: no eating or drinking inside. Not even water. Not even gum.",
+     "八點半，捷運。在任何一站買一張悠遊卡，嗶一下就能走。捷運又快、又乾淨、又安靜。只有一條規定：車上不能吃東西、不能喝飲料。連水都不行，口香糖也不行。","informative"],
+    ["9:00 a.m. — Longshan Temple. This [[temple]] is almost three hundred years old. Smoke from the [[incense]] fills the air. People [[pray]] for health, for love, and for good grades. You can watch quietly, or you can pray too.",
+     "九點，龍山寺。這座廟將近三百年歷史。香的煙霧瀰漫在空氣中。人們祈求健康、愛情和好成績。你可以安靜地看，也可以一起拜拜。","calm"],
+    ["12:00 p.m. — Lunch. You are in Taiwan. Eat [[beef noodle soup]]. That’s it. That’s the advice.",
+     "中午十二點，午餐。你在台灣耶。吃牛肉麵。就這樣。這就是建議。","playful"],
+    ["2:00 p.m. — Taipei 101. It is 508 meters tall. The [[elevator]] goes from the 5th floor to the 89th floor in about thirty-seven seconds. Your ears go pop. The city below looks like a toy.",
+     "下午兩點，台北 101。它有 508 公尺高。電梯從五樓到八十九樓只要大約三十七秒。你的耳朵會「啵」一下。底下的城市看起來像玩具一樣。","excited"],
+    ["5:00 p.m. — A [[convenience store|c:711]]. There is one on almost every corner. Buy a tea egg, pay a bill, send a package, or just sit in the air-conditioning. Taiwanese people love them. Soon, you will too.",
+     "傍晚五點，便利商店。幾乎每個街角都有一家。買顆茶葉蛋、繳帳單、寄包裹，或只是坐著吹冷氣。台灣人超愛便利商店。很快地，你也會愛上。","cheerful"],
+    ["7:00 p.m. — Raohe Night Market. At the entrance, next to a colorful temple, there is a long line for [[pepper buns|c:pepper]]. They come out of a hot clay [[oven]]. Be careful. The first bite is very hot.",
+     "晚上七點，饒河夜市。入口處、一座色彩繽紛的廟旁邊，有一條長長的隊伍在排胡椒餅。胡椒餅是從很燙的土窯裡拿出來的。小心，第一口非常燙。","excited"],
+    ["10:00 p.m. — Back to your hotel. Your feet hurt. Your stomach is full. You have one day in Taipei. It isn’t enough. It never is.",
+     "晚上十點，回飯店。你的腳好痠，肚子好飽。你在台北只有一天。不夠。永遠都不會夠。","wistful"]
+  ],
+  quiz:[
+    ["What can’t you do on the Taipei MRT?", ["Talk","Drink water","Use an EasyCard"], 1, "捷運車廂內禁止飲食，連喝水和嚼口香糖都不行。"],
+    ["How long does the Taipei 101 elevator take to the 89th floor?", ["About 37 seconds","About 5 minutes","About 89 seconds"], 0, "從五樓到八十九樓大約三十七秒。"],
+    ["Why should you be careful with pepper buns?", ["They are very spicy.","They are very hot.","They are very big."], 1, "“The first bite is very hot.” 剛出爐，第一口很燙。"]
+  ]
+},
+/* ---------------- 10 ---------------- */
+{ id:"bus", thread:"", kind:"orig", title:"The Last Bus", zt:"末班車", voice:"m",
+  by:"InkQuest original",
+  intro:"深夜的末班公車上，有一位老先生每天在第三站上車，繞完一整圈，又在第三站下車。司機黃先生終於開口問他要去哪裡。",
+  paras:[
+    ["The last bus leaves the station at 11:40 p.m. It goes around the city in a big circle and comes back to the station. Mr. Huang drives it. He likes the last bus. The streets are empty, and most of the lights turn green for him, like old friends.",
+     "末班車晚上十一點四十分從總站出發，繞城市一大圈再回到總站。開車的是黃先生。他喜歡開末班車。街道空蕩蕩的，大部分的紅綠燈都為他變綠，像老朋友一樣。","calm"],
+    ["Most nights, the [[passengers|passenger]] are tired. Students with heavy bags. Nurses after a long [[shift]]. A man asleep with his mouth open.",
+     "大多數的夜晚，乘客都很累。背著沉重書包的學生。剛下班的護理師。一個張著嘴睡著的男人。","tired"],
+    ["At the third stop, an old man always gets on. He wears a gray [[jacket]] and carries nothing. He says, “Good evening,” sits in the second row, and looks out the window.",
+     "在第三站，總有一位老先生上車。他穿著灰色外套，什麼也沒帶。他說聲「晚安」，坐在第二排，望著窗外。","gentle"],
+    ["He doesn’t get off at the hospital, or the night market, or the river. He rides the whole circle and gets off at the third stop again, right where he got on. Then he walks home.",
+     "他不在醫院下車，不在夜市下車，也不在河邊下車。他坐完一整圈，又在第三站下車，就是他上車的地方。然後他走路回家。","thoughtful"],
+    ["For a month, Mr. Huang says nothing. Then one night, at a red light, he asks, “Sir, where are you going?”",
+     "有一個月，黃先生什麼也沒說。後來有一天晚上，在一個紅燈前，他問：「先生，您要去哪裡？」","gentle"],
+    ["The old man smiles. “Nowhere,” he says. “My wife took this bus to work for thirty years. She was a nurse at the hospital. Night shift. She always sat right here.” He touches the seat.",
+     "老先生笑了。「哪裡也不去，」他說，「我太太坐這班車上班，坐了三十年。她是醫院的護理師，上大夜班。她總是坐在這個位子。」他摸了摸座椅。","nostalgic"],
+    ["“She always said the city is beautiful at night. Sometimes I rode with her, but I never saw it. I always fell asleep.”",
+     "「她總說這座城市晚上很美。我有時候會陪她坐，可是從來沒看到。我每次都睡著。」","wistful"],
+    ["“And now?” asks Mr. Huang.",
+     "「那現在呢？」黃先生問。","gentle"],
+    ["“She [[passed away|pass away]] last spring,” says the old man. “Now I don’t sleep. So I look.”",
+     "「她去年春天走了，」老先生說，「現在我睡不著。所以我就看。」","sad"],
+    ["The light turns green. Mr. Huang drives a little slower than usual.",
+     "綠燈亮了。黃先生開得比平常慢了一點。","tender"],
+    ["They go over the bridge. The river is black and full of lights. The city shines like a box of stars.",
+     "他們開上橋。河水黑黑的，映滿了燈光。整座城市閃閃發亮，像一整盒星星。","nostalgic"],
+    ["“She was right,” says the old man. His voice is very quiet.",
+     "「她說得對。」老先生說。他的聲音很輕。","tender"],
+    ["After that night, Mr. Huang always keeps the second row free. And when the bus goes over the bridge, he drives slowly, so there is time to look.",
+     "從那天晚上起，黃先生總是把第二排的位子留著。每次公車開上那座橋，他都開得很慢，好讓人有時間好好看看。","warm"]
+  ],
+  quiz:[
+    ["Where does the old man go?", ["To the hospital","Nowhere — he rides the whole circle","To his daughter’s home"], 1, "“Nowhere.” 他坐完一整圈，又在上車的第三站下車。"],
+    ["Why does he ride the last bus?", ["His wife took this bus to work for thirty years.","He works at night.","He likes the driver."], 0, "他太太當了三十年大夜班護理師，每天坐這班末班車去上班。"],
+    ["What does Mr. Huang do after that night?", ["He drives faster.","He changes to a day bus.","He drives slowly over the bridge."], 2, "他把第二排留著，過橋時開得很慢。"]
+  ]
+}
+];
+
+/* ---------------- glossary ---------------- */
+const VOCAB = {
+/* 1 */
+"cave":{w:"cave",pos:"n.",kk:"[kev]",lv:"A2",zh:"洞穴",d:"山裡面又大又暗的洞。"},
+"shadow":{w:"shadow",pos:"n.",kk:"[ˋʃædo]",lv:"A2",zh:"影子、陰影",d:"光被擋住後的暗處。in the shadows 就是「在暗處」。"},
+"wizard":{w:"wizard",pos:"n.",kk:"[ˋwɪzɚd]",lv:"B1",zh:"巫師",d:"會用魔法的人，像哈利波特。"},
+"accountant":{w:"accountant",pos:"n.",kk:"[əˋkaʊntənt]",lv:"A2",zh:"會計師",d:"幫公司管錢、算帳的人。"},
+"bard":{w:"bard",pos:"n.",kk:"[bɑrd]",lv:"C1",zh:"吟遊詩人",d:"奇幻故事裡邊走邊唱歌說故事的人。在 D&D 裡，吟遊詩人用音樂施法。"},
+"fighter":{w:"fighter",pos:"n.",kk:"[ˋfaɪtɚ]",lv:"B1",zh:"戰士",d:"很會打鬥的人。fight（打）＋ -er（人）。"},
+"sword":{w:"sword",pos:"n.",kk:"[sord]",lv:"B1",zh:"劍",d:"又長又利的武器。w 不發音，唸起來像 sord。"},
+"goblin":{w:"goblin",pos:"n.",kk:"[ˋgɑblɪn]",lv:"C1",zh:"哥布林、小妖精",d:"奇幻故事裡綠色、矮小、很吵的小怪物，通常是新手冒險者遇到的第一個敵人。"},
+"roll":{w:"roll",pos:"v.",kk:"[rol]",lv:"A2",zh:"擲（骰子）；滾動",d:"roll the dice 就是擲骰子。"},
+"ceiling":{w:"ceiling",pos:"n.",kk:"[ˋsilɪŋ]",lv:"A2",zh:"天花板",d:"房間或洞穴上方的頂部。"},
+/* 2 */
+"grill":{w:"grill",pos:"n.",kk:"[grɪl]",lv:"B1",zh:"烤爐、烤架",d:"用來烤肉、烤魷魚的架子。當動詞是「烤」。"},
+"count":{w:"count",pos:"v.",kk:"[kaʊnt]",lv:"A1",zh:"數、計算",d:"一、二、三……這樣數。"},
+"squid":{w:"squid",pos:"n.",kk:"[skwɪd]",lv:"B1",zh:"魷魚",d:"海裡有十隻腳的動物。複數也是 squid。"},
+"stall":{w:"stall",pos:"n.",kk:"[stɔl]",lv:"B1",zh:"攤位",d:"夜市、市場裡的小攤子。"},
+"hide":{w:"hide",pos:"v.",kk:"[haɪd]",lv:"A2",zh:"躲、藏",d:"讓別人看不到你。"},
+"flashlight":{w:"flashlight",pos:"n.",kk:"[ˋflæʃ͵laɪt]",lv:"B1",zh:"手電筒",d:"拿在手上的小燈。英式英語叫 torch。"},
+"bark":{w:"bark",pos:"v.",kk:"[bɑrk]",lv:"B1",zh:"（狗）叫",d:"狗發出「汪汪」的聲音。"},
+"grab":{w:"grab",pos:"v.",kk:"[græb]",lv:"B1",zh:"一把抓住",d:"很快地抓走、拿走。"},
+"kitten":{w:"kitten",pos:"n.",kk:"[ˋkɪtn]",lv:"A2",zh:"小貓",d:"很小的貓。小狗是 puppy。"},
+"beard":{w:"beard",pos:"n.",kk:"[bɪrd]",lv:"A2",zh:"（下巴的）鬍子",d:"長在下巴的鬍子。嘴唇上面的是 mustache。"},
+"belly":{w:"belly",pos:"n.",kk:"[ˋbɛlɪ]",lv:"B1",zh:"肚子",d:"比 stomach 更口語、更可愛的說法。"},
+/* 3 */
+"zoo":{w:"zoo",pos:"n.",kk:"[zu]",lv:"A1",zh:"動物園",d:"養很多動物、讓人參觀的地方。"},
+"manager":{w:"manager",pos:"n.",kk:"[ˋmænɪdʒɚ]",lv:"A2",zh:"經理",d:"管理一家店、旅館或銀行的人。"},
+"suitcase":{w:"suitcase",pos:"n.",kk:"[ˋsut͵kes]",lv:"A2",zh:"行李箱",d:"旅行時裝衣服的箱子。"},
+"guest":{w:"guest",pos:"n.",kk:"[gɛst]",lv:"A2",zh:"房客、客人",d:"住旅館的人，或來你家作客的人。"},
+"lobby":{w:"lobby",pos:"n.",kk:"[ˋlɑbɪ]",lv:"B1",zh:"大廳",d:"旅館或大樓一進門的大空間。"},
+"toast":{w:"toast",pos:"n.",kk:"[tost]",lv:"A2",zh:"烤吐司",d:"烤過的麵包片。烤麵包機是 toaster。"},
+"crumb":{w:"crumb",pos:"n.",kk:"[krʌm]",lv:"B2",zh:"（麵包）屑",d:"麵包掉下來的碎屑。b 不發音。"},
+/* 4 */
+"chopsticks":{w:"chopsticks",pos:"n.",kk:"[ˋtʃɑp͵stɪks]",lv:"A2",zh:"筷子",d:"一雙筷子是 a pair of chopsticks。"},
+"marry":{w:"married",pos:"adj.",kk:"[ˋmærɪd]",lv:"A1",zh:"結婚的",d:"get married 是「結婚」。When are you getting married? 就是「你什麼時候要結婚？」"},
+"apartment":{w:"apartment",pos:"n.",kk:"[əˋpɑrtmənt]",lv:"A1",zh:"公寓、房子",d:"大樓裡的一戶。英式英語叫 flat。"},
+"pretend":{w:"pretend",pos:"v.",kk:"[prɪˋtɛnd]",lv:"B1",zh:"假裝",d:"做得好像是真的，其實不是。pretend not to cry：假裝沒有要哭。"},
+/* 5 */
+"sweater":{w:"sweater",pos:"n.",kk:"[ˋswɛtɚ]",lv:"A1",zh:"毛衣",d:"冷天穿的厚上衣。"},
+"burn":{w:"burn",pos:"v.",kk:"[bɝn]",lv:"A2",zh:"燙傷、燒",d:"burn my tongue 就是燙到舌頭。"},
+"umbrella stand":{w:"umbrella stand",pos:"n.",kk:"[ʌmˋbrɛlə stænd]",lv:"B1",zh:"傘架",d:"門口放雨傘的架子或桶子。"},
+"dinosaur":{w:"dinosaur",pos:"n.",kk:"[ˋdaɪnə͵sɔr]",lv:"A2",zh:"恐龍",d:"很久以前的巨大爬蟲類。"},
+"handle":{w:"handle",pos:"n.",kk:"[ˋhændl]",lv:"B1",zh:"把手、柄",d:"用手握的地方，例如傘柄、門把。"},
+"nervous":{w:"nervous",pos:"adj.",kk:"[ˋnɝvəs]",lv:"A2",zh:"緊張的",d:"擔心、心跳很快的感覺。"},
+"niece":{w:"niece",pos:"n.",kk:"[nis]",lv:"A2",zh:"姪女、外甥女",d:"兄弟姊妹的女兒。兒子是 nephew。"},
+/* 6 */
+"countryside":{w:"countryside",pos:"n.",kk:"[ˋkʌntrɪ͵saɪd]",lv:"B1",zh:"鄉下",d:"城市以外、有田和樹的地方。"},
+"tragedy":{w:"tragedy",pos:"n.",kk:"[ˋtrædʒədɪ]",lv:"B2",zh:"悲劇",d:"非常悲傷、不幸的事。"},
+"swamp":{w:"swamp",pos:"n.",kk:"[swɑmp]",lv:"C1",zh:"沼澤",d:"又濕又軟、會讓人陷下去的泥地。"},
+"make up":{w:"make up",pos:"phr. v.",kk:"[mek ʌp]",lv:"B1",zh:"編（故事）",d:"把不是真的事情說得像真的。make up a story：編故事。"},
+/* 7 */
+"hills":{w:"hill",pos:"n.",kk:"[hɪl]",lv:"A2",zh:"山丘",d:"比 mountain 小、比較矮的山。"},
+"knight":{w:"knight",pos:"n.",kk:"[naɪt]",lv:"B2",zh:"騎士",d:"古時候騎馬、穿盔甲、為國王打仗的人。k 不發音，跟 night 同音。"},
+"monster":{w:"monster",pos:"n.",kk:"[ˋmɑnstɚ]",lv:"A2",zh:"怪物",d:"故事裡又大又可怕的生物。"},
+"scale":{w:"scale",pos:"n.",kk:"[skel]",lv:"B2",zh:"鱗片",d:"魚或龍身上一片一片硬硬的東西。"},
+"relaxed":{w:"relaxed",pos:"adj.",kk:"[rɪˋlækst]",lv:"A2",zh:"放鬆的",d:"輕鬆、不緊張。"},
+"poetry":{w:"poetry",pos:"n.",kk:"[ˋpoɪtrɪ]",lv:"B1",zh:"詩（總稱）",d:"一首詩是 a poem，寫詩的人是 poet。"},
+"clap":{w:"clap",pos:"v.",kk:"[klæp]",lv:"A2",zh:"拍手",d:"兩手互拍，表示喜歡或讚美。"},
+"fake":{w:"fake",pos:"adj.",kk:"[fek]",lv:"B1",zh:"假的",d:"不是真的。相反詞是 real。"},
+"roar":{w:"roar",pos:"v.",kk:"[ror]",lv:"B2",zh:"吼叫",d:"獅子或龍發出很大、很低的叫聲。"},
+"spear":{w:"spear",pos:"n.",kk:"[spɪr]",lv:"C1",zh:"長矛",d:"一根長棍子，前端是尖的，古時候的武器。"},
+/* 8 */
+"clerk":{w:"clerk",pos:"n.",kk:"[klɝk]",lv:"B1",zh:"行員、店員",d:"在銀行、商店或辦公室櫃台工作的人。"},
+"raise":{w:"raise",pos:"n.",kk:"[rez]",lv:"B2",zh:"加薪",d:"get a raise 是「加薪」。英式英語說 pay rise。"},
+"shake":{w:"shake",pos:"v.",kk:"[ʃek]",lv:"A2",zh:"發抖、搖",d:"很快地前後、左右動。My legs shake. 我的腿在抖。"},
+"account":{w:"account",pos:"n.",kk:"[əˋkaʊnt]",lv:"A2",zh:"帳戶",d:"在銀行存錢的戶頭。open an account：開戶。"},
+"detective":{w:"detective",pos:"n.",kk:"[dɪˋtɛktɪv]",lv:"A2",zh:"偵探、刑警",d:"查案子、找出真相的人，像福爾摩斯。"},
+"whisper":{w:"whisper",pos:"v.",kk:"[ˋhwɪspɚ]",lv:"B1",zh:"小聲說",d:"用很輕很輕的聲音說話。"},
+"bang":{w:"bang",pos:"n.",kk:"[bæŋ]",lv:"B2",zh:"砰的一聲",d:"很大聲、很突然的聲響。"},
+"savings":{w:"savings",pos:"n.",kk:"[ˋsevɪŋz]",lv:"B1",zh:"存款、積蓄",d:"存起來、還沒花掉的錢。"},
+/* 9 */
+"comfortable":{w:"comfortable",pos:"adj.",kk:"[ˋkʌmfɚtəbl]",lv:"A2",zh:"舒服的",d:"穿起來、坐起來很舒適。美國人常唸成三個音節 COMF-ter-bul。"},
+"soy milk":{w:"soy milk",pos:"n.",kk:"[sɔɪ mɪlk]",lv:"B1",zh:"豆漿",d:"用黃豆做的飲料。"},
+"temple":{w:"temple",pos:"n.",kk:"[ˋtɛmpl]",lv:"A2",zh:"廟、寺",d:"拜神、拜佛的地方。"},
+"incense":{w:"incense",pos:"n.",kk:"[ˋɪnsɛns]",lv:"C1",zh:"香",d:"點燃後會冒出香味煙霧的細棒，拜拜時用。"},
+"pray":{w:"pray",pos:"v.",kk:"[pre]",lv:"B1",zh:"祈禱、拜拜",d:"向神明說出心願。"},
+"beef noodle soup":{w:"beef noodle soup",pos:"n.",kk:"[bif ˋnudl sup]",lv:"A1",zh:"牛肉麵",d:"台灣最有名的麵之一。"},
+"elevator":{w:"elevator",pos:"n.",kk:"[ˋɛlə͵vetɚ]",lv:"A1",zh:"電梯",d:"英式英語叫 lift。"},
+"oven":{w:"oven",pos:"n.",kk:"[ˋʌvən]",lv:"A2",zh:"烤爐、烤箱",d:"用來烤東西的爐子。胡椒餅用的是土做的窯。"},
+/* 10 */
+"passenger":{w:"passenger",pos:"n.",kk:"[ˋpæsndʒɚ]",lv:"A2",zh:"乘客",d:"搭車、搭船、搭飛機的人（不是開車的人）。"},
+"shift":{w:"shift",pos:"n.",kk:"[ʃɪft]",lv:"B1",zh:"班、輪班",d:"工作的時段。night shift 是大夜班。"},
+"jacket":{w:"jacket",pos:"n.",kk:"[ˋdʒækɪt]",lv:"A1",zh:"外套、夾克",d:"穿在外面的短外套。"},
+"pass away":{w:"pass away",pos:"phr. v.",kk:"[pæs əˋwe]",lv:"B2",zh:"過世",d:"die 的溫和說法，就像中文說「走了」。"}
+};
+
+const CULT = {
+"c:dm":{h:"Dungeon Master (DM)",zh:"地下城主",d:"玩《龍與地下城》（Dungeons & Dragons，簡稱 D&D）時，一個人負責說故事、描述場景、扮演所有怪物和路人，這個人就是地下城主。其他玩家各自扮演一個角色，用說的決定要做什麼。"},
+"c:d20":{h:"twenty-sided die (d20)",zh:"二十面骰",d:"D&D 最重要的骰子，有二十個面。擲到 20 是大成功，擲到 1 是大失敗，常常會發生好笑的意外。die 是單數，dice 是複數。"},
+"c:stinky":{h:"stinky tofu",zh:"臭豆腐",d:"stinky 是「臭的」。很多外國人第一次聞到會嚇一跳，吃了卻愛上。"},
+"c:ghostmonth":{h:"Ghost Month",zh:"鬼月",d:"農曆七月。傳說這個月鬼門開，家家戶戶和店家會準備食物「拜好兄弟」。很多人這個月不搬家、不游泳、晚上不吹口哨。"},
+"c:literal":{h:"take something literally",zh:"照字面理解",d:"literally 是「照字面上」。英文有很多慣用語不能照字面理解，就像中文的「吃醋」不是真的在吃醋。"},
+"c:catsdogs":{h:"raining cats and dogs",zh:"傾盆大雨",d:"英文慣用語，意思是雨下得非常大，天上當然沒有真的掉貓掉狗。日常對話比較常說 It’s pouring.（雨下得好大。）"},
+"c:hand":{h:"give someone a hand",zh:"幫某人一把",d:"意思是幫忙，常用在搬東西、做事的時候。Can you give me a hand? 就是「可以幫我一下嗎？」"},
+"c:horse":{h:"I could eat a horse.",zh:"我餓到可以吞下一頭牛",d:"英文用「吃下一匹馬」形容非常餓，中文則常說「餓到可以吞下一頭牛」。"},
+"c:cny":{h:"Lunar New Year’s Eve",zh:"除夕",d:"農曆新年前一晚，全家一起吃年夜飯（圍爐）。年夜飯一定有魚，取「年年有餘」的意思。"},
+"c:hongbao":{h:"red envelope",zh:"紅包",d:"過年時長輩給晚輩紅包；開始工作賺錢以後，很多人也會包紅包給爸媽，表示孝心。"},
+"c:jie":{h:"Jie",zh:"姊",d:"華人常用稱謂叫比自己大的姊姊或表姊，而不是直接叫名字。英文通常直接叫名字，所以翻譯時會保留 Jie 這個音。"},
+"c:check":{h:"checkbook / check",zh:"支票簿、支票",d:"這個故事寫於 1910 年。當時在銀行領錢要自己寫支票，寫上金額和名字。現在的台灣很少人用支票了，但在美國還有人用。英式拼法是 cheque。"},
+"c:shaobing":{h:"shaobing youtiao",zh:"燒餅油條",d:"酥脆的燒餅夾一根油條，是台灣傳統早餐。英文沒有固定翻譯，可以說 a flaky flatbread with a fried dough stick inside。"},
+"c:easycard":{h:"EasyCard",zh:"悠遊卡",d:"台北的交通卡，可以搭捷運、公車，也可以在便利商店付錢。"},
+"c:711":{h:"convenience store",zh:"便利商店",d:"台灣是全世界便利商店最密集的地方之一。除了買東西，還能繳費、寄包裹、影印、取票。"},
+"c:pepper":{h:"pepper bun",zh:"胡椒餅",d:"外皮烤得酥脆，裡面是加了大量胡椒和蔥的豬肉餡，貼在土窯壁上烤。饒河夜市入口的胡椒餅常要排隊。"}
+};
+
+/* =========================================================
+   LAMPLIGHT READERS — reader engine
+   needs: LEVEL (level.js), S / VOCAB / CULT (data.js)
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(LEVEL.prefix+k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(LEVEL.prefix+k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(LEVEL.prefix+k); }catch(e){} }
+};
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const pad = n => String(n).padStart(2,"0");
+const RX = /\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]/g;
+const plain = s => String(s).replace(RX,"$1");
+const keyOf = (disp, key) => key || disp.toLowerCase();
+function mk(s){
+  return esc(s).replace(RX,(m,disp,key)=>{
+    key = keyOf(disp, key);
+    return `<span class="g ${key.startsWith("c:") ? "cu" : "vo"}" role="button" tabindex="0" data-k="${esc(key)}">${disp}</span>`;
+  });
+}
+const CEFR = {A1:1,A2:2,B1:3,B2:4,C1:5,C2:6};
+const THREAD = {dnd:"🎲 龍與地下城", women:"✨ 自信女性", love:"💕 輕鬆愛情", static:"📡 高雄三部曲"};
+const KIND = {orig:"原創故事", classic:"經典改寫", guide:"旅遊指南"};
+const KIND_EN = {orig:"ORIGINAL", classic:"CLASSIC", guide:"GUIDE"};
+
+/* word counts and which story each note first appears in */
+S.forEach((s,i)=>{
+  s.i = i;
+  s.words = s.paras.reduce((n,p)=>n + (plain(p[0]).match(/[A-Za-z0-9’'-]+/g) || []).length, 0);
+  s.mins = Math.max(1, Math.round(s.words / 110));
+  s.keys = [];
+  s.paras.forEach(p=>{ for(const m of p[0].matchAll(RX)){ const k = keyOf(m[1], m[2]); if(!s.keys.includes(k)) s.keys.push(k);
+    const e = k.startsWith("c:") ? CULT[k] : VOCAB[k]; if(e && e.s === undefined) e.s = i; } });
+});
+
+/* ---------------- icons ---------------- */
+const SVGI = {
+  spk:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>',
+  play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>',
+  stop:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12v12H6z"/></svg>',
+  pause:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>',
+  restart:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>',
+  star:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.8l2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9z"/></svg>',
+  starO:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.8l2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9zm0 4.5-1.5 3.2-3.5.5 2.5 2.4-.6 3.5 3.1-1.7 3.1 1.7-.6-3.5 2.5-2.4-3.5-.5z"/></svg>',
+  zh:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v2H4zm7 3h2v3h6v7h-2v-5h-4v7h-2v-7H7v5H5v-7h6z"/></svg>'
+};
+const PAL = {k:"#2B2536",w:"#FFFFFF",y:"#F4C542",o:"#E08A3C",r:"#D9674E",p:"#F2A1A8",g:"#4E9A5B",G:"#7BC57F",b:"#8FCBE3",B:"#5F71A6",s:"#B9B0A3",n:"#8A5A3C",l:"#6FB7C9"};
+function pix(id){
+  const rows = LEVEL.icons[id]; if(!rows) return "";
+  let r = "";
+  rows.forEach((row,y)=>{ let x = 0;
+    while(x < row.length){ const c = row[x]; if(c === "."){ x++; continue; }
+      let w = 1; while(row[x+w] === c) w++;
+      r += `<rect x="${x}" y="${y}" width="${w}" height="1" fill="${PAL[c]}"/>`; x += w; } });
+  return `<svg viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
+}
+
+/* ---------------- cover scene (320×180, Bayer-dithered) ---------------- */
+const Scene = (()=>{
+  const cv = $("#cv"), x = cv.getContext("2d"), W = 320, H = 180;
+  const B4 = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+  const hex = h => [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+  const img = x.createImageData(W,H), d = img.data;
+  const put = (px,py,c)=>{ if(px<0||py<0||px>=W||py>=H) return; const i=(py*W+px)*4; d[i]=c[0]; d[i+1]=c[1]; d[i+2]=c[2]; d[i+3]=255; };
+  const rect = (x0,y0,w,h,c)=>{ c=hex(c); for(let yy=y0;yy<y0+h;yy++) for(let xx=x0;xx<x0+w;xx++) put(xx,yy,c); };
+  const vgrad = (x0,y0,w,h,cols)=>{ const cs=cols.map(hex), n=cs.length-1;
+    for(let yy=0;yy<h;yy++){ const t=yy/(h-1)*n, k=Math.min(n-1,Math.floor(t)), f=t-k;
+      for(let xx=0;xx<w;xx++){ const b=(B4[yy&3][xx&3]+.5)/16; put(x0+xx,y0+yy, f>b?cs[k+1]:cs[k]); } } };
+  const glow = (cx,cy,r,col,str)=>{ const c=hex(col);
+    for(let yy=cy-r;yy<=cy+r;yy++) for(let xx=cx-r;xx<=cx+r;xx++){
+      if(xx<0||yy<0||xx>=W||yy>=H) continue;
+      const dd=Math.hypot(xx-cx,(yy-cy)*1.1)/r; if(dd>1) continue;
+      const t=(1-dd)*(1-dd)*str, b=(B4[yy&3][xx&3]+.5)/16;
+      const i=(yy*W+xx)*4, a = t>b ? .55 : t>b*.5 ? .25 : 0;
+      if(a){ d[i]+= (c[0]-d[i])*a; d[i+1]+=(c[1]-d[i+1])*a; d[i+2]+=(c[2]-d[i+2])*a; } } };
+  vgrad(0,0,W,120,["#2A2336","#352B40","#3F3246"]);
+  for(let xx=0;xx<W;xx+=16) rect(xx,0,1,120,"#2E2639");
+  rect(18,14,132,92,"#1B1726");
+  vgrad(22,18,124,84,["#15183A","#232A5A","#3B3872","#5A4A83"]);
+  [[30,24],[52,30],[70,21],[96,28],[118,23],[134,34],[42,40],[88,44]].forEach(p=>put(p[0],p[1],hex("#E8E3FF")));
+  for(let yy=-9;yy<=9;yy++) for(let xx=-9;xx<=9;xx++){ if(xx*xx+yy*yy<=81) put(120+xx,36+yy,hex((xx+yy)>6?"#D9CFAE":"#F4EBCB")); }
+  rect(116,32,3,2,"#E2D7B6"); rect(123,39,2,2,"#E2D7B6");
+  const sk=[[22,78,14,24],[36,70,12,32],[48,82,16,20],[64,66,10,36],[74,76,18,26],[92,72,12,30],[104,80,16,22],[120,68,12,34],[132,78,14,24]];
+  sk.forEach(b=>rect(b[0],b[1],b[2],b[3],"#241F3C"));
+  for(let i=0;i<46;i++){ const b=sk[i%sk.length]; const wx=b[0]+2+((i*5)%(b[2]-3)), wy=b[1]+3+((i*7)%(b[3]-6)); if(i%3) put(wx,wy,hex(i%4?"#F2C46B":"#FFE3A3")); }
+  rect(18,14,132,4,"#5A4232"); rect(18,102,132,5,"#6B4E3A"); rect(18,14,4,92,"#5A4232"); rect(146,14,4,92,"#5A4232"); rect(82,18,4,84,"#5A4232"); rect(22,58,124,3,"#5A4232");
+  rect(14,106,140,4,"#7A5A43");
+  for(let yy=10;yy<112;yy++){ const w=8+Math.round(Math.sin(yy/9)*2); rect(6,yy,w,1,yy%6<3?"#8C4F5E":"#7B4453"); rect(154-w+8,yy,w,1,yy%6<3?"#8C4F5E":"#7B4453"); }
+  rect(4,8,160,3,"#4A3528");
+  vgrad(0,120,W,60,["#6E4B35","#5C3E2C","#4A3223"]);
+  rect(0,120,W,2,"#8A6147");
+  for(let xx=0;xx<W;xx+=40) rect(xx,128,24,1,"#5F4130");
+  [["#5F7FA8",196,108,52,6],["#B96F7D",200,102,46,6],["#6F9277",194,96,50,6],["#C0823A",202,90,40,6]].forEach(b=>{rect(b[1],b[2],b[3],b[4],b[0]); rect(b[1],b[2],b[3],1,"#FFFFFF"); rect(b[1]+2,b[2]+2,b[3]-4,1,"#F4E7CF");});
+  rect(150,134,70,4,"#3E2A1E");
+  for(let i=0;i<32;i++){ const lift=Math.round(Math.sin(i/31*Math.PI)*3); rect(152+i,128-lift,1,8+lift,"#F4ECDA"); rect(186+i,128-lift,1,8+lift,"#EFE5D0"); }
+  rect(184,126,2,10,"#CBBFA6");
+  for(let l=0;l<4;l++){ rect(156,129+l*2,24,1,"#C9BDA4"); rect(190,129+l*2,24,1,"#C9BDA4"); }
+  rect(110,124,20,14,"#E9E1D2"); rect(110,124,20,2,"#FFFFFF"); rect(112,125,16,2,"#9A6A3F"); rect(130,127,4,2,"#E9E1D2"); rect(133,127,2,7,"#E9E1D2"); rect(130,132,4,2,"#E9E1D2"); rect(106,138,28,2,"#CFC6B6");
+  rect(262,136,30,4,"#2E2A30"); rect(274,88,4,48,"#3A3540"); rect(272,86,8,3,"#3A3540");
+  for(let yy=0;yy<22;yy++){ const w=18+yy; rect(276-w/2|0,64+yy,w,1,yy<2?"#F7D59A":yy%4?"#E8B561":"#DDA955"); }
+  rect(262,86,28,2,"#C98E43");
+  rect(34,128,18,12,"#B1634A"); rect(33,127,20,2,"#C9745A");
+  [[40,112,3,16],[44,108,3,20],[36,116,3,12],[48,114,3,14]].forEach(s=>rect(s[0],s[1],s[2],s[3],"#4E8A5B"));
+  [[34,114,6,3],[46,106,6,3],[38,108,5,3],[49,112,6,3],[30,120,6,3]].forEach(s=>rect(s[0],s[1],s[2],s[3],"#6FAE78"));
+  /* the level number, lettered on the spine of the top book */
+  const baseImg = new Uint8ClampedArray(d);
+  const drops = Array.from({length:44},()=>({x:22+Math.random()*124, y:18+Math.random()*84, v:1.6+Math.random()*1.4}));
+  const steam = Array.from({length:10},(_,i)=>({t:i/10}));
+  const rain = hex("#9DB2E6"), rain2 = hex("#6F7FB8"), st1 = hex("#F4EFE6"), st2 = hex("#C9BFB6");
+  let frame = 0, last = 0, on = false;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function paint(){
+    d.set(baseImg);
+    const fl = 1 + (Math.sin(frame*.7)+Math.sin(frame*1.9))*.03;
+    glow(276,96,90,"#F6C57A",.72*fl); glow(276,112,40,"#FFE2A8",.8*fl); glow(120,36,26,"#CFC8FF",.35);
+    drops.forEach(p=>{ p.y+=p.v; if(p.y>100){ p.y=18; p.x=22+Math.random()*124; } put(p.x|0,p.y|0,rain); put(p.x|0,(p.y|0)-1,rain2); });
+    steam.forEach((s,i)=>{ s.t=(s.t+.02)%1; const sy=122-s.t*22, sx=118+Math.round(Math.sin(s.t*6+i)*3)+(i%3)*2;
+      if(s.t<.85){ const c=s.t<.4?st1:st2; put(sx,sy|0,c); if(i%2) put(sx+1,sy|0,c); } });
+    x.putImageData(img,0,0);
+  }
+  function loop(ts){ if(!on) return; if(ts-last >= 83){ last = ts; frame++; paint(); } requestAnimationFrame(loop); }
+  return {
+    start(){ if(on) return; on = true; paint(); if(!reduce) requestAnimationFrame(loop); },
+    stop(){ on = false; }
+  };
+})();
+
+/* ---------------- FM music ---------------- */
+const Music = (()=>{
+  let ctx=null, bus, out, timer=null, cur=-1, step=0, nextT=0, keeper=null, ducked=false;
+  let vol = store.get("vol", 42) / 100;
+  const midi = n=>{ const m=/^([A-G])(#?)(\d)$/.exec(n); return 12*(+m[3]+1)+{C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+(m[2]?1:0); };
+  const hz = m=>440*Math.pow(2,(m-69)/12);
+  const P = {
+    ep:   {mods:[{r:1,i:1.6,d:.9},{r:14,i:.5,d:.07}], a:.004, dec:2.2, sus:0, g:.16, lp:3200},
+    bell: {mods:[{r:3.5,i:2.6,d:1.6}], a:.002, dec:2.6, sus:0, g:.10, lp:6000},
+    bass: {mods:[{r:1,i:2.2,d:.22}], a:.005, dec:.9, sus:.35, g:.24, lp:900},
+    pad:  {mods:[{r:2,i:.7,d:9}], a:.9, dec:4, sus:.8, g:.07, lp:2400, det:6},
+    mar:  {mods:[{r:4,i:2.4,d:.09}], a:.002, dec:.55, sus:0, g:.13, lp:4200}
+  };
+  function parse(str){ const t=str.split(/\s+/).filter(z=>z&&z!=="|"), ev={}; let last=null;
+    t.forEach((k,i)=>{ if(k==="-"){last=null;return;} if(k==="_"){ if(last) last.len++; return; } last={ms:k.split("+").map(midi),len:1}; ev[i]=last; });
+    return {n:t.length, ev}; }
+  const TR = LEVEL.tracks; TR.forEach(t=>t.parts.forEach(p=>p.q=parse(p.s)));
+  function silentWav(){
+    const n = 4000, buf = new ArrayBuffer(44+n), v = new DataView(buf), w = (o,s)=>{ for(let i=0;i<s.length;i++) v.setUint8(o+i,s.charCodeAt(i)); };
+    w(0,"RIFF"); v.setUint32(4,36+n,true); w(8,"WAVE"); w(12,"fmt "); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+    v.setUint32(24,8000,true); v.setUint32(28,8000,true); v.setUint16(32,1,true); v.setUint16(34,8,true); w(36,"data"); v.setUint32(40,n,true);
+    for(let i=0;i<n;i++) v.setUint8(44+i,128);
+    let s = ""; new Uint8Array(buf).forEach(b=> s += String.fromCharCode(b));
+    return "data:audio/wav;base64," + btoa(s);
+  }
+  /* iOS: play through the silent switch, and keep the session alive */
+  function unlockIOS(){
+    try{ if(navigator.audioSession) navigator.audioSession.type = "playback"; }catch(e){}
+    try{ if(!keeper){ keeper = new Audio(silentWav()); keeper.loop = true; keeper.setAttribute("playsinline",""); keeper.volume = 0.01; }
+      const pr = keeper.play(); if(pr && pr.catch) pr.catch(()=>{}); }catch(e){}
+  }
+  function impulse(sec){ const n=ctx.sampleRate*sec, b=ctx.createBuffer(2,n,ctx.sampleRate);
+    for(let c=0;c<2;c++){ const ch=b.getChannelData(c); for(let i=0;i<n;i++) ch[i]=(Math.random()*2-1)*Math.pow(1-i/n,3.2); } return b; }
+  function init(){
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false;
+    ctx=new AC(); out=ctx.createGain(); bus=ctx.createGain();
+    const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-18; comp.ratio.value=3;
+    const rev=ctx.createConvolver(); rev.buffer=impulse(3); const rg=ctx.createGain(); rg.gain.value=.32;
+    const dly=ctx.createDelay(1); dly.delayTime.value=.42; const fb=ctx.createGain(); fb.gain.value=.28;
+    const dlp=ctx.createBiquadFilter(); dlp.type="lowpass"; dlp.frequency.value=1800; const dg=ctx.createGain(); dg.gain.value=.18;
+    bus.connect(comp); bus.connect(rev); rev.connect(rg); rg.connect(comp);
+    bus.connect(dly); dly.connect(dlp); dlp.connect(fb); fb.connect(dly); dlp.connect(dg); dg.connect(comp);
+    comp.connect(out); out.connect(ctx.destination); out.gain.value=0; return true;
+  }
+  function applyVol(){ if(out) out.gain.setTargetAtTime(cur < 0 ? 0 : vol*(ducked?.3:1), ctx.currentTime, .08); }
+  function voice(t, m, dur, p, vel){
+    const f=hz(m), amp=ctx.createGain(), lp=ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=p.lp;
+    const carriers=[f]; if(p.det) carriers.push(f*Math.pow(2,p.det/1200));
+    const stopAt=t+dur+p.dec+.2;
+    carriers.forEach(cf=>{
+      const c=ctx.createOscillator(); c.frequency.value=cf;
+      p.mods.forEach(md=>{ const o=ctx.createOscillator(), g=ctx.createGain(); o.frequency.value=cf*md.r;
+        const idx=cf*md.i; g.gain.setValueAtTime(idx,t); g.gain.setTargetAtTime(idx*.15,t+.005,md.d/3);
+        o.connect(g); g.connect(c.frequency); o.start(t); o.stop(stopAt); });
+      c.connect(lp); c.start(t); c.stop(stopAt);
+    });
+    const pk=p.g*(vel||1)/carriers.length;
+    amp.gain.setValueAtTime(0,t); amp.gain.linearRampToValueAtTime(pk,t+p.a);
+    amp.gain.setTargetAtTime(pk*p.sus,t+p.a,p.dec/3);
+    amp.gain.setTargetAtTime(0,t+Math.max(p.a,dur),p.sus?.5:.25);
+    lp.connect(amp); amp.connect(bus);
+  }
+  function tick(){
+    const T=TR[cur], sd=60/T.bpm/2;
+    while(nextT < ctx.currentTime+.25){
+      const sw = step%2 ? sd*T.swing : 0;
+      T.parts.forEach(pt=>{ const e=pt.q.ev[step%pt.q.n]; if(!e) return;
+        e.ms.forEach((m,k)=>voice(nextT+sw+(pt.strum||0)*k, m, e.len*sd*.96, P[pt.p], pt.vel)); });
+      nextT += sd; step++;
+    }
+  }
+  function play(i){
+    if(!ctx && !init()){ toast("這個瀏覽器無法播放音樂"); return; }
+    unlockIOS();
+    const r = ctx.resume(); if(r && r.catch) r.catch(()=>{});
+    setTimeout(()=>{ if(cur >= 0 && ctx.state !== "running") toast("瀏覽器擋住了音樂：請再點一下 ♪，並確認手機沒有開靜音"); }, 700);
+    clearInterval(timer); cur=i; step=0; nextT=ctx.currentTime+.1; applyVol();
+    tick(); timer=setInterval(tick,40); store.set("trk", i); ui();
+  }
+  function stop(){ clearInterval(timer); timer=null; cur=-1; if(ctx) applyVol(); if(keeper) keeper.pause(); ui(); }
+  function wake(){ if(ctx && cur >= 0 && ctx.state !== "running"){ unlockIOS(); ctx.resume(); } }
+  function ui(){
+    $("#musicBtn").classList.toggle("on", cur >= 0);
+    $$(".trk").forEach(b=>{ const on = +b.dataset.t === cur; b.classList.toggle("on", on); b.querySelector(".pl").textContent = on ? "❚❚" : "▶"; });
+    $("#coverMusic").textContent = cur >= 0 ? "♪ " + TR[cur].n.toUpperCase() : "♪ TAP ANYWHERE FOR MUSIC";
+  }
+  document.addEventListener("visibilitychange", ()=>{
+    if(!ctx || cur < 0) return;
+    if(document.hidden){ clearInterval(timer); ctx.suspend(); }
+    else ctx.resume().then(()=>{ nextT = ctx.currentTime + .05; clearInterval(timer); timer = setInterval(tick,40); });
+  });
+  return { TR, play, stop, wake, ui,
+    get cur(){ return cur; }, get state(){ return ctx ? ctx.state : "none"; },
+    setVol(v){ vol=v; store.set("vol", Math.round(v*100)); if(ctx) applyVol(); }, get vol(){ return vol; },
+    duck(on){ ducked=on; if(ctx) applyVol(); } };
+})();
+
+/* ---------------- speech ----------------
+   1. a recorded clip listed in <audio>/manifest.json   (s01-03.mp3 = story 1, paragraph 3)
+   2. the browser's voice, sentence by sentence, shaped by each paragraph's mood */
+const MOOD = {
+  cheerful:[1.05,1.12], excited:[1.12,1.2], panicked:[1.16,1.16], bright:[1.03,1.08], friendly:[1.0,1.05],
+  warm:[0.95,1.0], gentle:[0.9,0.98], tender:[0.86,0.95], nostalgic:[0.87,0.95], wistful:[0.86,0.92], sad:[0.84,0.9],
+  hopeful:[0.93,1.05], playful:[1.05,1.1], teasing:[1.0,1.08], amused:[1.0,1.08], deadpan:[0.92,0.9],
+  curious:[1.0,1.1], surprised:[1.08,1.2], calm:[0.95,1.0], proud:[1.0,1.06], triumphant:[1.06,1.15],
+  thoughtful:[0.9,0.97], nervous:[1.04,1.05], tired:[0.88,0.94], informative:[0.97,1.0], worried:[1.02,1.03], shy:[0.95,1.05], annoyed:[1.06,0.95]
+};
+const SYN = window.speechSynthesis || null;
+let qid = 0, Q = null;
+let rate = store.get("rate", .85);
+let voiceURI = store.get("voiceURI", "");
+const VOICES = {all:[], f:[], m:[], main:null};
+const FEM = /Samantha|Ava|Allison|Susan|Zira|Aria|Jenny|Michelle|Emma|Joanna|Salli|Kendra|Kimberly|Ivy|Karen|Moira|Tessa|Victoria|Serena|Kate|Fiona|Veena|Libby|Sonia|Natasha|Nicky|Sara|Female|Google US English/i;
+const MAL = /Alex|Daniel|Tom|Aaron|Arthur|Rishi|David|Mark|Guy|Ryan|Eric|Christopher|Matthew|Joey|Justin|Brian|Oliver|Gordon|Lee|Evan|Nathan|Male/i;
+const NOVELTY = /Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Deranged|Good News|Hysterical|Jester|Junior|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Ralph|Fred|Kathy|Princess|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley/i;
+function vq(v){ const s = (v.voiceURI || "") + " " + v.name;
+  if(/premium|高品質|優質/i.test(s)) return 2; if(/enhanced|增強|加強|Natural|Neural|Online/i.test(s)) return 1; return 0; }
+const QLABEL = ["一般音質","增強音質","高品質"];
+function pickVoice(){
+  if(!SYN) return;
+  const us = v => /^en[-_]US/i.test(v.lang) ? 0 : 1, hq = v => 2 - vq(v);
+  const vs = SYN.getVoices().filter(v=>/^en/i.test(v.lang) && !NOVELTY.test(v.name)).sort((a,b)=>us(a)-us(b) || hq(a)-hq(b));
+  VOICES.all = vs; VOICES.f = vs.filter(v=>FEM.test(v.name)); VOICES.m = vs.filter(v=>!FEM.test(v.name) && MAL.test(v.name));
+  VOICES.main = vs.find(v=>v.voiceURI === voiceURI)
+    || vs.find(v=>us(v)===0 && /Samantha|Google US English|Aria|Jenny|Ava|Allison/i.test(v.name)) || VOICES.f[0] || vs[0] || null;
+  fillVoiceSel();
+}
+/* a story told by a man uses a male voice, unless the reader picked a voice by hand */
+function narrator(s){
+  if(voiceURI || !s || s.voice !== "m") return VOICES.main;
+  return VOICES.m.find(v=>v.lang === (VOICES.main && VOICES.main.lang)) || VOICES.m[0] || VOICES.main;
+}
+if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
+const speakable = t => plain(t).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/…/g,"...").replace(/—/g,", ").replace(/\$(\d+)/g,"$1 dollars");
+function sentences(t){
+  const s = speakable(t).replace(/\b([ap])\.m\./g,"$1_m_").replace(/\b(Mr|Mrs|Ms|Dr|St)\./g,"$1_");
+  return (s.match(/[^.!?]+(?:[.!?]+["']?|$)/g) || [s]).map(x=>x.replace(/([ap])_m_/g,"$1.m.").replace(/\b(Mr|Mrs|Ms|Dr|St)_/g,"$1.").trim()).filter(Boolean);
+}
+function prosody(sent, mood){
+  const m = MOOD[mood] || [1,1];
+  let r = rate * m[0], p = m[1];
+  if(/!["']?$/.test(sent)){ r *= 1.06; p += .08; } else if(/\?["']?$/.test(sent)) p += .07; else if(/\.\.\.["']?$/.test(sent)) r *= .92;
+  return {rate:Math.max(.5, Math.min(1.5, r)), pitch:Math.max(.8, Math.min(1.25, p))};
+}
+function pushTTS(q, it){
+  const ss = sentences(it.text), v = narrator(S[cur]);
+  ss.forEach((s,n)=>{ const pr = prosody(s, it.mood), last = n === ss.length-1;
+    const gap = last ? 450 : /\.\.\.["']?$/.test(s) ? 450 : /\?["']?$/.test(s) ? 320 : 260;
+    q.push({text:s, el:it.el, gap, voice:v, rate:pr.rate, pitch:pr.pitch}); });
+}
+const CLIPS = new Set();
+const player = new Audio(); player.preload = "auto";
+try{ fetch(LEVEL.audio + "manifest.json", {cache:"no-cache"}).then(r=>r.ok ? r.json() : null).then(j=>{
+  if(j) (Array.isArray(j) ? j : (j.files || [])).forEach(f=>CLIPS.add(String(f).replace(/\.mp3$/i,""))); }).catch(()=>{}); }catch(e){}
+function clearSpeaking(){ $$(".speaking").forEach(e=>e.classList.remove("speaking")); }
+function stopSpeech(){ qid++; if(SYN) SYN.cancel(); try{ player.pause(); }catch(e){} clearSpeaking(); Q = null; Music.duck(false); playBtns(); }
+function pauseSpeech(){ if(!Q || Q.paused) return; qid++; Q.paused = true; Q.k = Math.max(0, Q.k-1); if(SYN) SYN.cancel(); try{ player.pause(); }catch(e){} Music.duck(false); playBtns(); }
+function resumeSpeech(){ if(Q && Q.paused){ Q.paused = false; runQueue(); } }
+function sayQueue(items, mode){
+  const hasClip = items.some(it=>it.clip && CLIPS.has(it.clip));
+  if(!SYN && !hasClip){ toast("這個瀏覽器不支援朗讀功能"); return; }
+  stopSpeech();
+  const q = [];
+  items.forEach(it=>{ if(it.clip && CLIPS.has(it.clip)) q.push({audio:it.clip, el:it.el, gap:450, it}); else pushTTS(q, it); });
+  Q = {q, k:0, mode, paused:false}; runQueue();
+}
+function runQueue(){
+  const my = ++qid, S_ = Q, q = S_.q;
+  playBtns(); Music.duck(true);
+  const next = ()=>{
+    if(my !== qid) return;
+    if(S_.k >= q.length){ clearSpeaking(); Q = null; Music.duck(false); playBtns(); return; }
+    const x = q[S_.k++];
+    if(x.el && !x.el.classList.contains("speaking")){ clearSpeaking(); x.el.classList.add("speaking"); if(q.length > 1) x.el.scrollIntoView({block:"center", behavior:"smooth"}); }
+    if(x.audio){
+      let failed = false;
+      const fail = ()=>{ if(failed || my !== qid) return; failed = true; const sub = []; pushTTS(sub, x.it); q.splice(S_.k, 0, ...sub); next(); };
+      player.onended = ()=>{ if(my === qid) setTimeout(next, x.gap); }; player.onerror = fail;
+      player.src = `${LEVEL.audio}${x.audio}.mp3`; player.playbackRate = rate < .8 ? .85 : 1;
+      const pr = player.play(); if(pr && pr.catch) pr.catch(fail); return;
+    }
+    if(!SYN){ next(); return; }
+    const u = new SpeechSynthesisUtterance(x.text);
+    if(x.voice){ u.voice = x.voice; u.lang = x.voice.lang; } else u.lang = "en-US";
+    u.rate = x.rate; u.pitch = x.pitch;
+    u.onend = ()=>{ if(my === qid) setTimeout(next, x.gap); };
+    u.onerror = ()=>{ if(my === qid) setTimeout(next, 50); };
+    SYN.speak(u);
+  };
+  setTimeout(next, 60);
+}
+function sayWord(t){ if(!SYN) return; stopSpeech(); const u = new SpeechSynthesisUtterance(t); const v = VOICES.main;
+  if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "en-US"; u.rate = Math.min(1, rate); SYN.speak(u); }
+let speechUnlocked = false;
+function unlockSpeech(){ if(speechUnlocked || !SYN) return; speechUnlocked = true;
+  try{ const u = new SpeechSynthesisUtterance(" "); u.volume = 0; u.lang = "en-US"; SYN.speak(u); }catch(e){} }
+["touchend","click","keydown"].forEach(t=>document.addEventListener(t, unlockSpeech, true));
+function fillVoiceSel(){
+  const s = $("#voiceSel"); if(!s) return;
+  if(!VOICES.all.length){ s.innerHTML = `<option>（這個瀏覽器沒有英文語音）</option>`; s.disabled = true; return; }
+  s.disabled = false;
+  s.innerHTML = `<option value="">自動（依故事選男聲或女聲）</option>` + VOICES.all.map((v,i)=>`<option value="${i}"${voiceURI && v === VOICES.main ? " selected" : ""}>${esc(v.name)} · ${esc(v.lang)} · ${QLABEL[vq(v)]}</option>`).join("");
+  const m = VOICES.main; if(m) $("#voiceNow").innerHTML = `目前主要聲音：<b>${esc(m.name)}（${QLABEL[vq(m)]}）</b>`;
+}
+function playBtns(){
+  const b = $("#playAll");
+  if(b){ const mine = Q && Q.mode === "all";
+    b.innerHTML = !mine ? SVGI.play + "<span>Listen 朗讀全文</span>" : Q.paused ? SVGI.play + "<span>Resume 繼續</span>" : SVGI.pause + "<span>Pause 暫停</span>";
+    b.classList.toggle("on", !!mine && !Q.paused); const r = $("#playRe"); if(r) r.hidden = !mine; }
+  $$(".pspk").forEach(p=>{ const live = !!Q && Q.mode === "p" + p.dataset.p;
+    if(p.classList.contains("live") !== live){ p.classList.toggle("live", live); p.innerHTML = live ? SVGI.stop : SVGI.spk; p.setAttribute("aria-label", live ? "停止" : "聽這一段"); } });
+}
+
+/* ---------------- state ---------------- */
+let cur = -1;                                   /* -1 = contents page */
+let read = store.get("read", {});               /* id -> date string */
+let quiz = store.get("quiz", {});               /* id -> [answers] */
+let stars = store.get("stars", []);
+let showZh = !!store.get("zhdef", false);
+let fresh = "";                                 /* story stamped this visit, animated on the card */
+const today = ()=>{ const d = new Date(); return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`; };
+const readCount = ()=>S.filter(s=>read[s.id]).length;
+const wordsRead = ()=>S.reduce((n,s)=>n + (read[s.id] ? s.words : 0), 0);
+
+/* ---------------- views ---------------- */
+function tagHTML(s){
+  return `<span class="tag t">${KIND[s.kind]}</span>` + (s.thread ? `<span class="tag">${THREAD[s.thread]}${s.age ? " · " + s.age : ""}</span>` : "");
+}
+function libHTML(){
+  const n = readCount(), perfect = S.filter(s=>{ const a = quiz[s.id]; return a && a.length === s.quiz.length && a.every((x,k)=>x === s.quiz[k][2]); }).length;
+  return `<section class="lib" aria-label="借書證">
+    <div class="libh"><b>Library Card</b><span>借書證・讀完一篇就蓋一個章</span></div>
+    <div class="stamps">${S.map((s,i)=>`<button class="st${read[s.id] ? " on" : ""}${fresh === s.id ? " new" : ""}" data-go="${i}" data-sid="${s.id}" aria-label="${esc(s.title)}${read[s.id] ? "（已讀）" : ""}">${read[s.id] ? pix(s.id) : pad(i+1)}</button>`).join("")}</div>
+    <div class="libs"><span><b>${n}</b>/ ${S.length} 篇讀完</span><span><b>${wordsRead().toLocaleString()}</b>個英文字</span><span><b>${perfect}</b>篇小測驗全對</span></div>
+  </section>`;
+}
+function renderHome(){
+  stopSpeech(); cur = -1; store.set("pos", -1);
+  $("#main").innerHTML = libHTML() + `<h2 class="hh">Stories 故事</h2><div class="cards">` + S.map((s,i)=>`
+    <button class="card" data-go="${i}">
+      <span class="ico">${pix(s.id)}</span>
+      <span><span class="cn">${pad(i+1)}. ${esc(s.title)}</span><span class="cz2">${esc(s.zt)}</span><span class="tags">${tagHTML(s)}</span></span>
+      <span class="cr">${read[s.id] ? '<span class="ok">✓</span>' : ""}${s.words} words<br>${s.mins} min</span>
+    </button>`).join("") + `</div>`;
+  buildToc(); window.scrollTo(0,0);
+}
+function renderStory(i, para){
+  stopSpeech(); closePop(); cur = i; store.set("pos", i);
+  const s = S[i], prev = S[i-1], next = S[i+1], a = quiz[s.id] || [];
+  $("#main").innerHTML = `<article class="story">
+    <p class="sk">STORY ${pad(i+1)} · ${KIND_EN[s.kind]}</p>
+    <h1>${esc(s.title)}</h1>
+    <p class="szt">${esc(s.zt)}</p>
+    <div class="meta">${tagHTML(s)}<span class="tag">${s.words} words · 約 ${s.mins} 分鐘</span></div>
+    <div class="intro">${esc(s.intro)}<span class="by">${esc(s.by)}</span></div>
+    <div class="tools">
+      <button class="pb" id="playAll"></button>
+      <button class="pb" id="playRe" hidden>${SVGI.restart}<span>從頭</span></button>
+      <button class="pb${showZh ? " sel" : ""}" id="zhBtn" aria-pressed="${showZh}">${showZh ? "隱藏中文" : "顯示中文"}</button>
+    </div>
+    ${s.paras.map((p,k)=>`<div class="pp" id="p${k}"><button class="pspk" data-p="${k}" aria-label="聽這一段">${SVGI.spk}</button><p class="en"><span class="t">${mk(p[0])}</span></p><p class="zh">${esc(p[1])}</p></div>`).join("")}
+    <p class="end">~ THE END ~</p>
+    <section class="box" id="quiz">
+      <p class="bh">Did you get it?</p><p class="bz">小測驗・三題，可以跳過</p>
+      ${s.quiz.map((q,k)=>`<div class="q" data-q="${k}"><p class="qt">${k+1}. ${esc(q[0])}</p><div class="qo">${q[1].map((o,j)=>`<button data-o="${j}">${esc(o)}</button>`).join("")}</div><p class="qx" hidden></p></div>`).join("")}
+    </section>
+    <section class="box done" id="done"></section>
+    <nav class="nav">
+      ${prev ? `<button data-go="${i-1}"><small>← 上一篇</small><span>${esc(prev.title)}</span></button>` : `<button data-home><small>←</small><span>Contents 目錄</span></button>`}
+      ${next ? `<button data-go="${i+1}"><small>下一篇 →</small><span>${esc(next.title)}</span></button>` : `<button data-home><small>→</small><span>Contents 目錄</span></button>`}
+    </nav>
+  </article>`;
+  a.forEach((x,k)=>{ if(x !== undefined && x !== null) answer(k, x, true); });
+  doneBox(); playBtns(); buildToc();
+  if(para !== undefined){ const el = $("#p"+para); if(el){ el.scrollIntoView({block:"center"}); el.querySelector(".en").classList.add("flash"); } }
+  else window.scrollTo(0,0);
+}
+function doneBox(){
+  const s = S[cur], d = read[s.id];
+  $("#done").innerHTML = d
+    ? `<button class="bigst" disabled>✓ READ · ${esc(d)}</button><small>已經蓋在借書證上了。想再讀一次，隨時歡迎。</small>`
+    : `<button class="bigst" id="stampBtn">I finished! 我讀完了</button><small>按下去，就會在借書證上蓋一個章。</small>`;
+}
+function answer(k, j, quiet){
+  const s = S[cur], q = s.quiz[k], box = $(`.q[data-q="${k}"]`); if(!box) return;
+  const ok = j === q[2];
+  box.querySelectorAll(".qo button").forEach((b,n)=>{ b.classList.toggle("right", ok && n === j); b.classList.toggle("wrong", !ok && n === j); });
+  const x = box.querySelector(".qx"); x.hidden = false;
+  x.innerHTML = ok ? `<b>答對了！</b>${esc(q[3])}` : `<b>再想想看。</b>回到故事裡找找線索，再選一次。`;
+  if(!quiet){ const a = quiz[s.id] || []; a[k] = j; quiz[s.id] = a; store.set("quiz", quiz); }
+}
+function stamp(){
+  const s = S[cur]; if(read[s.id]) return;
+  read[s.id] = today(); store.set("read", read); fresh = s.id; doneBox();
+  const n = readCount();
+  toast(n === S.length ? `十篇全部讀完了！你讀了 ${wordsRead().toLocaleString()} 個英文字 🎉` : `蓋章！借書證上已經有 ${n} 個章了`);
+  buildToc();
+}
+
+/* ---------------- popover ---------------- */
+const pop = $("#pop");
+function popHTML(k){
+  if(k.startsWith("c:")){ const c = CULT[k]; if(!c) return "";
+    return `<div class="ph"><span class="pw">${esc(c.h)}</span><span class="lvb">文化小知識</span><span class="px2"><button class="ib" data-say="${esc(c.h)}" aria-label="聽發音">${SVGI.spk}</button><button class="ib" data-close aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg></button></span></div>
+      <p class="pz">${esc(c.zh)}</p><p class="pd">${esc(c.d)}</p>`; }
+  const v = VOCAB[k]; if(!v) return "";
+  const hi = (CEFR[v.lv] || 1) > LEVEL.rank, st = stars.includes(k);
+  return `<div class="ph"><span class="pw">${esc(v.w)}</span><span class="pk">${esc(v.kk)}</span><span class="lvb${hi ? " hi" : ""}">${esc(v.lv)}${hi ? " · 超出本級" : ""}</span>
+      <span class="px2"><button class="ib" data-say="${esc(v.w)}" aria-label="聽發音">${SVGI.spk}</button><button class="ib star${st ? " on" : ""}" data-star="${esc(k)}" aria-label="${st ? "取消收藏" : "收藏"}">${st ? SVGI.star : SVGI.starO}</button><button class="ib" data-close aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg></button></span></div>
+    <p class="pz"><span class="lvb">${esc(v.pos)}</span> ${esc(v.zh)}</p><p class="pd">${esc(v.d)}</p>${v.s !== undefined ? `<p class="pn">出自第 ${v.s+1} 篇〈${esc(S[v.s].title)}〉</p>` : ""}`;
+}
+function openPop(k){ const h = popHTML(k); if(!h) return; $("#popIn").innerHTML = h; pop.classList.add("on"); pop.setAttribute("aria-hidden","false"); pop.dataset.k = k; }
+function closePop(){ pop.classList.remove("on"); pop.setAttribute("aria-hidden","true"); }
+
+/* ---------------- drawer ---------------- */
+function openDrawer(p){ $("#drawer").classList.add("on"); $("#scrim").classList.add("on"); switchPane(p || "toc"); }
+function closeDrawer(){ $("#drawer").classList.remove("on"); $("#scrim").classList.remove("on"); }
+function switchPane(p){
+  $$("#tabs button").forEach(b=>b.classList.toggle("on", b.dataset.p === p));
+  $$(".pane").forEach(x=>x.hidden = x.id !== "p-"+p);
+  if(p === "words") buildWords(); if(p === "about") buildAbout(); if(p === "find") setTimeout(()=>$("#q").focus(), 250);
+}
+function buildToc(){
+  $("#toc").innerHTML = `<a data-home class="${cur < 0 ? "cur" : ""}"><span></span><span><span class="n">Contents & Library Card</span><span class="z">目錄與借書證</span></span><span></span></a>` +
+    S.map((s,i)=>`<a data-go="${i}" class="${i === cur ? "cur" : ""}">${pix(s.id)}<span><span class="n">${pad(i+1)}. ${esc(s.title)}</span><span class="z">${esc(s.zt)}</span></span><span class="ok">${read[s.id] ? "✓" : ""}</span></a>`).join("");
+}
+function snip(t, q){ const i = t.toLowerCase().indexOf(q.toLowerCase()); if(i < 0) return esc(t.slice(0,80));
+  const a = Math.max(0, i-40), b = Math.min(t.length, i+q.length+50);
+  return (a ? "…" : "") + esc(t.slice(a,i)) + "<mark>" + esc(t.slice(i,i+q.length)) + "</mark>" + esc(t.slice(i+q.length,b)) + (b < t.length ? "…" : ""); }
+function search(){
+  const q = $("#q").value.trim(), res = $("#res");
+  if(q.length < 2 && !/[一-鿿]/.test(q)){ res.innerHTML = `<p class="hint">可以搜尋故事內容、中文翻譯和詞彙。</p>`; return; }
+  const out = [], ql = q.toLowerCase();
+  Object.keys(VOCAB).forEach(k=>{ const v = VOCAB[k]; if(v.w.toLowerCase().includes(ql) || v.zh.includes(q)) out.push(`<a data-pop="${esc(k)}"><small>WORD 詞彙</small><b>${esc(v.w)}</b>　${esc(v.zh)}</a>`); });
+  Object.keys(CULT).forEach(k=>{ const c = CULT[k]; if(c.h.toLowerCase().includes(ql) || c.zh.includes(q)) out.push(`<a data-pop="${esc(k)}"><small>CULTURE 文化</small><b>${esc(c.h)}</b>　${esc(c.zh)}</a>`); });
+  S.forEach((s,i)=>s.paras.forEach((p,k)=>{ const en = plain(p[0]);
+    if(en.toLowerCase().includes(ql)) out.push(`<a data-go="${i}" data-para="${k}"><small>STORY ${pad(i+1)} · ${esc(s.title)}</small>${snip(en,q)}</a>`);
+    else if(p[1].includes(q)) out.push(`<a data-go="${i}" data-para="${k}"><small>STORY ${pad(i+1)} · ${esc(s.zt)}</small>${snip(p[1],q)}</a>`); }));
+  res.innerHTML = out.length ? `<p class="hint">找到 ${out.length} 筆</p>` + out.slice(0,60).join("") : `<p class="hint">找不到「${esc(q)}」。</p>`;
+}
+let wmode = "all";
+function buildWords(){
+  $$("#wseg button").forEach(b=>b.classList.toggle("on", b.dataset.w === wmode));
+  const row = k=>{ const v = VOCAB[k], c = CULT[k]; if(!v && !c) return "";
+    return `<a data-pop="${esc(k)}"><b>${esc(v ? v.w : c.h)}</b><span>${esc(v ? v.zh : c.zh)}</span>${stars.includes(k) ? "<i>★</i>" : ""}</a>`; };
+  if(wmode === "star"){
+    $("#wl").innerHTML = stars.length ? stars.map(row).join("") : `<p class="hint">還沒有收藏。讀故事時點一下有虛線的字，再按 ☆ 就能收藏。</p>`; return; }
+  $("#wl").innerHTML = S.map((s,i)=>`<h4>${pad(i+1)}. ${esc(s.title)}</h4>` + s.keys.filter(k=>(VOCAB[k] || CULT[k]) && (VOCAB[k] || CULT[k]).s === i).map(row).join("")).join("");
+}
+function buildAbout(){
+  $("#p-about").innerHTML = `<p class="big">InkQuest</p><p class="mot">Every quest begins with a story.</p>
+    <p><b>Lamplight Readers 燈下小書</b><br>${esc(LEVEL.zh)}（${LEVEL.cefr}）・${S.length} 篇故事<br>版本 ${esc(LEVEL.version)}</p>
+    <p>《窗邊英文》的姊妹讀本，給想自己多讀一點的人。每篇都可以朗讀、點字看解釋；讀完蓋個章，看看自己讀了多少英文。</p>
+    <p>目前進度：讀完 ${readCount()} 篇，共 ${wordsRead().toLocaleString()} 個英文字。</p>
+    <p><b>經典故事來源</b>（皆為公有領域作品，由 InkQuest 改寫為 ${LEVEL.cefr} 程度）</p>
+    <ul>${LEVEL.credits.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>
+    <p>字型：Jersey 15、Literata（SIL Open Font License）。音樂為瀏覽器即時 FM 合成。</p>
+    <p>Created with Claude.</p>
+    <p>© 2026 Wen-Hung Fang. All rights reserved.</p>`;
+}
+
+/* ---------------- settings ---------------- */
+let fs = store.get("fs", 19);
+function applyFs(){ document.documentElement.style.setProperty("--fs", fs+"px"); $$("#sizes button").forEach(b=>b.classList.toggle("on", +b.dataset.v === fs)); }
+function applyRate(){ $$("#rates button").forEach(b=>b.classList.toggle("on", +b.dataset.v === rate)); }
+function applyZhDef(){ const d = !!store.get("zhdef", false); $$("#zhset button").forEach(b=>b.classList.toggle("on", !!+b.dataset.v === d)); }
+function applyTheme(){ const t = store.get("theme", "auto"); if(t === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t);
+  $$("#themes button").forEach(b=>b.classList.toggle("on", b.dataset.v === t)); }
+function setZh(on){ showZh = on; document.body.classList.toggle("showzh", on); const b = $("#zhBtn"); if(b){ b.textContent = on ? "隱藏中文" : "顯示中文"; b.classList.toggle("sel", on); b.setAttribute("aria-pressed", on); } }
+
+/* ---------------- toast ---------------- */
+const toastQ = []; let toastBusy = false;
+function toast(m){ if(toastQ[toastQ.length-1] !== m) toastQ.push(m); if(!toastBusy) toastNext(); }
+function toastNext(){ const m = toastQ.shift(); if(m === undefined){ toastBusy = false; return; } toastBusy = true;
+  const t = $("#toast"); t.textContent = m; t.classList.add("on"); setTimeout(()=>{ t.classList.remove("on"); setTimeout(toastNext, 300); }, 2600); }
+
+/* ---------------- events ---------------- */
+document.addEventListener("click", e=>{
+  const t = e.target;
+  const g = t.closest(".g"); if(g){ openPop(g.dataset.k); return; }
+  const go = t.closest("[data-go]");
+  if(go){ const para = go.dataset.para; closeDrawer(); renderStory(+go.dataset.go, para === undefined ? undefined : +para); return; }
+  if(t.closest("[data-home]")){ closeDrawer(); renderHome(); return; }
+  const pp = t.closest("[data-pop]"); if(pp){ openPop(pp.dataset.pop); return; }
+  const sp = t.closest(".pspk");
+  if(sp){ const k = +sp.dataset.p; if(Q && Q.mode === "p"+k){ stopSpeech(); return; }
+    const s = S[cur]; sayQueue([{text:s.paras[k][0], mood:s.paras[k][2], el:$("#p"+k), clip:`s${pad(cur+1)}-${pad(k+1)}`}], "p"+k); return; }
+  if(t.closest("#playAll")){
+    if(Q && Q.mode === "all"){ Q.paused ? resumeSpeech() : pauseSpeech(); return; }
+    const s = S[cur]; sayQueue(s.paras.map((p,k)=>({text:p[0], mood:p[2], el:$("#p"+k), clip:`s${pad(cur+1)}-${pad(k+1)}`})), "all"); return; }
+  if(t.closest("#playRe")){ const s = S[cur]; sayQueue(s.paras.map((p,k)=>({text:p[0], mood:p[2], el:$("#p"+k), clip:`s${pad(cur+1)}-${pad(k+1)}`})), "all"); return; }
+  if(t.closest("#zhBtn")){ setZh(!showZh); return; }
+  const qo = t.closest(".qo button"); if(qo){ answer(+qo.closest(".q").dataset.q, +qo.dataset.o); return; }
+  if(t.closest("#stampBtn")){ stamp(); return; }
+  const say = t.closest("[data-say]"); if(say){ sayWord(say.dataset.say); return; }
+  const star = t.closest("[data-star]");
+  if(star){ const k = star.dataset.star, i = stars.indexOf(k); if(i < 0) stars.push(k); else stars.splice(i,1); store.set("stars", stars);
+    openPop(k); toast(i < 0 ? "收藏到詞彙的「我的收藏」" : "取消收藏"); if(!$("#p-words").hidden) buildWords(); return; }
+  if(t.closest("[data-close]")){ closePop(); return; }
+  if(pop.classList.contains("on") && !t.closest("#pop")) closePop();
+  if(!$("#mp").hidden && !t.closest("#mp") && !t.closest("#musicBtn")) $("#mp").hidden = true;
+});
+document.addEventListener("keydown", e=>{
+  if((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("g")){ e.preventDefault(); openPop(e.target.dataset.k); }
+  if(e.key === "Escape"){ closePop(); closeDrawer(); $("#mp").hidden = true; }
+});
+$("#menuBtn").onclick = ()=>openDrawer("toc");
+$("#setBtn").onclick = ()=>openDrawer("set");
+$("#dClose").onclick = closeDrawer;
+$("#scrim").onclick = closeDrawer;
+$("#brand").onclick = ()=>renderHome();
+$("#tabs").onclick = e=>{ const b = e.target.closest("button"); if(b) switchPane(b.dataset.p); };
+$("#q").addEventListener("input", search);
+$("#wseg").onclick = e=>{ const b = e.target.closest("button"); if(b){ wmode = b.dataset.w; buildWords(); } };
+$("#sizes").onclick = e=>{ const b = e.target.closest("button"); if(b){ fs = +b.dataset.v; store.set("fs", fs); applyFs(); } };
+$("#rates").onclick = e=>{ const b = e.target.closest("button"); if(b){ rate = +b.dataset.v; store.set("rate", rate); applyRate(); } };
+$("#zhset").onclick = e=>{ const b = e.target.closest("button"); if(b){ store.set("zhdef", !!+b.dataset.v); applyZhDef(); setZh(!!+b.dataset.v); } };
+$("#themes").onclick = e=>{ const b = e.target.closest("button"); if(b){ store.set("theme", b.dataset.v); applyTheme(); } };
+$("#voiceSel").onchange = e=>{
+  const v = e.target.value === "" ? null : VOICES.all[+e.target.value];
+  voiceURI = v ? v.voiceURI : ""; store.set("voiceURI", voiceURI); pickVoice();
+  if(v && SYN){ SYN.cancel(); const u = new SpeechSynthesisUtterance("Hello! Shall we read a story?"); u.voice = v; u.lang = v.lang; u.rate = rate; SYN.speak(u); }
+};
+let resetArm = 0;
+$("#resetBtn").onclick = ()=>{
+  if(Date.now() - resetArm > 4000){ resetArm = Date.now(); $("#resetBtn").textContent = "確定要清除嗎？再按一次"; setTimeout(()=>{ $("#resetBtn").textContent = "清除閱讀紀錄"; }, 4000); return; }
+  read = {}; quiz = {}; stars = []; ["read","quiz","stars","pos"].forEach(store.del); resetArm = 0;
+  $("#resetBtn").textContent = "清除閱讀紀錄"; toast("閱讀紀錄已清除"); closeDrawer(); renderHome();
+};
+/* music panel */
+$("#tracks").innerHTML = Music.TR.map((t,i)=>`<button class="trk" data-t="${i}"><span class="pl">▶</span><span><span class="tn">${esc(t.n)}</span><span class="tz">${esc(t.z)}</span></span></button>`).join("");
+$("#tracks").onclick = e=>{ const b = e.target.closest(".trk"); if(!b) return; const i = +b.dataset.t; if(Music.cur === i) Music.stop(); else Music.play(i); };
+$("#musicBtn").onclick = ()=>{ $("#mp").hidden = !$("#mp").hidden; };
+$("#mStop").onclick = ()=>Music.stop();
+$("#vol").value = Math.round(Music.vol*100);
+$("#vol").addEventListener("input", e=>Music.setVol(e.target.value/100));
+
+/* ---------------- cover ---------------- */
+function leaveCover(){ document.body.classList.remove("cover"); Scene.stop(); }
+let musicTried = false;
+function coverTap(e){
+  if(!document.body.classList.contains("cover")) return;
+  if(!musicTried){ musicTried = true; Music.play(store.get("trk", 0) || 0); }
+  if(e.target.closest("#goBtn")) leaveCover();
+}
+/* touchend/click count as a user gesture on iOS; pointerdown doesn't */
+$("#cover").addEventListener("touchend", coverTap);
+$("#cover").addEventListener("click", coverTap);
+$("#cover").addEventListener("keydown", e=>{ if(e.key === "Enter") leaveCover(); });
+["touchend","click"].forEach(t=>document.addEventListener(t, ()=>Music.wake(), true));
+
+/* ---------------- boot ---------------- */
+function boot(){
+  $("#cvK").textContent = LEVEL.kicker; $("#cvZ").textContent = LEVEL.zh; $("#brandLv").textContent = `L${LEVEL.n} · ${LEVEL.cefr}`;
+  applyFs(); applyRate(); applyZhDef(); applyTheme(); setZh(showZh); Music.ui();
+  const p = store.get("pos", -1);
+  if(p >= 0 && p < S.length) renderStory(p); else renderHome();
+  document.body.classList.add("cover"); Scene.start();
+}
+boot();
+
+</script>
+</body>
+</html>
