@@ -1260,12 +1260,12 @@ const Music = (()=>{
   }
   function applyVol(){ if(out) out.gain.setTargetAtTime(cur < 0 ? 0 : vol*(ducked?.3:1), ctx.currentTime, .08); }
   function voice(t, m, dur, p, vel, dest){
-    const f=hz(m), amp=ctx.createGain(), lp=ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=p.lp;
+    const f=hz(m), amp=ctx.createGain(), lp=ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=p.lp; const nodes=[amp,lp];
     const carriers=[f]; if(p.det) carriers.push(f*Math.pow(2,p.det/1200));
     const stopAt=t+dur+p.dec+.2;
     carriers.forEach(cf=>{
-      const c=ctx.createOscillator(); c.frequency.value=cf;
-      p.mods.forEach(md=>{ const o=ctx.createOscillator(), g=ctx.createGain(); o.frequency.value=cf*md.r;
+      const c=ctx.createOscillator(); c.frequency.value=cf; nodes.push(c);
+      p.mods.forEach(md=>{ const o=ctx.createOscillator(), g=ctx.createGain(); o.frequency.value=cf*md.r; nodes.push(o,g);
         const idx=cf*md.i; g.gain.setValueAtTime(idx,t); g.gain.setTargetAtTime(idx*.15,t+.005,md.d/3);
         o.connect(g); g.connect(c.frequency); o.start(t); o.stop(stopAt); });
       c.connect(lp); c.start(t); c.stop(stopAt);
@@ -1275,6 +1275,8 @@ const Music = (()=>{
     amp.gain.setTargetAtTime(pk*p.sus,t+p.a,p.dec/3);
     amp.gain.setTargetAtTime(0,t+Math.max(p.a,dur),p.sus?.25:.2);
     lp.connect(amp); amp.connect(dest||bus);
+    /* free the whole voice when it ends (some iOS versions keep connected nodes alive) */
+    nodes[2].onended=()=>nodes.forEach(n=>{ try{ n.disconnect(); }catch(e){} });
   }
   function drum(t, k, vel, dest){
     vel = vel || 1; dest = dest || bus;
@@ -1282,14 +1284,14 @@ const Music = (()=>{
       const o=ctx.createOscillator(), g=ctx.createGain(), f0 = k==="k" ? 150 : 220, f1 = k==="k" ? 42 : 90;
       o.frequency.setValueAtTime(f0,t); o.frequency.exponentialRampToValueAtTime(f1,t+.12);
       g.gain.setValueAtTime(.55*vel,t); g.gain.exponentialRampToValueAtTime(.001,t+(k==="k"?.28:.22));
-      o.connect(g); g.connect(dest); o.start(t); o.stop(t+.3); return;
+      o.connect(g); g.connect(dest); o.onended=()=>{ o.disconnect(); g.disconnect(); }; o.start(t); o.stop(t+.3); return;
     }
     const s=ctx.createBufferSource(); s.buffer=noise; const f=ctx.createBiquadFilter(), g=ctx.createGain();
     if(k==="h"){ f.type="highpass"; f.frequency.value=7000; g.gain.setValueAtTime(.11*vel,t); g.gain.exponentialRampToValueAtTime(.001,t+.05); }
     else if(k==="c"){ f.type="highpass"; f.frequency.value=4000; g.gain.setValueAtTime(.16*vel,t); g.gain.exponentialRampToValueAtTime(.001,t+1.1); }
     else { f.type="bandpass"; f.frequency.value=1800; f.Q.value=.7; g.gain.setValueAtTime(.32*vel,t); g.gain.exponentialRampToValueAtTime(.001,t+.16);
-      const o=ctx.createOscillator(), og=ctx.createGain(); o.frequency.value=190; og.gain.setValueAtTime(.18*vel,t); og.gain.exponentialRampToValueAtTime(.001,t+.09); o.connect(og); og.connect(dest); o.start(t); o.stop(t+.1); }
-    s.connect(f); f.connect(g); g.connect(dest); s.start(t, Math.random()*.5); s.stop(t+1.2);
+      const o=ctx.createOscillator(), og=ctx.createGain(); o.frequency.value=190; og.gain.setValueAtTime(.18*vel,t); og.gain.exponentialRampToValueAtTime(.001,t+.09); o.connect(og); og.connect(dest); o.onended=()=>{ o.disconnect(); og.disconnect(); }; o.start(t); o.stop(t+.1); }
+    s.connect(f); f.connect(g); g.connect(dest); s.onended=()=>{ s.disconnect(); f.disconnect(); g.disconnect(); }; s.start(t, Math.random()*.5); s.stop(t+1.2);
   }
   function tick(){
     const T=TRACKS[cur], sd=60/T.bpm/2;
@@ -1304,6 +1306,7 @@ const Music = (()=>{
   function start(){ if(!init()){ toast("This browser can't play music. 這個瀏覽器無法播放音樂"); return false; }
     unlockIOS(); const r = ctx.resume(); if(r && r.catch) r.catch(()=>{}); return true; }
   function play(i){
+    if(!TRACKS[i]) i = 0;   /* a track saved by another page (e.g. Kettlebrook's extra tracks) may not exist here */
     if(!start()) return;
     setTimeout(()=>{ if(cur >= 0 && ctx.state !== "running") toast("Tap ♪ again, and check your phone isn't on silent. 請再點一次 ♪，並確認手機沒有靜音"); }, 700);
     clearInterval(timer); cur=i; step=0; nextT=ctx.currentTime+.1; applyVol();
@@ -1334,9 +1337,19 @@ const Music = (()=>{
     else if(kind === "heal"){ ["C6","E6","G6","B6"].forEach((n,i)=>voice(t+i*.06, N(n), .2, P.bell, .8, fx)); }
     else if(kind === "hurt"){ drum(t, "k", 1, fx); drum(t+.02, "s", .6, fx); }
     else if(kind === "level"){ ["C5","E5","G5","C6"].forEach((n,i)=>voice(t+i*.12, N(n), .12, P.brass, 1.4, fx)); voice(t+.5, N("C6"), .9, P.brass, 1.5, fx); voice(t+.5, N("E5"), .9, P.brass, 1.3, fx); voice(t+.5, N("G5"), .9, P.brass, 1.3, fx); drum(t+.5, "c", 1, fx); }
-    else if(kind === "page"){ const s=ctx.createBufferSource(); s.buffer=noise; const f=ctx.createBiquadFilter(); f.type="bandpass"; f.frequency.setValueAtTime(900,t); f.frequency.linearRampToValueAtTime(3000,t+.15); const g=ctx.createGain(); g.gain.setValueAtTime(.12,t); g.gain.exponentialRampToValueAtTime(.001,t+.2); s.connect(f); f.connect(g); g.connect(fx); s.start(t); s.stop(t+.25); }
+    else if(kind === "page"){ const s=ctx.createBufferSource(); s.buffer=noise; const f=ctx.createBiquadFilter(); f.type="bandpass"; f.frequency.setValueAtTime(900,t); f.frequency.linearRampToValueAtTime(3000,t+.15); const g=ctx.createGain(); g.gain.setValueAtTime(.12,t); g.gain.exponentialRampToValueAtTime(.001,t+.2); s.connect(f); f.connect(g); g.connect(fx); s.onended=()=>{ s.disconnect(); f.disconnect(); g.disconnect(); }; s.start(t); s.stop(t+.25); }
   }
-  return { play, stop, ui, sfx, start,
+  /* one struck bell (used by the Kettlebrook bell door): the note plus a soft octave below */
+  function ring(n, vel){ if(sfxVol <= 0 || !start()) return; const t = ctx.currentTime + .02, v = vel || 1;
+    voice(t, N(n), .5, P.bell, 1.5*v, fx); voice(t, N(n)-12, 1.2, P.bell, .7*v, fx); voice(t+.01, N(n)+12, .15, P.mar, .25*v, fx); }
+  function noise2(t, f0, f1, dur, g){ const s=ctx.createBufferSource(); s.buffer=noise; const f=ctx.createBiquadFilter(); f.type="bandpass"; f.frequency.setValueAtTime(f0,t); f.frequency.linearRampToValueAtTime(f1,t+dur); const gg=ctx.createGain(); gg.gain.setValueAtTime(g,t); gg.gain.exponentialRampToValueAtTime(.001,t+dur); s.connect(f); f.connect(gg); gg.connect(fx); s.onended=()=>{ s.disconnect(); f.disconnect(); gg.disconnect(); }; s.start(t, Math.random()*.5); s.stop(t+dur+.05); }
+  function sfx2(kind){ if(sfxVol <= 0 || !start()) return; const t = ctx.currentTime + .02;
+    if(kind === "clunk"){ drum(t, "t", .8, fx); voice(t, N("C3"), .12, P.mar, 1, fx); }
+    else if(kind === "zip"){ noise2(t, 600, 4000, .18, .18); voice(t+.12, N("G6"), .05, P.bell, .7, fx); }
+    else if(kind === "door"){ drum(t, "k", 1, fx); noise2(t+.1, 200, 90, 1.6, .22); [0,.25,.5,.75,1].forEach((d,i)=>voice(t+.2+d, N(["C4","G3","C4","G3","C3"][i]), .1, P.mar, .9, fx)); ["G4","C5","E5","G5","C6"].forEach((n,i)=>voice(t+1.4+i*.1, N(n), .5, P.bell, 1.1, fx)); }
+  }
+  function addTrack(tr){ tr.parts.forEach(p=>p.q=parse(p.s)); TRACKS.push(tr); return TRACKS.length - 1; }
+  return { play, stop, ui, sfx, start, ring, sfx2, addTrack,
     get cur(){ return cur; },
     setVol(v){ vol=v; store.set("vol", Math.round(v*100)); if(ctx) applyVol(); }, get vol(){ return vol; },
     setSfx(v){ sfxVol=v; store.set("sfx", Math.round(v*100)); if(fx) fx.gain.value=v; }, get sfxVol(){ return sfxVol; },
