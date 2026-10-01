@@ -63,7 +63,9 @@ body{
 .stage{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:10px}
 .wrap>.stage{flex:1 1 auto;min-height:0}
 .monster{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center}
-.m-emoji{font-size:48px;line-height:64px;text-align:center;background:var(--panel2);border-radius:14px}
+.m-emoji{font-size:48px;line-height:64px;text-align:center;background:var(--panel2);border-radius:14px;position:relative}
+/* subject badge on the monster: "💪›🧠" = Muscle beats this Brains monster */
+.m-sub{position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);font-size:11px;line-height:1;white-space:nowrap;background:#0e0f24;border:1px solid var(--lantern);border-radius:999px;padding:2px 6px}
 .m-emoji.hit{animation:shake .25s}
 @keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .m-name{font-family:var(--display);font-size:19px;line-height:1.2}
@@ -230,6 +232,10 @@ html[lang="en"] .foot>span:last-child{gap:5px!important}
 .btn-auto[aria-pressed="true"]{background:var(--lantern);color:var(--lantern-ink);border-color:var(--lantern)}
 .hero .lv{color:var(--muted);font-size:10px;margin-left:3px}
 .hero .lvtag{position:absolute;top:3px;left:6px;font-size:9.5px;color:var(--muted)}
+/* subject matchups: green ▲ when this crew member is strong against the monster, red ▼ when weak */
+.hero .a .ic{font-style:normal;font-size:.8em;margin-right:1px}
+.hero.adv .atk{color:var(--hp)}.hero.dis .atk{color:var(--danger)}
+.dex .it.adv .stat{color:var(--hp)}.dex .it.dis .stat{color:var(--danger)}
 .tabs.four{grid-template-columns:repeat(4,1fr)}
 .tabs.four button{font-size:12px;padding:8px 2px}
 .ach{display:flex;flex-direction:column;gap:6px}
@@ -311,7 +317,7 @@ html[lang="en"] .hero .n{font-size:11px;white-space:normal;line-height:1.15;min-
 .hero .n{font-size:11px;letter-spacing:-.01em}
 @media (max-width:370px){.hero .n{font-size:10.5px}}
 html[lang="en"] .logo small{letter-spacing:.02em}
-.hero .a{white-space:nowrap;font-size:10px;letter-spacing:-.02em}
+.hero .a{white-space:nowrap;font-size:clamp(9px,2.6vw,10px);letter-spacing:-.03em}
 html[lang="en"] .face .nm{line-height:1.15}
 @media (prefers-reduced-motion: reduce){
   *{animation:none!important;transition:none!important}
@@ -482,14 +488,25 @@ const HEROES = [
   /* ---- Chapter 3: Temple Fair pack ---- */
   {id:'dice',pack:'temple',name:'烤香腸阿伯',short:'香腸阿伯',e:'🎲',r:'C',hp:30,atk:9,skill:'十八啦',desc:'每次攻擊都跟怪物比骰子，贏了（50%）再打一下。',q:'「來啦，比大小！贏了香腸多一根！」',
     en:{name:'Sausage Dice Uncle',short:'Dice Uncle',skill:'Roll the Dice',desc:'Rolls dice against the monster on every attack. If he wins (50%), he hits again.',q:'“Come on, roll the dice! Win and you get an extra sausage!”'}},
-  {id:'keeper',pack:'temple',name:'廟公',short:'廟公',e:'🧓',r:'R',hp:36,atk:9,skill:'解籤',desc:'抽籤的效果加倍。他在隊上時，之後的章節也會抽籤。',q:'「這支籤啊……你要先聽好的，還是壞的？」',
-    en:{name:'Temple Keeper',short:'Keeper',skill:'Reading the Sticks',desc:'Fortune sticks work twice as well. With him on the team, you draw sticks in later chapters too.',q:'“This stick… you want the good news or the bad news first?”'}},
+  {id:'keeper',pack:'temple',name:'廟公',short:'廟公',e:'🧓',r:'R',hp:36,atk:9,skill:'解籤',desc:'在隊上時，抽籤的效果加倍。收集到廟公之後，之後的章節也會繼續抽籤。',q:'「這支籤啊……你要先聽好的，還是壞的？」',
+    en:{name:'Temple Keeper',short:'Keeper',skill:'Reading the Sticks',desc:'On the team, he makes fortune sticks twice as strong. Once you have him, you keep drawing sticks in later chapters.',q:'“This stick… you want the good news or the bad news first?”'}},
   {id:'chef',pack:'temple',name:'流水席總舖師',short:'總舖師',e:'🧑‍🍳',r:'R',hp:38,atk:8,skill:'出菜囉',desc:'每第 3 回合出一道大菜，全隊回復 12% 生命。',q:'「一百桌，準時開席！」',
     en:{name:'Banquet Chef',short:'Chef',skill:'Food’s Up!',desc:'Every 3rd round, serves a big dish. Team heals 12% HP.',q:'“A hundred tables, and dinner starts on time!”'}},
   {id:'lion',pack:'temple',name:'舞獅少年',short:'舞獅少年',e:'🦁',r:'E',hp:48,atk:15,skill:'開場舞獅',desc:'戰鬥開始時，怪物被嚇到，前 2 回合不攻擊（穩如泰山的怪物只愣 1 回合）。',q:'「鑼鼓一響，獅子就醒了！」',
     en:{name:'Lion Dance Kid',short:'Lion Kid',skill:'Lion Dance',desc:'The monster gets scared and doesn’t attack in rounds 1–2 (only round 1 if it’s Steady).',q:'“When the drums start, the lion wakes up!”'}},
   {id:'santaizi',pack:'temple',name:'電音三太子',short:'電音三太子',e:'🕺',r:'L',hp:58,atk:20,skill:'越跳越嗨',desc:'邊跳邊打：自己的攻擊力每回合 +10%。',q:'「音樂下！不要停！」',
     en:{name:'Techno Third Prince',short:'Third Prince',skill:'Dance Till Dawn',desc:'Dances while he fights: his own attack goes up +10% every round.',q:'“Drop the beat! Don’t stop!”'}},
+  /* ---- Chapter 4: Cram School pack ---- */
+  {id:'dog',pack:'cram',name:'校狗小黑',short:'校狗小黑',e:'🐕',r:'C',hp:36,atk:10,skill:'汪汪警報',desc:'每次怪物攻擊，有 15% 機率被吠走，這次攻擊落空。',q:'「汪！」（翻譯：下課了。）',
+    en:{name:'Blackie the School Dog',short:'Blackie',skill:'Bark Alarm',desc:'Each time the monster attacks, 15% chance he barks it away and the attack misses.',q:'“Woof!” (Translation: class is over.)'}},
+  {id:'xueba',pack:'cram',name:'學霸',short:'學霸',e:'🤓',r:'R',hp:30,atk:12,skill:'標準答案',desc:'攻擊不會落空。每第 2 回合寫出標準答案：攻擊 ×1.8。',q:'「這題老師上禮拜講過了。」',
+    en:{name:'Top Student',short:'Top Student',skill:'Model Answer',desc:'Her attacks never miss. Every 2nd round, she writes the model answer: ×1.8 attack.',q:'“The teacher went over this last week.”'}},
+  {id:'monitor',pack:'cram',name:'風紀股長',short:'風紀股長',e:'📋',r:'R',hp:38,atk:9,skill:'記你名字',desc:'戰鬥開始時怪物攻擊 −10%，之後每 3 回合再記一次，再 −5%（最多再記 3 次）。',q:'「講話的，名字我都記下來了。」',
+    en:{name:'Class Monitor',short:'Monitor',skill:'Writing Your Name Down',desc:'The monster starts with −10% attack, then loses 5% more every 3 rounds (up to 3 more times).',q:'“Anyone talking, I’m writing your name down.”'}},
+  {id:'pe',pack:'cram',name:'體育老師',short:'體育老師',e:'🏃',r:'E',hp:56,atk:16,skill:'跑操場',desc:'全隊「體力」夥伴攻擊 +20%。',q:'「數學老師請假，這節上體育！」',
+    en:{name:'PE Teacher',short:'PE Teacher',skill:'Laps Around the Field',desc:'Every Muscle crew member gets +20% attack.',q:'“The math teacher is sick. This period is PE!”'}},
+  {id:'guru',pack:'cram',name:'補教天王',short:'補教天王',e:'🎙️',r:'L',hp:54,atk:21,skill:'考前猜題',desc:'每回合 40% 機率猜中考題：全隊這回合攻擊 +40%。',q:'「這題沒考，我頭給你！」',
+    en:{name:'Cram School Superstar',short:'Superstar',skill:'Guess the Test',desc:'Each round, 40% chance he guesses the test question: team +40% attack that round.',q:'“If this isn’t on the test, I’ll eat my microphone!”'}},
   /* hidden crew: never in the card pool until an achievement hands them over */
   {id:'grad',secret:true,name:'厭世碩專生',short:'厭世碩專生',e:'🧑‍🎓',r:'R',hp:32,atk:11,skill:'死線戰士',desc:'前 2 回合攻擊力減半；第 8 回合起攻擊 ×3。',q:'「論文？明天再寫。明天的我會處理。」',
     en:{name:'Burned-Out Grad Student',short:'Grad Student',skill:'Deadline Warrior',desc:'Half attack in rounds 1–2. From round 8, ×3 attack.',q:'“The thesis? Tomorrow. Tomorrow-me will handle it.”'}},
@@ -516,7 +533,10 @@ const GEAR = [
   {id:'sausage',pack:'market',name:'大腸包小腸',e:'🌭',r:'E',atk:8,hp:20,q:'一份吃飽，一整晚都有力。',en:{name:'Sausage in Sticky Rice',q:'One of these keeps you going all night.'}},
   {id:'amulet',pack:'temple',name:'平安符',e:'🧿',r:'C',atk:5,hp:8,q:'掛在機車上，出入平安。',en:{name:'Safety Charm',q:'Hang it on your scooter. Travel safe.'}},
   {id:'incense',pack:'temple',name:'香火袋',e:'👝',r:'R',atk:4,hp:28,q:'阿嬤說過香爐就有保庇。',en:{name:'Incense Pouch',q:'A-má says one pass over the incense burner, and the gods will protect you.'}},
-  {id:'goldmedal',pack:'temple',name:'金牌',e:'🏅',r:'E',atk:12,hp:26,q:'廟會送的，純金打造。',en:{name:'Gold Medal',q:'A gift from the temple fair. Solid gold.'}}
+  {id:'goldmedal',pack:'temple',name:'金牌',e:'🏅',r:'E',atk:12,hp:26,q:'廟會送的，純金打造。',en:{name:'Gold Medal',q:'A gift from the temple fair. Solid gold.'}},
+  {id:'pencil',pack:'cram',name:'自動鉛筆',e:'✏️',r:'C',atk:7,hp:10,q:'按一下，筆芯就出來。考試必備。',en:{name:'Mechanical Pencil',q:'Click once and the lead comes out. A test-day must.'}},
+  {id:'refbook',pack:'cram',name:'厚重參考書',e:'📚',r:'R',atk:5,hp:36,q:'讀不完，但拿來擋很好用。',en:{name:'Giant Study Guide',q:'You’ll never finish it, but it makes a great shield.'}},
+  {id:'perfect',pack:'cram',name:'滿分考卷',e:'💯',r:'E',atk:16,hp:34,q:'裱框掛在客廳，阿嬤逢人就說。',en:{name:'Perfect Test Paper',q:'A-má framed it and shows it to every visitor.'}}
 ];
 const EVENTS = [
   {id:'receipt',name:'對中發票',e:'🧾',r:'C',desc:'中了兩百元！換成 💎 1。',fx:s=>{s.gems+=1},
@@ -563,6 +583,16 @@ const EVENTS = [
                en:{label:'Sit down and eat',sub:'Team +16 HP',res:'Soup, crab sticky rice, dish after dish. Team +16 HP.'}},
              {label:'打包帶走',sub:'獲得 💎 3',fx:s=>{s.gems+=3},res:'阿姨塞給你三個塑膠袋。你轉手賣給排隊的人。💎 +3。',
                en:{label:'Take it to go',sub:'Get 💎 3',res:'The auntie hands you three plastic bags. You sell them to the people in line. 💎 +3.'}}]},
+  {id:'oldexam',pack:'cram',name:'撿到考古題',e:'🗂️',r:'C',desc:'學長留下一整疊考古題。轉賣給學弟妹，💎 +2。',fx:s=>{s.gems+=2},
+    en:{name:'Old Exam Papers',desc:'An older student left a whole stack of old exams. You sell them to the younger kids. 💎 +2.'}},
+  {id:'note',pack:'cram',name:'上課傳紙條',e:'💌',r:'R',desc:'隔壁同學傳來一張紙條：「下課去福利社？」',
+    en:{name:'Passing Notes',desc:'Your classmate slides you a note: “Snack bar after class?”'},
+    choices:[{label:'先把筆記抄完',sub:'全隊攻擊 +6',fx:s=>{s.bAtk+=6},res:'你把紙條收進口袋，認真抄完黑板。全隊攻擊 +6。',
+               en:{label:'Finish your notes first',sub:'Team +6 attack',res:'You put the note in your pocket and copy the whole board. Team +6 attack.'}},
+             {label:'下課衝福利社',sub:'全隊生命 +20',fx:s=>{s.bHp+=20},res:'熱狗麵包配冰紅茶。全隊生命 +20。',
+               en:{label:'Run to the snack bar',sub:'Team +20 HP',res:'A hot dog bun and iced black tea. Team +20 HP.'}}]},
+  {id:'fullmarks',pack:'cram',name:'段考考一百',e:'🎉',r:'E',desc:'成績單發下來，全班都在看你。全隊攻擊 +9。',fx:s=>{s.bAtk+=9},
+    en:{name:'A Perfect Score',desc:'Report cards come out, and the whole class is staring at you. Team +9 attack.'}},
   {id:'firstincense',pack:'temple',name:'搶到頭香',e:'🎇',r:'E',desc:'午夜十二點，你第一個衝進廟門！全隊攻擊 +7。',fx:s=>{s.bAtk+=7},
     en:{name:'First Incense of the Year',desc:'Midnight. You’re the first one through the temple doors! Team +7 attack.'}}
 ];
@@ -643,6 +673,29 @@ const TEMPLE=buildMonsters(21,[
     rageQ:['👑 萬年爐主暴怒了！「今年的爐主，還是我！」攻擊力大增！','👑 The Forever Festival Chief is furious! “This year’s chief is me, again!” Attack way up!'],
     en:{name:'Forever Festival Chief',q:'Chapter boss · Steady. [Me Again] Attacks twice each round. Gets angry at half HP.'}}
 ],{h:2.6,a:1.4});
+const CRAM=buildMonsters(31,[
+  {name:'考卷雪崩',e:'📝',sub:'brain',trait:'aoe',kh:1.5,ka:.75,q:'【發考卷】每 3 回合攻擊全隊。',aoeQ:['📝 「考卷往後傳！」一整疊考卷砸向全隊！','📝 “Pass the tests back!” A whole stack of papers crashes onto the team!'],
+    en:{name:'Test Paper Avalanche',q:'[Pass It Back] Hits the whole team every 3 rounds.'}},
+  {name:'早自習鬧鐘',e:'⏰',sub:'muscle',trait:'bite',kh:1.6,ka:.8,q:'【貪睡】30% 機率攻擊兩次。',biteQ:['⏰ 鈴鈴鈴！按掉了又響一次！','⏰ Rrring! You hit snooze, and it rings again!'],
+    en:{name:'Morning Study Alarm',q:'[Snooze] 30% chance to attack twice.'}},
+  {name:'瞌睡蟲',e:'🐛',sub:'mouth',trait:'meeting',kh:1.6,ka:.9,q:'【好想睡】每 2 回合讓一位夥伴睡著，無法行動。',stunQ:['🐛 {n} 打了個大呵欠，趴在桌上睡著了。','🐛 {n} yawns, puts their head on the desk, and falls asleep.'],
+    en:{name:'Sleepy Bug',q:'[So Sleepy] Every 2 rounds, one crew member falls asleep and can’t act.'}},
+  {name:'三角函數幽靈',e:'📐',sub:'brain',trait:'dodge',kh:1.45,ka:.9,q:'【看不懂】每次攻擊有 25% 機率落空。',dodgeQ:['{n} 盯著 sin 和 cos，完全看不懂，打歪了。','{n} stares at sin and cos, understands nothing, and misses.'],
+    en:{name:'Trigonometry Ghost',q:'[Makes No Sense] Each of your attacks has a 25% chance to miss.'}},
+  {name:'模擬考大魔王',e:'🏫',sub:'brain',trait:'storm',steady:true,kh:2.5,ka:.9,q:'中頭目・穩如泰山【連考三天】每 2 回合攻擊全隊。',aoeQ:['🏫 第二天下午，數學考到一半，全隊頭痛欲裂！','🏫 Day two, halfway through the math test. Everyone’s head is pounding!'],
+    en:{name:'Mock Exam Monster',q:'Mini-boss · Steady. [Three Days of Tests] Hits the whole team every 2 rounds.'}},
+  {name:'家長群組',e:'💬',sub:'mouth',trait:'kpi',grow:.06,kh:1.65,ka:.85,q:'【訊息 99+】每回合攻擊力變強。',growQ:['💬 家長群組又多了 30 則訊息，攻擊力變成 {a}。','💬 Thirty more messages in the parents’ group chat. Attack is now {a}.'],
+    en:{name:'Parents’ Group Chat',q:'[99+ Messages] Gets stronger every round.'}},
+  {name:'手機的誘惑',e:'📱',sub:'mouth',trait:'drain',kh:1.5,ka:.95,q:'【再滑一下就好】造成傷害的 100% 回復自己。',
+    en:{name:'Phone Temptation',q:'[Just One More Scroll] Heals itself for all the damage it deals.'}},
+  {name:'補習費帳單',e:'🧾',sub:'muscle',trait:'storm',kh:1.85,ka:.95,q:'【下期繳費】每 2 回合攻擊全隊。',aoeQ:['🧾 下一期的補習費帳單來了，全隊錢包都在痛！','🧾 Next term’s bill is here. Everyone’s wallet hurts!'],
+    en:{name:'Tuition Bill',q:'[Next Term’s Fees] Hits the whole team every 2 rounds.'}},
+  {name:'成績排行榜',e:'📊',sub:'muscle',trait:'weak',kh:1.5,ka:1.05,q:'【誰是最後一名】總是攻擊生命最低的夥伴。',
+    en:{name:'The Ranking Board',q:'[Who’s Last?] Always attacks the crew member with the lowest HP.'}},
+  {name:'學測大魔王',e:'🎓',sub:'brain',trait:'boss',steady:true,kh:2.1,ka:.88,rage:.1,q:'章節魔王・穩如泰山【考前一百天】每回合攻擊兩次，血量減半後暴怒。',
+    rageQ:['🎓 學測大魔王暴怒了！「倒數一百天！」攻擊力大增！','🎓 The Big Exam is furious! “One hundred days left!” Attack way up!'],
+    en:{name:'The Big Exam',q:'Chapter boss · Steady. [100 Days to Go] Attacks twice each round. Gets angry at half HP.'}}
+],{h:2.6,a:1.4});
 const CHAPTERS=[
   {id:1,pack:'office',e:'🏢',name:'辦公大樓',en:{name:'Office Tower',endQ:'One by one, the lights in the building go out. Today, everyone leaves on time.'},monsters:MONSTERS,
     endQ:'整棟大樓的燈一盞一盞熄滅。今天，所有人都準時下班。',
@@ -658,9 +711,14 @@ const CHAPTERS=[
     endQ:'最後一串鞭炮放完了。鑼鼓停下，煙散了，廟前的燈照著空蕩蕩的廣場。',
     intro:[['🏯 鑼鼓聲從巷口傳來。整條街都是香的味道，鞭炮的紅紙屑鋪滿了地。','🏯 Drums echo down the street. The air smells of incense, and red firecracker paper covers the ground.'],
            ['🧓 廟公遞上籤筒：「每一關打之前，先抽一支籤。」','🧓 The temple keeper holds out a cup of sticks. “Before every fight, draw a fortune stick.”']],
-    nextQ:['你跟著遶境的隊伍往前走。煙霧裡傳來 {e} 的氣息。','You follow the procession forward. Something {e} is waiting in the smoke.']}
+    nextQ:['你跟著遶境的隊伍往前走。煙霧裡傳來 {e} 的氣息。','You follow the procession forward. Something {e} is waiting in the smoke.']},
+  {id:4,pack:'cram',e:'🏫',name:'補習班',en:{name:'Cram School',endQ:'The last bell rings. The fluorescent lights click off, one by one, and the whole street empties into the night.'},monsters:CRAM,
+    endQ:'最後一堂課的鐘聲響了。日光燈一盞一盞關掉，整條補習街的人潮湧進夜色裡。',
+    intro:[['🏫 晚上七點的補習街。日光燈嗡嗡作響，每一棟大樓都貼滿了「金榜題名」的紅榜。','🏫 Cram school street, 7 p.m. The fluorescent lights hum, and every building is covered in red banners of top test scores.'],
+           ['📋 風紀股長推了推眼鏡：「每個關卡都有科目。看清楚它怕什麼，再派人上場。」','📋 The class monitor pushes up her glasses. “Every monster has a subject. Check what it’s weak to, then send the right people.”']],
+    nextQ:['你爬上下一層樓的教室。門縫裡傳來 {e} 的氣息。','You climb to the next classroom. Something {e} is waiting behind the door.']}
 ];
-const NEXT_TEASER=['第四章「補習班」製作中，敬請期待！','Chapter 4, “Cram School”, is coming soon!'];
+const NEXT_TEASER=['第五章「科學園區」製作中，敬請期待！','Chapter 5, “Science Park”, is coming soon!'];
 const MAX_FLOOR=CHAPTERS.length*10;
 const chapterOf=f=>Math.min(CHAPTERS.length,Math.ceil(Math.min(f,MAX_FLOOR)/10));
 const chapterAt=f=>CHAPTERS[chapterOf(f)-1];
@@ -700,7 +758,11 @@ const ACH=[
   {id:'lucky',e:'📜',name:'上上籤',desc:'第一次抽到上上籤。',reward:{gems:2},
     en:{name:'Great Fortune',desc:'Draw a Great Fortune stick.'},test:s=>s.flags.lucky},
   {id:'boss3',e:'🏯',name:'廟會之光',desc:'打倒萬年爐主。',reward:{gems:10},
-    en:{name:'Star of the Temple Fair',desc:'Beat the Forever Festival Chief.'},test:s=>s.floor>30||(s.done&&s.floor>=30)}
+    en:{name:'Star of the Temple Fair',desc:'Beat the Forever Festival Chief.'},test:s=>s.floor>30||(s.done&&s.floor>=30)},
+  {id:'aptitude',e:'🎯',name:'因材施教',desc:'派出四位都克制怪物的夥伴，打贏一層。',reward:{gems:3},
+    en:{name:'The Right Person for the Job',desc:'Win a floor with all four crew members strong against the monster’s subject.'},test:s=>s.flags.aptitude},
+  {id:'boss4',e:'🎓',name:'金榜題名',desc:'打倒學測大魔王。',reward:{gems:10},
+    en:{name:'Top of the List',desc:'Beat the Big Exam.'},test:s=>s.floor>40||(s.done&&s.floor>=40)}
 ];
 function rewardText(a,l=LANG,reveal=false){
   if(a.reward.gems) return tx(`💎 ${a.reward.gems}`,`💎 ${a.reward.gems}`,l);
@@ -736,7 +798,8 @@ const xpFor=lv=>40*(lv-1)*(lv-1);          /* total xp needed to reach a level *
 const xpGain=(f,win)=>win?10+2*f:5+f;
 /* company-wide pay raises: every raise lifts ALL crew by 8% (gear included), so nobody gets locked out of the team */
 const RAISE_PCT=.10;
-const raiseCost=()=>10+6*(S.pay||0);
+/* cheap early on; from the 6th raise the price climbs faster, so raises don't replace pulling late in the game */
+const raiseCost=()=>{const n=S.pay||0;return 10+6*n+(n>=5?4*(n-4)*(n-4):0)};
 function companyRaise(){
   const c=raiseCost(); if(S.gems<c) return false;
   S.gems-=c; S.pay=(S.pay||0)+1; S.raiseTotal=(S.raiseTotal||0)+1; S.flags.raise=true;
@@ -760,6 +823,17 @@ const ECON={win0:1,winF:1.2,loss0:2,lossF:.3,boss:5};
 const lossGems=f=>Math.round(ECON.loss0+ECON.lossF*f);
 const floorReward = f => Math.round(ECON.win0+ECON.winF*f)+(f%5===0?ECON.boss:0);
 const H = Object.fromEntries(HEROES.map(h=>[h.id,h]));
+/* ---------- subjects (Chapter 4 on): Muscle beats Brains, Brains beat Mouth, Mouth beats Muscle ---------- */
+const SUBJ={muscle:{e:'💪',name:'體力',en:{name:'Muscle'}},brain:{e:'🧠',name:'腦力',en:{name:'Brains'}},mouth:{e:'🗣️',name:'嘴砲',en:{name:'Mouth'}}};
+const BEATS={muscle:'brain',brain:'mouth',mouth:'muscle'};
+const SUB_ADV=1.3, SUB_DIS=.8;
+const weakTo=sub=>Object.keys(BEATS).find(k=>BEATS[k]===sub);
+const subEdge=(hs,ms)=>!ms||!hs?0:BEATS[hs]===ms?1:BEATS[ms]===hs?-1:0;
+{const HERO_SUB={intern:'brain',guard:'muscle',uber:'muscle',jie:'muscle',fortune:'mouth',boba:'mouth',drill:'mouth',medium:'mouth',engineer:'brain',
+  grandma:'mouth',typhoon:'muscle',clerk:'brain',oden:'muscle',parking:'muscle',claw:'brain',singer:'mouth',tofu:'muscle',chicken:'mouth',
+  dice:'mouth',keeper:'brain',chef:'muscle',lion:'muscle',santaizi:'muscle',dog:'muscle',xueba:'brain',monitor:'mouth',pe:'muscle',guru:'mouth',
+  grad:'brain',manager:'mouth',techie:'brain',teacher:'mouth',lieflat:'muscle'};
+ HEROES.forEach(h=>h.sub=HERO_SUB[h.id]||'muscle');}
 const shortName=(h,l=LANG)=>l==='en'?(h.en.short||h.en.name):(h.short||h.name);
 
 /* ---------- state ---------- */
@@ -847,6 +921,12 @@ COMBOS.push(
   {id:'feast',e:'🍲',members:['chef','oden'],name:'辦桌',desc:'總舖師改成每 2 回合出菜，全隊攻擊 +8%。',
     en:{name:'Banquet Night',desc:'The Chef serves a dish every 2 rounds. Team +8% attack.'}}
 );
+COMBOS.push(
+  {id:'pe_class',e:'🏃',members:['pe','dog'],name:'體育課',desc:'小黑跟著跑操場：全隊攻擊 +10%，小黑吠走攻擊的機率變成 30%。',
+    en:{name:'PE Class',desc:'Blackie runs laps too: team +10% attack, and his bark chance goes up to 30%.'}},
+  {id:'two_teachers',e:'🍎',members:['guru','teacher'],name:'雙師授課',desc:'中外師聯手：天王猜題機率 60%，外師 Joe 讓怪物聽不懂的機率 35%。',
+    en:{name:'Team Teaching',desc:'Two teachers, one class: the Superstar guesses right 60% of the time, and Teacher Joe confuses the monster 35% of the time.'}}
+);
 /* Burnout Trio: attack grows every round, a little HP burns away */
 const BURN={atk:.05,hp:0};
 const activeCombos=ids=>COMBOS.filter(c=>c.members.every(m=>ids.includes(m)));
@@ -882,7 +962,9 @@ function renderMonster(cur){
   }
   const hp=cur?cur.hp:m.hp, max=cur?cur.max:m.hp;
   $('mEmoji').textContent=m.e; $('mName').textContent=N(m,'name'); $('mQuote').textContent=N(m,'q');
-  $('mFloor').textContent=tx(`${ch.name}・第 ${f} 層${isBossFloor(f)?'・魔王':''}`,`${ch.en.name.toUpperCase()} · FLOOR ${f}${isBossFloor(f)?' · BOSS':''}`);
+  if(m.sub){const b=document.createElement('span');b.className='m-sub';b.textContent=`${SUBJ[weakTo(m.sub)].e}›${SUBJ[m.sub].e}`;b.title=tx(`${SUBJ[m.sub].name}，怕${SUBJ[weakTo(m.sub)].name}`,`${SUBJ[m.sub].en.name}, weak to ${SUBJ[weakTo(m.sub)].en.name}`);$('mEmoji').appendChild(b)}
+  const sb=m.sub?SUBJ[m.sub]:null, wk=m.sub?SUBJ[weakTo(m.sub)]:null;
+  $('mFloor').textContent=tx(`${ch.name}・第 ${f} 層${isBossFloor(f)?'・魔王':''}${sb?`・${sb.e}${sb.name}，怕${wk.e}`:''}`,`${ch.en.name.toUpperCase()} · FLOOR ${f}${isBossFloor(f)?' · BOSS':''}`);
   $('mBar').style.width=Math.max(0,hp/max*100)+'%';
   $('mHp').textContent=tx(`生命 ${Math.max(0,hp)} / ${max}`,`HP ${Math.max(0,hp)} / ${max}`);
   $('mAtk').textContent=tx(`攻擊 ${cur?cur.atk:m.atk}`,`ATK ${cur?cur.atk:m.atk}`);
@@ -892,16 +974,18 @@ const kfmt=n=>n>=10000?Math.round(n/1000)+'k':n>=1000?(Math.round(n/100)/10)+'k'
 function renderParty(units){
   const t=units||team().map(x=>({...x,cur:x.hp,max:x.hp}));
   const comboIds=activeCombos(t.map(u=>u.id)).flatMap(c=>c.members);
+  const msub=monsterAt(Math.min(S.floor,MAX_FLOOR)).sub;
   let html='';
   for(let i=0;i<4;i++){
     const u=t[i];
     if(!u){html+=`<div class="hero empty">${Object.keys(S.roster).length>t.length?tx('空位<br>點這裡補人','Empty<br>Tap to add'):tx('空位<br>去抽卡！','Empty<br>Pull a card!')}</div>`;continue}
     const pct=Math.max(0,u.cur/u.max*100);
-    html+=`<div class="hero r-${u.h.r} ${u.cur<=0?'dead':''}" data-i="${i}">
+    const edge=subEdge(u.h.sub,msub);
+    html+=`<div class="hero r-${u.h.r} ${u.cur<=0?'dead':''} ${edge>0?'adv':edge<0?'dis':''}" data-i="${i}">
       ${comboIds.some(m=>m===u.id)?'<span class="cmb" aria-hidden="true">✨</span>':''}<div class="e">${u.h.e}</div><div class="n">${shortName(u.h)}</div>
-      <span class="lvtag">Lv${u.lv}</span><div class="s">${'★'.repeat(u.stars)}</div>
+      <span class="lvtag">Lv${u.lv}${msub?` ${SUBJ[u.h.sub].e}`:''}</span><div class="s">${'★'.repeat(u.stars)}</div>
       <div class="bar hpb ${pct<35?'low':''}"><span style="width:${pct}%"></span></div>
-      <div class="a num">⚔${kfmt(u.atk)} ♥${kfmt(Math.max(0,u.cur))}</div></div>`;
+      <div class="a num"><span class="atk"><i class="ic">${edge>0?'▲':edge<0?'▼':'⚔\uFE0E'}</i>${kfmt(u.atk)}</span>\u2009<i class="ic">♥\uFE0E</i>${kfmt(Math.max(0,u.cur))}</div></div>`;
   }
   $('party').innerHTML=html;
 }
@@ -989,7 +1073,7 @@ function faceHTML(k,l,cls){
   if(type==='gear'){st=[c.atk?tx(`全隊攻擊 +${c.atk}`,`Team ATK +${c.atk}`,l):'',c.hp?tx(`全隊生命 +${c.hp}`,`Team HP +${c.hp}`,l):''].filter(Boolean).join(' · ');q=N(c,'q',l)}
   if(type==='event'){ds=N(c,'desc',l)}
   const tg=tagText(tag,l);
-  return `<div class="face ${cls}" lang="${l==='en'?'en':'zh-Hant'}"><div class="rar">${N(RAR[r],'name',l)}${sep}${typeName(type,l)}</div><div class="e">${c.e}</div>
+  return `<div class="face ${cls}" lang="${l==='en'?'en':'zh-Hant'}"><div class="rar">${N(RAR[r],'name',l)}${sep}${typeName(type,l)}${type==='hero'&&c.sub?`${l==='en'?' · ':'・'}${SUBJ[c.sub].e}${l==='en'?' '+SUBJ[c.sub].en.name:SUBJ[c.sub].name}`:''}</div><div class="e">${c.e}</div>
     <div class="nm">${N(c,'name',l)}</div>${tg?`<div class="tag">${tg}</div>`:''}
     ${st?`<div class="st">${st}</div>`:''}${ds?`<div class="ds">${ds}</div>`:''}${q?`<div class="q">${q}</div>`:''}</div>`;
 }
@@ -1132,6 +1216,7 @@ function simulate(ids,quiet,floorArg){
   if(C('clockout')) teamPct+=.15;
   if(C('procession')) teamPct+=.12;
   if(C('feast')) teamPct+=.08;
+  if(C('pe_class')) teamPct+=.10;
   const lot=S.lot&&S.lot.f===f&&lotFloor(f)?S.lot.id:null, lm=lotMult(units.map(u=>u.id));
   if(lot==='great') teamPct+=LOTS.great.p/100*lm;
   if(lot==='fair') mon.atk=Math.round(mon.atk*(1-LOTS.fair.p/100*lm));
@@ -1140,12 +1225,15 @@ function simulate(ids,quiet,floorArg){
   if(lot) snap([`📜 ${LOTS[lot].name}：${lotFx(lot,lm,'zh')}${lm>1?'（廟公加倍）':''}。`,`📜 ${LOTS[lot].en.name}: ${lotFx(lot,lm,'en')}${lm>1?' (doubled by the Keeper)':''}.`],'gold');
   if(teamPct) snap([`全隊士氣高昂，攻擊力 +${Math.round(teamPct*100)}%。`,`The team is fired up! Attack +${Math.round(teamPct*100)}%.`],'good');
   if(has('tofu')){mon.atk=Math.round(mon.atk*.8);snap([`🦨 臭豆腐老闆掀開鍋蓋。${mz} 被臭到，攻擊力降到 ${mon.atk}。`,`🦨 The Tofu Boss lifts the lid. The ${me} gags. Its attack drops to ${mon.atk}.`],'good')}
-  let singerB=0, scared=0;
+  let singerB=0, scared=0, marks=0;
+  if(has('monitor')){mon.atk=Math.round(mon.atk*.9);snap([`📋 風紀股長把 ${mz} 的名字寫在黑板上。攻擊力降到 ${mon.atk}。`,`📋 The Monitor writes the ${me}’s name on the board. Its attack drops to ${mon.atk}.`],'good')}
+  if(m0.sub){const w=weakTo(m0.sub);snap([`📖 科目：${SUBJ[m0.sub].e} ${SUBJ[m0.sub].name}。${SUBJ[w].e} ${SUBJ[w].name}型的夥伴打它特別痛。`,`📖 Subject: ${SUBJ[m0.sub].e} ${SUBJ[m0.sub].en.name}. ${SUBJ[w].e} ${SUBJ[w].en.name} crew hit it extra hard.`],'sys')}
   if(has('lion')){scared=(m0.steady?1:2)+(C('procession')?1:0);snap([`🦁 鑼鼓一響，舞獅衝上前！${mz} 嚇了一大跳，${scared} 回合不敢動。`,`🦁 The drums start and the lion leaps out! The ${me} is too scared to attack for ${scared} round${scared>1?'s':''}.`],'good')}
   const fill=(pair,a,b)=>[pair[0].replace('{n}',a),pair[1].replace('{n}',b)];
   if(has('typhoon')){const d=Math.round(mon.max*.25*pctMul);mon.hp-=d;snap([`🌀 颱風假之神宣布停班停課！${mz} 失去 ${d} 生命！`,`🌀 The Typhoon God cancels work and school! The ${me} loses ${d} HP!`],'gold','m')}
   let win=false, stunned=null;
   const hurt=(t,d)=>{
+    if(has('dog')&&Math.random()<(C('pe_class')?.3:.15)){snap([`🐕 小黑衝出去狂吠！${mz} 嚇得打歪了。`,`🐕 Blackie runs out barking! The ${me} misses.`],'good');return}
     const mg=units.find(u=>u.id==='manager'&&u.cur>0);
     if(mg&&t!==mg&&Math.random()<.3){d=Math.max(1,Math.round(d/2));teamPct+=.02;snap([`🥪 夾心主管衝出來替 ${sz(t)} 擋刀！（全隊攻擊 +2%）`,`🥪 The Manager jumps in front of ${se(t)}! (Team attack +2%)`],'good');t=mg;}
     if(t.id==='lieflat'&&Math.random()<.3){snap([`🛌 躺平大師已經躺平了，完全不痛。`,`🛌 The Lie-Flat Master is already lying down. No damage.`],'good',units.indexOf(t));return}
@@ -1171,6 +1259,9 @@ function simulate(ids,quiet,floorArg){
       const alive=units.filter(u=>u.cur>0);
       if(alive.length){stunned=pick(alive);snap(m0.stunQ?fill(m0.stunQ,sz(stunned),se(stunned)):[`🐙 ${sz(stunned)} 被拉進會議，這回合無法行動。`,`🐙 ${se(stunned)} gets pulled into a meeting and can’t act this round.`],'bad')}
     }
+    let guess=0;
+    if(has('guru')&&Math.random()<(C('two_teachers')?.6:.4)){guess=.4;snap(['🎙️ 補教天王：「這題會考！」猜中了！全隊這回合攻擊 +40%。','🎙️ The Superstar: “This will be on the test!” He’s right! Team +40% attack this round.'],'gold')}
+    if(has('monitor')&&r%3===0&&marks<3){marks++;mon.atk=Math.round(mon.atk*.95);snap([`📋 風紀股長又記了一次。${mz} 攻擊力降到 ${mon.atk}。`,`📋 The Monitor writes it down again. The ${me}’s attack drops to ${mon.atk}.`],'good')}
     if(lot==='good'){const p=LOTS.good.p/100*lm;units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+Math.round(u.max*p))});snap([`📜 籤詩保佑，全隊回復 ${Math.round(p*100)}% 生命。`,`📜 The fortune stick protects you. Team heals ${Math.round(p*100)}% HP.`],'good')}
     if(has('chef')&&r%(C('feast')?2:3)===0){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+Math.round(u.max*.12))});snap(['🧑‍🍳 總舖師：「出菜囉！」全隊回復 12% 生命。','🧑‍🍳 The Chef shouts, “Food’s up!” Team heals 12% HP.'],'good')}
     if(has('boba')){const p=C('street_food')?.06:.03;units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+Math.round(u.max*p))});snap([`🧋 店長發飲料，全隊回復 ${Math.round(p*100)}% 生命。`,`🧋 The Tea Manager hands out drinks. Team heals ${Math.round(p*100)}% HP.`],'good')}
@@ -1183,8 +1274,10 @@ function simulate(ids,quiet,floorArg){
     }
     for(const u of units){
       if(u.cur<=0||mon.hp<=0||u===stunned)continue;
-      if(m0.trait==='dodge'&&Math.random()<.25){snap(m0.dodgeQ?fill(m0.dodgeQ,`${u.h.e} ${sz(u)}`,`${u.h.e} ${se(u)}`):[`${u.h.e} ${sz(u)} 的攻擊……被已讀不回了。`,`${u.h.e} ${se(u)} attacks… and gets left on read.`],'sys');continue}
-      let a=Math.round((u.atk+teamAtk)*(1+teamPct)), nz='', ne='';
+      if(m0.trait==='dodge'&&u.id!=='xueba'&&Math.random()<.25){snap(m0.dodgeQ?fill(m0.dodgeQ,`${u.h.e} ${sz(u)}`,`${u.h.e} ${se(u)}`):[`${u.h.e} ${sz(u)} 的攻擊……被已讀不回了。`,`${u.h.e} ${se(u)} attacks… and gets left on read.`],'sys');continue}
+      let a=Math.round((u.atk+teamAtk)*(1+teamPct+guess)), nz='', ne='';
+      if(u.id==='xueba'&&r%2===0){a=Math.round(a*1.8);nz='（標準答案！）';ne=' (Model answer!)'}
+      if(has('pe')&&u.h.sub==='muscle') a=Math.round(a*1.2);
       if(u.id==='jie'&&r>=4){a*=2;nz='（準時下班！）';ne=' (Leave on time!)'}
       if(u.id==='uber'&&r===1){a*=C('typhoon_day')?5:3;nz='（準時送達！）';ne=' (Right on time!)'}
       if(u.id==='medium'&&(u.cur<u.max/2||C('temple')||C('procession'))){a*=2;nz='（起乩！）';ne=' (Possessed!)'}
@@ -1200,6 +1293,8 @@ function simulate(ids,quiet,floorArg){
       let hits=1; if(u.id==='intern'&&Math.random()<.25){hits=2;nz='（連印兩張！）';ne=' (Double copy!)'}
       if(u.id==='dice'&&Math.random()<.5){hits=2;nz='（十八啦！再一下！）';ne=' (Rolled high! One more hit!)'}
       if(has('chicken')&&Math.random()<.15*pctMul){hits*=2;nz+='（加辣！）';ne+=' (Extra spicy!)'}
+      const edge=subEdge(u.h.sub,m0.sub);
+      if(edge>0){a=Math.round(a*SUB_ADV);nz+='（克制！）';ne+=' (Strong!)'} else if(edge<0){a=Math.round(a*SUB_DIS);nz+='（被克制）';ne+=' (Weak)'}
       const dmg=a*hits; mon.hp-=dmg;
       snap([`${u.h.e} ${sz(u)} 攻擊，造成 ${dmg} 傷害${nz}`,`${u.h.e} ${se(u)} attacks for ${dmg} damage${ne}`],'','m');
     }
@@ -1207,7 +1302,7 @@ function simulate(ids,quiet,floorArg){
     if(m0.trait==='boss'&&!mon.rage&&mon.hp<mon.max/2){mon.rage=true;mon.atk+=m0.rage<1?Math.round(m0.atk*m0.rage):(m0.rage||15);snap(m0.rageQ||['🕴️ 加班之王暴怒了！「今天誰都不准走！」攻擊 +15！','🕴️ The King of Overtime is furious! “Nobody leaves today!” Attack +15!'],'bad')}
     let frozen=false;
     if(r<=scared){snap([`🦁 ${mz} 還在發抖，不敢攻擊。`,`🦁 The ${me} is still shaking and doesn’t attack.`],'good');frozen=true}
-    else if(has('teacher')&&Math.random()<.25){snap([`🧑‍🏫 外師 Joe 說了一長串英文。${N(m0,'name','zh')} 聽不懂，這回合愣住了。`,`🧑‍🏫 Teacher Joe says something long in English. The ${N(m0,'name','en')} doesn’t understand and freezes this round.`],'good');frozen=true}
+    else if(has('teacher')&&Math.random()<(C('two_teachers')?.35:.25)){snap([`🧑‍🏫 外師 Joe 說了一長串英文。${N(m0,'name','zh')} 聽不懂，這回合愣住了。`,`🧑‍🏫 Teacher Joe says something long in English. The ${N(m0,'name','en')} doesn’t understand and freezes this round.`],'good');frozen=true}
     const aoe=(m0.trait==='aoe'&&r%3===0)||(m0.trait==='storm'&&r%2===0);
     if(frozen){}
     else if(aoe){
@@ -1309,6 +1404,7 @@ $('go').onclick=()=>{
     const ups=grantXP(ids,win);
     ups.forEach(u=>log([`⬆️ ${shortName(H[u.id],'zh')} 的年資升到 Lv${u.lv}！`,`⬆️ ${shortName(H[u.id],'en')} reached Lv${u.lv}!`],'good'));
     if(win){ Sound.sfx.win();
+      if(m0.sub&&units.length===4&&units.every(u=>subEdge(u.h.sub,m0.sub)>0)) S.flags.aptitude=true;
       if(S.autoAdv) S.autoWins=(S.autoWins||0)+1;
       const reward=floorReward(S.floor);
       S.gems+=reward; S.wins++;
@@ -1618,11 +1714,16 @@ function helpHTML(){
     <p>Turn on ⏩ next to “Go!” and your crew fights the next floor after every win. It stops when you lose or finish a chapter.</p></section>
   <section><h3>Stalls</h3>
     <p>From the Night Market on, some floors are stalls instead of monsters. Spend gems on lucky bags, gear, or bentos that give experience, or just walk on by. Auto-advance stops at every stall.</p></section>
+  <section><h3>Subjects 📖</h3>
+    <p>At the Cram School, every monster has a subject, and so does every crew member: 💪 Muscle, 🧠 Brains, or 🗣️ Mouth.</p>
+    <ul><li>💪 Muscle beats 🧠 Brains. 🧠 Brains beat 🗣️ Mouth. 🗣️ Mouth beats 💪 Muscle.</li>
+    <li>Strong against the monster: +30% damage (green ▲). Weak against it: −20% damage (red ▼).</li></ul>
+    <p>The monster’s subject and weakness are shown above its name. Auto team picks the right people for you.</p></section>
   <section><h3>Fortune sticks 📜</h3>
     <p>At the Temple Fair, you draw a fortune stick before every fight. It happens on its own, and the stick lasts for one fight.</p>
     <ul><li><b>Great Fortune</b> (15%): team +15% attack.</li><li><b>Good Fortune</b> (30%): team heals 5% HP every round.</li>
     <li><b>Fair</b> (35%): monster −10% attack.</li><li><b>Bad Luck</b> (20%): no bonus, but you get 💎 1.</li></ul>
-    <p>Tap the stick under the buttons to see it. Don’t like it? Toss the moon blocks to draw again: free once per stick, then 💎 1. The Temple Keeper doubles every stick.</p></section>
+    <p>Tap the stick under the buttons to see it. Don’t like it? Toss the moon blocks to draw again: free once per stick, then 💎 1. The Temple Keeper on your team doubles every stick, and once you have him, you keep drawing sticks in later chapters.</p></section>
   <section><h3>Chapters and awards</h3>
     <p>Every 10 floors is a new chapter with its own place, monsters, and new cards. Awards unlock gems and hidden crew. See them in Cards → Awards.</p></section>
   <section><h3>Language</h3>
@@ -1665,11 +1766,16 @@ function helpHTML(){
     <p>打開「出發！」旁邊的 ⏩，打贏後就會自動挑戰下一層。打輸或打完一章會停下來。</p></section>
   <section><h3>攤販</h3>
     <p>從夜市開始，有些樓層是攤販，不用戰鬥。可以花鑽石買福袋、裝備或能增加經驗的便當，也可以直接走過去。開著自動前進時，遇到攤販會停下來。</p></section>
+  <section><h3>科目 📖</h3>
+    <p>在補習班，每隻怪物都有科目，每位夥伴也有：💪 體力、🧠 腦力、🗣️ 嘴砲。</p>
+    <ul><li>💪 體力克 🧠 腦力（秀才遇到兵）；🧠 腦力克 🗣️ 嘴砲；🗣️ 嘴砲克 💪 體力。</li>
+    <li>克制怪物：傷害 +30%（綠色 ▲）；被怪物克制：傷害 −20%（紅色 ▼）。</li></ul>
+    <p>怪物的科目和弱點寫在名字上方。自動編隊會幫你挑對的人。</p></section>
   <section><h3>抽籤 📜</h3>
     <p>在廟會，每場戰鬥前會自動抽一支籤，只對這一場有效。</p>
     <ul><li><b>上上籤</b>（15%）：全隊攻擊 +15%。</li><li><b>上籤</b>（30%）：每回合全隊回復 5% 生命。</li>
     <li><b>中籤</b>（35%）：怪物攻擊 −10%。</li><li><b>下籤</b>（20%）：沒有加成，但得到 💎 1。</li></ul>
-    <p>點按鈕下方的籤可以看籤詩。不滿意就擲筊重抽：每支籤第一次免費，之後 💎 1。隊上有廟公，籤的效果加倍。</p></section>
+    <p>點按鈕下方的籤可以看籤詩。不滿意就擲筊重抽：每支籤第一次免費，之後 💎 1。隊上有廟公，籤的效果加倍；收集到廟公之後，之後的章節也會繼續抽籤。</p></section>
   <section><h3>章節與成就</h3>
     <p>每 10 層是一個新章節，有新場景、新怪物和新卡片。完成成就可以拿到鑽石和隱藏夥伴，在「圖鑑 → 成就」查看。</p></section>
   <section><h3>語言</h3>
@@ -1800,7 +1906,8 @@ function openTeam(){
   modalView=openTeam;
   const cur=team(), ids=cur.map(t=>t.id);
   const bench=Object.keys(S.roster).filter(id=>!ids.includes(id)).map(heroStats).sort((a,b)=>(b.atk*3+b.hp)-(a.atk*3+a.hp));
-  const chip=(t,extra,attrs)=>`<button class="it ${extra}" ${attrs} style="--rc:${RAR[t.h.r].css}"><div class="e">${t.h.e}</div>${shortName(t.h)}<br><span class="sub">${'★'.repeat(t.stars)}</span><span class="stat num">⚔${t.atk} ♥${t.hp}</span></button>`;
+  const nsub=monsterAt(nextFightFloor()).sub;
+  const chip=(t,extra,attrs)=>{const ed=subEdge(t.h.sub,nsub);return `<button class="it ${extra} ${ed>0?'adv':ed<0?'dis':''}" ${attrs} style="--rc:${RAR[t.h.r].css}"><div class="e">${t.h.e}</div>${shortName(t.h)}<br><span class="sub">${'★'.repeat(t.stars)} ${SUBJ[t.h.sub].e}</span><span class="stat num">⚔${t.atk} ♥${t.hp}</span></button>`};
   let slots='';
   for(let i=0;i<4;i++){
     const t=cur[i];
