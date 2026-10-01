@@ -1195,7 +1195,7 @@ function openLot(){
     <p class="center" style="font-size:16px">「${N(L,'poem')}」</p>
     <p class="center"><b style="color:var(--lantern)">${lotFx(lot.id,m)}</b>${m>1?tx('（廟公加倍）',' (doubled by the Keeper)'):''}</p>
     <p class="center" style="font-size:12px;color:var(--muted)">${tx('這支籤只對這一場戰鬥有效。不滿意可以擲筊重抽。','This stick lasts for one fight. Not happy? Toss the moon blocks to draw again.')}</p>
-    <div class="btns"><button id="mThrow" ${S.gems<c?'disabled':''}>🌙 ${tx('擲筊重抽','Draw again')}（${c?`💎 ${c}`:tx('免費','free')}）</button><button id="mOk">${tx('就這支','Keep it')}</button></div>`);
+    <div class="btns"><button id="mThrow" ${S.gems<c?'disabled':''}>🌙 ${tx(`擲筊重抽（${c?`💎 ${c}`:'免費'}）`,`Draw again (${c?`💎 ${c}`:'free'})`)}</button><button id="mOk">${tx('就這支','Keep it')}</button></div>`);
   $('mOk').onclick=closeModal;
   $('mThrow').onclick=()=>{ if(rethrowLot()){ Sound.sfx.click(); renderUI(); openLot(); } };
 }
@@ -1439,20 +1439,20 @@ $('go').onclick=()=>{
       renderUI();
       openModal(`<div class="big">💤</div><h2>${tx('全員躺平','Total Wipeout')}</h2>
         <p class="center">${tx(`${mn} 太強了。大家決定先回家睡覺。<br>補償金 💎 ${lg} 已發放，抽點新夥伴再來！`,`The ${mn} was too strong. Everyone decides to go home and sleep.<br>You get 💎 ${lg} comfort pay. Pull some new crew and try again!`)}</p>
-        ${S.gems<raiseCost()&&Object.keys(S.roster).length>=2?`<div class="wipe-raise" style="opacity:.6">${tx(`也可以<b>全體調薪</b>：所有夥伴 +${Math.round(RAISE_PCT*100)}%。`,`You could also give a <b>company raise</b>: every crew member +${Math.round(RAISE_PCT*100)}%.`)}
-          <button disabled>💰 ${tx(`鑽石不足：需要 💎 ${raiseCost()}，你有 💎 ${S.gems}`,`Not enough gems: need 💎 ${raiseCost()}, you have 💎 ${S.gems}`)}</button>
+        ${S.gems<raiseCost()&&Object.keys(S.roster).length>=2?`<div class="wipe-raise" style="opacity:.6"><span>${tx(`也可以<b>全體調薪</b>：所有夥伴 +${Math.round(RAISE_PCT*100)}%。`,`You could also give a <b>company raise</b>: every crew member +${Math.round(RAISE_PCT*100)}%.`)}</span>
+          <button disabled style="font-size:14px">💰 ${tx(`鑽石不足：需要 💎 ${raiseCost()}，你有 💎 ${S.gems}`,`Need 💎\u00a0${raiseCost()} (you have\u00a0${S.gems})`)}</button>
           <span style="font-size:12px;color:var(--muted)">${tx('下次抽卡時，可以留一些鑽石下來。','Next time you pull cards, try saving a few gems.')}</span></div>`:''}
-        ${S.gems>=raiseCost()?`<div class="wipe-raise" id="wipeRaise">${tx(`不想一直抽卡？也可以<b>全體調薪</b>：所有夥伴 +${Math.round(RAISE_PCT*100)}%。`,`Tired of pulling cards? Try a <b>company raise</b>: every crew member +${Math.round(RAISE_PCT*100)}%.`)}
+        ${S.gems>=raiseCost()?`<div class="wipe-raise" id="wipeRaise"><span>${tx(`不想一直抽卡？也可以<b>全體調薪</b>：所有夥伴 +${Math.round(RAISE_PCT*100)}%。`,`Tired of pulling cards? Try a <b>company raise</b>: every crew member +${Math.round(RAISE_PCT*100)}%.`)}</span>
           <span>${tx('目前預估勝率','Current estimated odds')} <b>${winRate(team().map(t=>t.id))}%</b></span>
-          <button id="mWipeRaise" style="background:var(--L);color:#2a1d00">💰 ${tx('全體調薪','Give a company raise')}（💎 ${raiseCost()}）</button></div>`:''}
+          <button id="mWipeRaise" style="background:var(--L);color:#2a1d00">💰 ${tx(`全體調薪（💎 ${raiseCost()}）`,`Company raise (💎\u00a0${raiseCost()})`)}</button></div>`:''}
         <div class="btns"><button id="mOk">${tx('好啦','Fine…')}</button></div>`);
       $('mOk').onclick=closeModal;
       const doWipeRaise=()=>{
         const before=winRate(team().map(t=>t.id));
         if(companyRaise()){ Sound.sfx.flip.E(); checkAch(); smartCache.key=''; renderUI();
           const after=winRate(team().map(t=>t.id));
-          $('wipeRaise').innerHTML=tx(`💰 調薪完成！預估勝率 <b>${before}% → ${after}%</b>`,`💰 Raise done! Estimated odds <b>${before}% → ${after}%</b>`)
-            +(S.gems>=raiseCost()?`<button id="mWipeRaise2" style="background:var(--L);color:#2a1d00">💰 ${tx('再調一次','Another raise')}（💎 ${raiseCost()}）</button>`:'');
+          $('wipeRaise').innerHTML=`<span>${tx(`💰 調薪完成！預估勝率 <b>${before}% → ${after}%</b>`,`💰 Raise done! Estimated odds <b>${before}% → ${after}%</b>`)}</span>`
+            +(S.gems>=raiseCost()?`<button id="mWipeRaise2" style="background:var(--L);color:#2a1d00">💰 ${tx(`再調一次（💎 ${raiseCost()}）`,`Another raise (💎\u00a0${raiseCost()})`)}</button>`:'');
           if($('mWipeRaise2')) $('mWipeRaise2').onclick=doWipeRaise;
         }
       };
