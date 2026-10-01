@@ -964,8 +964,10 @@ const STORY = {
   ideal:[["Friendship. My friends are my family.","友情。朋友就是我的家人。"],["Freedom. Nobody should be a prisoner.","自由。沒有人應該被囚禁。"],["Knowledge. I want to learn everything.","知識。我想學會所有事情。"],["Fairness. Rules should be the same for everyone.","公平。規則應該對每個人都一樣。"],["Adventure. Life is short — see the world!","冒險。人生很短，去看看世界！"]],
   bond:[["I owe my life to an old friend. I'll help them anytime.","我欠一位老朋友一條命，隨時都願意幫他。"],["I'm looking for my missing brother.","我在尋找失蹤的哥哥。"],["I want to build a home in a small town.","我想在小鎮上建立一個家。"],["I carry something that belonged to my mentor.","我帶著恩師留下的遺物。"],["I promised to protect the people of my village.","我發誓要保護家鄉的人。"]],
   flaw:[["I can't say no to a shiny treasure.","看到亮晶晶的寶物我就無法拒絕。"],["I'm scared of spiders.","我怕蜘蛛。"],["I speak before I think.","我常常沒想清楚就開口。"],["I'm a little too proud.","我有點太驕傲了。"],["I fall asleep when I'm bored.","一無聊我就會睡著。"]],
-  hook:[["You were hired to guard a supply wagon on its way to a small frontier town.","你受雇護送一輛補給馬車前往邊境小鎮。"],["An old friend asked you to meet them in town. They sounded worried.","一位老朋友約你在鎮上見面，他聽起來很擔心。"],["You heard stories about a lost mine full of magic, and you want to find it.","你聽說有一座充滿魔法的失落礦坑，想親自找到它。"],["You need money, and the job pays well. Simple as that.","你需要錢，這份工作報酬很好，就這麼簡單。"],["You're running from your old life and looking for a new start.","你在逃離過去的生活，想要重新開始。"]]
+  hook:[["I was hired to guard a supply wagon on its way to a small frontier town.","我受雇護送一輛補給馬車前往邊境小鎮。"],["An old friend asked me to meet them in town. They sounded worried.","一位老朋友約我在鎮上見面，他聽起來很擔心。"],["I heard stories about a lost mine full of magic, and I want to find it.","我聽說有一座充滿魔法的失落礦坑，想親自找到它。"],["I need money, and the job pays well. Simple as that.","我需要錢，這份工作報酬很好，就這麼簡單。"],["I'm running from my old life and looking for a new start.","我在逃離過去的生活，想要重新開始。"]]
 };
+/* old "you" wording of the hooks, for saved heroes */
+const HOOK_OLD = {"You were hired to guard a supply wagon on its way to a small frontier town.": "I was hired to guard a supply wagon on its way to a small frontier town.", "An old friend asked you to meet them in town. They sounded worried.": "An old friend asked me to meet them in town. They sounded worried.", "You heard stories about a lost mine full of magic, and you want to find it.": "I heard stories about a lost mine full of magic, and I want to find it.", "You need money, and the job pays well. Simple as that.": "I need money, and the job pays well. Simple as that.", "You're running from your old life and looking for a new start.": "I'm running from my old life and looking for a new start."};
 const NAMES = {
   human:["Mara","Toren","Elin","Cass","Bram","Nessa","Rowan","Lia"], elf:["Aelar","Lia","Thia","Varis","Naivara","Sylas","Elowen"],
   dwarf:["Bruni","Dagna","Thorin","Hilda","Rurik","Eldeth"], halfling:["Pip","Rosie","Milo","Tansy","Cade","Lavinia"],
@@ -1995,6 +1997,7 @@ const clsName = c => CLASSES[c.cls] ? CLASSES[c.cls].en : "";
 const MAXSLOTS = 6;
 
 let roster = store.get("roster", []);
+roster.forEach(c=>{ if(c && c.story && HOOK_OLD[c.story.hook]) c.story.hook = HOOK_OLD[c.story.hook]; });
 function saveRoster(){ store.set("roster", roster); }
 function findChar(id){ return roster.find(c=>c.id === id); }
 function persist(c){ c.updated = Date.now(); const i = roster.findIndex(x=>x.id === c.id); if(i >= 0) roster[i] = c; saveRoster(); }
