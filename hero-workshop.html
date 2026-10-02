@@ -178,6 +178,12 @@ label.fl .zh{font-weight:400;margin-left:6px;}
 /* roster */
 .slot{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;text-align:left;}
 .por{width:64px;height:64px;flex:none;image-rendering:pixelated;background:var(--bg);border:2px solid var(--line2);border-radius:4px;padding:6px;}
+.slotsfree{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;padding:8px 12px;border:2px dashed var(--line);border-radius:6px;color:var(--muted);font-size:14px;letter-spacing:2px;}
+.slotsfree span{letter-spacing:0;}
+.howcard{display:block;width:100%;text-align:left;margin-top:12px;border-color:var(--gold);} .howcard .t{font-family:var(--f-px);font-size:21px;color:var(--gold);} .howcard .d{font-size:15px;margin-top:4px;}
+.pillars{margin-top:10px;} .pillars .card{text-align:left;} .pillars .t{font-family:var(--f-px);font-size:20px;}
+.pillars .d{font-size:15px;margin-top:6px;}
+.abhelp{margin:6px 0 0;padding-left:20px;} .abhelp li{margin-bottom:8px;} .abhelp .zh{display:block;}
 .slot.empty{border-style:dashed;color:var(--muted);grid-template-columns:1fr;text-align:center;padding:18px;}
 .slot .nm{font-family:var(--f-px);font-size:25px;line-height:1;}
 
@@ -971,6 +977,28 @@ const STORY = {
 };
 /* old "you" wording of the hooks, for saved heroes */
 const HOOK_OLD = {"You were hired to guard a supply wagon on its way to a small frontier town.": "I was hired to guard a supply wagon on its way to a small frontier town.", "An old friend asked you to meet them in town. They sounded worried.": "An old friend asked me to meet them in town. They sounded worried.", "You heard stories about a lost mine full of magic, and you want to find it.": "I heard stories about a lost mine full of magic, and I want to find it.", "You need money, and the job pays well. Simple as that.": "I need money, and the job pays well. Simple as that.", "You're running from your old life and looking for a new start.": "I'm running from my old life and looking for a new start."};
+/* why the recommended ability order fits each class (top two abilities) */
+const ABWHY = {
+  barbarian:["Strength first: you hit hard with big weapons. Constitution next: more HP, because you stand in the front.","力量第一：用大武器用力打。體魄第二：血量更多，因為你站在最前面。"],
+  bard:["Charisma first: it powers your magic and your songs. Dexterity next: it helps you dodge and keeps you safe.","魅力第一：你的魔法和歌聲都靠它。敏捷第二：幫你閃躲，保護自己。"],
+  cleric:["Wisdom first: it powers your healing and your spells. Strength next: you can wear heavy armor and swing a mace.","感知第一：治療和法術都靠它。力量第二：可以穿重甲、揮動釘頭錘。"],
+  druid:["Wisdom first: it powers your nature magic. Constitution next: more HP, and you keep your spells going when you get hit.","感知第一：自然魔法靠它。體魄第二：血量更多，被打到時也比較能維持法術。"],
+  fighter:["Strength first: you hit hard with swords and axes. Dexterity next: better with bows, and harder to hit.","力量第一：用劍和斧頭用力打。敏捷第二：射箭更準，也更難被打中。"],
+  monk:["Dexterity first: fast punches and quick dodges. Wisdom next: it makes you even harder to hit, and powers your special moves.","敏捷第一：出拳快、閃得快。感知第二：讓你更難被打中，也強化你的特殊招式。"],
+  paladin:["Strength first: you hit hard in heavy armor. Charisma next: it powers your holy magic and your brave words.","力量第一：穿著重甲用力打。魅力第二：神聖魔法和鼓舞人心的話都靠它。"],
+  ranger:["Dexterity first: you shoot arrows and move quietly. Wisdom next: it powers your nature magic and helps you spot tracks.","敏捷第一：射箭、安靜移動。感知第二：自然魔法靠它，也幫你發現足跡。"],
+  rogue:["Dexterity first: sneaking, lockpicking, and quick attacks. Intelligence next: you notice clues and solve puzzles.","敏捷第一：潛行、開鎖、快速攻擊。智力第二：發現線索、解開謎題。"],
+  sorcerer:["Charisma first: your magic comes from inside you, and Charisma powers it. Constitution next: more HP, because wizards break easily.","魅力第一：你的魔法是天生的，靠魅力發揮。體魄第二：血量更多，因為施法者很脆弱。"],
+  warlock:["Charisma first: it powers the magic from your mysterious friend. Dexterity next: it helps you dodge and keeps you safe.","魅力第一：你從神祕力量得到的魔法靠它。敏捷第二：幫你閃躲，保護自己。"],
+  wizard:["Intelligence first: you learn magic from books, and Intelligence powers it. Wisdom next: you notice danger before it notices you.","智力第一：你從書本學魔法，靠智力發揮。感知第二：在危險發現你之前，先發現危險。"]
+};
+/* what D&D is: the four parts of play */
+const PILLARS = [
+  ["🧭","Exploration","探索","Walk into new places, look around, and ask questions. What's behind that door?","走進新的地方，四處看看，多問問題。那扇門後面有什麼？"],
+  ["🧩","Puzzles","解謎","Find clues, think, and try your ideas. A lock, a riddle, or a mystery often has more than one answer.","找線索、動腦筋、試試你的點子。一道鎖、一個謎語或一個謎團，答案往往不只一個。"],
+  ["⚔️","Combat","戰鬥","Sometimes a fight can't be avoided. Then everyone takes turns, rolls dice, and works together. But fighting is only one way to solve a problem.","有時候戰鬥避免不了，這時大家輪流行動、擲骰子、一起合作。不過，打架只是解決問題的其中一種方法。"],
+  ["🎭","Roleplaying","角色扮演","Talk and act like your hero. Make friends, make deals, and make the choices your hero would make. A kind word or a clever plan can beat a monster.","用英雄的方式說話和行動。交朋友、談條件，做出你的英雄會做的選擇。一句好話或一個聰明的計畫，也能打敗怪物。"]];
+const PLAY_INTRO = ["D&D is a story you tell together. The DM describes the world, and you decide what your hero does. There's no winning or losing: the fun is in the story. A game has four parts:","D&D 是大家一起說的故事。DM 描述這個世界，你決定英雄要做什麼。沒有輸贏，好玩的是故事本身。遊戲有四個部分："];
 const NAMES = {
   human:["Mara","Toren","Elin","Cass","Bram","Nessa","Rowan","Lia"], elf:["Aelar","Lia","Thia","Varis","Naivara","Sylas","Elowen"],
   dwarf:["Bruni","Dagna","Thorin","Hilda","Rurik","Eldeth"], halfling:["Pip","Rosie","Milo","Tansy","Cade","Lavinia"],
@@ -2110,9 +2138,10 @@ function subtitle(c){
 }
 VIEWS.home = ()=>{
   const slots = [];
-  for(let i=0;i<MAXSLOTS;i++){ const c = roster[i];
-    slots.push(c ? `<button class="card slot" data-act="open" data-id="${c.id}">${portrait(c)}<div><div class="nm">${esc(c.name || "Unnamed")}</div><div class="muted">${subtitle(c)}</div></div></button>`
-      : `<div class="card slot empty"><span class="px" style="font-size:20px">Empty slot ${i+1}</span><span class="zh">空位 ${i+1}</span></div>`); }
+  roster.forEach(c=>slots.push(`<button class="card slot" data-act="open" data-id="${c.id}">${portrait(c)}<div><div class="nm">${esc(c.name || "Unnamed")}</div><div class="muted">${subtitle(c)}</div></div></button>`));
+  const free = MAXSLOTS - roster.length;
+  const emptyRow = !roster.length ? `<div class="card slot empty">No heroes yet. Make one above! <span class="zh">還沒有角色，從上面建立一個吧！</span></div>`
+    : free ? `<div class="slotsfree">${"▢ ".repeat(free)}<span>${free} empty slot${free>1?"s":""} <span class="zh" style="display:inline">還有 ${free} 個空位</span></span></div>` : "";
   const full = roster.length >= MAXSLOTS;
   return `
   <div class="panel center" style="padding:18px 14px">
@@ -2125,7 +2154,10 @@ VIEWS.home = ()=>{
     ${full ? `<p class="zh" style="color:var(--red)">All 6 slots are full. Delete a hero to make room. 六個欄位都滿了，請先刪除一個角色。</p>` : ""}
   </div>
   <div class="row sp" style="margin:4px 0 8px"><h3>My heroes <span class="zh">我的角色</span></h3><span class="cnt">${roster.length} / ${MAXSLOTS}</span></div>
-  <div class="grid2">${slots.join("")}</div>
+  ${slots.length ? `<div class="grid2">${slots.join("")}</div>` : ""}${emptyRow}
+  <button class="card howcard" data-act="howPlay"><div class="t">📖 How to play <span class="zh" style="display:inline">怎麼玩</span></div>
+    <div class="d">D&D is a story you tell together. You explore, solve puzzles, fight, and talk like your hero. Tap to learn the basics.</div>
+    <span class="zh">D&D 是大家一起說的故事：探索、解謎、戰鬥，還有扮演你的英雄。點這裡學基本玩法。</span></button>
   <div class="row" style="margin-top:14px">
     <button class="btn sm" data-act="newCompanion" ${full?"disabled":""}>🐾 Add companion card <small>新增夥伴卡</small></button>
     <button class="btn sm" data-act="importChar" ${full?"disabled":""}>📥 Import <small>匯入</small></button>
@@ -2133,6 +2165,11 @@ VIEWS.home = ()=>{
     <button class="btn sm" data-act="guide">📖 Guide <small>指南</small></button>
   </div>`;
 };
+function pillarsHTML(){
+  return `<div class="panel tight"><p style="margin:0">${PLAY_INTRO[0]} ${SAY(PLAY_INTRO[0])}</p><span class="zh">${PLAY_INTRO[1]}</span></div>
+  <div class="grid2 pillars">${PILLARS.map(p=>`<div class="card"><div class="t">${p[0]} ${p[1]} ${SAY(p[1] + ". " + p[3])}</div><span class="zh">${p[2]}</span><div class="d">${p[3]}</div><span class="zh">${p[4]}</span></div>`).join("")}</div>`;
+}
+ACTS.howPlay = ()=>{ closeOv(); go("guide", {tab:"play"}); };
 ACTS.open = b => { const c = findChar(b.dataset.id); if(!c) return; Music.sfx("page"); go(c.kind === "companion" ? "companion" : "sheet", {id:c.id, tab:"main"}); };
 ACTS.newMode = b => { if(roster.length >= MAXSLOTS){ toast("All 6 slots are full. 欄位已滿"); return; } Music.sfx("click");
   const m = b.dataset.m; if(m === "quick") startQuiz(); else if(m === "random") startRandom(); else startManual(); };
@@ -2292,16 +2329,9 @@ VIEWS.guide = ()=>{
   } else if(tab === "phrases"){
     body = PHRASES.map(g=>`<div class="panel tight"><h3>${g[0]} <span class="zh">${g[1]}</span></h3><div class="list" style="margin-top:8px">${g[2].map(p=>`<button class="li" data-say="${esc(p[0])}"><div class="main"><b>${esc(p[0])}</b><span class="zh">${esc(p[1])}</span></div><span>🔊</span></button>`).join("")}</div></div>`).join("");
   } else if(tab === "play"){
-    const P = [
-      ["1. The DM describes. You say what you do.","DM 描述情境，你說出你要做什麼。","The Dungeon Master tells the story. You are your hero. Say what your hero does, in your own words."],
-      ["2. Hard things need a roll.","困難的事要擲骰。","Roll a d20 and add your bonus. If you reach the Difficulty Class, you succeed. Easy is 10, medium is 15, hard is 20."],
-      ["3. Fights happen in turns.","戰鬥輪流進行。","Everyone rolls Initiative. On your turn you can move, take one action, and maybe one bonus action."],
-      ["4. On your turn","你的回合","Move up to your Speed. Then take one Action: Attack, Cast a Spell, Dash, Dodge, Help, Hide, or something else you describe."],
-      ["5. Attacking","攻擊","Roll a d20 + your attack bonus. If it meets or beats the enemy's Armor Class, you hit! Then roll damage."],
-      ["6. Getting hurt","受傷","Damage lowers your Hit Points. At 0 HP you fall down and make Death Saving Throws. Friends can heal you!"],
-      ["7. Resting","休息","A Short Rest is one hour: roll Hit Point Dice to heal. A Long Rest is a night's sleep: you get everything back."],
-      ["8. Roleplay!","角色扮演！","Talk like your hero. Ask questions. Be curious. The best adventures come from good ideas, not good numbers."]];
-    body = P.map(p=>`<div class="panel tight"><h3>${p[0]} ${SAY(p[0] + " " + p[2])}</h3><span class="zh">${p[1]}</span><p style="margin:6px 0 0">${p[2]}</p></div>`).join("") +
+    const P = [["1. The DM describes. You say what you do.", "DM 描述情境，你說出你要做什麼。", "The Dungeon Master tells the story. You are your hero. Say what your hero does, in your own words.", "DM 是說故事的人，你就是你的英雄。用你自己的話，說出英雄要做什麼。"], ["2. Hard things need a roll.", "困難的事要擲骰。", "Roll a d20 and add your bonus. If you reach the Difficulty Class, you succeed. Easy is 10, medium is 15, hard is 20.", "擲一顆 d20，加上你的加值。達到難度等級（DC）就成功。簡單是 10，中等是 15，困難是 20。"], ["3. Try talking first.", "先試著溝通。", "Not every problem needs a sword. Ask questions, make a deal, or make a friend. Monsters want things too: food, gold, or just to be left alone. Many players forget this, and it often works.", "不是每個問題都要用劍解決。問問題、談條件、交朋友。怪物也有想要的東西：食物、金幣，或只是想被放過。很多玩家都忘了這招，但它常常有用。"], ["4. Be clever.", "動動腦筋。", "A trick, a trap, a disguise, or a good distraction can win without a fight. If your plan makes sense, the DM will let you try it. Sneaking past is a win too.", "一個詭計、一個陷阱、一套偽裝，或一個好的聲東擊西，不用打架也能過關。只要你的計畫合理，DM 就會讓你試試看。偷偷溜過去也算贏。"], ["5. When you have to fight", "不得不戰鬥的時候", "Sometimes a fight can't be avoided. Everyone rolls Initiative and takes turns. On your turn, move, then take one Action: Attack, Cast a Spell, Dodge, Help, Hide, or something you describe. To attack, roll a d20 + your attack bonus. If it meets or beats the enemy's Armor Class, you hit! Then roll damage.", "有時候戰鬥避免不了。每個人先擲先攻，然後輪流行動。輪到你時，先移動，再做一個動作：攻擊、施法、閃避、協助、躲藏，或你自己描述的事。攻擊時擲 d20 加上攻擊加值，等於或超過敵人的護甲等級（AC）就命中！接著擲傷害。"], ["6. Ending a fight", "結束戰鬥", "A fight can end in many ways, not just by winning it. Scare the enemies off. Fool them with an illusion. Grab their leader and make the rest stop. Put them to sleep with Sleep and tie them up. Trap them with Entangle, Web, or Grease. Or run away, give up, or start talking.", "戰鬥不是只有打贏才能結束。可以把敵人嚇跑、用幻術騙過他們、抓住他們的首領逼其他人停手、用睡眠術讓他們睡著再綁起來，或用糾纏術、蛛網術、油膩術把他們困住。當然，也可以逃跑、投降，或開始談判。"], ["7. Find your table's style.", "找到你們的玩法。", "Some groups love talking, some love puzzles, and some love big battles. There's no one right way to play. The DM and the players decide together. Tell your DM what you enjoy most.", "有些團喜歡聊天交涉，有些喜歡解謎，有些喜歡大場面的戰鬥。沒有唯一正確的玩法，由 DM 和玩家一起決定。告訴你的 DM 你最喜歡什麼。"], ["8. Roleplay!", "角色扮演！", "Talk like your hero. Ask questions. Be curious. The best adventures come from good ideas, not good numbers.", "用英雄的口吻說話。多問問題，保持好奇。最棒的冒險來自好點子，不是好數字。"]];
+    body = pillarsHTML() + `<h3 style="margin:16px 0 8px">The basics in 8 steps <span class="zh">8 個步驟學會玩</span></h3>` +
+      P.map(p=>`<div class="panel tight"><h3>${p[0]} ${SAY(p[0] + " " + p[2])}</h3><span class="zh">${p[1]}</span><p style="margin:6px 0 0">${p[2]}</p><span class="zh">${p[3]}</span></div>`).join("") +
       `<div class="tip"><span class="i">💡</span><p>Tap any <span class="term">dotted word</span> to hear it and see Chinese. 點任何有底線的字，可以聽發音、看中文。</p></div>`;
   } else if(tab === "conds"){
     body = `<div class="list">${Object.keys(CONDITIONS).map(k=>`<div class="li"><div class="main"><b>${k}</b> ${SAY(k)} <span class="muted">· ${CONDITIONS[k][0]}</span><div style="font-size:15px">${CONDITIONS[k][1]}</div><span class="zh">${CONDITIONS[k][2]}</span></div></div>`).join("")}</div>`;
@@ -2540,20 +2570,30 @@ STEPV.abil = c => {
   const vals = c.method === "roll" ? (c.rolls || []) : [15,14,13,12,10,8];
   const two = Object.values(c.bonus).includes(2);
   return `<h2>Ability scores ${SAY("Ability scores")}</h2><div class="zh" style="font-size:16px;margin-bottom:10px">屬性值：你的角色擅長什麼？</div>
-  ${tip(`Tap one ability, then tap another to <b>swap</b> them. ★ marks your class's main ability — put a high number there.`, "先點一項屬性，再點另一項就能交換數值。★ 是職業的主要屬性，放高一點的數字。")}
+  <div class="panel"><h3>What are ability scores? ${SAY("What are ability scores?")} <span class="zh">屬性值是什麼？</span></h3>
+    <ul class="abhelp">
+      <li>Six numbers say what your hero is good at. Strong? Quick? Smart? Friendly?<span class="zh">六個數字說明你的英雄擅長什麼。力氣大？動作快？聰明？討人喜歡？</span></li>
+      <li>Look at the <b>big number</b> on each card, like <b>+2</b>. That's what you add when you roll a d20. The small number below it (like 14) is the score. <b>10 is an ordinary person.</b><span class="zh">看每張卡片上的大數字，例如 +2。擲 d20 的時候，就是加上這個數字。下面的小數字（例如 14）是屬性值。10 代表普通人。</span></li>
+      <li>We already put your numbers in the best order for your class. <b>You can just tap Next.</b><span class="zh">我們已經依照你的職業，把數字排成最好的順序。你可以直接按「下一步」。</span></li>
+    </ul>
+    ${ABWHY[c.cls] ? `<div class="tip" style="margin:8px 0 0"><span class="i">★</span><p><b>Why this order? (${C.en})</b> ${ABWHY[c.cls][0]} ${SAY(ABWHY[c.cls][0])}<span class="zh">為什麼這樣排？${ABWHY[c.cls][1]}</span></p></div>` : ""}
+  </div>
+  ${tip(`Want to change it? Tap one ability, then tap another to <b>swap</b> them. ★ marks your class's main ability. <b>★ Best order</b> puts everything back.`, "想自己調整？先點一項屬性，再點另一項就能交換數值。★ 是職業的主要屬性。按「★ 最佳排列」可以恢復推薦的順序。")}
   <div class="row" style="margin-bottom:12px"><div class="seg"><button data-act="abMethod" data-v="array" class="${c.method!=="roll"?"on":""}">${"Standard Array"} 標準數列</button><button data-act="abMethod" data-v="roll" class="${c.method==="roll"?"on":""}">Roll 4d6 擲骰</button></div>
     ${c.method === "roll" ? `<button class="btn sm" data-act="abRoll">🎲 ${c.rolls ? "Roll again 重擲" : "Roll! 擲骰"}</button>` : ""}<button class="btn sm" data-act="abRec">★ Best order 最佳排列</button></div>
   ${c.method === "roll" ? `<p class="zh" style="margin:0 0 10px">For each score, roll four d6 and drop the lowest. ${c.rolls ? "Ask your DM before you roll again! 重擲前先問問 DM！" : "每個數值擲四顆 d6，去掉最低的一顆。"}</p><div id="rollShow"></div>` : ""}
   <div class="abgrid">${AB.map(a=>`<button class="ab${BLD.sw===a?" sel":""}${C.prim.includes(a)?" prim":""}" data-act="abSwap" data-a="${a}">
     <div class="n">${ABN[a].s}</div><div class="m">${sgn(mod(sc[a]))}</div><div class="v">${sc[a]}</div>
     <div class="plus">${c.base[a]}${c.bonus[a] ? " +" + c.bonus[a] : ""}</div><div class="zh" style="font-size:12px">${ABN[a].zh}</div></button>`).join("")}</div>
-  <p class="zh center" style="margin:6px 0 14px">Big number = score · small = base + bonus · top = ${T("Modifier","modifier")} 調整值</p>
+  <p class="zh center" style="margin:6px 0 14px">Big number = ${T("Modifier","modifier")}（加到骰子上的數字） · in the oval = score 屬性值 · green = base + background bonus 基礎值＋背景加值</p>
+  <h3 style="margin:4px 0 6px">What each ability does <span class="zh">每項屬性的用途</span></h3>
+  <div class="list" style="margin-bottom:14px">${AB.map(a=>`<div class="li"><div class="main"><b>${ABN[a].en}</b> ${SAY(ABN[a].en)} <span class="muted">${ABN[a].zh} · ${sgn(mod(sc[a]))}</span><div style="font-size:14px">${ABN[a].d}</div><span class="zh">${ABN[a].dz}</span></div></div>`).join("")}</div>
   <div class="panel"><h3>Background bonus <span class="zh">背景加值 (${B.en})</span></h3>
     <p style="margin:6px 0">Add <b>+2 and +1</b>, or <b>+1 to all three</b>: ${B.ab.map(a=>ABN[a].en).join(", ")}.</p><span class="zh">從三項屬性中選一項 +2、一項 +1，或三項各 +1。</span>
     <div class="seg" style="margin:8px 0"><button data-act="bonusMode" data-v="21" class="${two?"on":""}">+2 / +1</button><button data-act="bonusMode" data-v="111" class="${!two?"on":""}">+1 / +1 / +1</button></div>
     ${two ? `<div class="row">${B.ab.map(a=>`<div style="flex:1;min-width:90px" class="center"><div class="px">${ABN[a].s}</div><div class="seg"><button data-act="bonusSet" data-a="${a}" data-v="0" class="${!c.bonus[a]?"on":""}">0</button><button data-act="bonusSet" data-a="${a}" data-v="1" class="${c.bonus[a]===1?"on":""}">+1</button><button data-act="bonusSet" data-a="${a}" data-v="2" class="${c.bonus[a]===2?"on":""}">+2</button></div></div>`).join("")}</div>` : ""}
   </div>
-  <div class="list">${AB.map(a=>`<div class="li"><div class="main"><b>${ABN[a].en}</b> ${SAY(ABN[a].en)} <span class="muted">${ABN[a].zh}</span><div style="font-size:14px">${ABN[a].d}</div><span class="zh">${ABN[a].dz}</span></div></div>`).join("")}</div>`;
+  `;
 };
 ACTS.abSwap = b => { const c = BLD.c, a = b.dataset.a;
   if(!BLD.sw){ BLD.sw = a; } else if(BLD.sw === a){ BLD.sw = null; } else { const t = c.base[a]; c.base[a] = c.base[BLD.sw]; c.base[BLD.sw] = t; BLD.sw = null; Music.sfx("ok"); }
