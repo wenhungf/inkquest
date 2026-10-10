@@ -1,0 +1,1732 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>深淵觀光團</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+body{margin:0}
+[hidden]{display:none!important}
+:root{
+  color-scheme: dark;
+  --bg:#17131c; --panel:#241d2b; --panel2:#30273a; --line:#4a3d57;
+  --text:#f3ece0; --muted:#b4a8bf; --torch:#f2a33a; --torch-ink:#3a2200;
+  --hp:#6fd08c; --hp-low:#ff6b6b; --danger:#ff6b6b;
+  --C:#bcb6c8; --R:#5aa7ff; --E:#c07bff; --L:#ffcf4a;
+  --display:"Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;
+  --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+[hidden]{display:none !important}
+/* dark-only game: paint the page ourselves so a light viewer theme can't turn it white */
+html{background:#17131c !important;color-scheme:dark}
+html body{background-color:#17131c !important}
+.backdrop{position:fixed;inset:0;z-index:-1;pointer-events:none;background:#17131c;
+  background-image:radial-gradient(520px 300px at 12% -6%, rgba(242,163,58,.16), transparent 70%),radial-gradient(480px 260px at 100% 0%, rgba(120,90,200,.12), transparent 70%)}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:480px;margin:0 auto;padding-inline:16px;padding-block:12px calc(10px + env(safe-area-inset-bottom, 0px));display:flex;flex-direction:column;gap:10px;height:100%}
+.wrap>*{flex:none}
+.num{font-variant-numeric:tabular-nums}
+img.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+
+/* top */
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.logo{font-family:var(--display);font-weight:900;font-size:22px;letter-spacing:.04em;line-height:1.1;flex:none;white-space:nowrap}
+.logo small{display:block;font-family:var(--body);font-weight:400;font-size:11px;color:var(--muted);letter-spacing:.1em;white-space:normal;max-width:14em}
+.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;flex:1 1 0;min-width:0}
+.chip{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:13px;white-space:nowrap;color:var(--text)}
+.chip b{font-weight:700;font-size:15px}
+.chip.snd{font-size:14px;line-height:1.2;padding:4px 9px}
+.chip.lang{font-family:var(--body);font-size:12px;line-height:1.35;padding:4px 9px;min-width:38px}
+
+/* the level as a 10-step corridor; boss steps are marked */
+.corridor{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.corridor i{height:7px;border-radius:2px;background:var(--line)}
+.corridor i.done{background:var(--torch)}
+.corridor i.now{background:var(--text);animation:blink 1.2s infinite}
+.corridor i.boss:not(.done):not(.now){background:transparent;box-shadow:inset 0 0 0 1.5px var(--danger)}
+@keyframes blink{50%{opacity:.35}}
+
+/* stage */
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.wrap>.stage{flex:1 1 auto;min-height:0}
+/* only the log may shrink on short screens; foes and party keep their full height */
+.stage>*:not(.logwrap){flex:none}
+.enc-tag{font-size:11px;color:var(--torch);letter-spacing:.12em}
+.enc-name{font-family:var(--display);font-weight:900;font-size:18px;line-height:1.2}
+.enc-q{font-size:12px;color:var(--muted)}
+.foes{display:flex;justify-content:center;gap:6px;min-height:84px}
+.foe{flex:0 1 calc(25% - 4.5px);background:var(--panel2);border-radius:10px;padding:5px 4px 6px;text-align:center;position:relative;min-width:0;border:1.5px solid transparent}
+.foe.boss{border-color:var(--danger)}
+.foe img.px{margin:0 auto}
+.foe .fn{font-size:10.5px;line-height:1.2;min-height:2.4em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--muted)}
+.foe .fh{font-size:10px;color:var(--muted)}
+.foe.dead{opacity:.25;filter:grayscale(1)}
+.foe.hit{animation:shake .25s}
+.foe.mad .fn{color:var(--danger)}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.bar{height:6px;background:#0d0b12;border-radius:3px;overflow:hidden;margin-top:3px}
+.bar>span{display:block;height:100%;background:var(--danger);transition:width .25s}
+.bar.hpb>span{background:var(--hp)}
+.bar.hpb.low>span{background:var(--hp-low)}
+
+.party{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.hero{background:var(--panel2);border-radius:10px;padding:6px 4px;text-align:center;border:1.5px solid transparent;position:relative;min-width:0;cursor:pointer}
+.hero img.px{margin:0 auto}
+.hero .n{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
+.hero .s{font-size:9.5px;color:var(--torch);letter-spacing:.04em;min-height:13px;line-height:1.3}
+.hero .a{white-space:nowrap;font-size:clamp(9px,2.6vw,10px);color:var(--muted);letter-spacing:-.03em}
+.hero .a .ic{font-style:normal;font-size:.8em;margin-right:1px}
+.hero .lvtag{position:absolute;top:3px;left:5px;font-size:9.5px;color:var(--muted)}
+.hero .cls{position:absolute;top:2px;right:4px;font-size:11px}
+.hero .syn{position:absolute;top:18px;right:4px;font-size:10px}
+.hero.dead{opacity:.35;filter:grayscale(1)}
+.hero.hit{animation:shake .25s}
+.hero.empty{border:1.5px dashed var(--line);background:transparent;color:var(--muted);font-size:11px;display:flex;align-items:center;justify-content:center;min-height:96px}
+.hero.r-C{border-color:var(--C)}.hero.r-R{border-color:var(--R)}.hero.r-E{border-color:var(--E)}.hero.r-L{border-color:var(--L)}
+
+.logwrap{position:relative;flex:1 1 0;min-height:5.2em;display:flex}
+/* if a phone is too short for everything, the page scrolls instead of the log spilling out of the box */
+.wrap>.stage{min-height:auto}
+/* room for the “tap to expand” tip, so it never covers the last line */
+body:not(.fighting) .log{padding-bottom:1.6em}
+.log{background:#0f0c14;border-radius:10px;padding:8px 10px;flex:1 1 auto;min-height:0;overflow-y:auto;font-size:13px;display:flex;flex-direction:column;gap:3px;cursor:zoom-in}
+.log p{margin:0}
+.log .sys{color:var(--muted)}
+.log .good{color:var(--hp)}
+.log .bad{color:var(--danger)}
+.log .gold{color:var(--L)}
+.log-tip{position:absolute;right:8px;bottom:6px;font-size:10.5px;color:var(--muted);background:rgba(15,12,20,.85);border-radius:6px;padding:1px 6px;pointer-events:none}
+
+/* actions */
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button{font-family:var(--display);font-weight:700;font-size:17px;border:0;border-radius:10px;padding:9px 10px;cursor:pointer;color:var(--text);background:var(--panel2);transition:transform .08s, filter .15s}
+button:active{transform:scale(.97)}
+button:focus-visible{outline:2px solid var(--torch);outline-offset:2px}
+button:disabled{opacity:.4;cursor:not-allowed}
+button small{display:block;font-family:var(--body);font-weight:400;font-size:11px;opacity:.8}
+.btn-pull{background:linear-gradient(180deg,#45375a,#33284a);border:1px solid #5d4c78}
+.go-row{grid-column:1/-1;display:flex;gap:8px}
+.btn-go{flex:1;background:var(--torch);color:var(--torch-ink);font-size:19px}
+.btn-go small{opacity:.75}
+.btn-auto{flex:none;width:68px;font-family:var(--body);font-size:20px;line-height:1.1;background:var(--panel2);border:1px solid var(--line)}
+.btn-auto small{font-size:11px}
+.btn-auto[aria-pressed="true"]{background:var(--torch);color:var(--torch-ink);border-color:var(--torch)}
+.btn-skip{display:none;width:100%;font-family:var(--body);font-size:14px;padding:10px;background:var(--panel2);border:1px solid var(--line)}
+.btn-skip[aria-pressed="true"]{color:var(--torch);border-color:var(--torch)}
+/* during a battle the controls step aside and the log takes their space */
+.fighting .actions,.fighting .buffs,.fighting .foot{display:none}
+.fighting .btn-skip{display:block}
+.fighting .log-tip{display:none}
+.fighting .log{cursor:pointer}
+.logbig .actions,.logbig .buffs,.logbig .foot,.logbig .party,.logbig .foes{display:none}
+.logbig .log{cursor:zoom-out}
+.buffs{font-size:12px;color:var(--muted)}
+.buffs b{color:var(--text);font-weight:500}
+.buffs .bs{white-space:nowrap}
+.hall-chip{background:none;border:0;padding:0;font:inherit;color:var(--L);cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:12px;color:var(--muted);flex-wrap:nowrap}
+.foot #pity{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.foot-btns{display:flex;gap:6px;flex-shrink:0}
+.foot button{font-family:var(--body);font-weight:400;font-size:12px;padding:6px 9px;border-radius:8px;background:transparent;border:1px solid var(--line);color:var(--muted)}
+html[lang="en"] .foot button{padding:6px 7px}
+html[lang="en"] .foot-btns{gap:5px}
+#partyBtn{position:relative}
+#partyBtn.can-up::after{content:'';position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:var(--L);box-shadow:0 0 6px var(--L)}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(8,6,12,.84);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10;overflow-y:auto}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;width:100%;max-width:440px;display:flex;flex-direction:column;gap:14px;max-height:100%;overflow-y:auto}
+.modal h2{font-family:var(--display);font-weight:900;font-size:22px;margin:0;text-align:center;text-wrap:balance}
+.modal p{margin:0}
+.modal>*{flex-shrink:0}
+.modal .btns{display:flex;flex-direction:column;gap:8px}
+.modal .btns button{width:100%}
+.center{text-align:center}
+.big{font-size:52px;text-align:center;line-height:1}
+.big img.px{margin:0 auto}
+.summary{font-size:13px;color:var(--muted);text-align:center}
+
+/* cards */
+.cards{display:grid;gap:8px}
+.cards.one{grid-template-columns:1fr;justify-items:center}
+.cards.ten{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.card{perspective:800px;width:100%;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.cards.one .card{max-width:240px}
+.card-in{position:relative;transition:transform .5s;transform-style:preserve-3d;transform:rotateY(180deg)}
+.card.open .card-in{transform:rotateY(0)}
+.face,.back{backface-visibility:hidden;border-radius:10px}
+.back{position:absolute;inset:0;transform:rotateY(180deg);background:repeating-linear-gradient(45deg,#3a2e4c 0 8px,#31274a 8px 16px);border:2px solid #5d4c78;display:flex;align-items:center;justify-content:center;font-family:var(--display);color:#a596c4;font-size:22px}
+.face{background:var(--panel2);border:2px solid var(--rc);padding:12px 10px;text-align:center;display:flex;flex-direction:column;gap:4px;align-items:center;box-shadow:0 0 18px -4px var(--rc);font-family:var(--body)}
+.face .rar{font-size:10px;letter-spacing:.12em;color:var(--rc)}
+.face .e{font-size:48px;line-height:1.1}
+.face .nm{font-family:var(--display);font-weight:700;font-size:17px;line-height:1.25}
+.face .cl{font-size:11px;color:var(--muted)}
+.face .st{font-size:12px;color:var(--torch)}
+.face .ds{font-size:12px;opacity:.9}
+.face .q{font-size:11.5px;color:var(--muted);font-style:italic}
+.face .tag{font-size:10px;background:var(--rc);color:#111;border-radius:6px;padding:1px 6px}
+.face.alt{display:none;outline:2px dashed var(--rc);outline-offset:-6px}
+.card.showalt .face.main{display:none}
+.card.showalt .face.alt{display:flex}
+.cards.ten .face{padding:6px 2px;gap:1px}
+.cards.ten .face .e{font-size:24px}
+.cards.ten .face img.px{width:32px;height:32px}
+.cards.ten .face .nm{font-size:9.5px;line-height:1.2;font-family:var(--body);font-weight:500;overflow-wrap:break-word;hyphens:auto}
+.cards.ten .face .rar{font-size:8px;letter-spacing:.04em}
+.cards.ten .face .cl,.cards.ten .face .ds,.cards.ten .face .q,.cards.ten .face .st{display:none}
+.cards.ten .face .tag{font-size:8px;padding:0 3px}
+.cards.ten .card-in{min-height:84px}
+.rL .face{animation:gold 1.6s infinite}
+@keyframes gold{50%{box-shadow:0 0 34px 2px var(--L)}}
+.lp-hint{font-size:12px;color:var(--muted);text-align:center;margin:0}
+
+/* collection, party editor */
+.dex{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dex .it{font-family:var(--body);font-weight:400;font-size:11.5px;line-height:1.35;background:var(--panel2);border-radius:10px;padding:8px 4px;text-align:center;border:1.5px solid var(--rc);color:var(--text)}
+.dex .it .e{font-size:26px;line-height:1.25}
+.dex .it img.px{margin:0 auto 2px}
+.dex .it .sub{color:var(--torch)}
+.dex .it .stat{display:block;color:var(--muted);font-size:10.5px}
+.dex .it.no{opacity:.35;filter:grayscale(1);border-color:var(--line);cursor:default}
+.dex.slots{grid-template-columns:repeat(4,1fr)}
+.dex .it.sel{outline:2px solid var(--torch);outline-offset:2px}
+.dex .it.empty-slot{border-style:dashed;border-color:var(--line);color:var(--muted);background:transparent}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:#0f0c14;border-radius:10px;padding:4px}
+.tabs button{font-family:var(--body);font-weight:400;font-size:12px;padding:8px 2px;border-radius:8px;background:transparent;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--panel2);color:var(--text)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#0f0c14;border-radius:10px;padding:4px}
+.seg button{font-family:var(--body);font-weight:400;font-size:13px;padding:8px 4px;border-radius:8px;background:transparent;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--panel2);color:var(--text)}
+.sec{font-family:var(--display);font-weight:700;font-size:15px;color:var(--torch);margin:4px 0 -4px}
+.info{background:#0f0c14;border-radius:10px;padding:10px 12px;font-size:13px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0}
+.info dt{color:var(--muted)}
+.info dd{margin:0}
+.tpow{background:#0f0c14;border-radius:10px;padding:8px 12px;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:4px 14px;font-size:12.5px;color:var(--muted)}
+.tpow b{color:var(--text);font-weight:500}
+.tpow .pw{font-family:var(--display);font-weight:900;font-size:18px;color:var(--torch)}
+.tpow .up{color:var(--hp)}.tpow .down{color:var(--danger)}
+.team-hint{font-size:12.5px;color:var(--muted);text-align:center;margin:0;min-height:1.4em}
+.team-hint.warn{color:var(--torch)}
+.danger-link{font-family:var(--body);font-weight:400;font-size:12px;background:transparent;border:1px solid var(--line);color:var(--muted);padding:6px 10px;border-radius:8px;align-self:center}
+.syns{display:flex;flex-direction:column;gap:6px}
+.syncard{background:#0f0c14;border-radius:10px;padding:8px 10px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;border:1.5px solid transparent;font-size:12.5px;font-family:var(--body);font-weight:400;color:var(--text);text-align:left;line-height:1.5;width:100%}
+.syncard.on{border-color:var(--torch)}
+.syncard .ce{font-size:22px;grid-row:span 2;align-self:center}
+.syncard .cn{font-family:var(--display);font-weight:700;font-size:14px}
+.syncard .cn b{font-family:var(--body);font-weight:500;font-size:11px;color:var(--torch-ink);background:var(--torch);border-radius:5px;padding:0 5px;margin-left:6px}
+.syncard .cd{color:var(--muted)}
+.syncard .cm{grid-column:2;display:flex;gap:4px;align-items:center;flex-wrap:wrap;font-size:11px;color:var(--muted)}
+.syncard .go{grid-column:2;font-size:11.5px;color:var(--torch)}
+.hall{background:linear-gradient(135deg,rgba(255,207,74,.12),rgba(255,207,74,.03));border:1.5px solid var(--L);border-radius:10px;padding:10px 12px;display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:center}
+.hall .re{font-size:26px;grid-row:span 2}
+.hall .rn{font-family:var(--display);font-weight:700;font-size:15px;color:var(--L)}
+.hall .rd{font-size:12px;color:var(--muted);grid-column:2}
+.hall button{grid-row:1/span 2;grid-column:3;font-family:var(--body);font-size:13px;padding:8px 12px;background:var(--L);color:#2a1d00;border-radius:8px;white-space:nowrap}
+.hall button:disabled{background:var(--panel2);color:var(--muted)}
+.wipe-up{display:flex;flex-direction:column;gap:6px;background:#0f0c14;border-radius:10px;padding:10px 12px;font-size:13px;text-align:center}
+.wipe-up b{color:var(--L)}
+.ach{display:flex;flex-direction:column;gap:6px}
+.ach div{background:#0f0c14;border-radius:10px;padding:8px 10px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:12.5px;border:1.5px solid transparent}
+.ach div.got{border-color:var(--L)}
+.ach div.no{opacity:.55}
+.ach .ae{font-size:22px;grid-row:span 3;align-self:center}
+.ach .an{font-family:var(--display);font-weight:700;font-size:14px}
+.ach .ad{color:var(--muted)}
+.ach .ar{color:var(--torch);font-size:11.5px}
+.help{display:flex;flex-direction:column;gap:14px}
+.help h3{font-family:var(--display);font-weight:700;font-size:16px;margin:0 0 4px;color:var(--torch)}
+.help section{display:flex;flex-direction:column;gap:4px}
+.help p,.help li{font-size:13.5px;margin:0}
+.help ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px}
+.help b{font-weight:500;color:var(--text)}
+.help .rar-row{display:flex;flex-wrap:wrap;gap:6px}
+.help .rar-row span{font-size:12px;border:1.5px solid var(--rc);border-radius:999px;padding:2px 9px;color:var(--rc)}
+.help table{border-collapse:collapse;font-size:12.5px}
+.help td{padding:2px 8px 2px 0;vertical-align:top}
+/* about */
+.ab{display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.75}
+.ab-art{display:flex;justify-content:center;gap:6px}
+.ab-brand{margin:0;text-align:center;font-family:var(--display);font-weight:900;font-size:26px;line-height:1.1}
+.ab-brand span{color:var(--torch)}
+.ab-slogan{margin:-6px 0 0;text-align:center;font-style:italic}
+.ab-sub{margin:-12px 0 0;text-align:center;color:var(--muted);font-size:13px}
+.ab h3{font-family:var(--display);font-weight:700;font-size:16px;color:var(--torch);margin:6px 0 -4px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.ab p b{color:var(--torch);font-weight:500}
+.ab-note{background:#0f0c14;border-radius:10px;padding:8px 12px;text-align:center;font-weight:500}
+.ab-info{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:13px}
+.ab-info dt{color:var(--muted)}
+.ab-info dd{margin:0}
+.ab-copy{font-size:12px;color:var(--muted);text-align:center}
+.toast{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top, 0px));transform:translate(-50%,-150%);z-index:30;background:var(--panel2);border:1.5px solid var(--L);border-radius:12px;padding:10px 16px;box-shadow:0 8px 24px rgba(0,0,0,.4);transition:transform .35s;width:min(340px, calc(100% - 32px));text-align:center;font-size:13px}
+.toast.show{transform:translate(-50%,0)}
+.toast b{display:block;font-family:var(--display);font-weight:700;font-size:16px;color:var(--L)}
+
+/* splash */
+.splash{position:fixed;inset:0;z-index:20;background:var(--bg);
+  background-image:radial-gradient(420px 320px at 50% 32%, rgba(242,163,58,.18), transparent 70%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px 16px;text-align:center;transition:opacity .35s}
+.splash.bye{opacity:0;pointer-events:none}
+.gate{position:relative;width:min(270px,76vw);height:150px;border-radius:120px 120px 6px 6px;background:radial-gradient(ellipse at 50% 85%, #2b2236 0%, #0d0a12 70%);border:6px solid #4d4058;box-shadow:inset 0 0 0 3px #2c2433, 0 0 40px -10px rgba(242,163,58,.6);display:flex;align-items:flex-end;justify-content:center;gap:2px;padding-bottom:6px;overflow:hidden}
+.gate .peek{position:absolute;top:28px;left:50%;transform:translateX(-50%);opacity:.55;filter:brightness(.6)}
+.gate .torch{position:absolute;top:40px;width:10px;height:18px;border-radius:50% 50% 30% 30%;background:radial-gradient(circle at 50% 70%, #ffe08a, #f2a33a 50%, #c2491f);animation:flicker .3s infinite alternate}
+.gate .torch.l{left:16px}.gate .torch.r{right:16px}
+@keyframes flicker{to{transform:scale(1.15) translateY(-1px);opacity:.85}}
+.splash .t{font-family:var(--display);font-weight:900;font-size:clamp(34px,10vw,44px);letter-spacing:.06em;line-height:1.1;margin:0}
+.splash .slogan{font-family:var(--display);font-weight:700;font-size:18px;color:var(--torch);margin:0}
+.splash .sub{font-size:13px;color:var(--muted);margin:0}
+.splash .copy{font-size:11.5px;color:var(--muted);opacity:.75;margin:10px 0 0}
+.splash button{background:var(--torch);color:var(--torch-ink);font-size:19px;padding:12px 36px;border-radius:10px;margin-top:4px}
+.lang-btn{position:absolute;top:calc(12px + env(safe-area-inset-top, 0px));right:16px;font-family:var(--body);font-size:13px;padding:6px 12px;border-radius:8px;background:var(--panel);border:1px solid var(--line);color:var(--text)}
+
+/* English uses Latin faces: CJK fonts draw ’ “ ” as full-width glyphs */
+[lang="en"]{--display:"Pixelify Sans","Noto Serif TC",system-ui,sans-serif;--body:"Nunito","Noto Sans TC",system-ui,sans-serif}
+[lang="zh-Hant"]{--display:"Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;--body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+html[lang="en"] .hero .n{font-size:10.5px;white-space:normal;line-height:1.15;min-height:2.3em;display:flex;align-items:center;justify-content:center}
+html[lang="en"] .logo small{letter-spacing:.02em}
+@media (max-width:370px){.hero .n{font-size:10px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="backdrop" aria-hidden="true"></div>
+<div class="splash" id="splash" role="dialog" aria-label="深淵觀光團">
+  <div class="gate" id="gate" aria-hidden="true"></div>
+  <h1 class="t" data-s="title">深淵觀光團</h1>
+  <p class="slogan" data-s="slogan">每座地城都有出口。大概啦。</p>
+  <p class="sub" data-s="splashSub">抽卡就好，打怪交給隊伍。</p>
+  <button id="startBtn" data-s="start">報名出團</button>
+  <p class="sub" id="splashHint" data-s="hintTap">👆 點一下畫面，開啟音樂</p>
+  <p class="copy">© 2026 Wen-Hung Fang. All rights reserved.</p>
+  <button class="lang-btn" id="langBtn2" aria-label="Switch language">EN</button>
+</div>
+<div class="wrap">
+  <header class="top">
+    <div class="logo"><span data-s="title">深淵觀光團</span></div>
+    <div class="chips">
+      <button class="chip lang" id="langBtn" aria-label="Switch language">EN</button>
+      <button class="chip snd" id="soundBtn" aria-label="關閉聲音">🔊</button>
+      <span class="chip">💎 <b class="num" id="gems">10</b></span>
+    </div>
+  </header>
+  <div class="corridor" id="corridor"></div>
+
+  <section class="stage">
+    <div class="enc-head"><div class="enc-tag" id="encTag"></div><div class="enc-name" id="encName"></div><div class="enc-q" id="encQ"></div></div>
+    <div class="foes" id="foes"></div>
+    <div class="party" id="party"></div>
+    <div class="logwrap"><div class="log" id="log" aria-live="polite" tabindex="0"></div><span class="log-tip" id="logTip"></span></div>
+  </section>
+
+  <div class="actions">
+    <button class="btn-pull" id="pull1"><span data-s="pull1">抽一張</span><small>💎 1</small></button>
+    <button class="btn-pull" id="pull10"><span data-s="pull10">十連抽</span><small data-s="pull10sub">💎 10・必出史詩以上</small></button>
+    <div class="go-row">
+      <button class="btn-go" id="go"><span data-s="go">前進！</span><small id="goHint"></small></button>
+      <button class="btn-auto" id="autoBtn" aria-pressed="false">⏩<small id="autoLbl"></small></button>
+    </div>
+  </div>
+  <button class="btn-skip" id="skipBtn" aria-pressed="false"></button>
+
+  <div class="foot">
+    <span id="pity"></span>
+    <span class="foot-btns">
+      <button id="partyBtn" data-s="partyBtn">隊伍</button>
+      <button id="dexBtn" data-s="dexBtn">圖鑑</button>
+      <button id="helpBtn" data-s="rulesBtn">規則</button>
+      <button id="aboutBtn" data-s="aboutBtn">關於</button>
+    </span>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="overlay" id="overlay" hidden><div class="modal" id="modal"></div></div>
+
+<script>
+/* ===== i18n.js ===== */
+/* Clear Out · language. Chinese is the default; English is one tap away, and long-press shows a card in the other language.
+   Every player-facing line is a [zh, en] pair or an object with an `en` sub-object. */
+let LANG='zh'; try{ if(localStorage.getItem('clearout-lang')==='en') LANG='en'; }catch(e){}
+const other=l=>l==='en'?'zh':'en';
+const tx=(zh,en,l=LANG)=>l==='en'?en:zh;
+/* N(item, field, lang): the zh value lives on the item, the en value in item.en */
+const N=(c,f,l=LANG)=>l==='en'&&c.en&&c.en[f]!=null?c.en[f]:c[f];
+const STR={
+  title:['深淵觀光團','Clear Out'],
+  tagline:['抽卡組隊，地城交給公會','Pull cards. Your party clears the dungeon.'],
+  slogan:['每座地城都有出口。大概啦。','Every dungeon has an exit. Usually.'],
+  splashSub:['抽卡就好，打怪交給隊伍。','Just pull cards. Your party does the fighting.'],
+  start:['報名出團','Join the Tour'],
+  hintTap:['👆 點一下畫面，開啟音樂','👆 Tap the screen to turn on the music'],
+  pull1:['抽一張','Pull ×1'],
+  pull10:['十連抽','Pull ×10'],
+  pull10sub:['💎 10・必出史詩以上','💎 10 · Epic or better'],
+  go:['前進！','Go!'],
+  partyBtn:['隊伍','Party'],
+  dexBtn:['圖鑑','Cards'],
+  rulesBtn:['規則','Rules'],
+  aboutBtn:['關於','About'],
+};
+function applyStatic(){
+  document.documentElement.lang=LANG==='en'?'en':'zh-Hant';
+  document.title=STR.title[LANG==='en'?1:0];
+  document.querySelectorAll('[data-s]').forEach(el=>{const v=STR[el.dataset.s]; if(v) el.textContent=v[LANG==='en'?1:0]});
+  ['langBtn','langBtn2'].forEach(id=>{const b=$(id); b.textContent=LANG==='en'?'中文':'EN'; b.setAttribute('aria-label',LANG==='en'?'切換成中文':'Switch to English')});
+}
+/* ===== data.js ===== */
+/* Clear Out · content. Everything a dungeon level adds lives here: crew, gear, events, synergies, encounters, awards.
+   Numbers that tune the game sit next to the content they tune. */
+
+/* ---------- rarity ---------- */
+const RAR={
+  C:{name:'普通',en:{name:'Common'},w:55,css:'var(--C)'},
+  R:{name:'稀有',en:{name:'Rare'},w:30,css:'var(--R)'},
+  E:{name:'史詩',en:{name:'Epic'},w:12,css:'var(--E)'},
+  L:{name:'傳說',en:{name:'Legendary'},w:3,css:'var(--L)'}
+};
+const ORDER=['C','R','E','L'];
+const PITY_MAX=30;
+const TYPE_NAME={hero:['隊員','Crew'],gear:['裝備','Gear'],event:['事件','Event']};
+const typeName=(t,l=LANG)=>TYPE_NAME[t][l==='en'?1:0];
+
+/* ---------- classes: the mechanical role. A card = class + archetype (the person) ----------
+   atk/hp are multipliers on the rarity base. Traits: taunt (3× as likely to be hit), cleave, area, assassin, sniper. */
+const CLASSES={
+  fighter:  {icon:'🛡️',role:'front',  atk:1.00,hp:1.50,taunt:true,       name:'戰士',en:{name:'Fighter',  how:'Front line. Monsters attack them more often (Taunt).'},how:'前排。怪物比較常打他（嘲諷）。'},
+  barbarian:{icon:'🪓',role:'front',  atk:1.20,hp:1.20,trait:'cleave',  name:'蠻族',en:{name:'Barbarian',how:'Front line. Extra damage spills onto the next monster (Cleave).'},how:'前排。打倒怪物後，多出來的傷害會砍到下一隻（順劈）。'},
+  paladin:  {icon:'✝️',role:'front',  atk:0.90,hp:1.40,taunt:true,       name:'聖騎士',en:{name:'Paladin', how:'Front line with Taunt. Heals the whole party a little every round.'},how:'前排，會嘲諷。每回合幫全隊回一點血。'},
+  rogue:    {icon:'🗡️',role:'damage', atk:1.25,hp:0.85,trait:'assassin',name:'盜賊',en:{name:'Rogue',    how:'Damage. +10% against monsters below half HP (Finisher).'},how:'輸出。打生命低於一半的怪物 +10%（收尾）。'},
+  ranger:   {icon:'🏹',role:'damage', atk:1.25,hp:0.85,trait:'sniper',  name:'遊俠',en:{name:'Ranger',   how:'Damage. +10% against monsters above half HP (Opener).'},how:'輸出。打生命高於一半的怪物 +10%（開場）。'},
+  wizard:   {icon:'🔮',role:'damage', atk:1.25,hp:0.85,trait:'area',    name:'法師',en:{name:'Wizard',   how:'Damage. Hits every monster at once for 65% (Area). Weak against a lone boss.'},how:'輸出。一次打所有怪物，每隻 65%（範圍）。單挑魔王比較吃虧。'},
+  cleric:   {icon:'✚', role:'support',atk:0.60,hp:1.00,                   name:'牧師',en:{name:'Cleric',   how:'Support. Heals the most hurt party member every round.'},how:'輔助。每回合治療傷最重的隊友。'},
+  bard:     {icon:'🎵',role:'support',atk:0.60,hp:0.90,                   name:'吟遊詩人',en:{name:'Bard',  how:'Support. The party hits harder every round, up to a limit.'},how:'輔助。全隊攻擊力每回合提高，有上限。'},
+  druid:    {icon:'🌿',role:'support',atk:0.70,hp:1.00,                   name:'德魯伊',en:{name:'Druid',  how:'Support. Monsters deal less damage while the Druid stands.'},how:'輔助。德魯伊站著的時候，怪物的傷害降低。'}
+};
+const RBASE={C:{atk:6,hp:28},R:{atk:8,hp:32},E:{atk:11,hp:40},L:{atk:15,hp:50}};
+
+/* ---------- crew ----------
+   kit = this person's numbers on top of the class:
+     crit {chance, mult, every}  a strong hit (every = guaranteed on every Nth round instead of a chance)
+     double {chance}             attacks twice      heal {pct}      partyHeal {pct}      song {step, cap}
+     soothe {cut}                monsters deal less damage        guard {cut}  takes less damage
+     area {pct}                  replaces the class's 65%          confuse {chance}  a monster loses its turn
+   critQ = the [zh, en] note shown in the log when the kit fires. */
+const HEROES=[
+  {id:'farmhand',pack:'warrens',cls:'fighter',r:'C',sp:'farmhand',kit:{crit:{chance:.2,mult:1.5}},critQ:['乾草叉一戳！','Pitchfork poke!'],
+    name:'帶乾草叉的農家子',short:'農家子',skill:'乾草叉',desc:'會嘲諷。20% 機率乾草叉一戳，傷害 ×1.5。',q:'「媽說六點吃晚飯，我們快點打完。」',
+    en:{name:'The Farmhand with a Pitchfork',short:'Farmhand',skill:'Pitchfork',desc:'Taunt. 20% chance of a pitchfork poke for ×1.5 damage.',q:'“Mom says dinner’s at six. Let’s make this quick.”'}},
+  {id:'lute',pack:'warrens',cls:'bard',r:'C',sp:'lute',kit:{song:{step:.05,cap:.25}},
+    name:'酒館魯特琴手',short:'琴手',skill:'加油歌',desc:'全隊攻擊每回合 +5%，最多 +25%。',q:'「我只會三首歌。第三首是第一首倒著彈。」',
+    en:{name:'The Tavern Lute Player',short:'Lute Player',skill:'Fight Song',desc:'Party attack +5% every round, up to +25%.',q:'“I know three songs. The third one is the first one, backward.”'}},
+  {id:'ratcatcher',pack:'warrens',cls:'ranger',r:'C',sp:'ratcatcher',kit:{double:{chance:.25}},critQ:['連射！','Double shot!'],
+    name:'捕鼠人',short:'捕鼠人',skill:'連射',desc:'開場型：打生命高於一半的怪物 +10%。25% 機率射兩箭。',q:'「哥布林？就是比較大隻的老鼠。」',
+    en:{name:'The Rat-Catcher',short:'Rat-Catcher',skill:'Double Shot',desc:'Opener: +10% on monsters above half HP. 25% chance to shoot twice.',q:'“Goblins? Just bigger rats.”'}},
+  {id:'knight',pack:'warrens',cls:'paladin',r:'R',sp:'knight',kit:{partyHeal:{pct:.03}},
+    name:'膝蓋不好的退休騎士',short:'退休騎士',skill:'老騎士的祝福',desc:'會嘲諷。每回合全隊回復 3% 生命。',q:'「我還能打。只是蹲下去就起不來。」',
+    en:{name:'The Retired Knight with a Bad Knee',short:'Old Knight',skill:'Old Knight’s Blessing',desc:'Taunt. Heals the whole party 3% HP every round.',q:'“I can still fight. I just can’t kneel.”'}},
+  {id:'apprentice',pack:'warrens',cls:'wizard',r:'R',sp:'apprentice',kit:{crit:{chance:.15,mult:2}},critQ:['火放太大了！','Way too much fire!'],
+    name:'燒掉圖書館的學徒',short:'魔法學徒',skill:'火球（偏大）',desc:'範圍攻擊：一次打所有怪物，每隻 65%。15% 機率火放太大，傷害 ×2。',q:'「那是意外。第二次也是。」',
+    en:{name:'The Apprentice Who Burned Down the Library',short:'Apprentice',skill:'Fireball (Large)',desc:'Area: hits every monster for 65%. 15% chance the fire gets out of hand: ×2 damage.',q:'“That was an accident. So was the second time.”'}},
+  {id:'pickpocket',pack:'warrens',cls:'rogue',r:'R',sp:'pickpocket',kit:{crit:{chance:.3,mult:2}},critQ:['背刺！','Backstab!'],
+    name:'街頭小扒手',short:'小扒手',skill:'背刺',desc:'收尾型：打生命低於一半的怪物 +10%。30% 機率背刺，傷害 ×2。',q:'「你的錢包？沒看到喔。」',
+    en:{name:'The Street Pickpocket',short:'Pickpocket',skill:'Backstab',desc:'Finisher: +10% on monsters below half HP. 30% chance to backstab for ×2 damage.',q:'“Your wallet? Haven’t seen it.”'}},
+  {id:'healer',pack:'warrens',cls:'cleric',r:'E',sp:'healer',kit:{heal:{pct:.12}},
+    name:'見過大風大浪的村醫',short:'村醫',skill:'坐好別動',desc:'每回合治療傷最重的隊友 12% 生命。',q:'「更慘的我都看過。坐好別動。」',
+    en:{name:'The Village Healer Who Has Seen Everything',short:'Healer',skill:'Sit Still',desc:'Every round, heals the most hurt party member 12% HP.',q:'“I’ve seen worse. Sit still.”'}},
+  {id:'berserker',pack:'warrens',cls:'barbarian',r:'E',sp:'berserker',kit:{crit:{chance:.25,mult:1.8}},critQ:['狂暴！','Rage!'],
+    name:'冬天也打赤膊的狂戰士',short:'狂戰士',skill:'狂暴',desc:'順劈：打倒怪物後，多的傷害砍向下一隻。25% 機率狂暴，傷害 ×1.8。',q:'「冷？什麼是冷？」',
+    en:{name:'The Berserker Who Never Wears a Shirt',short:'Berserker',skill:'Rage',desc:'Cleave: extra damage spills onto the next monster. 25% chance to rage for ×1.8 damage.',q:'“Cold? What’s cold?”'}},
+  {id:'herbwife',pack:'warrens',cls:'druid',r:'E',sp:'herbwife',kit:{soothe:{cut:.15},confuse:{chance:.1}},
+    name:'森林裡的草藥婆婆',short:'草藥婆婆',skill:'安神香草',desc:'她站著的時候，怪物的傷害 −15%。每隻怪物每回合有 10% 機率被藤蔓纏住，不能攻擊。',q:'「那朵蘑菇可以吃。那朵不行。那朵也不行。」',
+    en:{name:'The Herb Granny of the Woods',short:'Herb Granny',skill:'Calming Herbs',desc:'While she stands, monsters deal 15% less damage. Each round, each monster has a 10% chance to get tangled in vines and skip its attack.',q:'“You can eat that mushroom. Not that one. Not that one either.”'}},
+  {id:'stranger',pack:'warrens',cls:'rogue',r:'L',sp:'stranger',kit:{crit:{chance:.4,mult:2.5}},critQ:['影襲！','From the shadows!'],
+    name:'角落卡座的兜帽怪客',short:'兜帽怪客',skill:'影襲',desc:'收尾型：打生命低於一半的怪物 +10%。40% 機率從陰影出手，傷害 ×2.5。',q:'「我不是來喝酒的。……好啦，我也是來喝酒的。」',
+    en:{name:'The Hooded Stranger in the Corner Booth',short:'Stranger',skill:'From the Shadows',desc:'Finisher: +10% on monsters below half HP. 40% chance to strike from the shadows for ×2.5 damage.',q:'“I’m not here for the ale. …Fine. I’m also here for the ale.”'}},
+  {id:'archmage',pack:'warrens',cls:'wizard',r:'L',sp:'archmage',kit:{area:{pct:.8},crit:{every:3,mult:2}},critQ:['流星雨！','Meteor shower!'],
+    name:'在找眼鏡的大法師',short:'大法師',skill:'流星雨',desc:'範圍攻擊：一次打所有怪物，每隻 80%。每第 3 回合召喚流星雨，傷害 ×2。',q:'「我的眼鏡呢？……啊，在頭上。」',
+    en:{name:'The Archmage Looking for His Glasses',short:'Archmage',skill:'Meteor Shower',desc:'Area: hits every monster for 80%. Every 3rd round, a meteor shower: ×2 damage.',q:'“Where are my glasses? …Ah. On my head.”'}},
+  {id:'slayer',pack:'warrens',cls:'fighter',r:'L',sp:'slayer',kit:{guard:{cut:.25},crit:{chance:.2,mult:1.5}},critQ:['盾擊！','Shield bash!'],
+    name:'據說屠過龍的屠龍者',short:'屠龍者',skill:'屠龍盾',desc:'會嘲諷。受到的傷害 −25%。20% 機率盾擊，傷害 ×1.5。',q:'「龍？當然屠過。很大一隻，在很遠的地方。沒人看到。」',
+    en:{name:'The Dragon-Slayer (Allegedly)',short:'Dragon-Slayer',skill:'Dragon Shield',desc:'Taunt. Takes 25% less damage. 20% chance of a shield bash for ×1.5 damage.',q:'“A dragon? Sure, I killed one. A big one. Far away. Nobody saw.”'}},
+  /* hidden crew: never in the card pool; an award hands them over */
+  {id:'parrot',secret:true,cls:'bard',r:'E',sp:'parrot',kit:{song:{step:.04,cap:.2},confuse:{chance:.2}},
+    name:'會說十國語言的鸚鵡',short:'鸚鵡',skill:'外語轟炸',desc:'全隊攻擊每回合 +4%，最多 +20%。每隻怪物每回合有 20% 機率聽不懂牠在說什麼，愣住不攻擊。',q:'「Hello！你好！Bonjour！給餅乾！」',
+    en:{name:'The Polyglot Parrot',short:'Parrot',skill:'Language Barrage',desc:'Party attack +4% every round, up to +20%. Each round, each monster has a 20% chance to get confused by what it’s saying and skip its attack.',q:'“Hello! 你好! Bonjour! Cracker, please!”'}},
+  {id:'mimic',secret:true,cls:'barbarian',r:'E',sp:'mimic',kit:{crit:{chance:.3,mult:2}},critQ:['大口一咬！','Big chomp!'],
+    name:'想當冒險者的寶箱怪',short:'寶箱怪',skill:'大口一咬',desc:'順劈：打倒怪物後，多的傷害咬向下一隻。30% 機率大口一咬，傷害 ×2。',q:'「我不是寶箱。我是冒險者。……請不要打開我。」',
+    en:{name:'The Mimic Who Wants to Be an Adventurer',short:'Mimic',skill:'Big Chomp',desc:'Cleave: extra damage spills onto the next monster. 30% chance of a big chomp for ×2 damage.',q:'“I’m not a chest. I’m an adventurer. …Please don’t open me.”'}}
+];
+/* stats come from rarity × class unless a card sets its own */
+HEROES.forEach(h=>{const c=CLASSES[h.cls],b=RBASE[h.r]; if(h.atk==null)h.atk=Math.round(b.atk*c.atk); if(h.hp==null)h.hp=Math.round(b.hp*c.hp);});
+const H=Object.fromEntries(HEROES.map(h=>[h.id,h]));
+const shortName=(h,l=LANG)=>l==='en'?(h.en.short||h.en.name):(h.short||h.name);
+const STARTER='farmhand';
+
+/* ---------- gear: flat stats for the whole party; slot is flavor ---------- */
+const GEAR=[
+  {id:'shortsword',pack:'warrens',slot:'weapon',name:'生鏽的短劍',e:'🗡️',r:'C',atk:1,hp:0,q:'還能用。大概。',en:{name:'Rusty Shortsword',q:'Still works. Probably.'}},
+  {id:'cap',pack:'warrens',slot:'armor',name:'皮帽',e:'🧢',r:'C',atk:0,hp:4,q:'擋得住石頭，擋不住流言。',en:{name:'Leather Cap',q:'Stops rocks. Doesn’t stop rumors.'}},
+  {id:'coin',pack:'warrens',slot:'trinket',name:'幸運銅幣',e:'🪙',r:'C',atk:1,hp:2,q:'正面：好運。反面：也是好運。',en:{name:'Lucky Copper Coin',q:'Heads: good luck. Tails: also good luck.'}},
+  {id:'chain',pack:'warrens',slot:'armor',name:'鎖子甲',e:'🥋',r:'R',atk:0,hp:8,q:'走路會叮噹響，偷襲就別想了。',en:{name:'Chain Shirt',q:'It jingles when you walk. Forget sneaking.'}},
+  {id:'dagger',pack:'warrens',slot:'weapon',name:'銀匕首',e:'🔪',r:'R',atk:2,hp:3,q:'切麵包也很好用。',en:{name:'Silver Dagger',q:'Also great for cutting bread.'}},
+  {id:'roundshield',pack:'warrens',slot:'armor',name:'矮人圓盾',e:'🛡️',r:'E',atk:1,hp:15,q:'矮人說可以用一百年。矮人很長壽。',en:{name:'Dwarven Round Shield',q:'The dwarves say it lasts a hundred years. Dwarves live a long time.'}},
+  {id:'cloak',pack:'warrens',slot:'trinket',name:'精靈斗篷',e:'🧥',r:'E',atk:4,hp:0,q:'穿上就覺得自己很帥。這也是一種力量。',en:{name:'Elven Cloak',q:'You feel cool in it. That’s a kind of power too.'}},
+  {id:'boots',pack:'warrens',slot:'armor',name:'屠龍者的舊靴子',e:'🥾',r:'L',atk:6,hp:18,q:'聞起來像冒險。主要是腳。',en:{name:'The Dragon-Slayer’s Old Boots',q:'Smells like adventure. Mostly feet.'}}
+];
+
+/* ---------- events: instant rewards or a choice ---------- */
+const EVENTS=[
+  {id:'purse',pack:'warrens',name:'撿到錢袋',e:'👛',r:'C',desc:'地上有個錢袋。失主大概不會回來找了。💎 +1。',fx:s=>{s.gems+=1},
+    en:{name:'A Dropped Purse',desc:'There’s a purse on the ground. The owner probably isn’t coming back. 💎 +1.'}},
+  {id:'shrine',pack:'warrens',name:'路邊小神龕',e:'🕯️',r:'C',desc:'你點了一根蠟燭。全隊生命 +3。',fx:s=>{s.bHp+=3},
+    en:{name:'Roadside Shrine',desc:'You light a candle. Party +3 HP.'}},
+  {id:'rumor',pack:'warrens',name:'酒館傳聞',e:'🍺',r:'R',desc:'鄰桌的醉漢壓低聲音：「我知道哥布林把寶藏藏在哪。」',
+    en:{name:'Tavern Rumor',desc:'A drunk at the next table leans in. “I know where the goblins hide their gold.”'},
+    choices:[{label:'跟著傳聞走',sub:'全隊攻擊 +2',fx:s=>{s.bAtk+=2},res:'寶藏沒找到，倒是摸清了哥布林的巡邏路線。全隊攻擊 +2。',
+               en:{label:'Follow the rumor',sub:'Party +2 attack',res:'No gold, but now you know the goblin patrol routes. Party +2 attack.'}},
+             {label:'把傳聞賣給別人',sub:'獲得 💎 3',fx:s=>{s.gems+=3},res:'另一隊冒險者付了三顆寶石。祝他們好運。💎 +3。',
+               en:{label:'Sell the rumor',sub:'Get 💎 3',res:'Another party pays three gems for it. Good luck to them. 💎 +3.'}}]},
+  {id:'chest',pack:'warrens',name:'可疑的寶箱',e:'🧰',r:'R',desc:'走廊中間有個寶箱。太剛好了。',
+    en:{name:'Suspicious Chest',desc:'There’s a chest in the middle of the hallway. A little too convenient.'},
+    choices:[{label:'打開它',sub:'💎 5……或者是寶箱怪',fx:s=>{ if(Math.random()<.3){ s.flags.mimic=true; return 'mimic'; } s.gems+=5; },res:'裡面真的是寶石！💎 +5。',
+               en:{label:'Open it',sub:'💎 5… or a mimic',res:'Real gems inside! 💎 +5.'}},
+             {label:'繞過去',sub:'全隊攻擊 +2',fx:s=>{s.bAtk+=2},res:'你覺得自己很聰明。全隊攻擊 +2。',
+               en:{label:'Walk around it',sub:'Party +2 attack',res:'You feel very smart. Party +2 attack.'}}]},
+  {id:'well',pack:'warrens',name:'許願井',e:'⛲',r:'E',desc:'井底閃著一點一點的光。',
+    en:{name:'Wishing Well',desc:'Something glitters at the bottom of the well.'},
+    choices:[{label:'丟 💎 3 許願',sub:'必出史詩以上的隊員',need:3,fx:s=>{s.gems-=3;return 'pull'},
+               en:{label:'Toss in 💎 3',sub:'Get an Epic or better crew member'}},
+             {label:'把井底的錢撈起來',sub:'獲得 💎 2',fx:s=>{s.gems+=2},res:'你濕了一隻袖子，賺了兩顆寶石。💎 +2。',
+               en:{label:'Fish out the coins',sub:'Get 💎 2',res:'One wet sleeve, two gems. 💎 +2.'}}]},
+  {id:'ballad',pack:'warrens',name:'有人為你寫了歌',e:'📜',r:'E',desc:'酒館裡有人在唱你們的事蹟。歌詞有點誇張。全隊攻擊 +3、生命 +6。',fx:s=>{s.bAtk+=3;s.bHp+=6},
+    en:{name:'A Song About You',desc:'Someone in the tavern is singing about your party. The lyrics exaggerate a little. Party +3 attack, +6 HP.'}},
+  {id:'hoard',pack:'warrens',name:'巨龍的零錢',e:'💰',r:'L',desc:'一隻路過的龍掉了幾枚硬幣。對牠來說只是零錢。💎 +8。',fx:s=>{s.gems+=8},
+    en:{name:'The Dragon’s Spare Change',desc:'A passing dragon dropped a few coins. To a dragon, that’s pocket change. 💎 +8.'}}
+];
+
+/* ---------- party synergies: percent effects inside the fight ----------
+   need = list of requirements, each a crew id or 'class:<class>'; each needs a different party member. */
+const SYNERGIES=[
+  {id:'classic',e:'⚔️',need:['class:fighter','class:cleric','class:wizard','class:rogue'],name:'經典隊伍',desc:'戰士、牧師、法師、盜賊都在：全隊攻擊 +12%。',
+    en:{name:'The Classic Party',desc:'A Fighter, a Cleric, a Wizard and a Rogue: party attack +12%.'}},
+  {id:'oldsoldiers',e:'🎖️',need:['knight','farmhand'],name:'老兵不死',desc:'會嘲諷的隊員受到的傷害 −20%。',
+    en:{name:'Old Soldiers',desc:'Party members with Taunt take 20% less damage.'}},
+  {id:'encore',e:'🎶',need:['class:bard','class:wizard'],name:'安可！',desc:'有吟遊詩人伴奏，法師的範圍攻擊從 65% 提高到 85%。',
+    en:{name:'Encore!',desc:'With a Bard playing, a Wizard’s Area damage goes up from 65% to 85%.'}}
+];
+
+/* ---------- monsters and encounters ----------
+   An encounter = a pack of 1–4 foes sharing one HP/attack budget (Engine.makePack splits it by role).
+   abilities use the engine's names: ramp, disable, evasive, enrage, lifesteal, sweep, multiAttack, multiStrike, focusWeakest, steady. */
+const FOES={
+  scout:   {sp:'goblin',  name:'哥布林斥候',en:{name:'Goblin Scout'}},
+  rat:     {sp:'rat',     name:'巨鼠',en:{name:'Giant Rat'}},
+  spear:   {sp:'spear',   name:'哥布林長矛兵',en:{name:'Goblin Spearman'}},
+  archer:  {sp:'archer',  name:'哥布林弓箭手',en:{name:'Goblin Archer'}},
+  sergeant:{sp:'hobgob',  name:'半獸人士官',en:{name:'Hobgoblin Sergeant'}},
+  grunt:   {sp:'goblin',  name:'哥布林小兵',en:{name:'Goblin Grunt'}},
+  bat:     {sp:'bat',     name:'洞穴蝙蝠',en:{name:'Cave Bat'}},
+  doctor:  {sp:'doctor',  name:'哥布林巫醫',en:{name:'Goblin Witch Doctor'}},
+  wolf:    {sp:'wolf',    name:'座狼騎兵',en:{name:'Wolf Rider'}},
+  bruiser: {sp:'bruiser', name:'哥布林重裝兵',en:{name:'Goblin Bruiser'}},
+  king:    {sp:'king',    name:'哥布林王',en:{name:'The Goblin King'}},
+  guard:   {sp:'guard',   name:'王室衛兵',en:{name:'Royal Guard'}}
+};
+/* budget = what one foe alone would have; the pack multiplies it by the pack-size table and splits it */
+const WARRENS=[
+  {name:'哥布林斥候',en:{name:'Goblin Scouts',q:'Two scouts. They saw you first.'},q:'兩個斥候。他們先看到你了。',
+    budget:{hp:52,atk:6},foes:[{k:'scout'},{k:'scout'}]},
+  {name:'巨鼠窩',en:{name:'Rat Nest',q:'[Nibble] 30% chance to bite twice.'},q:'【亂咬】30% 機率咬兩口。',
+    budget:{hp:390,atk:20},foes:[{k:'rat',role:'minion',abilities:{multiStrike:{chance:.3,hits:2}}},{k:'rat',role:'minion',abilities:{multiStrike:{chance:.3,hits:2}}},{k:'rat',role:'minion',abilities:{multiStrike:{chance:.3,hits:2}}}]},
+  {name:'長矛陣',en:{name:'Spear Wall',q:'Two spearmen. Tough, slow, stubborn.'},q:'兩個長矛兵。皮厚、動作慢、很固執。',
+    budget:{hp:570,atk:25},foes:[{k:'spear',role:'brute'},{k:'spear',role:'brute'}]},
+  {name:'弓箭手埋伏',en:{name:'Archer Ambush',q:'[Behind Cover] 20% of your attacks miss.'},q:'【躲在掩體後】你的攻擊有 20% 機率落空。',
+    budget:{hp:760,atk:30},foes:[{k:'archer',role:'striker',abilities:{evasive:{chance:.2}}},{k:'archer',role:'striker',abilities:{evasive:{chance:.2}}},{k:'archer',role:'striker',abilities:{evasive:{chance:.2}}}]},
+  {name:'半獸人士官',boss:true,en:{name:'Hobgoblin Sergeant',q:'Mid-boss. [Charge!] Every 3 rounds, hits the whole party. Gets angry at half HP.'},q:'中頭目【衝鋒！】每 3 回合攻擊全隊，血量減半後暴怒。',
+    budget:{hp:1150,atk:36},foes:[{k:'sergeant',role:'boss',abilities:{sweep:{every:3,pct:.6},enrage:{below:.5,add:.2}},rageQ:['🪖 士官大吼：「全體，衝！」攻擊力大增！','🪖 The Sergeant roars, “All together, CHARGE!” Attack way up!'],sweepQ:['🪖 士官帶頭衝鋒，撞翻全隊！','🪖 The Sergeant leads a charge and knocks the whole party over!']},{k:'grunt',role:'minion'},{k:'grunt',role:'minion'}]},
+  {name:'蝙蝠群',en:{name:'Bat Swarm',q:'[Flutter] 25% of your attacks miss.'},q:'【亂飛】你的攻擊有 25% 機率落空。',
+    budget:{hp:1600,atk:40},foes:[{k:'bat',role:'minion',abilities:{evasive:{chance:.25}}},{k:'bat',role:'minion',abilities:{evasive:{chance:.25}}},{k:'bat',role:'minion',abilities:{evasive:{chance:.25}}},{k:'bat',role:'minion',abilities:{evasive:{chance:.25}}}]},
+  {name:'巫醫營火',en:{name:'Witch Doctors’ Fire',q:'Two healers and a shaman. The shaman weakens your party; the healers patch up the others.'},q:'兩個治療者和一個薩滿。薩滿削弱你的隊伍，治療者幫同伴補血。',
+    budget:{hp:1900,atk:58},foes:[{k:'doctor',role:'shaman'},{k:'doctor',role:'healer'},{k:'doctor',role:'healer'}]},
+  {name:'座狼突襲',en:{name:'Wolf Raid',q:'[Pounce] 35% chance to attack twice. [Pack Hunters] Always go for the weakest.'},q:'【撲咬】35% 機率攻擊兩次。【狼群戰術】專挑最弱的打。',
+    budget:{hp:2500,atk:62},foes:[{k:'wolf',role:'striker',abilities:{multiStrike:{chance:.35,hits:2},focusWeakest:{}}},{k:'wolf',role:'striker',abilities:{multiStrike:{chance:.35,hits:2},focusWeakest:{}}}]},
+  {name:'重裝兵關卡',en:{name:'Bruiser Checkpoint',q:'[Warming Up] Attack grows every round.'},q:'【越打越熱】每回合攻擊力變強。',
+    budget:{hp:3300,atk:74},foes:[{k:'bruiser',role:'brute',abilities:{ramp:{pct:.05}}},{k:'bruiser',role:'brute',abilities:{ramp:{pct:.05}}},{k:'bruiser',role:'brute',abilities:{ramp:{pct:.05}}}]},
+  {name:'哥布林王',boss:true,en:{name:'The Goblin King',q:'Level boss. [Royal Temper] Attacks twice each round. Gets angry at half HP. Two guards protect him.'},q:'地城魔王【王的脾氣】每回合攻擊兩次，血量減半後暴怒。兩名衛兵護駕。',
+    budget:{hp:4700,atk:76},foes:[{k:'king',role:'boss',abilities:{multiAttack:{hits:2},enrage:{below:.5,add:.25}},rageQ:['👑 哥布林王把王冠摔在地上：「誰准你們進來的！」攻擊力大增！','👑 The Goblin King throws down his crown. “Who let you in here?!” Attack way up!']},{k:'guard',role:'brute'},{k:'guard',role:'brute'}]}
+];
+/* build each encounter's foes once: names (A/B/C when there are several of one kind), sprite, split budget */
+function buildEncounters(list){
+  return list.map(enc=>{
+    const counts={}; enc.foes.forEach(f=>counts[f.k]=(counts[f.k]||0)+1);
+    const seen={};
+    const defs=enc.foes.map(f=>{const base=FOES[f.k]; const n=counts[f.k]>1?' '+'ABCD'[(seen[f.k]=(seen[f.k]||0)+1)-1]:'';
+      return {...f,sp:base.sp,name:base.name+n,en:{name:base.en.name+n}}});
+    return {...enc,pack:Engine.makePack(defs,enc.budget)};
+  });
+}
+
+/* ---------- dungeon levels ---------- */
+const LEVELS=[
+  {id:1,pack:'warrens',e:'🕳️',name:'哥布林地穴',encounters:WARRENS,
+    en:{name:'Goblin Warrens',endQ:'The Goblin King’s throne room goes quiet. Somewhere below, something older is waiting.'},
+    endQ:'哥布林王的王座廳安靜下來了。更深的地方，有更古老的東西在等著。',
+    /* one short line: the log shows 2–4 lines, and new players may never expand it */
+    intro:[['🕳️ 木牌寫著：「哥布林地穴，觀光團請排隊。」','🕳️ A sign reads: “Goblin Warrens. Tours line up here.”']],
+    nextQ:['你們往地穴更深處走。火把照出了{e}的影子。','You head deeper into the warrens. Up ahead, in the torchlight: the {e}.']}
+];
+const NEXT_TEASER=['第二層「古墓地窖」製作中，敬請期待！','Level 2, “Barrow Crypts”, is coming soon!'];
+
+/* ---------- awards ---------- */
+const ACH=[
+  {id:'english',e:'🌏',name:'雙語冒險者',desc:'第一次切換到英文。',reward:{hero:'parrot'},
+    en:{name:'Bilingual Adventurer',desc:'Switch the game to English for the first time.'},test:s=>s.flags.english},
+  {id:'synergy',e:'✨',name:'默契十足',desc:'第一次在戰鬥中發動隊伍羈絆。',reward:{gems:2},
+    en:{name:'Perfect Teamwork',desc:'Trigger a party synergy in battle.'},test:s=>s.flags.synergy},
+  {id:'commons',e:'🧑‍🤝‍🧑',name:'菜鳥全員到齊',desc:'收集所有普通隊員。',reward:{gems:2},
+    en:{name:'All the Rookies',desc:'Collect every Common crew member.'},test:s=>HEROES.filter(h=>h.r==='C'&&!h.secret).every(h=>s.roster[h.id])},
+  {id:'star5',e:'🌟',name:'公會之星',desc:'讓一位隊員升到 5★。',reward:{gems:2},
+    en:{name:'Guild Star',desc:'Get a crew member to 5★.'},test:s=>Object.values(s.roster).some(v=>v>=5)},
+  {id:'lv10',e:'🎖️',name:'老手',desc:'讓一位隊員升到 Lv10。',reward:{gems:3},
+    en:{name:'Old Hand',desc:'Get a crew member to Lv10.'},test:s=>Object.keys(s.roster).some(id=>lvOf(id)>=10)},
+  {id:'mimic',e:'🧰',name:'它不是寶箱',desc:'打開一個寶箱怪。',reward:{hero:'mimic'},
+    en:{name:'That Was Not a Chest',desc:'Open a mimic.'},test:s=>s.flags.mimic},
+  {id:'hall3',e:'🏰',name:'公會擴建',desc:'擴建公會大廳 3 次。',reward:{gems:5},
+    en:{name:'Growing Guild',desc:'Upgrade the Guild Hall 3 times.'},test:s=>(s.pay||0)>=3},
+  {id:'autowin10',e:'🤖',name:'全自動觀光',desc:'開著自動前進，累計打贏 10 場。',reward:{gems:3},
+    en:{name:'Autopilot Tour',desc:'Win 10 encounters in total with auto-advance on.'},test:s=>(s.autoWins||0)>=10},
+  {id:'retreat10',e:'🏳️',name:'戰略性撤退',desc:'累計撤退 10 次。',reward:{gems:3},
+    en:{name:'Strategic Retreat',desc:'Retreat 10 times in total.'},test:s=>s.losses>=10},
+  {id:'boss5',e:'🪖',name:'士官退場',desc:'打倒半獸人士官。',reward:{gems:5},
+    en:{name:'Sergeant Dismissed',desc:'Beat the Hobgoblin Sergeant.'},test:s=>s.enc>5||s.done},
+  {id:'boss10',e:'👑',name:'廢王',desc:'打倒哥布林王。',reward:{gems:10},
+    en:{name:'Kingslayer (Goblin Edition)',desc:'Beat the Goblin King.'},test:s=>s.enc>10||(s.done&&s.enc>=10)}
+];
+
+/* ---------- economy (Clock Out's tuned numbers) ---------- */
+const ECON={win0:1,winF:1.2,loss0:2,lossF:.3,boss:5};
+const MAX_ROUNDS=15, BOSS_ROUNDS=20;
+const LV_MAX=50;
+const HALL_PCT=.10;              /* each Guild Hall upgrade: every member +10% total stats */
+const CUR_PACK_SHARE=.6, MISSING_BOOST=1.25;
+/* ===== sprites.js ===== */
+/* Clear Out · VGA-style pixel sprites.
+   Every sprite is 16×16, built from layers of pixel maps ('.' = see-through). Crew share one bust and one face,
+   then add hair, headgear, clothes colors and a held item, so the whole guild looks like one set.
+   Letters are palette keys; h/H (hair), c/C (clothes), a (accent), x (item glow) are set per sprite. */
+const PAL={k:'#1a1420',s:'#f2c29b',S:'#cf9670',g:'#7cbf45',G:'#467f2b',m:'#d3d8e0',M:'#7d8597',w:'#a66e3c',W:'#6b4426',
+  t:'#f6f1e3',y:'#f4c542',r:'#d8433a',R:'#8e2620',b:'#4f86e0',B:'#2c4f96',v:'#8d55c9',o:'#ec8b2e',n:'#7a4c2c',N:'#4f3020',
+  f:'#9a948d',F:'#5f5a55',p:'#f09ab0',l:'#62c24d',u:'#3a3346'};
+const L=rows=>rows.map(r=>r.padEnd(16,'.').slice(0,16));
+const LAYER={
+  bust:L(['','','','.....kkkkkk.....','....kssssssk....','....kssssssk....','....kskssksk....','....kssssssk....','....kssSSssk....','.....kssssk.....','......kssk......',
+    '...kkcccccckk...','..kccccccccccck.','.kccccaaaacccck.','.kcccccaacccccck','.kccccccccccccck']),
+  hairShort:L(['','','.....hhhhhh.....','....hhhhhhhh....','....hh....hh....','....h......h....']),
+  hairLong:L(['','','.....hhhhhh.....','....hhhhhhhh....','...hhh....hhh...','...hh......hh...','...hh......hh...','...hh......hh...','...hH......Hh...','....H......H....']),
+  hairWild:L(['','..h..h.hh.h..h..','..hhhhhhhhhhhh..','...hhhhhhhhhh...','...hhh....hhh...','...hh......hh...','...h........h...']),
+  hairBun:L(['','.......hh.......','......hHHh......','.....hhhhhh.....','....hhhhhhhh....','....hh....hh....']),
+  bald:L(['','','','.....kkkkkk.....','....kSssssSk....']),
+  beard:L(['','','','','','','','....t......t....','....tt.SS.tt....','....tttttttt....','.....tttttt.....','......tttt......']),
+  hood:L(['','......kkkk......','....kkCCCCkk....','...kCCCCCCCCk...','...kCSSSSSSCk...','...kCSSSSSSCk...','...kC.y..y.Ck...','...kC......Ck...','...kCC....CCk...','....kC....Ck....']),
+  wizHat:L(['........kk......','.......kaak.....','......kaaaak....','..kaaaaaaaaaaak.','...kkkkkkkkkkk..']),
+  helmOpen:L(['','......kkkk......','....kkmmmmkk....','...kmmmmmmmmk...','...kmMMMMMMmk...','...km......mk...','...km......mk...','...km......mk...','....k......k....']),
+  helmPlume:L(['......rr........','.....rrrr.......','....kkmmmmkk....','...kmmmmmmmmk...','...kmMMMMMMmk...','...km......mk...','...km......mk...']),
+  band:L(['','','','','....rrrrrrrr....']),
+  fork:L(['','','.............m.m','.............m.m','.............mmm','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.']),
+  lute:L(['','','','','','','','','','.............kw.','............kw..','.........kkkwk..','........kwwwwwk.','........kwwkwwk.','........kwwwwwk.','.........kkkkk..']),
+  bow:L(['','','','.............wk.','..............w.','............t.w.','............t.w.','............t.w.','............t.w.','............t.w.','............t.w.','............t.w.','..............w.','.............wk.']),
+  staffFire:L(['.............ooo','............oyyo','.............ooo','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.']),
+  staffBlue:L(['............kbbk','............bxxb','............bxxb','............kbbk','.............ww.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.']),
+  staffLeaf:L(['............l.l.','.............ll.','............lwl.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.']),
+  dagger:L(['','','','','','','','','','','.............m..','............mm..','...........mm...','..........yy....','.........nn.....']),
+  sword:L(['','..............m.','..............m.','..............m.','..............m.','..............m.','..............m.','..............m.','..............m.','..............m.','.............yyy','..............n.','..............n.']),
+  axe:L(['','','............mmm.','...........mmmmw','............mmw.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.']),
+  shield:L(['','','','','','','','','','kkkkk...........','kaaak...........','kayak...........','kaaak...........','.kak............','..k.............']),
+  apron:L(['','','','','','','','','','','','','.....tttttt.....','....tttrtttt....','....ttrrrttt....','....tttrtttt....'])
+};
+/* shirtless: the bust's body rows in skin tones, with a belt */
+LAYER.bare=LAYER.bust.map((r,y)=>y<11?'.'.repeat(16):r.replace(/c/g,'s').replace(/C/g,'S').replace(/a/g,y>=14?'n':'S'));
+LAYER.bare[15]=LAYER.bare[15].replace(/s/g,(m,i)=>i>3&&i<12?'n':m);
+/* crew portraits: layers bottom to top, plus the palette keys they set */
+const CREW_SPRITES={
+  farmhand:{layers:['bust','hairShort','fork'],pal:{h:'#c98a3a',c:'#7aa4c9',C:'#55779a',a:'#c98a3a'}},
+  lute:{layers:['bust','hairLong','lute'],pal:{h:'#7a3b2b',c:'#3fa37a',C:'#2b7356',a:'#f4c542'}},
+  ratcatcher:{layers:['bust','hairShort','bow'],pal:{h:'#4a3a2a',c:'#8a6a3a',C:'#5f4826',a:'#5f4826'}},
+  knight:{layers:['bust','beard','helmOpen','shield'],pal:{c:'#9aa3b5',C:'#6b7385',a:'#4f86e0'}},
+  apprentice:{layers:['bust','hairShort','wizHat','staffFire'],pal:{h:'#d65a2a',c:'#c0503a',C:'#8e3326',a:'#c0503a'}},
+  pickpocket:{layers:['bust','hairWild','dagger'],pal:{h:'#2b2b36',c:'#5a5566',C:'#3a3646',a:'#8a2f2f'}},
+  healer:{layers:['bust','hairBun','apron'],pal:{h:'#d8d8d8',H:'#a8a8a8',c:'#7d6aa8',C:'#5a4a80',a:'#7d6aa8'}},
+  berserker:{layers:['bust','bare','hairWild','band','axe'],pal:{h:'#d9a53a'}},
+  herbwife:{layers:['bust','hairLong','staffLeaf'],pal:{h:'#cfcfcf',H:'#9a9a9a',c:'#4f7a3a',C:'#355628',a:'#a8743a'}},
+  stranger:{layers:['bust','hood','dagger'],pal:{c:'#3b3550',C:'#2a2540',a:'#3b3550'}},
+  archmage:{layers:['bust','beard','wizHat','staffBlue'],pal:{c:'#4256b3',C:'#2c3a80',a:'#f4c542',x:'#bfe3ff'}},
+  slayer:{layers:['bust','helmPlume','sword','shield'],pal:{c:'#b0453a',C:'#7c2b24',a:'#f4c542'}},
+  parrot:{rows:L(['','.......kkkk.....','......krrrrk....','.....krrrrrrk...','.....krtkrrrk...','.....krrrrrkyk..','....krrrrrrkyyk.','....krrrrrrrkk..','...kbbrrrrrrk...','...kbbbrrrrrk...','..kbbbbyrrrk....','..kbbbyyyrrk....','...kkbyyyrk.....','.....kyyyk......','......knk.......','.....kn.nk......'])},
+  mimic:{rows:L(['','','..kkkkkkkkkkkk..','.kwwwwwwwwwwwwk.','.kwWwwwwwwwwWwk.','.kyyyyyyyyyyyyk.','.kkkkkkkkkkkkkk.','.ktkrrrrrrrrktk.','.krrrrrrrrrrrrk.','.krryrrrrrryrrk.','.ktkrrrrrrrrktk.','.kkkkkkkkkkkkkk.','.kwwwwwyywwwwwk.','.kwWwwwyywwwWwk.','.kwwwwwwwwwwwwk.','..kkkkkkkkkkkk..'])}
+};
+/* monsters */
+const GOBLIN=L(['','','.....kkkkkk.....','....kggggggk....','.kk.kggggggk.kk.','.kgkggggggggkgk.','..kggykggkyggk..','...kggggggggk...','...kgGtGGtGgk...','....kggggggk....','.....kGGGGk.....','...kknnnnnnkk...','..knnnnnnnnnnk..','.kgnnnnnnnnnngk.','.kgnnnWWnnnnngk.','.kgnnnnnnnnnngk.']);
+const MON_SPRITES={
+  goblin:{layers:['goblin','gobDagger']},
+  spear:{layers:['goblin','gobSpear']},
+  archer:{layers:['goblin','gobBow']},
+  doctor:{layers:['goblin','skullMask']},
+  guard:{layers:['goblin','gobHelm','gobShield']},
+  bruiser:{layers:['goblin','gobBig','gobClub'],pal:{g:'#5c9a3a'}},
+  hobgob:{layers:['goblin','helmPlume','gobClub'],pal:{g:'#c46a3a',G:'#8a4426'}},
+  king:{layers:['goblin','crown','cape']},
+  rat:{rows:L(['','','','','..kk............','.kffk...........','.kfffkkkkkk.....','kfkffffffffkk...','kpfffffffffffk..','.kfffffffffffk..','..kFffffffffk.k.','...kFFkkFFFk.kpk','...kk..kk.kkkpk.','............kk..'])},
+  bat:{rows:L(['','','','','k..............k','kk....k..k....kk','kFk...kkkk...kFk','kFFk.kFFFFk.kFFk','kFFFkFrFFrFkFFFk','kFFFFFFFFFFFFFFk','.kFFkFtFFtFkFFk.','..kk.kFFFFk.kk..','......kFFk......','.......kk.......'])},
+  wolf:{rows:L(['','..k.........k...','.kfk.......kfk..','.kffk.....kffk..','.kfffkkkkkfffk..','..kfffffffffk...','..kfykfffykffk..','..kffffffffffk..','...kfffFFfffk...','...kffkkkkffk...','....kftttfk.....','.....kffffk.....','....kfFFFFfk....','...kfFFFFFFfk...','..kffFFFFFFffk..','..kffffffffffk..'])}
+};
+Object.assign(LAYER,{
+  goblin:GOBLIN,
+  gobDagger:L(['','','','','','','','','','','.............m..','............mm..','...........yk...']),
+  gobSpear:L(['..............m.','.............mmm','..............m.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.','..............w.']),
+  gobBow:L(['','','','','..k.............','.kw.............','.w.t............','kw..t...........','kw..t...........','kw..t...........','.w.t............','.kw.............','..k.............']),
+  skullMask:L(['....r..r..r.....','....rr.r.rr.....','.....kkkkkk.....','....kttttttk....','....kttttttk....','....ktkttktk....','....kkkttkkk....','....kttttttk....','....kttktktk....','.....kttttk.....']),
+  gobHelm:L(['','','....kkkkkkkk....','...kMMMMMMMMk...','...kMmmmmmmMk...']),
+  gobShield:L(['','','','','','','','','','kkkkk...........','kbbbk...........','kbtbk...........','kbbbk...........','.kbk............','..k.............']),
+  gobBig:L(['','','','','','','','','','','.....kGGGGk.....','..kkkGGGGGGkkk..','.kGGGGGGGGGGGGk.','kGGGGGGGGGGGGGGk','kGGGGWWWWWGGGGGk','kGGGGGGGGGGGGGGk']),
+  gobClub:L(['','','','','............kww.','...........kwwww','............kwwk','.............ww.','..............w.','..............w.','..............w.','..............w.']),
+  crown:L(['....y.yy.y......','....yyyyyyy.....','....yryyryy.....']),
+  cape:L(['','','','','','','','','','','','...kkrrrrrrkk...','..krrRnnnnRrrk..','.krrRnnnnnnRrrk.','.krRnnnnnnnnRrk.','.krRnnnnnnnnRrk.'])
+});
+/* rendered images are cached as data URLs */
+const spriteCache={};
+function spritePixels(def,extraPal){
+  const layers=def.rows?[def.rows]:def.layers.map(n=>LAYER[n]);
+  const pal={...PAL,h:'#6b4426',H:'#4a2e18',c:'#777',C:'#555',a:'#999',x:'#fff',...(def.pal||{}),...(extraPal||{})};
+  const out=Array.from({length:16},()=>Array(16).fill(null));
+  layers.forEach(rows=>rows.forEach((r,y)=>{for(let x=0;x<16;x++){const ch=r[x];if(ch&&ch!=='.')out[y][x]=pal[ch]||null}}));
+  return out;
+}
+function spriteURL(key){
+  if(spriteCache[key]) return spriteCache[key];
+  const def=CREW_SPRITES[key]||MON_SPRITES[key]; if(!def) return '';
+  const px=spritePixels(def);
+  const cv=document.createElement('canvas'); cv.width=16; cv.height=16;
+  const g=cv.getContext&&cv.getContext('2d'); if(!g) return '';
+  px.forEach((row,y)=>row.forEach((col,x)=>{if(col){g.fillStyle=col;g.fillRect(x,y,1,1)}}));
+  return spriteCache[key]=cv.toDataURL();
+}
+/* an <img> for a sprite; size in CSS pixels (a multiple of 16 keeps pixels crisp) */
+const spriteImg=(key,size=48,cls='')=>`<img class="px ${cls}" src="${spriteURL(key)}" width="${size}" height="${size}" alt="" aria-hidden="true">`;
+/* ===== audio.js ===== */
+/* Clear Out · FM-synth music and sound (Web Audio, no files).
+   Each note is a carrier oscillator whose pitch is wobbled by a modulator (FM), like the sound chips of early-90s PCs.
+   iOS rule carried over from Clock Out: audio must be unlocked inside a tap, with a silent buffer and resume(). */
+const Sound=(()=>{
+  let ctx=null, master, music, sfxBus, timer=null, song=null, step=0, next=0;
+  let on=true; try{on=localStorage.getItem('clearout-sound')!=='off'}catch(e){}
+  const mtof=m=>440*Math.pow(2,(m-69)/12);
+  const _=0;
+  /* 4 bars × 16 steps. chords = bar roots (MIDI), third = 3 (minor) or 4 (major) */
+  const SONGS={
+    title:{bpm:80, chords:[57,53,55,52], third:[3,4,4,3],
+      mel:[69,_,_,_,72,_,76,_,74,_,_,_,72,_,71,_, 69,_,_,_,65,_,69,_,67,_,_,_,64,_,_,_,
+           69,_,72,_,76,_,79,_,77,_,76,_,74,_,72,_, 71,_,72,_,74,_,71,_,69,_,_,_,_,_,_,_],
+      bass:[0,8], pad:true, arp:[0,4,8,12], kick:[], snare:[], hat:[]},
+    guild:{bpm:104, chords:[50,55,50,48], third:[3,4,3,4],
+      mel:[74,_,77,_,81,_,_,_,79,_,77,_,76,_,74,_, 79,_,83,_,86,_,_,_,84,_,83,_,81,_,79,_,
+           74,_,77,_,81,_,84,_,83,_,81,_,79,_,77,_, 76,_,74,_,72,_,76,_,74,_,_,_,_,_,_,_],
+      bass:[0,6,8,14], pad:false, arp:[], kick:[0,8], snare:[], hat:[4,12]},
+    battle:{bpm:150, chords:[52,48,50,47], third:[3,4,4,4],
+      mel:[76,_,76,79,76,_,74,_,72,_,74,_,76,_,_,_, 72,_,72,76,72,_,71,_,69,_,71,_,72,_,_,_,
+           74,_,74,78,74,_,72,_,71,_,72,_,74,_,_,_, 71,_,74,_,78,_,83,_,81,_,79,_,78,_,_,_],
+      bass:[0,2,4,6,8,10,12,14], oct:true, pad:false, arp:[], kick:[0,4,8,12], snare:[4,12], hat:[2,6,10,14]}
+  };
+  SONGS.boss={...SONGS.battle,bpm:166,chords:[52,53,50,47],third:[3,4,3,4]};
+  function init(){
+    if(ctx) return;
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+    ctx=new AC();
+    master=ctx.createGain(); master.gain.value=.5; master.connect(ctx.destination);
+    music=ctx.createGain(); music.gain.value=.3; music.connect(master);
+    sfxBus=ctx.createGain(); sfxBus.gain.value=.5; sfxBus.connect(master);
+  }
+  /* one FM note: ratio = modulator pitch / carrier pitch; index = how hard it wobbles (higher = brighter, buzzier) */
+  function fm(f,t,dur,vol,dest,ratio=1,index=2,wave='sine',decayIndex=true){
+    const car=ctx.createOscillator(), mod=ctx.createOscillator(), mg=ctx.createGain(), g=ctx.createGain();
+    car.type=wave; car.frequency.value=f; mod.frequency.value=f*ratio;
+    mg.gain.setValueAtTime(f*index,t); if(decayIndex) mg.gain.exponentialRampToValueAtTime(Math.max(1,f*index*.15),t+dur);
+    mod.connect(mg); mg.connect(car.frequency);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+.008); g.gain.exponentialRampToValueAtTime(.0008,t+dur);
+    car.connect(g); g.connect(dest);
+    car.start(t); mod.start(t); car.stop(t+dur+.02); mod.stop(t+dur+.02);
+  }
+  let noiseBuf=null;
+  function noise(t,dur,vol,hp){
+    if(!noiseBuf){noiseBuf=ctx.createBuffer(1,ctx.sampleRate*.3,ctx.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+    const src=ctx.createBufferSource(), fl=ctx.createBiquadFilter(), g=ctx.createGain();
+    src.buffer=noiseBuf; fl.type='highpass'; fl.frequency.value=hp;
+    g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0008,t+dur);
+    src.connect(fl); fl.connect(g); g.connect(music); src.start(t); src.stop(t+dur+.02);
+  }
+  function kick(t){
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.frequency.setValueAtTime(130,t); o.frequency.exponentialRampToValueAtTime(40,t+.12);
+    g.gain.setValueAtTime(.6,t); g.gain.exponentialRampToValueAtTime(.001,t+.15);
+    o.connect(g); g.connect(music); o.start(t); o.stop(t+.16);
+  }
+  function playStep(sg,i,t){
+    const s16=60/sg.bpm/4, bar=Math.floor(i/16)%4, pos=i%16, root=sg.chords[bar];
+    const m=sg.mel[i%64];
+    if(m){let len=1;while(len<4&&!sg.mel[(i+len)%64])len++; fm(mtof(m),t,len*s16*.95,.13,music,1,1.6)}     /* brassy lead */
+    if(sg.bass.includes(pos)){const oct=sg.oct&&pos%4===2?12:0; fm(mtof(root-12+oct),t,s16*(sg.oct?1.8:3.5),.32,music,.5,1.2)}  /* round FM bass */
+    if(sg.pad&&pos===0){[0,sg.third[bar],7].forEach(n=>fm(mtof(root+12+n),t,s16*15,.04,music,2,.6,'sine',false))}  /* soft organ pad */
+    if(sg.arp.includes(pos)){const n=[0,sg.third[bar],7,12][(pos/4)%4]; fm(mtof(root+24+n),t,s16*3,.05,music,3.5,1.2)}   /* bell arpeggio */
+    if(sg.hat.includes(pos)) noise(t,.04,.1,7000);
+    if(sg.kick.includes(pos)) kick(t);
+    if(sg.snare.includes(pos)) noise(t,.12,.22,1800);
+  }
+  function tick(){
+    if(!song) return;
+    while(next<ctx.currentTime+.12){ playStep(SONGS[song],step,next); next+=60/SONGS[song].bpm/4; step=(step+1)%64; }
+  }
+  function play(name,delay=0){
+    init(); if(!ctx) return;
+    if(song===name) return;
+    song=name; step=0; next=ctx.currentTime+.06+delay;
+    if(!timer) timer=setInterval(tick,25);
+    if(on&&ctx.state==='suspended') ctx.resume();
+  }
+  function notes(seq,vol=.2,gap=.08,dur=.2,ratio=3.5,index=1.5){
+    if(!ctx||!on) return; const t=ctx.currentTime+.01;
+    seq.forEach((m,k)=>{ (Array.isArray(m)?m:[m]).forEach(x=>fm(mtof(x),t+k*gap,Array.isArray(m)?dur*2.5:dur,Array.isArray(m)?vol*.6:vol,sfxBus,ratio,index)) });
+  }
+  const sfx={
+    flip:{C:()=>notes([79],.12),R:()=>notes([79,86],.14),E:()=>notes([79,84,91],.16,.07),L:()=>notes([76,79,84,88,91,96],.22,.06,.3)},
+    win:()=>notes([67,72,76,79,[72,76,79,84]],.2,.11,.22,1,1.8),
+    lose:()=>notes([64,60,57,52],.24,.2,.32,1,1),
+    click:()=>notes([91],.08,0,.05),
+    gate:()=>{ if(!ctx||!on) return; const t=ctx.currentTime+.01; fm(55,t,.9,.5,sfxBus,.5,3); fm(41,t+.05,1.1,.4,sfxBus,.5,2); },
+    harp:(at=0)=>{ if(!ctx||!on) return; const t=ctx.currentTime+.01+at; [57,60,64,69,72,76].forEach((m,k)=>fm(mtof(m),t+k*.07,1.2,.12,sfxBus,3.5,1.2)); }
+  };
+  function setOn(v){
+    on=v; try{localStorage.setItem('clearout-sound',v?'on':'off')}catch(e){}
+    if(ctx){ v?ctx.resume():ctx.suspend() }
+  }
+  document.addEventListener('visibilitychange',()=>{ if(!ctx) return; if(document.hidden) ctx.suspend(); else if(on) ctx.resume(); });
+  function unlock(){
+    init(); if(!ctx) return Promise.resolve();
+    try{ const b=ctx.createBuffer(1,1,22050), src=ctx.createBufferSource(); src.buffer=b; src.connect(ctx.destination); src.start(0); }catch(e){}
+    if(ctx.state==='running') return Promise.resolve();
+    const r=ctx.resume().catch(()=>{});
+    return Promise.race([r,new Promise(res=>setTimeout(res,300))]);
+  }
+  return {play,sfx,setOn,isOn:()=>on,init,unlock,current:()=>song};
+})();
+/* ENGINE:BEGIN — InkQuest auto-battle engine, shared by Clock Out, Clear Out and Cash Out.
+   Source of truth: engine/engine.js. Edit it there, then run build.py; never edit this block inside a game file.
+
+   A fight is a list of party units against a list of foes (Clock Out: one foe; Clear Out / Cash Out: 1–4).
+   The engine knows nothing about any one game. Each game passes:
+     • rules  — plug-ins that hook into fixed points of a round (crew skills, combos, sticks/scrolls/orders, matchups)
+     • text   — functions that return [zh, en] log lines for the built-in foe abilities
+   Foes carry ABILITIES with settings, e.g. {ramp:{pct:.06}, sweep:{every:2}, enrage:{below:.5,add:.1}}.
+   A boss is just a foe with several abilities, so every boss can fight differently.
+   Hook phases, in the order a fight runs them:
+     prep        silent setup (team % bonuses, stat changes)
+     intro       opening log lines and opening effects
+     roundStart  once per round, before anyone attacks
+     preAttack   per attacker; return true to skip this attack (e.g. a dodge)
+     attackMod   per attacker; change st.a (damage) / st.nz,st.ne (log notes); return false to skip the attack
+     hitMod      per attacker; change st.hits (multi-hits)
+     finalMod    per attacker; last multipliers (matchups, trait bonuses)
+     afterParty  once per round, after the party has attacked
+     foeSkip     per foe; return true and the foe loses its turn (first rule that returns true wins)
+     hurt        per hit on a party member; return {t,d} to change it, or null to cancel it
+     afterHurt   per hit, after damage lands
+     down        when a party member drops to 0 HP; return true if a rule handled it (e.g. a revive)
+   Each hook is {o: order, fn}. Hooks run in ascending order inside a phase, so a game controls
+   exactly where its rules sit next to the built-in foe abilities (their orders are listed in ABILITIES).
+   All randomness goes through ctx.rng, so a seeded rng replays a fight exactly. */
+const Engine=(()=>{
+  const PHASES=['prep','intro','roundStart','preAttack','attackMod','hitMod','finalMod','afterParty','foeSkip','hurt','afterHurt','down'];
+
+  /* ---- pack budget: a pack of n foes shares this much of the single-foe HP and attack (Clear Out sim, Oct 4) ---- */
+  const PACK_BUDGET={hp:[0,1.00,1.15,1.30,1.45],atk:[0,1.00,1.26,1.36,1.41]};
+  /* share of the pack budget each role takes */
+  const ROLES={
+    plain:{hpW:1.0,atkW:1.0}, boss:{hpW:3.0,atkW:2.0}, minion:{hpW:.5,atkW:.6},
+    brute:{hpW:1.4,atkW:.8}, striker:{hpW:.7,atkW:1.4},
+    healer:{hpW:.9,atkW:.4,heal:.08},          /* heals the most-hurt packmate 8% of its max HP on its turn */
+    shaman:{hpW:.9,atkW:.6,partyAtkDown:.10}   /* party attack −10% while it stands */
+  };
+  /* split a single-foe budget {hp,atk} among foe defs that carry a role */
+  function makePack(defs,base,budget=PACK_BUDGET){
+    const n=defs.length, totHp=base.hp*budget.hp[n], totAtk=base.atk*budget.atk[n];
+    const R=d=>ROLES[d.role||'plain'];
+    const sh=defs.reduce((s,d)=>s+R(d).hpW,0), sa=defs.reduce((s,d)=>s+R(d).atkW,0);
+    return defs.map(d=>({...R(d),...d,hp:Math.round(totHp*R(d).hpW/sh),atk:Math.round(totAtk*R(d).atkW/sa)}));
+  }
+
+  /* ---- unit traits for packs (Clear Out classes, Cash Out weight classes) ---- */
+  const TRAIT={area:.65,splash:.05,assassin:1.10,sniper:1.10,taunt:3};
+
+  /* ---- built-in foe abilities. A foe def lists them in def.abilities, each with its own settings ----
+     Hook-based abilities (they plug into the round like rules):
+       ramp      attack grows every round from round 2: {pct: share of base attack} or {flat: n} (default flat 3)
+       disable   every N rounds one party member can't act: {every: 2}
+       evasive   attacks on this foe miss: {chance: .25}; units with noMiss ignore it
+       enrage    once, when HP falls below a share of max: {below: .5, add: n} (add < 1 = share of base attack, else flat; default 15)
+       lifesteal heals itself for a share of the damage it deals: {pct: 1}
+     Turn-shape abilities (read by the foe turn below):
+       sweep        every N rounds hits the whole party instead of one target: {every: 3, pct: .6}
+       multiAttack  attacks this many times each turn: {hits: 2}
+       multiStrike  chance to attack extra times this turn: {chance: .3, hits: 2}
+       focusWeakest always attacks the party member with the lowest HP
+     Passive:
+       steady       percent-based effects work at a share of their strength: {factor: .4}; rules read it with Engine.resist(f) */
+  const ABILITIES={
+    ramp:{roundStart:{o:10,fn:(c,f,a)=>{ if(c.r>1){ f.atk+=a.pct?Math.round(f.def.atk*a.pct):(a.flat!=null?a.flat:3); c.snap(()=>c.text.ramp(f),'bad'); } }}},
+    disable:{roundStart:{o:50,fn:(c,f,a)=>{ if(c.r%(a.every||2)===0){ const al=c.liveParty(); if(al.length){ const s=c.pick(al); c.stunned.add(s); c.snap(()=>c.text.disable(f,s),'bad'); } } }}},
+    evasive:{preAttack:{o:10,fn:(c,u,f,a)=>{ if(!u.noMiss&&c.rng()<(a.chance!=null?a.chance:.25)){ c.snap(()=>c.text.evasive(f,u),'sys'); return true; } }}},
+    enrage:{afterParty:{o:10,fn:(c,f,a)=>{ if(!f.enraged&&f.hp>0&&f.hp<f.max*(a.below!=null?a.below:.5)){ f.enraged=true; const g=a.add; f.atk+=g<1?Math.round(f.def.atk*g):(g||15); c.snap(()=>c.text.enrage(f),'bad'); } }}},
+    lifesteal:{afterHurt:{o:10,fn:(c,t,d,f,a)=>{ if(f) f.hp=Math.min(f.max,f.hp+Math.round(d*(a.pct!=null?a.pct:1))); }}}
+  };
+  const abil=(f,name)=>f&&f.abil[name];
+  /* how strongly percent effects work on this foe (1 = full, steady foes less) */
+  const resist=f=>{ const s=abil(f,'steady'); return s?(s.factor!=null?s.factor:.4):1; };
+
+  /* hook lists are sorted once per rule set and set of foe abilities, then reused (auto-team runs thousands of fights) */
+  const hookCache=new WeakMap();
+  function hooksFor(rules,foes){
+    const names=[...new Set(foes.flatMap(f=>Object.keys(f.abil)))].filter(n=>ABILITIES[n]).sort();
+    const key=names.join('|');
+    let byRules=hookCache.get(rules); if(!byRules){byRules=new Map();hookCache.set(rules,byRules)}
+    if(byRules.has(key)) return byRules.get(key);
+    const H={}; PHASES.forEach(p=>H[p]=[]);
+    rules.forEach(rule=>{ for(const p in rule) if(H[p]) H[p].push({o:rule[p].o,fn:rule[p].fn}); });
+    names.forEach(n=>{ const T=ABILITIES[n]; for(const p in T) H[p].push({o:T[p].o,fn:T[p].fn,ab:n}); });
+    PHASES.forEach(p=>H[p].sort((a,b)=>a.o-b.o));
+    byRules.set(key,H); return H;
+  }
+  function fight(cfg){
+    const rng=cfg.rng||Math.random, quiet=!!cfg.quiet, text=cfg.text;
+    const party=cfg.party.map(u=>({...u,cur:u.hp,max:u.hp,revived:false}));
+    const foes=cfg.foes.map((d,i)=>({def:d,abil:d.abilities||{},ix:i,hp:d.hp,max:d.hp,atk:d.atk,enraged:false,role:d.role||'plain',heal:d.heal||ROLES[d.role||'plain'].heal||0,partyAtkDown:d.partyAtkDown||ROLES[d.role||'plain'].partyAtkDown||0}));
+    const frames=[];
+    const c={rng,party,foes,frames,quiet,text,cfg,r:0,rmax:cfg.rounds||15,teamPct:0,teamAtk:0,roundPct:0,state:{},stunned:new Set(),win:false};
+    /* a frame records what the screen shows after each log line.
+       snap takes a function that builds the [zh, en] line, so quiet runs (auto-team) never build text */
+    /* hit: 'm' = a foe was hit, a number = that party member was hit; fi = which foe (index, -1 = all foes) */
+    c.snap=quiet?()=>{}:(mk,cls,hit,fi)=>{const f0=foes[0];frames.push({text:mk(),cls,hit,fi,mon:{hp:f0.hp,max:f0.max,atk:f0.atk,rage:f0.enraged},foes:foes.map(f=>({hp:f.hp,max:f.max,atk:f.atk,enraged:f.enraged})),u:party.map(u=>u.cur)})};
+    c.pick=a=>a[Math.floor(rng()*a.length)];
+    c.liveParty=()=>party.filter(u=>u.cur>0);
+    c.liveFoes=()=>foes.filter(f=>f.hp>0);
+    const anyFoe=()=>{for(const f of foes)if(f.hp>0)return true;return false};
+    const anyParty=()=>{for(const u of party)if(u.cur>0)return true;return false};
+    c.has=id=>party.some(u=>u.id===id&&u.cur>0);
+    c.lowestFoe=()=>{let b=null;for(const f of foes)if(f.hp>0&&(!b||f.hp<b.hp))b=f;return b};
+    /* default targeting: lowest-HP foe first (one foe: always that foe) */
+    c.targetFor=u=>c.lowestFoe();
+
+    const H=hooksFor(cfg.rules||[],foes);
+    /* ability hooks run once per foe that has the ability (and get its settings); rule hooks run once.
+       Fixed-arity dispatch (no per-call arrays): e0/e1/e2 = hooks that take 0/1/2 arguments after ctx.
+       tf = the foe this call is about; undefined = run an ability once for every live foe that has it */
+    const e0=(h,tf)=>{ if(!h.ab) return h.fn(c);
+      if(tf!==undefined){ const a=abil(tf,h.ab); return a?h.fn(c,tf,a):undefined; }
+      let out; for(const f of foes){ const a=f.hp>0&&f.abil[h.ab]; if(a){ const v=h.fn(c,f,a); if(v!==undefined) out=v; } } return out; };
+    const e1=(h,x,tf)=>{ if(!h.ab) return h.fn(c,x); const a=abil(tf,h.ab); return a?h.fn(c,x,tf,a):undefined; };
+    const e2=(h,x,y,tf)=>{ if(!h.ab) return h.fn(c,x,y); const a=abil(tf,h.ab); return a?h.fn(c,x,y,tf,a):undefined; };
+    c.run=phase=>{ for(const h of H[phase]) e0(h); };
+
+    /* one hit on a party member, from foe f (or null for rule damage) */
+    c.hurt=(t,d,f)=>{
+      let hit={t,d};
+      for(const h of H.hurt){ hit=h.ab?hit:h.fn(c,hit.t,hit.d,f); if(!hit) return; }
+      hit.t.cur-=hit.d;
+      c.snap(()=>text.hit(f,hit.t,hit.d),'bad',party.indexOf(hit.t));
+      for(const h of H.afterHurt) e2(h,hit.t,hit.d,f);
+      if(hit.t.cur<=0){
+        let saved=false; for(const h of H.down){ if(h.fn(c,hit.t,f)){saved=true;break} }
+        if(!saved) c.snap(()=>text.down(hit.t),'bad');
+      }
+    };
+    /* who a foe hits: Taunt units are TRAIT.taunt times as likely; with no Taunt this is a plain pick */
+    c.foeTarget=f=>{
+      const al=c.liveParty(); if(!al.length) return null;
+      if(f.abil.focusWeakest) return al.reduce((a,b)=>b.cur<a.cur?b:a);
+      if(!al.some(u=>u.taunt)) return c.pick(al);
+      let tot=0; for(const u of al) tot+=u.taunt?TRAIT.taunt:1;
+      let x=rng()*tot; for(const u of al){ x-=u.taunt?TRAIT.taunt:1; if(x<=0) return u; } return al[al.length-1];
+    };
+    /* deal damage from one attacker. Area: every foe at 65% (u.areaPct overrides; weak against a lone boss).
+       Cleave: overkill plus a 5% splash go to the next-lowest foe */
+    c.deal=(u,tgt,dmg)=>{
+      if(u.trait==='area'){ const d=Math.round(dmg*(u.areaPct||TRAIT.area)); for(const f of c.liveFoes()) f.hp-=d; return d; }
+      tgt.hp-=dmg;
+      if(u.trait==='cleave'){ const over=tgt.hp<0?-tgt.hp:0; let next=null; for(const f of foes) if(f!==tgt&&f.hp>0&&(!next||f.hp<next.hp)) next=f; if(next) next.hp-=Math.round(dmg*TRAIT.splash)+over; }
+      return dmg;
+    };
+
+    c.run('prep'); c.run('intro');
+    for(let r=1;r<=c.rmax;r++){
+      c.r=r; c.roundPct=0; c.stunned.clear();
+      c.run('roundStart');
+      /* party turn */
+      let shaman=0; for(const f of foes) if(f.hp>0&&f.partyAtkDown) shaman+=f.partyAtkDown;
+      for(const u of party){
+        if(u.cur<=0||!anyFoe()||c.stunned.has(u)) continue;
+        const tgt=c.targetFor(u);
+        let skip=false; for(const h of H.preAttack){ if(e1(h,u,tgt)){skip=true;break} } if(skip) continue;
+        const st={a:Math.round((u.atk+c.teamAtk)*(1+c.teamPct+c.roundPct-shaman)),nz:'',ne:'',hits:1,tgt};
+        for(const h of H.attackMod){ if(e2(h,u,st,tgt)===false){skip=true;break} } if(skip) continue;
+        for(const h of H.hitMod) e2(h,u,st,tgt);
+        for(const h of H.finalMod) e2(h,u,st,tgt);
+        /* pack traits (no Clock Out crew has one) */
+        if(u.trait==='assassin'&&st.tgt.hp<st.tgt.max/2) st.a=Math.round(st.a*TRAIT.assassin);
+        if(u.trait==='sniper'&&st.tgt.hp>st.tgt.max/2) st.a=Math.round(st.a*TRAIT.sniper);
+        st.dmg=st.a*st.hits;
+        const before=text.foeDown?foes.map(f=>f.hp>0):null;
+        const dmg=c.deal(u,st.tgt,st.dmg);
+        c.snap(()=>text.attack(u,st.tgt,dmg,st.nz,st.ne),'','m',u.trait==='area'?-1:st.tgt.ix);
+        /* packs: say when a foe falls (only if the game gives a line for it) */
+        if(before) foes.forEach((f,i)=>{ if(before[i]&&f.hp<=0) c.snap(()=>text.foeDown(f),'good','m',i); });
+      }
+      if(!anyFoe()){ c.win=true; break; }
+      c.run('afterParty');
+      /* foe turn */
+      for(const f of foes){
+        if(f.hp<=0) continue;
+        let frozen=false; for(const h of H.foeSkip){ if(h.ab?(f.abil[h.ab]&&h.fn(c,f,f.abil[h.ab])):h.fn(c,f)){frozen=true;break} }
+        if(f.heal&&!frozen){ const al=c.liveFoes(); const t=al.reduce((a,b)=>b.hp/b.max<a.hp/a.max?b:a); t.hp=Math.min(t.max,t.hp+Math.round(t.max*f.heal)); if(text.foeHeal) c.snap(()=>text.foeHeal(f,t),'bad'); }
+        const sw=f.abil.sweep, ma=f.abil.multiAttack, ms=f.abil.multiStrike;
+        if(frozen){}
+        else if(sw&&r%(sw.every||3)===0){
+          const d=Math.round(f.atk*(sw.pct!=null?sw.pct:.6));
+          c.snap(()=>text.sweep(f),'bad');
+          c.liveParty().forEach(u=>c.hurt(u,d,f));
+        } else {
+          let strikes=ma?(ma.hits||2):1;
+          if(ms&&rng()<(ms.chance!=null?ms.chance:.3)){ strikes=Math.max(strikes,ms.hits||2); c.snap(()=>text.multiStrike(f),'bad'); }
+          for(let s=0;s<strikes;s++){ const t=c.foeTarget(f); if(!t) break; c.hurt(t,f.atk,f); }
+        }
+        if(!anyParty()) break;
+      }
+      if(!anyParty()) break;
+      if(r===c.rmax) c.snap(()=>text.timeout(),'bad');
+    }
+    return {units:party,foes,frames,win:c.win,m0:foes[0].def};
+  }
+
+  return {fight,makePack,resist,PACK_BUDGET,ROLES,TRAIT,ABILITIES,PHASES};
+})();
+/* ENGINE:END */
+/* ===== combat.js ===== */
+/* Clear Out · combat rules on the shared engine.
+   Classes give the trait (Taunt, Cleave, Area, Finisher, Opener) and the role; each card's `kit` gives its numbers.
+   Every hit rolls 90–110% so fights are never all-or-nothing (a lesson from the engine pack test). */
+const fName=f=>[N(f.def,'name','zh'),N(f.def,'name','en')];
+const uName=u=>[shortName(u.h,'zh'),shortName(u.h,'en')];
+const uIcon=u=>CLASSES[u.h.cls].icon;
+const CL_TEXT={
+  attack:(u,f,dmg,nz,ne)=>{ const [z,e]=uName(u);
+    if(u.trait==='area') return [`${uIcon(u)} ${z} 的範圍攻擊打中所有怪物，每隻 ${dmg} 傷害${nz}`,`${uIcon(u)} ${e}’s area attack hits every monster for ${dmg}${ne}`];
+    const [fz,fe]=fName(f); return [`${uIcon(u)} ${z} 攻擊${fz}，造成 ${dmg} 傷害${nz}`,`${uIcon(u)} ${e} hits the ${fe} for ${dmg}${ne}`]; },
+  hit:(f,t,d)=>{ const [fz,fe]=fName(f),[z,e]=uName(t); return [`💢 ${fz}攻擊${z}，造成 ${d} 傷害。`,`💢 The ${fe} hits ${e} for ${d}.`]; },
+  down:t=>{ const [z,e]=uName(t); return [`💤 ${z} 倒下了……`,`💤 ${e} is down…`]; },
+  foeDown:f=>{ const [fz,fe]=fName(f); return [`☠️ ${fz}倒下了！`,`☠️ The ${fe} falls!`]; },
+  foeHeal:(f,t)=>{ const [fz,fe]=fName(f),[tz,te]=fName(t); return [`🩹 ${fz}幫${tz}補血。`,`🩹 The ${fe} patches up the ${te}.`]; },
+  timeout:()=>['⌛ 火把燒完了，怪物還站著。大家摸黑撤回公會……','⌛ The torches burn out with monsters still standing. Everyone feels their way back to the guild…'],
+  ramp:f=>{ const [fz,fe]=fName(f); return f.def.rampQ||[`🔥 ${fz}越打越火大，攻擊力變成 ${f.atk}。`,`🔥 The ${fe} is getting worked up. Attack is now ${f.atk}.`]; },
+  disable:(f,s)=>{ const [fz,fe]=fName(f),[z,e]=uName(s); return [`🌀 ${fz}纏住了${z}，這回合無法行動。`,`🌀 The ${fe} pins down ${e}. They can’t act this round.`]; },
+  evasive:(f,u)=>{ const [fz,fe]=fName(f),[z,e]=uName(u); return [`${uIcon(u)} ${z} 的攻擊被${fz}躲開了。`,`${uIcon(u)} ${e} swings, but the ${fe} dodges.`]; },
+  enrage:f=>{ const [fz,fe]=fName(f); return f.def.rageQ||[`😠 ${fz}暴怒了！攻擊力大增！`,`😠 The ${fe} is furious! Attack way up!`]; },
+  sweep:f=>{ const [fz,fe]=fName(f); return f.def.sweepQ||[`💥 ${fz}橫掃全隊！`,`💥 The ${fe} sweeps the whole party!`]; },
+  multiStrike:f=>{ const [fz,fe]=fName(f); return f.def.multiQ||[`💢 ${fz}連續攻擊！`,`💢 The ${fe} attacks again!`]; }
+};
+const clHeal=(c,u,p)=>{ const g=Math.round(u.max*p); u.cur=Math.min(u.max,u.cur+g); return g; };
+const clSyn=(c,id)=>c.state.syn.some(x=>x.id===id);
+const CL_RULES=[
+  /* ---- before the fight ---- */
+  {prep:{o:10,fn:c=>{ c.state.syn=activeSynergies(c.party.map(u=>u.id));
+    if(clSyn(c,'classic')) c.teamPct+=.12;
+    if(clSyn(c,'encore')) c.party.forEach(u=>{ if(u.trait==='area') u.areaPct=(u.areaPct||Engine.TRAIT.area)+.2; }); }}},
+  {intro:{o:10,fn:c=>{ const e=c.cfg.enc, enc=encAt(e);
+    c.snap(()=>[`— 第 ${e} 場：${enc.name}（${c.foes.length} 隻）—`,`— Encounter ${e}: ${enc.en.name} (${c.foes.length} ${c.foes.length>1?'monsters':'monster'}) —`],'sys'); }}},
+  {intro:{o:20,fn:c=>{ c.state.syn.forEach(x=>c.snap(()=>[`${x.e} 隊伍羈絆：${x.name}${/[！!]$/.test(x.name)?'':'！'}${x.desc}`,`${x.e} Synergy: ${x.en.name}${/!$/.test(x.en.name)?'':'!'} ${x.en.desc}`],'gold')); }}},
+  {intro:{o:30,fn:c=>{ if(c.teamPct) c.snap(()=>[`全隊士氣高昂，攻擊力 +${Math.round(c.teamPct*100)}%。`,`The party is fired up! Attack +${Math.round(c.teamPct*100)}%.`],'good'); }}},
+  /* ---- every round ---- */
+  {roundStart:{o:0,fn:c=>{ if(c.r===MAX_ROUNDS+1) c.snap(()=>['⏰ 魔王戰延長！最多 20 回合。','⏰ Boss fight! Up to 20 rounds.'],'gold');
+    c.snap(()=>[`［第 ${c.r} 回合］`,`[Round ${c.r}]`],'sys'); }}},
+  /* bards: party attack climbs every round, each bard up to their own cap */
+  {roundStart:{o:30,fn:c=>{ c.party.forEach(u=>{ const s=u.kit.song; if(!s||u.cur<=0) return; u.songB=u.songB||0;
+    if(u.songB<s.cap-1e-9){ const add=Math.min(s.step,s.cap-u.songB); u.songB+=add; c.teamPct+=add; const [z,e]=uName(u);
+      const pz=`全隊攻擊 +${Math.round(add*100)}%（累計 +${Math.round(u.songB*100)}%）。`, pe=`Party attack +${Math.round(add*100)}% (total +${Math.round(u.songB*100)}%).`;
+      c.snap(()=>u.id==='parrot'?[`🦜 鸚鵡越叫越大聲！${pz}`,`🦜 The Parrot squawks louder! ${pe}`]:[`🎵 ${z} 越彈越起勁！${pz}`,`🎵 ${e} plays faster! ${pe}`],'good'); } }); }}},
+  /* paladins: a little healing for everyone */
+  {roundStart:{o:40,fn:c=>{ c.party.forEach(u=>{ const k=u.kit.partyHeal; if(!k||u.cur<=0) return; c.party.forEach(t=>{ if(t.cur>0) clHeal(c,t,k.pct); }); const [z,e]=uName(u);
+    c.snap(()=>[`✝️ ${z} 祝福全隊，回復 ${Math.round(k.pct*100)}% 生命。`,`✝️ ${e} blesses the party. Everyone heals ${Math.round(k.pct*100)}% HP.`],'good'); }); }}},
+  /* clerics: a big heal on the most hurt */
+  {roundStart:{o:45,fn:c=>{ c.party.forEach(u=>{ const k=u.kit.heal; if(!k||u.cur<=0) return; const al=c.liveParty(); const t=al.reduce((a,b)=>b.cur/b.max<a.cur/a.max?b:a);
+    if(t.cur>=t.max) return; const g=clHeal(c,t,k.pct); const [z,e]=uName(u),[tz,te]=uName(t);
+    c.snap(()=>[`✚ ${z} 治療${tz}，回復 ${g}。`,`✚ ${e} heals ${te} for ${g}.`],'good',c.party.indexOf(t)); }); }}},
+  /* ---- each attack ---- */
+  {attackMod:{o:10,fn:(c,u,st)=>{ const k=u.kit.crit; if(!k) return;
+    if(k.every?c.r%k.every===0:c.rng()<k.chance){ st.a=Math.round(st.a*k.mult); const q=u.h.critQ; st.nz=`（${q[0]}）`; st.ne=` (${q[1]})`; } }},
+   hitMod:{o:10,fn:(c,u,st)=>{ const k=u.kit.double; if(k&&c.rng()<k.chance){ st.hits=2; const q=u.h.critQ; st.nz=`（${q[0]}）`; st.ne=` (${q[1]})`; } }},
+   finalMod:{o:50,fn:(c,u,st)=>{ st.a=Math.round(st.a*(.9+.2*c.rng())); }}},
+  /* ---- hits on the party ---- */
+  {hurt:{o:5,fn:(c,t,d)=>({t,d:Math.max(1,Math.round(d*(.9+.2*c.rng())))})}},
+  {hurt:{o:10,fn:(c,t,d)=>{ let cut=0; c.party.forEach(u=>{ if(u.cur>0&&u.kit.soothe) cut=Math.max(cut,u.kit.soothe.cut); });
+    if(t.kit.guard) d=d*(1-t.kit.guard.cut);
+    if(t.taunt&&clSyn(c,'oldsoldiers')) d=d*.8;
+    return {t,d:Math.max(1,Math.round(d*(1-cut)))}; }}},
+  /* ---- monster turns: vines and confusing parrots ---- */
+  {foeSkip:{o:10,fn:(c,f)=>{ for(const u of c.party){ const k=u.kit.confuse; if(!k||u.cur<=0) continue;
+    if(c.rng()<k.chance){ const [fz,fe]=fName(f);
+      c.snap(()=>u.id==='parrot'?[`🦜 鸚鵡對${fz}連說了十國語言。牠聽不懂，愣住了。`,`🦜 The Parrot talks at the ${fe} in ten languages. It just stands there, confused.`]
+        :[`🌿 藤蔓纏住了${fz}的腳。這回合牠動不了。`,`🌿 Vines wrap around the ${fe}’s legs. It can’t attack this round.`],'good','m',f.ix); return true; } } }}}
+];
+/* which synergies a party lights up; each requirement needs a different member */
+function activeSynergies(ids){
+  return SYNERGIES.filter(sy=>{ const used=new Set();
+    return sy.need.every(req=>{ const m=ids.find(id=>!used.has(id)&&(req.startsWith('class:')?H[id].cls===req.slice(6):id===req)); if(!m) return false; used.add(m); return true; }); });
+}
+/* one Clear Out fight */
+function simulate(ids,quiet,encArg){
+  const e=encArg||S.enc, enc=encAt(e);
+  const party=(ids?ids.map(heroStats):team());
+  return Engine.fight({party,foes:enc.pack,rounds:enc.boss?BOSS_ROUNDS:MAX_ROUNDS,enc:e,quiet,rules:CL_RULES,text:CL_TEXT});
+}
+/* ===== game.js ===== */
+/* Clear Out · the game: state, card draws, party, battles, screens.
+   Structure and lessons carried over from Clock Out (save migration, iOS audio, one-screen phone layout,
+   bilingual log, modal focus without scrolling, stall-style delays against double taps). */
+const $=id=>document.getElementById(id);
+LEVELS.forEach(l=>l.built=buildEncounters(l.encounters));
+const MAX_ENC=LEVELS.length*10;
+const levelOf=e=>Math.min(LEVELS.length,Math.ceil(Math.min(e,MAX_ENC)/10));
+const levelAt=e=>LEVELS[levelOf(e)-1];
+const encAt=e=>levelAt(e).built[(Math.min(e,MAX_ENC)-1)%10];
+const packLevel=pack=>{const l=LEVELS.find(x=>x.pack===pack);return l?l.id:1};
+
+/* ---------- state ---------- */
+const KEY='clearout-v1';
+function fresh(){return {gems:10,enc:1,roster:{[STARTER]:1},bAtk:0,bHp:0,seen:{},pay:0,autoWins:0,teamMode:'auto',team:[],xp:{},ach:{},flags:{},autoAdv:false,pity:0,pulls:0,wins:0,losses:0,done:false}}
+let S=fresh();
+try{const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(fresh(),JSON.parse(raw));}catch(e){}
+/* a save that beat the last level moves on when a new level ships */
+if(S.done&&S.enc<MAX_ENC){S.done=false;S.enc++;}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+let busy=false, fast=false;
+
+/* ---------- economy, levels, Guild Hall ---------- */
+const floorReward=e=>Math.round(ECON.win0+ECON.winF*e)+(e%5===0?ECON.boss:0);
+const lossGems=e=>Math.round(ECON.loss0+ECON.lossF*e);
+const lvOf=id=>Math.min(LV_MAX,Math.floor(Math.sqrt((S.xp[id]||0)/40))+1);
+const xpFor=lv=>40*(lv-1)*(lv-1);
+const xpGain=(e,win)=>win?10+2*e:5+e;
+const dupeXP=()=>40+6*S.enc;
+function grantXP(ids,win){const ups=[];ids.forEach(id=>{const b=lvOf(id);S.xp[id]=(S.xp[id]||0)+xpGain(S.enc,win);const a=lvOf(id);if(a>b)ups.push({id,lv:a})});return ups}
+/* Guild Hall upgrades: every member +10% total stats; cheap early, steeper from the 6th (Clock Out's tuned curve) */
+const hallCost=()=>{const n=S.pay||0;return 10+6*n+(n>=5?4*(n-4)*(n-4):0)};
+function upgradeHall(){
+  const c=hallCost(); if(S.gems<c) return false;
+  S.gems-=c; S.pay=(S.pay||0)+1;
+  log([`🏰 公會大廳擴建完成！全體隊員總數值 +${Math.round(HALL_PCT*100)}%（累計 +${Math.round(HALL_PCT*100*S.pay)}%）。`,`🏰 Guild Hall upgraded! Every member gets +${Math.round(HALL_PCT*100)}% total stats (+${Math.round(HALL_PCT*100*S.pay)}% in all).`],'gold');
+  return true;
+}
+
+/* ---------- party ---------- */
+function heroStats(id){
+  const h=H[id], st=S.roster[id], lv=lvOf(id), m=(1+.25*(st-1))*(1+.025*(lv-1)), hall=1+HALL_PCT*(S.pay||0), c=CLASSES[h.cls];
+  return {id,h,stars:st,lv,hp:Math.round((h.hp*m+S.bHp)*hall),atk:Math.round((h.atk*m+S.bAtk)*hall),
+    taunt:!!c.taunt,trait:c.trait||null,kit:h.kit||{},areaPct:h.kit&&h.kit.area?h.kit.area.pct:undefined};
+}
+const power=t=>t.atk*3+t.hp;
+const byPower=ids=>ids.map(heroStats).sort((a,b)=>power(b)-power(a));
+let smartCache={key:'',ids:null};
+const smartKey=()=>[S.enc,JSON.stringify(S.roster),S.bAtk,S.bHp,Object.values(S.xp).reduce((a,b)=>a+b,0),S.pay||0].join('|');
+/* the pool auto-team tests: the best 2 of each role (front, damage, support), then the strongest others, up to 8.
+   Clock Out's top-8-by-power would skip healers and bards, who have low stats but win fights. */
+function autoPool(){
+  const all=byPower(Object.keys(S.roster)), pool=[];
+  ['front','damage','support'].forEach(role=>all.filter(t=>CLASSES[t.h.cls].role===role).slice(0,2).forEach(t=>pool.push(t.id)));
+  all.forEach(t=>{ if(pool.length<8&&!pool.includes(t.id)) pool.push(t.id); });
+  return pool;
+}
+function smartTeam(){
+  const key=smartKey(); if(smartCache.key===key) return smartCache.ids;
+  const pool=autoPool();
+  let best=byPower(pool).slice(0,4).map(t=>t.id);
+  if(Object.keys(S.roster).length>4){
+    const subs=[], seen=new Set(), e=S.enc;
+    const add=t=>{const k=t.slice().sort().join();if(!seen.has(k)){seen.add(k);subs.push(t)}};
+    const choose=(list,n,pre)=>{(function rec(st,a){if(a.length===n){add([...pre,...a]);return}for(let i=st;i<list.length;i++){a.push(list[i]);rec(i+1,a);a.pop()}})(0,[])};
+    choose(pool,4,[]);
+    /* every synergy you can field gets tested too, filled with the strongest others */
+    synergySeeds().forEach(core=>choose(byPower(Object.keys(S.roster).filter(id=>!core.includes(id))).slice(0,6).map(t=>t.id),4-core.length,core));
+    const scored=subs.map(sub=>{let w=0;for(let k=0;k<6;k++)if(simulate(sub,true,e).win)w++;return {sub,w,p:teamPower(sub).power}});
+    const top=Math.max(...scored.map(x=>x.w));
+    const finals=scored.filter(x=>x.w>=top-1).sort((a,b)=>b.w-a.w||b.p-a.p).slice(0,12);
+    finals.forEach(x=>{for(let k=0;k<24;k++)if(simulate(x.sub,true,e).win)x.w++});
+    finals.sort((a,b)=>b.w-a.w||b.p-a.p);
+    best=finals[0].sub;
+  }
+  smartCache={key,ids:best}; return best;
+}
+/* for each synergy you own: the strongest owned members that satisfy it */
+function synergySeeds(){
+  const owned=byPower(Object.keys(S.roster)).map(t=>t.id), out=[];
+  SYNERGIES.forEach(sy=>{ const used=[];
+    const ok=sy.need.every(req=>{ const m=owned.find(id=>!used.includes(id)&&(req.startsWith('class:')?H[id].cls===req.slice(6):id===req)); if(!m) return false; used.push(m); return true; });
+    if(ok&&used.length<=4) out.push(used); });
+  return out;
+}
+function winRate(ids,n=40){let w=0;for(let k=0;k<n;k++)if(simulate(ids,true,S.enc).win)w++;return Math.round(w/n*100)}
+function team(){
+  if(S.teamMode!=='manual') return smartTeam().filter(id=>S.roster[id]).map(heroStats);
+  S.team=S.team.filter(id=>S.roster[id]).slice(0,4);
+  if(!S.team.length) S.team=byPower(Object.keys(S.roster)).slice(0,4).map(t=>t.id);
+  return S.team.map(heroStats);
+}
+/* rough strength: stats plus flat team-attack bonuses; healing and traits aren't counted */
+function teamPower(ids){
+  const st=ids.map(heroStats), syn=activeSynergies(ids).map(x=>x.id);
+  const pct=syn.includes('classic')?.12:0;
+  const atk=Math.round(st.reduce((a,t)=>a+t.atk,0)*(1+pct)), hp=st.reduce((a,t)=>a+t.hp,0);
+  return {atk,hp,power:atk*3+hp};
+}
+
+/* ---------- awards ---------- */
+function rewardText(a,l=LANG,reveal=false){
+  if(a.reward.gems) return `💎 ${a.reward.gems}`;
+  const h=H[a.reward.hero];
+  return reveal?tx(`隱藏隊員：${h.name}`,`Hidden crew: ${h.en.name}`,l):tx('隱藏隊員 ❔','Hidden crew ❔',l);
+}
+let toastQ=[], toastBusy=false;
+function toast(html){toastQ.push(html);if(!toastBusy)nextToast()}
+function nextToast(){const t=$('toast'); if(!toastQ.length){toastBusy=false;return} toastBusy=true; t.innerHTML=toastQ.shift(); t.classList.add('show'); setTimeout(()=>{t.classList.remove('show');setTimeout(nextToast,400)},2800)}
+function checkAch(){
+  let got=false;
+  ACH.forEach(a=>{
+    if(S.ach[a.id]||!a.test(S)) return;
+    S.ach[a.id]=1; got=true;
+    if(a.reward.gems) S.gems+=a.reward.gems;
+    if(a.reward.hero&&!S.roster[a.reward.hero]){S.roster[a.reward.hero]=1; if(S.teamMode==='manual'&&S.team.length<4) S.team.push(a.reward.hero);}
+    log([`🏆 成就解鎖：${a.name}！獎勵：${rewardText(a,'zh',true)}`,`🏆 Award: ${a.en.name}! Reward: ${rewardText(a,'en',true)}`],'gold');
+    toast(`<b>🏆 ${N(a,'name')}</b>${tx('獎勵：','Reward: ')}${rewardText(a,LANG,true)}`);
+    Sound.sfx.flip.L();
+  });
+  if(got) renderUI();
+}
+
+/* ---------- log (stored as [zh, en] so it can switch language) ---------- */
+const logLines=[];
+function log(text,cls=''){
+  const pair=Array.isArray(text)?text:[text,text];
+  logLines.push({pair,cls}); if(logLines.length>80) logLines.shift();
+  const p=document.createElement('p'); p.textContent=pair[LANG==='en'?1:0]; if(cls)p.className=cls;
+  $('log').appendChild(p); $('log').scrollTop=$('log').scrollHeight;
+  while($('log').children.length>80) $('log').firstChild.remove();
+}
+function redrawLog(){$('log').innerHTML='';logLines.forEach(({pair,cls})=>{const p=document.createElement('p');p.textContent=pair[LANG==='en'?1:0];if(cls)p.className=cls;$('log').appendChild(p)});$('log').scrollTop=$('log').scrollHeight}
+
+/* ---------- main screen ---------- */
+const kfmt=n=>n>=10000?Math.round(n/1000)+'k':n>=1000?(Math.round(n/100)/10)+'k':String(n);
+function renderCorridor(){
+  const base=(levelOf(S.enc)-1)*10;
+  $('corridor').setAttribute('aria-label',tx('地城進度','Dungeon progress'));
+  $('corridor').innerHTML=Array.from({length:10},(_,i)=>{const e=base+i+1;
+    return `<i class="${e<S.enc||S.done?'done':e===S.enc?'now':''}${encAt(e).boss?' boss':''}"></i>`}).join('');
+}
+function renderEncounter(){
+  const e=Math.min(S.enc,MAX_ENC), enc=encAt(e), lv=levelAt(e);
+  const k=(e-1)%10+1; $('encTag').textContent=tx(`${lv.name}・第 ${k} / 10 場${enc.boss?(k===10?'・魔王':'・頭目'):''}`,`${lv.en.name.toUpperCase()} · ${k}/10${enc.boss?(k===10?' · BOSS':' · MID-BOSS'):''}`);
+  $('encName').textContent=N(enc,'name');
+  $('encQ').textContent=N(enc,'q');
+}
+/* foes: the pack's live state (from a battle frame) or the encounter's starting numbers */
+function renderFoes(state,hitIx){
+  const pack=encAt(Math.min(S.enc,MAX_ENC)).pack;
+  $('foes').innerHTML=pack.map((d,i)=>{
+    const st=state?state[i]:{hp:d.hp,max:d.hp,atk:d.atk,enraged:false};
+    const pct=Math.max(0,st.hp/st.max*100), dead=st.hp<=0;
+    return `<div class="foe ${d.role==='boss'?'boss':''} ${dead?'dead':''} ${st.enraged?'mad':''}" data-f="${i}">${spriteImg(d.sp,40)}
+      <div class="fn">${N(d,'name')}</div><div class="bar"><span style="width:${pct}%"></span></div>
+      <div class="fh num">♥${kfmt(Math.max(0,st.hp))} ⚔${kfmt(st.atk)}</div></div>`;
+  }).join('');
+  if(hitIx!=null){ const els=hitIx===-1?[...document.querySelectorAll('.foe')]:[document.querySelector(`.foe[data-f="${hitIx}"]`)];
+    els.forEach(el=>{ if(!el) return; el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit'); }); }
+}
+function renderParty(units){
+  const t=units||team().map(x=>({...x,cur:x.hp,max:x.hp}));
+  const synIds=activeSynergies(t.map(u=>u.id)).flatMap(sy=>{const used=[];sy.need.forEach(req=>{const m=t.find(u=>!used.includes(u.id)&&(req.startsWith('class:')?u.h.cls===req.slice(6):u.id===req));if(m)used.push(m.id)});return used});
+  let html='';
+  for(let i=0;i<4;i++){
+    const u=t[i];
+    if(!u){html+=`<div class="hero empty">${Object.keys(S.roster).length>t.length?tx('空位<br>點這裡補人','Empty<br>Tap to add'):tx('空位<br>去抽卡！','Empty<br>Pull a card!')}</div>`;continue}
+    const pct=Math.max(0,u.cur/u.max*100);
+    html+=`<div class="hero r-${u.h.r} ${u.cur<=0?'dead':''}" data-i="${i}"><span class="lvtag">Lv${u.lv}</span><span class="cls" aria-hidden="true">${CLASSES[u.h.cls].icon}</span>
+      ${synIds.includes(u.id)?'<span class="syn" aria-hidden="true">✨</span>':''}${spriteImg(u.h.sp,32)}<div class="n">${shortName(u.h)}</div><div class="s">${'★'.repeat(u.stars)}</div>
+      <div class="bar hpb ${pct<35?'low':''}"><span style="width:${pct}%"></span></div>
+      <div class="a num"><i class="ic">⚔︎</i>${kfmt(u.atk)} <i class="ic">♥︎</i>${kfmt(Math.max(0,u.cur))}</div></div>`;
+  }
+  $('party').innerHTML=html;
+}
+function renderUI(){
+  const canUp=S.gems>=hallCost()&&Object.keys(S.roster).length>=2;
+  $('partyBtn').classList.toggle('can-up',canUp);
+  $('partyBtn').setAttribute('aria-label',canUp?tx('隊伍（可以擴建公會大廳）','Party (a Guild Hall upgrade is ready)'):tx('隊伍','Party'));
+  $('gems').textContent=S.gems;
+  renderCorridor();
+  if(!busy){renderEncounter(); renderFoes(); renderParty();}
+  $('pull1').disabled=busy||S.gems<1; $('pull10').disabled=busy||S.gems<10; $('go').disabled=busy||S.done;
+  $('goHint').textContent=busy?(fast?tx('快轉中…','Fast-forwarding…'):tx('戰鬥中…（點戰鬥紀錄可快轉）','Fighting… (tap the log to skip)'))
+    :S.done?tx('已通關','Cleared!'):tx(`挑戰 ${N(encAt(S.enc),'name')}`,`Take on the ${N(encAt(S.enc),'name')}`);
+  $('pity').textContent=tx(`${PITY_MAX-S.pity} 抽內必出傳說`,`Legendary in ${PITY_MAX-S.pity}`);
+  save();
+}
+
+/* ---------- card draws ---------- */
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
+function rollRarity(min='C'){
+  S.pity++; S.pulls++;
+  if(S.pity>=PITY_MAX){S.pity=0;return 'L'}
+  const allowed=ORDER.slice(ORDER.indexOf(min)); const tot=allowed.reduce((a,r)=>a+RAR[r].w,0); let x=Math.random()*tot;
+  for(const r of allowed){x-=RAR[r].w; if(x<0){if(r==='L')S.pity=0; return r}}
+  return allowed[0];
+}
+const inPool=c=>(c.secret?!!S.roster[c.id]:true)&&packLevel(c.pack||'warrens')<=levelOf(S.enc);
+/* the current level's pack gets 60% of draws; crew you don't own never fall behind (Clock Out's catch-up rule) */
+function packWeights(r,list,catchUp){
+  const base=list.filter(c=>c.r===r&&inPool(c)); if(!base.length) return [];
+  const pk=levelAt(S.enc).pack, cur=base.filter(c=>(c.pack||'warrens')===pk);
+  const w=base.map(c=>(1-(cur.length?CUR_PACK_SHARE:0))/base.length+((c.pack||'warrens')===pk?CUR_PACK_SHARE/cur.length:0));
+  if(catchUp){const top=Math.max(...w); base.forEach((c,i)=>{if(!S.roster[c.id]) w[i]=Math.max(w[i],top)*MISSING_BOOST})}
+  return base.map((c,i)=>({c,w:w[i]}));
+}
+function pickWeighted(r,list,catchUp){
+  const ws=packWeights(r,list,catchUp); if(!ws.length) return null;
+  let x=Math.random()*ws.reduce((a,o)=>a+o.w,0); for(const o of ws){x-=o.w; if(x<0) return o.c} return ws[ws.length-1].c;
+}
+function pullOne(min='C',forceType=null){
+  const r=rollRarity(min);
+  let type=forceType; if(!type){const x=Math.random(); type=x<.42?'hero':x<.77?'gear':'event';}
+  let c=pickWeighted(r,type==='hero'?HEROES:type==='gear'?GEAR:EVENTS,type==='hero'); if(!c){type='hero';c=pickWeighted(r,HEROES,true)}
+  const card={type,c,r,tag:null};
+  if(type==='hero'){
+    if(S.roster[c.id]){ if(S.roster[c.id]<5){S.roster[c.id]++;card.tag={k:'up',n:S.roster[c.id]}} else {const x=dupeXP();S.xp[c.id]=(S.xp[c.id]||0)+x;S.gems+=1;card.tag={k:'max',n:x}} }
+    else {S.roster[c.id]=1;card.tag={k:'new'}; if(S.teamMode==='manual'&&S.team.length<4) S.team.push(c.id);}
+  } else if(type==='gear'){ S.bAtk+=c.atk; S.bHp+=c.hp; }
+  else if(c.fx&&!c.choices){ c.fx(S) }
+  if(type!=='hero'){ if(!S.seen[c.id])card.tag={k:'new'}; S.seen[c.id]=(S.seen[c.id]||0)+1; }
+  return card;
+}
+function tagText(tag,l=LANG){
+  if(!tag) return '';
+  if(tag.k==='new') return 'NEW';
+  if(tag.k==='up') return tx(`升到 ${tag.n}★`,`Up to ${tag.n}★`,l);
+  if(tag.k==='max') return tx(`滿星・💎1＋經驗 ${tag.n}`,`Max ★ · 💎1 + ${tag.n} XP`,l);
+  if(tag.k==='stars') return '★'.repeat(tag.n)+'☆'.repeat(5-tag.n);
+  return '';
+}
+function faceHTML(k,l,cls,small){
+  const {type,c,r,tag}=k, sep=l==='en'?' ':'';
+  let st='',ds='',q='',cl='',pic=`<div class="e">${c.e||''}</div>`;
+  if(type==='hero'){const C=CLASSES[c.cls]; pic=spriteImg(c.sp,64); cl=`${C.icon} ${N(C,'name',l)}`;
+    st=tx(`生命 ${c.hp}｜攻擊 ${c.atk}`,`HP ${c.hp} | ATK ${c.atk}`,l); ds=tx(`【${N(c,'skill',l)}】${N(c,'desc',l)}`,`[${N(c,'skill',l)}] ${N(c,'desc',l)}`,l); q=N(c,'q',l)}
+  if(type==='gear'){st=[c.atk?tx(`全隊攻擊 +${c.atk}`,`Party ATK +${c.atk}`,l):'',c.hp?tx(`全隊生命 +${c.hp}`,`Party HP +${c.hp}`,l):''].filter(Boolean).join(' · ');q=N(c,'q',l)}
+  if(type==='event'){ds=N(c,'desc',l)}
+  const tg=tagText(tag,l);
+  return `<div class="face ${cls}" lang="${l==='en'?'en':'zh-Hant'}"><div class="rar">${N(RAR[r],'name',l)}${sep}${typeName(type,l)}</div>${pic}
+    <div class="nm">${small&&type==='hero'?shortName(c,l):N(c,'name',l)}</div>${cl?`<div class="cl">${cl}</div>`:''}${tg?`<div class="tag">${tg}</div>`:''}
+    ${st?`<div class="st">${st}</div>`:''}${ds?`<div class="ds">${ds}</div>`:''}${q?`<div class="q">${q}</div>`:''}</div>`;
+}
+const cardHTML=(k,i,small)=>`<div class="card r${k.r}" style="--rc:${RAR[k.r].css}" data-i="${i}"><div class="card-in">${faceHTML(k,LANG,'main',small)}${faceHTML(k,other(LANG),'alt',small)}<div class="back">${tx('抽','?')}</div></div></div>`;
+const lpHint=()=>`<p class="lp-hint">${tx('長按卡片看英文','Press and hold a card to see Chinese')}</p>`;
+function showPulls(cards,title,after){
+  const ten=cards.length>1, best=cards.reduce((a,k)=>Math.max(a,ORDER.indexOf(k.r)),0);
+  openModal(`<h2>${title}</h2><div class="cards ${ten?'ten':'one'}">${cards.map((k,i)=>cardHTML(k,i,ten)).join('')}</div>
+    ${ten?`<div class="summary" id="sum"></div>`:''}${lpHint()}<div class="btns"><button id="mOk">${tx('收下','Keep')}</button></div>`);
+  const els=[...document.querySelectorAll('#modal .card')];
+  els.forEach((el,i)=>setTimeout(()=>{el.classList.add('open');Sound.sfx.flip[cards[i].r]()},250+i*(ten?160:0)));
+  if(ten){
+    const n=r=>cards.filter(k=>k.r===r).length;
+    setTimeout(()=>{if(!$('sum'))return;$('sum').textContent=tx(`傳說 ${n('L')}・史詩 ${n('E')}・稀有 ${n('R')}・普通 ${n('C')}`,`Legendary ${n('L')} · Epic ${n('E')} · Rare ${n('R')} · Common ${n('C')}`)},250+cards.length*160);
+    els.forEach((el,i)=>el.addEventListener('click',()=>{ if(el.dataset.lp){delete el.dataset.lp;return} showDetail(cards[i]); }));
+  }
+  cards.filter(k=>k.type==='hero'&&k.tag&&k.tag.k==='new').forEach(k=>log([`🎉 ${N(k.c,'name','zh')} 加入了公會！`,`🎉 ${N(k.c,'name','en')} joined the guild!`],'good'));
+  cards.filter(k=>k.type==='gear').forEach(k=>log([`${k.c.e} 裝備了${N(k.c,'name','zh')}。`,`${k.c.e} Equipped: ${N(k.c,'name','en')}.`],'sys'));
+  cards.filter(k=>k.type==='event'&&!k.c.choices).forEach(k=>log([`${k.c.e} ${N(k.c,'name','zh')}：${N(k.c,'desc','zh')}`,`${k.c.e} ${N(k.c,'name','en')}: ${N(k.c,'desc','en')}`],'gold'));
+  if(best===3) log(['✨ 傳說降臨！','✨ A Legendary appears!'],'gold');
+  $('mOk').onclick=()=>{closeModal(); checkAch(); runChoices(cards.filter(k=>k.type==='event'&&k.c.choices),after)};
+  renderUI();
+}
+function showDetail(k){
+  const d=document.createElement('div'); d.innerHTML=`<div class="cards one">${cardHTML(k,0)}</div>`; d.querySelector('.card').classList.add('open');
+  const box=$('detailBox')||Object.assign(document.createElement('div'),{id:'detailBox'}); box.innerHTML=d.innerHTML; box.style.marginTop='4px';
+  if($('sum')) $('sum').after(box);
+}
+function runChoices(list,after){
+  if(!list.length){renderUI(); after&&after(); return}
+  const k=list.shift(), c=k.c;
+  openModal(`<div class="big">${c.e}</div><h2>${N(c,'name')}</h2><p class="center">${N(c,'desc')}</p>
+    <div class="btns">${c.choices.map((ch,i)=>`<button data-i="${i}" ${ch.need&&S.gems<ch.need?'disabled':''}>${N(ch,'label')}<small>${N(ch,'sub')}</small></button>`).join('')}</div>`);
+  document.querySelectorAll('#modal .btns button').forEach(b=>b.onclick=()=>{
+    const ch=c.choices[+b.dataset.i], res=ch.fx(S);
+    closeModal();
+    if(res==='pull'){ const card=pullOne('E','hero'); showPulls([card],tx('井底亮了起來……','The well lights up…'),()=>runChoices(list,after)); return; }
+    if(res==='mimic') log(['🧰 寶箱長出了牙齒！是寶箱怪！牠咬了一口就跑了……','🧰 The chest grows teeth! A mimic! It takes a bite and runs off…'],'bad');
+    else log([`${c.e} ${N(ch,'res','zh')}`,`${c.e} ${N(ch,'res','en')}`],'gold');
+    checkAch(); renderUI(); runChoices(list,after);
+  });
+}
+$('pull1').onclick=()=>{ if(busy||S.gems<1)return; S.gems-=1; showPulls([pullOne()],tx('✨ 卡片翻轉……','✨ Flipping the card…')); };
+$('pull10').onclick=()=>{
+  if(busy||S.gems<10)return; S.gems-=10;
+  const cards=[]; for(let i=0;i<9;i++)cards.push(pullOne());
+  cards.push(cards.some(k=>ORDER.indexOf(k.r)>=2)?pullOne():pullOne('E'));
+  showPulls(cards,tx('十連抽！','Ten pulls!'));
+};
+/* long-press a card to see the other language */
+let lpTimer=null;
+document.addEventListener('pointerdown',e=>{const c=e.target.closest('.card.open'); if(!c) return; clearTimeout(lpTimer); lpTimer=setTimeout(()=>{c.classList.add('showalt');c.dataset.lp='1'},380);});
+const endLp=()=>{clearTimeout(lpTimer);document.querySelectorAll('.card.showalt').forEach(c=>{c.classList.remove('showalt');setTimeout(()=>delete c.dataset.lp,50)})};
+['pointerup','pointercancel','dragstart'].forEach(ev=>document.addEventListener(ev,endLp));
+document.addEventListener('contextmenu',e=>{if(e.target.closest('.card'))e.preventDefault()});
+
+/* ---------- battles ---------- */
+let autoTimer=null, lastFrame=null;
+function renderAuto(){const b=$('autoBtn'); b.setAttribute('aria-pressed',S.autoAdv?'true':'false'); $('autoLbl').textContent=S.autoAdv?tx('自動中','Auto on'):tx('自動','Auto');
+  b.setAttribute('aria-label',S.autoAdv?tx('關閉自動前進','Turn off auto-advance'):tx('開啟自動前進：打贏後自動挑戰下一場','Turn on auto-advance: take on the next encounter after each win'))}
+$('autoBtn').onclick=()=>{ S.autoAdv=!S.autoAdv; if(!S.autoAdv) clearTimeout(autoTimer); renderAuto(); save();
+  toast(S.autoAdv?tx('<b>⏩ 自動前進：開</b>打贏後自動挑戰下一場，打輸或打完一層就停。','<b>⏩ Auto-advance: on</b>After each win you take on the next encounter. It stops when you lose or finish a level.'):tx('<b>⏩ 自動前進：關</b>','<b>⏩ Auto-advance: off</b>')); };
+$('go').onclick=()=>{
+  if(busy||S.done||!Object.keys(S.roster).length) return;
+  clearTimeout(autoTimer); busy=true; fast=false; document.body.classList.remove('logbig'); document.body.classList.add('fighting'); renderSkip(); renderUI();
+  const enc=encAt(S.enc); Sound.play(enc.boss?'boss':'battle');
+  const {units,frames,win}=simulate();
+  let i=0;
+  const step=()=>{
+    if(i>=frames.length){finish();return}
+    const fr=frames[i++];
+    log(fr.text,fr.cls);
+    const pu=units.map((u,k)=>({...u,cur:fr.u[k]})); lastFrame={foes:fr.foes,party:pu};
+    renderFoes(fr.foes,fr.hit==='m'?(fr.fi==null?0:fr.fi):null);
+    renderParty(pu);
+    if(typeof fr.hit==='number'){const e=document.querySelector(`.hero[data-i="${fr.hit}"]`);e&&e.classList.add('hit')}
+    setTimeout(step,fast?40:380);
+  };
+  const finish=()=>{
+    busy=false; document.body.classList.remove('fighting'); Sound.play('guild');
+    const ids=units.map(u=>u.id);
+    if(activeSynergies(ids).length) S.flags.synergy=true;
+    grantXP(ids,win).forEach(u=>log([`⬆️ ${shortName(H[u.id],'zh')} 升到 Lv${u.lv}！`,`⬆️ ${shortName(H[u.id],'en')} reached Lv${u.lv}!`],'good'));
+    if(win) onWin(); else onLoss();
+  };
+  step();
+};
+function onWin(){
+  Sound.sfx.win(); if(S.autoAdv) S.autoWins=(S.autoWins||0)+1;
+  const enc=encAt(S.enc), reward=floorReward(S.enc); S.gems+=reward; S.wins++;
+  log([`🎉 ${enc.name}清空了！獲得 💎 ${reward}。`,`🎉 ${enc.en.name}: cleared! You get 💎 ${reward}.`],'gold');
+  if(S.enc>=MAX_ENC){ S.done=true; checkAch(); renderUI(); const lv=levelAt(S.enc);
+    openModal(`<div class="big">${spriteImg(enc.pack[0].sp,64)}</div><h2>${tx(`${lv.name}・通關！`,`${lv.en.name}: cleared!`)}</h2>
+      <p class="center">${N(lv,'endQ')}</p><p class="center" style="color:var(--torch)">${tx(...NEXT_TEASER)}</p>
+      <p class="summary">${tx(`抽卡 ${S.pulls} 次・勝 ${S.wins} 場・撤退 ${S.losses} 次・隊員 ${Object.keys(S.roster).length}/${HEROES.length}`,`Pulls ${S.pulls} · Wins ${S.wins} · Retreats ${S.losses} · Crew ${Object.keys(S.roster).length}/${HEROES.length}`)}</p>
+      <div class="btns"><button id="mAgain">${tx('再出團一次','Start a new tour')}</button><button id="mStay">${tx('先休息一下','Rest for now')}</button></div>`);
+    $('mAgain').onclick=()=>{closeModal();reset()}; $('mStay').onclick=closeModal; return; }
+  const levelDone=S.enc%10===0; S.enc++;
+  if(levelDone) levelIntro();
+  checkAch(); renderUI();
+  if(S.autoAdv&&!levelDone){
+    log([`⏩ 自動前進：1 秒後挑戰第 ${S.enc} 場。`,`⏩ Auto-advance: encounter ${S.enc} in 1 second.`],'sys');
+    autoTimer=setTimeout(()=>{ if(S.autoAdv&&!busy&&$('overlay').hidden&&!S.done) $('go').click(); },1200); return;
+  }
+  const next=encAt(S.enc), lv=levelAt(S.enc);
+  openModal(`<div class="big">🎉</div><h2>${levelDone?tx(`${levelAt(S.enc-1).name}・完成！`,`${levelAt(S.enc-1).en.name}: cleared!`):tx(`第 ${S.enc-1} 場清空！`,`Encounter ${S.enc-1} cleared!`)}</h2>
+    <p class="center">${levelDone?`${N(levelAt(S.enc-1),'endQ')}<br><br>`+tx(`獲得 💎 ${reward}。下一層：${lv.e} ${lv.name}。<br>新卡片已加入卡池！`,`You get 💎 ${reward}. Next level: ${lv.e} ${lv.en.name}.<br>New cards have joined the card pool!`)
+      :tx(`獲得 💎 ${reward}。`,`You get 💎 ${reward}. `)+tx(lv.nextQ[0],lv.nextQ[1]).replace('{e}',N(next,'name'))}</p>
+    <div class="btns"><button id="mOk">${tx('繼續','Continue')}</button></div>`);
+  $('mOk').onclick=closeModal;
+}
+function onLoss(){
+  const lg=lossGems(S.enc); S.gems+=lg; S.losses++; Sound.sfx.lose(); checkAch();
+  log([`🏳️ 全隊撤退回公會。撿回的戰利品換到 💎 ${lg}。抽點新隊員再來吧！`,`🏳️ The party retreats to the guild. The loot you grabbed is worth 💎 ${lg}. Pull some new crew and try again!`],'sys');
+  renderUI();
+  const enc=encAt(S.enc), many=Object.keys(S.roster).length>=2, can=S.gems>=hallCost();
+  openModal(`<div class="big">🏳️</div><h2>${tx('戰略性撤退','Strategic Retreat')}</h2>
+    <p class="center">${tx(`${enc.name}太難纏了。大家決定先回公會喝一杯。<br>戰利品換到 💎 ${lg}，抽點新隊員再來！`,`The ${enc.en.name} was too much. Everyone heads back to the guild for a drink.<br>Your loot is worth 💎 ${lg}. Pull some new crew and try again!`)}</p>
+    ${many&&!can?`<div class="wipe-up" style="opacity:.6"><span>${tx(`也可以<b>擴建公會大廳</b>：全體隊員 +${Math.round(HALL_PCT*100)}%。`,`You could also <b>upgrade the Guild Hall</b>: every member +${Math.round(HALL_PCT*100)}%.`)}</span>
+      <button disabled style="font-size:14px">🏰 ${tx(`鑽石不足：需要 💎 ${hallCost()}，你有 💎 ${S.gems}`,`Need 💎 ${hallCost()} (you have ${S.gems})`)}</button>
+      <span style="font-size:12px;color:var(--muted)">${tx('下次抽卡時，可以留一些鑽石下來。','Next time you pull cards, try saving a few gems.')}</span></div>`:''}
+    ${can?`<div class="wipe-up" id="wipeUp"><span>${tx(`不想一直抽卡？也可以<b>擴建公會大廳</b>：全體隊員 +${Math.round(HALL_PCT*100)}%。`,`Tired of pulling cards? <b>Upgrade the Guild Hall</b>: every member +${Math.round(HALL_PCT*100)}%.`)}</span>
+      <span>${tx('目前預估勝率','Current estimated odds')} <b>${winRate(team().map(t=>t.id))}%</b></span>
+      <button id="mWipeUp" style="background:var(--L);color:#2a1d00">🏰 ${tx(`擴建公會（💎 ${hallCost()}）`,`Upgrade (💎 ${hallCost()})`)}</button></div>`:''}
+    <div class="btns"><button id="mOk">${tx('好吧','Fine…')}</button></div>`);
+  $('mOk').onclick=closeModal;
+  const doUp=()=>{ const before=winRate(team().map(t=>t.id));
+    if(upgradeHall()){ Sound.sfx.flip.E(); checkAch(); smartCache.key=''; renderUI(); const after=winRate(team().map(t=>t.id));
+      $('wipeUp').innerHTML=`<span>${tx(`🏰 擴建完成！預估勝率 <b>${before}% → ${after}%</b>`,`🏰 Upgraded! Estimated odds <b>${before}% → ${after}%</b>`)}</span>`
+        +(S.gems>=hallCost()?`<button id="mWipeUp2" style="background:var(--L);color:#2a1d00">🏰 ${tx(`再擴建一次（💎 ${hallCost()}）`,`Again (💎 ${hallCost()})`)}</button>`:'');
+      if($('mWipeUp2')) $('mWipeUp2').onclick=doUp; } };
+  if($('mWipeUp')) $('mWipeUp').onclick=doUp;
+}
+function renderSkip(){const b=$('skipBtn');b.textContent=fast?tx('快轉中 ▶▶','Fast-forwarding ▶▶'):tx('快轉 ▶▶','Skip ▶▶');b.setAttribute('aria-pressed',fast?'true':'false')}
+function skipBattle(){if(busy){fast=true;$('goHint').textContent=tx('快轉中…','Fast-forwarding…');renderSkip()}}
+function renderLogTip(){$('logTip').textContent=document.body.classList.contains('logbig')?tx('點一下縮回 ▲','Tap to shrink ▲'):tx('點一下展開 ▼','Tap to expand ▼')}
+function toggleLog(){const big=document.body.classList.toggle('logbig'); renderLogTip(); if(!big) $('log').scrollTop=$('log').scrollHeight}
+$('log').addEventListener('click',()=>{ if(busy) skipBattle(); else toggleLog(); });
+$('log').addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault(); if(busy) skipBattle(); else toggleLog();} });
+$('skipBtn').onclick=skipBattle;
+
+/* ---------- sound button ---------- */
+function renderSound(){const b=$('soundBtn');b.textContent=Sound.isOn()?'🔊':'🔇';b.setAttribute('aria-label',Sound.isOn()?tx('關閉聲音','Sound off'):tx('開啟聲音','Sound on'))}
+$('soundBtn').onclick=()=>{Sound.init();Sound.setOn(!Sound.isOn());renderSound();if(Sound.isOn())Sound.play(busy?(encAt(S.enc).boss?'boss':'battle'):'guild')};
+
+/* ---------- modals ---------- */
+let modalView=null; /* redraws the open modal, so a language switch can refresh it */
+function openModal(html){$('modal').innerHTML=html;$('overlay').hidden=false;const b=$('modal').querySelector('button:not([disabled])');b&&b.focus({preventScroll:true});$('modal').scrollTop=0;$('overlay').scrollTop=0}
+function closeModal(){$('overlay').hidden=true;modalView=null}
+
+/* ---------- card detail and collection ---------- */
+const TYPES={hero:{list:HEROES},gear:{list:GEAR},event:{list:EVENTS}};
+const owned=(type,id)=>type==='hero'?S.roster[id]:S.seen[id];
+let dexTab='hero';
+function synergyRows(id){
+  const list=SYNERGIES.filter(sy=>sy.need.some(req=>req===id||req==='class:'+H[id].cls)); if(!list.length) return '';
+  const ids=team().map(t=>t.id);
+  return `<h3 class="sec">${tx('隊伍羈絆','Synergies')}</h3><div class="syns">${list.map(sy=>synergyHTML(sy,ids)).join('')}</div>`;
+}
+function showCard(type,id,fromDex){
+  modalView=()=>showCard(type,id,fromDex);
+  const c=TYPES[type].list.find(x=>x.id===id); let tag=null, rows='';
+  if(type==='hero'){
+    const st=heroStats(id), inTeam=team().some(t=>t.id===id), need=st.lv<LV_MAX?xpFor(st.lv+1)-(S.xp[id]||0):0, C=CLASSES[c.cls];
+    tag={k:'stars',n:st.stars};
+    rows=tx(`<dt>職業</dt><dd>${C.icon} ${C.name}：${C.how}</dd>
+      <dt>星等</dt><dd>${st.stars}★（基礎數值 +${(st.stars-1)*25}%）</dd>
+      ${S.pay?`<dt>公會大廳</dt><dd>擴建 ${S.pay} 次（總數值 +${Math.round(S.pay*HALL_PCT*100)}%）</dd>`:''}
+      <dt>等級</dt><dd>Lv${st.lv}（數值 +${((st.lv-1)*2.5).toFixed(1).replace('.0','')}%）${st.lv<LV_MAX?`・再 ${need} 經驗升級`:''}</dd>
+      <dt>目前生命</dt><dd class="num">${st.hp}（含裝備 +${S.bHp}）</dd><dt>目前攻擊</dt><dd class="num">${st.atk}（含裝備 +${S.bAtk}）</dd>
+      <dt>狀態</dt><dd>${inTeam?'出團中':'候補'}</dd>
+      <dt>下一星</dt><dd>${st.stars<5?`再抽到 1 張就升到 ${st.stars+1}★`:'已滿星，再抽到會換成 💎1 和經驗'}</dd>`,
+     `<dt>Class</dt><dd>${C.icon} ${C.en.name}: ${C.en.how}</dd>
+      <dt>Stars</dt><dd>${st.stars}★ (base stats +${(st.stars-1)*25}%)</dd>
+      ${S.pay?`<dt>Guild Hall</dt><dd>${S.pay} upgrades (total stats +${Math.round(S.pay*HALL_PCT*100)}%)</dd>`:''}
+      <dt>Level</dt><dd>Lv${st.lv} (stats +${((st.lv-1)*2.5).toFixed(1).replace('.0','')}%)${st.lv<LV_MAX?` · ${need} XP to next level`:''}</dd>
+      <dt>HP now</dt><dd class="num">${st.hp} (gear +${S.bHp})</dd><dt>ATK now</dt><dd class="num">${st.atk} (gear +${S.bAtk})</dd>
+      <dt>Status</dt><dd>${inTeam?'In the party':'On the bench'}</dd>
+      <dt>Next star</dt><dd>${st.stars<5?`Pull 1 more copy to reach ${st.stars+1}★`:'Max stars. Extra copies give 💎1 plus experience'}</dd>`);
+  } else if(type==='gear'){ const n=S.seen[id]||0;
+    rows=tx(`<dt>已獲得</dt><dd class="num">${n} 件</dd><dt>累計加成</dt><dd class="num">${[c.atk?`攻擊 +${c.atk*n}`:'',c.hp?`生命 +${c.hp*n}`:''].filter(Boolean).join('・')}</dd><dt>說明</dt><dd>裝備會疊加，效果套用在全隊。</dd>`,
+      `<dt>Owned</dt><dd class="num">${n}</dd><dt>Total bonus</dt><dd class="num">${[c.atk?`ATK +${c.atk*n}`:'',c.hp?`HP +${c.hp*n}`:''].filter(Boolean).join(' · ')}</dd><dt>Note</dt><dd>Gear stacks, and it works for the whole party.</dd>`);
+  } else { rows=tx(`<dt>遇到次數</dt><dd class="num">${S.seen[id]||0} 次</dd>`,`<dt>Times seen</dt><dd class="num">${S.seen[id]||0}</dd>`)
+      +(c.choices?`<dt>${tx('選項','Choices')}</dt><dd>${c.choices.map(ch=>`${N(ch,'label')}${tx(`（${N(ch,'sub')}）`,` (${N(ch,'sub')})`)}`).join('<br>')}</dd>`:''); }
+  openModal(`<div class="cards one">${cardHTML({type,c,r:c.r,tag},0)}</div>${lpHint()}<dl class="info">${rows}</dl>${type==='hero'?synergyRows(id):''}
+    <div class="btns">${type==='hero'&&S.roster[id]?`<button id="mTeam">${tx('調整隊伍','Edit party')}</button>`:''}<button id="mOk">${fromDex?tx('返回圖鑑','Back to Cards'):tx('關閉','Close')}</button></div>`);
+  if($('mTeam')) $('mTeam').onclick=()=>{teamSel=null;openParty()};
+  $('modal').querySelector('.card').classList.add('open');
+  $('mOk').onclick=fromDex?openDex:closeModal;
+}
+function openDex(){
+  modalView=openDex;
+  const tabs=Object.entries(TYPES).map(([k,v])=>`<button role="tab" data-t="${k}" aria-selected="${k===dexTab}">${typeName(k)} ${v.list.filter(c=>owned(k,c.id)).length}/${v.list.length}</button>`).join('')
+    +`<button role="tab" data-t="ach" aria-selected="${dexTab==='ach'}">${tx('成就','Awards')} ${Object.keys(S.ach).length}/${ACH.length}</button>`;
+  let body;
+  if(dexTab==='ach') body=`<div class="ach">${ACH.map(a=>`<div class="${S.ach[a.id]?'got':'no'}"><span class="ae">${S.ach[a.id]?a.e:'🔒'}</span><span class="an">${N(a,'name')}</span><span class="ad">${N(a,'desc')}</span><span class="ar">${tx('獎勵：','Reward: ')}${rewardText(a,LANG,!!S.ach[a.id])}</span></div>`).join('')}</div>`;
+  else { const items=TYPES[dexTab].list.map(c=>{ const o=owned(dexTab,c.id);
+      if(!o) return `<button class="it no" style="--rc:${RAR[c.r].css}" disabled><div class="e">${c.secret?'🔒':'❔'}</div>？？？<br><span class="sub">${c.secret?tx('成就解鎖','Award'):N(RAR[c.r],'name')}</span></button>`;
+      const pic=dexTab==='hero'?spriteImg(c.sp,48):`<div class="e">${c.e}</div>`;
+      const sub=dexTab==='hero'?'★'.repeat(o):dexTab==='gear'?`× ${o}`:tx(`遇過 ${o} 次`,`Seen ×${o}`);
+      return `<button class="it" data-id="${c.id}" style="--rc:${RAR[c.r].css}">${pic}${dexTab==='hero'?shortName(c):N(c,'name')}<br><span class="sub">${sub}</span></button>`; }).join('');
+    const hint={hero:tx('點隊員看詳細資料。用「隊伍」按鈕選擇誰出團。','Tap a crew member for details. Use the Party button to choose who goes.'),gear:tx('裝備會疊加，效果套用在全隊。','Gear stacks, and it works for the whole party.'),event:tx('抽到過的事件才會出現在這裡。','Events show up here after you pull them.')}[dexTab];
+    body=`<div class="dex">${items}</div><p class="summary">${hint}</p>`; }
+  openModal(`<h2>${tx('圖鑑','Card Collection')}</h2><div class="tabs" role="tablist">${tabs}</div>${body}<div class="btns"><button id="mOk">${tx('關閉','Close')}</button></div>`);
+  $('modal').querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{dexTab=b.dataset.t;openDex()});
+  $('modal').querySelectorAll('.dex .it[data-id]').forEach(b=>b.onclick=()=>showCard(dexTab,b.dataset.id,true));
+  $('mOk').onclick=closeModal;
+}
+$('dexBtn').onclick=openDex;
+$('party').addEventListener('click',e=>{
+  if(busy) return;
+  if(e.target.closest('.hero.empty')){teamSel=null;openParty();return}
+  const h=e.target.closest('.hero[data-i]'); if(!h) return;
+  const t=team()[+h.dataset.i]; if(t) showCard('hero',t.id,false);
+});
+
+/* ---------- party editor and Guild Hall ---------- */
+let teamSel=null, teamMsg=null;
+/* a synergy card; "ready" = you own everyone it needs, but they aren't all in the party */
+function synergyHTML(sy,ids){
+  const on=activeSynergies(ids).some(x=>x.id===sy.id), seeds=synergySeeds(), core=seeds.find(c=>activeSynergies(c).some(x=>x.id===sy.id));
+  const who=sy.need.map(req=>req.startsWith('class:')?`${CLASSES[req.slice(6)].icon}${N(CLASSES[req.slice(6)],'name')}`:(S.roster[req]?spriteImg(H[req].sp,16):'❔')).join(' ');
+  const ready=!on&&core;
+  const inner=`<span class="ce">${sy.e}</span><span class="cn">${N(sy,'name')}${on?`<b>${tx('發動中','ON')}</b>`:''}</span><span class="cd">${N(sy,'desc')}</span><span class="cm">${who}</span>
+    ${ready?`<span class="go">${tx('▶ 點一下，讓他們出團','▶ Tap to put them in the party')}</span>`:''}`;
+  return ready?`<button class="syncard" data-syn="${sy.id}">${inner}</button>`:`<div class="syncard ${on?'on':''}">${inner}</div>`;
+}
+function useSynergy(id){
+  const sy=SYNERGIES.find(x=>x.id===id), core=synergySeeds().find(c=>activeSynergies(c).some(x=>x.id===id)); if(!core) return;
+  const keep=byPower(team().map(t=>t.id).filter(m=>!core.includes(m))).map(t=>t.id);
+  S.teamMode='manual'; S.team=[...core,...keep].slice(0,4); teamSel=null;
+  teamMsg=tx(`${sy.e} ${sy.name} 的成員出團了！`,`${sy.e} ${sy.en.name} is ready to go!`); renderUI(); openParty();
+}
+document.addEventListener('click',e=>{const b=e.target.closest('button.syncard[data-syn]'); if(b&&!$('overlay').hidden) useSynergy(b.dataset.syn);});
+function toManual(){ if(S.teamMode!=='manual'){ S.team=smartTeam().slice(); S.teamMode='manual'; } }
+function powerHTML(ids){
+  if(!ids.length) return '';
+  const p=teamPower(ids); let cmp='';
+  if(S.teamMode==='manual'){ const d=p.power-teamPower(smartTeam()).power;
+    cmp=d===0?`<span>${tx('與自動編隊相同','Same as Auto')}</span>`:`<span class="${d>0?'up':'down'}">${tx(`比自動編隊 ${d>0?'+':''}${d}`,`${d>0?'+':''}${d} vs Auto`)}</span>`; }
+  const wr=winRate(ids), enc=encAt(S.enc), wrAuto=S.teamMode==='manual'?winRate(smartTeam()):null;
+  return `<div class="tpow num"><span>${tx('總戰力','Party power')} <span class="pw">${p.power}</span></span><span>${tx('攻擊','ATK')} <b>${p.atk}</b></span><span>${tx('生命','HP')} <b>${p.hp}</b></span>${cmp}
+    <span style="flex-basis:100%;text-align:center">${tx(`對「${enc.name}」的預估勝率`,`Estimated odds vs the ${enc.en.name}`)} <b class="${wr>=60?'up':wr<30?'down':''}" style="font-size:15px">${wr}%</b>${wrAuto!=null?tx(`（自動編隊 ${wrAuto}%）`,` (Auto: ${wrAuto}%)`):''}</span></div>`;
+}
+function hallHTML(){
+  const c=hallCost(), now=Math.round((S.pay||0)*HALL_PCT*100), step=Math.round(HALL_PCT*100);
+  return `<div class="hall"><span class="re">🏰</span><span class="rn">${tx('擴建公會大廳','Upgrade the Guild Hall')}</span>
+    <span class="rd">${tx(`全體隊員總數值 +${step}%（目前 +${now}%）。新舊隊員一起變強。`,`Every member +${step}% total stats (now +${now}%). New and old crew alike.`)}</span>
+    <button id="mHall" ${S.gems<c?'disabled':''}>💎 ${c}</button></div>`;
+}
+function openParty(){
+  modalView=openParty;
+  const cur=team(), ids=cur.map(t=>t.id);
+  const bench=byPower(Object.keys(S.roster).filter(id=>!ids.includes(id)));
+  const chip=(t,extra,attrs)=>`<button class="it ${extra}" ${attrs} style="--rc:${RAR[t.h.r].css}">${spriteImg(t.h.sp,32)}${shortName(t.h)}<br><span class="sub">${'★'.repeat(t.stars)} ${CLASSES[t.h.cls].icon}</span><span class="stat num">⚔${t.atk} ♥${t.hp}</span></button>`;
+  let slots=''; for(let i=0;i<4;i++){const t=cur[i]; slots+=t?chip(t,teamSel===i?'sel':'',`data-slot="${i}"`):`<button class="it empty-slot" data-slot="${i}"><div class="e">＋</div>${tx('空位','Empty')}</button>`;}
+  const hint=teamMsg?`<p class="team-hint warn" role="status">${teamMsg}</p>`:`<p class="team-hint">${teamSel!=null?tx('點一位候補隊員來交換，或按「移到候補」。','Tap someone on the bench to swap, or press “Move to bench”.')
+    :S.teamMode==='manual'?tx('點隊伍裡的人，再點候補的人來交換。','Tap a party member, then someone on the bench to swap.')
+    :tx('自動編隊會先模擬幾種組合，派出對下一場勝率最高的隊伍，也會考慮治療和輔助。點任何人就能改成手動。','Auto tests different parties against the next encounter and sends the one most likely to win, healers and support included. Tap anyone to switch to Manual.')}</p>`;
+  const known=SYNERGIES.filter(sy=>sy.need.some(req=>req.startsWith('class:')?Object.keys(S.roster).some(id=>H[id].cls===req.slice(6)):S.roster[req]));
+  const syns=known.length?known.map(sy=>synergyHTML(sy,ids)).join(''):`<p class="summary">${tx('抽到羈絆需要的隊員之後，羈絆就會出現在這裡。','Synergies show up here once you own someone they need.')}</p>`;
+  openModal(`<h2>${tx('隊伍','Party')}</h2>
+    <div class="seg" role="group"><button data-mode="auto" aria-pressed="${S.teamMode!=='manual'}">${tx('自動（挑勝率最高）','Auto (best odds)')}</button><button data-mode="manual" aria-pressed="${S.teamMode==='manual'}">${tx('手動','Manual')}</button></div>
+    <div class="dex slots">${slots}</div>${powerHTML(ids)}${hallHTML()}${hint}
+    ${teamSel!=null&&cur.length>1?`<button class="danger-link" id="mBench">${tx('移到候補','Move to bench')}</button>`:''}
+    <h3 class="sec">${tx('候補','Bench')}</h3>
+    ${bench.length?`<div class="dex">${bench.map(t=>chip(t,'',`data-bench="${t.id}"`)).join('')}</div>`:`<p class="summary">${tx('還沒有候補隊員。多抽幾張吧！','No one on the bench yet. Pull more cards!')}</p>`}
+    <h3 class="sec">${tx('隊伍羈絆','Synergies')}</h3><div class="syns">${syns}</div>
+    <div class="btns"><button id="mOk">${tx('完成','Done')}</button></div>`);
+  teamMsg=null;
+  const m=$('modal');
+  m.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{ if(b.dataset.mode==='auto'){S.teamMode='auto';S.team=[];} else toManual(); teamSel=null; renderUI(); openParty(); });
+  m.querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.slot; toManual();
+    if(!cur[i]){ teamSel=null; teamMsg=bench.length?tx('點一位候補隊員補上這個空位。','Tap someone on the bench to fill this slot.'):tx('還沒有候補隊員。','No one on the bench yet.'); } else teamSel=(teamSel===i?null:i);
+    renderUI(); openParty(); });
+  m.querySelectorAll('[data-bench]').forEach(b=>b.onclick=()=>{ const id=b.dataset.bench; toManual();
+    if(teamSel!=null&&S.team[teamSel]) S.team[teamSel]=id; else if(S.team.length<4) S.team.push(id); else teamMsg=tx('隊伍滿了。先點隊伍裡要換下來的人。','The party is full. First tap the member you want to swap out.');
+    teamSel=null; renderUI(); openParty(); });
+  if($('mHall')) $('mHall').onclick=()=>{ if(upgradeHall()){Sound.sfx.flip.E();checkAch();smartCache.key='';renderUI();} openParty(); };
+  if($('mBench')) $('mBench').onclick=()=>{ S.team.splice(teamSel,1); teamSel=null; renderUI(); openParty(); };
+  $('mOk').onclick=()=>{teamSel=null;closeModal()};
+}
+$('partyBtn').onclick=()=>{teamSel=null;openParty()};
+
+/* ---------- rules ---------- */
+function helpHTML(){
+  const rar=`<div class="rar-row">${ORDER.map(r=>`<span style="--rc:${RAR[r].css}">${N(RAR[r],'name')} ${RAR[r].w}%</span>`).join('')}</div>`;
+  const cls=Object.values(CLASSES).map(c=>`<tr><td>${c.icon}&nbsp;${N(c,'name')}</td><td>${LANG==='en'?c.en.how:c.how}</td></tr>`).join('');
+  if(LANG==='en') return `<h2>How to Play</h2><div class="help">
+  <section><h3>The basics</h3><p>Pull cards to build your guild. Press “Go!” and your party of four fights on its own. Each dungeon level has 10 encounters; clear encounter ${MAX_ENC} to finish the tour.</p></section>
+  <section><h3>Pulling cards</h3>${rar}<ul><li>Each card is a <b>crew member</b>, a piece of <b>gear</b>, or an <b>event</b>.</li><li><b>Pull ×10</b> always gives at least one Epic or better.</li><li><b>Pity</b>: 30 pulls without a Legendary, and pull 30 is Legendary. The bottom of the screen counts down.</li><li>Crew you don’t have yet come up more often, so nobody stays out of reach.</li></ul></section>
+  <section><h3>Monster packs</h3><p>Most encounters are 1–4 monsters. Your party hits the weakest one first. Some monsters heal the others, and some weaken your party. Mid-bosses and bosses get 20 rounds instead of 15.</p></section>
+  <section><h3>Classes</h3><table>${cls}</table></section>
+  <section><h3>Stars and levels</h3><p>Each star adds 25% to a member’s base HP and attack (up to 5★). Members who fight earn experience, win or lose, and each level adds 2.5%.</p></section>
+  <section><h3>Gear and events</h3><ul><li><b>Gear</b> stacks, and every bonus goes to the whole party.</li><li><b>Events</b> give a reward right away or ask you to choose.</li></ul></section>
+  <section><h3>Your party</h3><p>By default the game picks your party: before each encounter it tests different parties against the monsters and sends the one most likely to win, healers and support included. Press <b>Party</b> to choose for yourself.</p></section>
+  <section><h3>Synergies</h3><p>Some crew work better together. When everyone a synergy needs is in the party, it turns on at the start of each fight. ✨ marks them.</p></section>
+  <section><h3>Gems</h3><ul><li>Each cleared encounter pays more than the last (about 1.2 × its number), and every 5th pays 5 extra.</li><li>A retreat still pays a little loot.</li></ul></section>
+  <section><h3>Guild Hall 🏰</h3><p>On the Party screen, spend gems to upgrade the Guild Hall. Every member, old or new, gets +10% total stats, gear included. Each upgrade costs a bit more.</p></section>
+  <section><h3>Auto-advance ⏩</h3><p>Turn on ⏩ next to “Go!” and your party takes on the next encounter after every win. It stops when you lose or finish a level.</p></section>
+  <section><h3>Language</h3><p>Tap “中文” at the top to switch to Chinese. Press and hold any card to see it in Chinese.</p></section>
+  </div><div class="btns"><button id="mOk">Got it</button></div><button class="danger-link" id="mReset">Restart the game…</button>`;
+  return `<h2>遊戲規則</h2><div class="help">
+  <section><h3>怎麼玩</h3><p>抽卡壯大公會，按「前進！」讓四人小隊自動戰鬥。每層地城有 10 場戰鬥，打完第 ${MAX_ENC} 場就完成這趟觀光。</p></section>
+  <section><h3>抽卡</h3>${rar}<ul><li>每張卡可能是<b>隊員</b>、<b>裝備</b>或<b>事件</b>。</li><li><b>十連抽</b>至少有一張史詩以上。</li><li><b>保底</b>：連續 30 抽沒出傳說，第 30 抽一定是傳說。畫面下方會倒數。</li><li>還沒收集到的隊員比較容易抽到，不會有人永遠抽不到。</li></ul></section>
+  <section><h3>怪物群</h3><p>大部分戰鬥會有 1～4 隻怪物。隊伍會先打血最少的那隻。有些怪物會幫同伴補血，有些會削弱你的隊伍。頭目和魔王戰最多 20 回合，一般戰鬥 15 回合。</p></section>
+  <section><h3>職業</h3><table>${cls}</table></section>
+  <section><h3>星等與等級</h3><p>每多一顆星，隊員的基礎生命和攻擊 +25%（最多 5★）。上場的隊員不管輸贏都會累積經驗，每升一級數值 +2.5%。</p></section>
+  <section><h3>裝備與事件</h3><ul><li><b>裝備</b>會疊加，加成套用在全隊。</li><li><b>事件</b>可能直接給獎勵，也可能讓你二選一。</li></ul></section>
+  <section><h3>編隊</h3><p>預設是自動編隊：每場戰鬥前，遊戲會先模擬幾種組合，派出勝率最高的隊伍，也會考慮治療和輔助。想自己決定，就按下方的<b>隊伍</b>。</p></section>
+  <section><h3>隊伍羈絆</h3><p>有些隊員湊在一起特別強。羈絆需要的人都在隊上時，每場戰鬥開始就會發動，並標上 ✨。</p></section>
+  <section><h3>鑽石</h3><ul><li>越後面的戰鬥給越多鑽石（大約是場次 × 1.2），每 5 場多給 5 顆。</li><li>撤退也會帶回一點戰利品。</li></ul></section>
+  <section><h3>公會大廳 🏰</h3><p>在隊伍畫面可以花鑽石擴建公會大廳。每擴建一次，所有隊員（不論新舊）的總數值（含裝備）+10%，價格一次比一次高。</p></section>
+  <section><h3>自動前進 ⏩</h3><p>打開「前進！」旁邊的 ⏩，打贏後就會自動挑戰下一場。打輸或打完一層會停下來。</p></section>
+  <section><h3>語言</h3><p>點右上角的「EN」切換成英文。長按任何一張卡片，可以看它的英文版。</p></section>
+  </div><div class="btns"><button id="mOk">知道了</button></div><button class="danger-link" id="mReset">重新開始遊戲…</button>`;
+}
+function openHelp(){ modalView=openHelp; openModal(helpHTML()); $('mOk').onclick=closeModal; $('mReset').onclick=openReset; }
+$('helpBtn').onclick=openHelp;
+function openReset(){
+  modalView=openReset;
+  openModal(`<h2>${tx('重新開始？','Start over?')}</h2><p class="center">${tx('隊員、裝備和進度都會清空。','Your crew, gear, and progress will all be cleared.')}</p>
+    <div class="btns"><button id="mYes">${tx('重新開始','Start over')}</button><button id="mNo">${tx('算了','Never mind')}</button></div>`);
+  $('mYes').onclick=()=>{closeModal();reset()}; $('mNo').onclick=closeModal;
+}
+
+/* ---------- about ---------- */
+function aboutHTML(){
+  const art=['farmhand','apprentice','healer','stranger'].map(k=>spriteImg(H[k].sp,48)).join('');
+  const n={crew:HEROES.length,gear:GEAR.length,ev:EVENTS.length,syn:SYNERGIES.length,lv:LEVELS.length,enc:MAX_ENC};
+  if(LANG==='en') return `<div class="ab"><div class="ab-art" aria-hidden="true">${art}</div>
+    <p class="ab-brand">Ink<span>Quest</span></p><p class="ab-slogan">Every quest begins with a story.</p><p class="ab-sub">每一段冒險，都從一個故事開始。</p>
+    <h3>English can be fun</h3><p>For a lot of people, English means word lists and exam papers. InkQuest tries something else: give you a good story first, so you want to know what happens next. The English comes along for the ride.</p>
+    <p>Gamebooks, graded readers, role-playing games, board games… many forms, one idea: <b>get people hooked, and the learning takes care of itself.</b></p>
+    <h3>About Clear Out</h3><p>An adventurers’ guild runs tours of a very dangerous dungeon. You hire the party: a farmhand with a pitchfork, a knight with a bad knee, a stranger from the corner booth. They do the fighting. You pull the cards.</p>
+    <p>Play it half-asleep and let auto-party do the thinking, or build your own party and hunt for synergies. Switch between Chinese and English any time, and press and hold a card to see it in the other language.</p>
+    <p class="ab-note">Every dungeon has an exit. Usually.</p>
+    <h3>Version</h3><dl class="ab-info"><dt>Title</dt><dd>Clear Out 深淵觀光團</dd><dt>Version</dt><dd>Test build · October 2026</dd>
+      <dt>Content</dt><dd>${n.lv} level · ${n.enc} encounters · ${n.crew} crew · ${n.gear} gear · ${n.ev} events · ${n.syn} synergies</dd><dt>Author</dt><dd>Wen-Hung Fang</dd><dt>Made with</dt><dd>Claude</dd></dl>
+    <p class="ab-copy">© 2026 Wen-Hung Fang. All rights reserved.</p></div><div class="btns"><button id="mOk">Close</button></div>`;
+  return `<div class="ab"><div class="ab-art" aria-hidden="true">${art}</div>
+    <p class="ab-brand">Ink<span>Quest</span></p><p class="ab-slogan">Every quest begins with a story.</p><p class="ab-sub">每一段冒險，都從一個故事開始。</p>
+    <h3>學英文，可以好玩一點</h3><p>很多人對英文的記憶，是背不完的單字表和寫不完的考卷。InkQuest 想換個方式：先給你一個好故事，讓你想知道接下來會發生什麼事，英文就在不知不覺中跟著進來了。</p>
+    <p>互動遊戲書、分級讀本、角色扮演遊戲、桌遊……做法很多，想法只有一個：<b>先讓人投入，學習就會自然發生。</b></p>
+    <h3>關於《深淵觀光團》</h3><p>冒險者公會開辦了一條非常危險的地城觀光路線。隊伍由你來湊：帶乾草叉的農家子、膝蓋不好的退休騎士、酒館角落的兜帽怪客……打怪交給他們，抽卡交給你。</p>
+    <p>可以躺著玩，讓自動編隊幫你想；也可以自己排隊伍、研究羈絆。遊戲隨時能切換中英文，長按卡片還能看到另一種語言。</p>
+    <p class="ab-note">每座地城都有出口。大概啦。</p>
+    <h3>版本資訊</h3><dl class="ab-info"><dt>名稱</dt><dd>深淵觀光團 Clear Out</dd><dt>版本</dt><dd>測試版・2026 年 10 月</dd>
+      <dt>內容</dt><dd>${n.lv} 層・${n.enc} 場戰鬥・${n.crew} 位隊員・${n.gear} 件裝備・${n.ev} 個事件・${n.syn} 種羈絆</dd><dt>作者</dt><dd>Wen-Hung Fang</dd><dt>製作</dt><dd>Created with Claude</dd></dl>
+    <p class="ab-copy">© 2026 Wen-Hung Fang. All rights reserved.</p></div><div class="btns"><button id="mOk">關閉</button></div>`;
+}
+function openAbout(){ modalView=openAbout; openModal(aboutHTML()); $('mOk').onclick=closeModal; }
+$('aboutBtn').onclick=openAbout;
+
+/* ---------- start, language, splash ---------- */
+function reset(){S=fresh();smartCache.key='';logLines.length=0;$('log').innerHTML='';intro();renderUI()}
+function levelIntro(){ levelAt(S.enc).intro.forEach(l=>log(l,'gold')); }
+function intro(){ levelIntro(); log(['抽卡組隊，再按「前進！」。','Pull cards, then press “Go!”.'],'sys'); }
+function setLang(l){
+  LANG=l; try{localStorage.setItem('clearout-lang',l)}catch(e){}
+  if(l==='en'&&!S.flags.english){S.flags.english=true;setTimeout(checkAch,500)}
+  applyStatic(); renderSound(); renderSkip(); renderAuto(); renderLogTip(); redrawLog(); renderUI();
+  renderEncounter(); if(busy&&lastFrame){ renderFoes(lastFrame.foes); renderParty(lastFrame.party); }
+  if(busy) $('goHint').textContent=fast?tx('快轉中…','Fast-forwarding…'):tx('戰鬥中…（點戰鬥紀錄可快轉）','Fighting… (tap the log to skip)');
+  if(!$('overlay').hidden&&modalView) modalView();
+  const hint=$('splashHint'); if(hint.dataset.state) hint.textContent=splashHintText(hint.dataset.state);
+}
+$('langBtn').onclick=()=>setLang(other(LANG));
+$('langBtn2').onclick=e=>{e.stopPropagation();setLang(other(LANG))};
+$('langBtn2').addEventListener('pointerdown',e=>e.stopPropagation());
+function splashHintText(state){
+  return state==='muted'?tx('🔇 聲音已關閉，進入遊戲後可以用右上角的喇叭打開。','🔇 Sound is off. Turn it on with the speaker button after you start.')
+    :tx('🔊 進入遊戲後，可以用右上角的喇叭關掉聲音。','🔊 You can turn the sound off with the speaker button later.');
+}
+$('gate').innerHTML='<i class="torch l"></i><i class="torch r"></i>'+spriteImg('goblin',48,'peek')+['farmhand','apprentice','healer','stranger'].map(k=>spriteImg(k,56)).join('');
+$('splash').addEventListener('click',e=>{
+  if(e.target.closest('#startBtn')||e.target.closest('#langBtn2')) return;
+  Sound.init(); const hint=$('splashHint');
+  if(!Sound.isOn()){ hint.dataset.state='muted'; hint.textContent=splashHintText('muted'); return; }
+  if(window.splashPlayed) return; window.splashPlayed=true;
+  Sound.unlock().then(()=>{ Sound.sfx.harp(); if(!$('splash').classList.contains('bye')) Sound.play('title',.9); });
+  hint.dataset.state='on'; hint.textContent=splashHintText('on');
+});
+$('startBtn').onclick=()=>{Sound.unlock();if(Sound.isOn()){Sound.sfx.gate();Sound.play('guild',.4)}const sp=$('splash');sp.classList.add('bye');setTimeout(()=>sp.hidden=true,360)};
+
+applyStatic(); renderSound(); renderAuto(); renderLogTip(); intro(); renderUI(); checkAch();
+$('startBtn').focus();
+</script>
+
+</body>
+</html>

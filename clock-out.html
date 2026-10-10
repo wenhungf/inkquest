@@ -42,7 +42,7 @@ body{
 .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .top .logo{flex:none;white-space:nowrap}
 .top .logo small{white-space:normal;max-width:14em;font-weight:400}
-.logo{font-family:var(--display);font-size:24px;letter-spacing:.04em;line-height:1.1}
+.logo{font-family:var(--display);font-size:22px;letter-spacing:.04em;line-height:1.1}
 .logo small{display:block;font-family:var(--body);font-size:11px;color:var(--muted);letter-spacing:.12em}
 .chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;flex:1 1 0;min-width:0}
 .chip{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:13px;white-space:nowrap}
@@ -108,7 +108,11 @@ button small{display:block;font-family:var(--body);font-size:11px;opacity:.8}
 .btn-skip{display:none;width:100%;font-family:var(--body);font-size:14px;padding:10px;background:var(--panel2);border:1px solid var(--line);color:var(--text)}
 .fighting .actions,.fighting .buffs,.fighting .foot{display:none}
 /* tap the log between fights to read it in a big view; tap again to shrink */
-.logwrap{position:relative;flex:1 1 0;min-height:60px;display:flex}
+.logwrap{position:relative;flex:1 1 0;min-height:5.2em;display:flex}
+.stage>*:not(.logwrap){flex:none}
+.wrap>.stage{min-height:auto}
+/* room for the “tap to expand” tip, so it never covers the last line */
+body:not(.fighting) .log{padding-bottom:1.6em}
 .logwrap .log{flex:1 1 auto;min-height:0}
 .log-tip{position:absolute;right:8px;bottom:6px;font-size:10.5px;color:var(--muted);background:rgba(14,15,36,.85);border-radius:6px;padding:1px 6px;pointer-events:none}
 .fighting .log-tip{display:none}
@@ -252,7 +256,9 @@ html[lang="en"] .foot>span:last-child{gap:5px!important}
 /* company raise: shown when it matters */
 #teamBtn{position:relative}
 #teamBtn.can-raise::after{content:'';position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:var(--L);box-shadow:0 0 6px var(--L)}
-.lot-chip{color:var(--lantern)}
+.m-top{display:flex;align-items:center;gap:8px}
+.m-top .m-floor{flex:1 1 auto;min-width:0}
+.lot-chip{flex:none;font-family:var(--body);font-size:12px;line-height:1.3;padding:2px 8px;border-radius:999px;background:#0e0f24;border:1px solid var(--lantern);color:var(--lantern)}
 .lot-art{width:84px;margin:0 auto;display:block}
 .pay-chip{background:none;border:0;padding:0;font:inherit;color:var(--L);cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
 .raise-card{background:linear-gradient(135deg,rgba(255,207,74,.12),rgba(255,207,74,.03));border:1.5px solid var(--L);border-radius:12px;padding:10px 12px;display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:center}
@@ -354,12 +360,11 @@ html[lang="en"] .face .nm{line-height:1.15}
 </div>
 <div class="wrap">
   <header class="top">
-    <div class="logo"><span data-s="title">躺平冒險團</span><small data-s="tagline">只要抽卡，其他交給夥伴</small></div>
+    <div class="logo"><span data-s="title">躺平冒險團</span></div>
     <div class="chips">
       <button class="chip lang" id="langBtn" aria-label="Switch language">EN</button>
       <button class="chip snd" id="soundBtn" aria-label="關閉聲音">🔊</button>
       <span class="chip">💎 <b class="num" id="gems">10</b></span>
-      <span class="chip" id="floorChip"></span>
     </div>
   </header>
   <div class="floors" id="floors"></div>
@@ -368,7 +373,7 @@ html[lang="en"] .face .nm{line-height:1.15}
     <div class="monster">
       <div class="m-emoji" id="mEmoji">🍄</div>
       <div>
-        <div class="m-floor" id="mFloor"></div>
+        <div class="m-top"><div class="m-floor" id="mFloor"></div><button class="lot-chip" id="lotChip" hidden></button></div>
         <div class="m-name" id="mName"></div>
         <div class="m-quote" id="mQuote"></div>
         <div class="bar"><span id="mBar" style="width:100%"></span></div>
@@ -389,7 +394,6 @@ html[lang="en"] .face .nm{line-height:1.15}
   </div>
   <button class="btn-skip" id="skipBtn" aria-pressed="false"></button>
 
-  <div class="buffs" id="buffs"></div>
   <div class="foot">
     <span id="pity"></span>
     <span style="display:flex;gap:6px">
@@ -699,8 +703,7 @@ const CRAM=buildMonsters(31,[
 const CHAPTERS=[
   {id:1,pack:'office',e:'🏢',name:'辦公大樓',en:{name:'Office Tower',endQ:'One by one, the lights in the building go out. Today, everyone leaves on time.'},monsters:MONSTERS,
     endQ:'整棟大樓的燈一盞一盞熄滅。今天，所有人都準時下班。',
-    intro:[['下午五點五十九分。再一分鐘就下班了——辦公室的燈突然閃了一下。','It’s 5:59 p.m. One more minute until clock-out. Then the office lights flicker.'],
-           ['🛡️ 打工仔騎士・阿傑扛起盾牌：「撐到下班，我們就贏了。」','🛡️ Jie, Part-Time Knight, lifts his shield. “Make it to clock-out, and we win.”']],
+    intro:[['🕔 五點五十九分，辦公室的燈閃了一下。','🕔 5:59 p.m. The office lights flicker.']],
     nextQ:['電梯「叮」一聲，往上一層。門外傳來 {e} 的氣息。','The elevator dings and climbs a floor. Something {e} is waiting outside the doors.']},
   {id:2,pack:'market',e:'🏮',name:'夜市',en:{name:'Night Market',endQ:'One by one, the stalls pack up. The market lights are still on, and everyone heads home with a late-night snack.'},monsters:MARKET,
     endQ:'攤販一攤一攤收起來。夜市的燈還亮著，大家各自提著宵夜回家。',
@@ -994,7 +997,6 @@ function renderUI(){
   $('teamBtn').classList.toggle('can-raise',canRaise);
   $('teamBtn').setAttribute('aria-label',canRaise?tx('隊伍（可以全體調薪）','Team (a company raise is available)'):tx('隊伍','Team'));
   $('gems').textContent=S.gems;
-  $('floorChip').innerHTML=tx(`第 <b class="num">${Math.min(S.floor,MAX_FLOOR)}</b> / ${MAX_FLOOR} 層`,`Floor <b class="num">${Math.min(S.floor,MAX_FLOOR)}</b> / ${MAX_FLOOR}`);
   renderFloors();
   if(!busy){renderMonster(); renderParty();}
   $('pull1').disabled=busy||S.gems<1; $('pull10').disabled=busy||S.gems<10;
@@ -1002,12 +1004,10 @@ function renderUI(){
   $('goHint').textContent=busy?(fast?tx('快轉中…','Fast-forwarding…'):tx('戰鬥中…（點戰鬥紀錄可快轉）','Fighting… (tap the log to skip)'))
     :S.done?tx('已通關','Cleared!'):monsterAt(S.floor).shop?tx(`逛逛${N(monsterAt(S.floor),'name')}`,`Visit ${N(monsterAt(S.floor),'name')}`):tx(`挑戰 ${N(monsterAt(S.floor),'name')}`,`Fight the ${N(monsterAt(S.floor),'name')}`);
   $('pity').textContent=tx(`${PITY_MAX-S.pity} 抽內必出傳說`,`Legendary in ${PITY_MAX-S.pity}`);
-  const owned=Object.keys(S.roster).length, combosNow=activeCombos(team().map(t=>t.id)).length;
-  const lotNow=busy||S.done?null:ensureLot();
-  $('buffs').innerHTML=(lotNow?`<button class="pay-chip lot-chip" id="lotChip" aria-label="${tx('查看籤詩','See your fortune stick')}">${LOTS[lotNow.id].e} ${N(LOTS[lotNow.id],'name')}</button>${tx('　｜　','　|　')}`:'')+(S.pay||canRaise?`<button class="pay-chip" id="payChip">${tx(`💰 調薪 +${Math.round((S.pay||0)*RAISE_PCT*100)}%`,`💰 Pay +${Math.round((S.pay||0)*RAISE_PCT*100)}%`)}</button>${tx('　｜　','　|　')}`:'')+tx(`裝備加成（全隊）：攻擊 <b class="num">+${S.bAtk}</b>・生命 <b class="num">+${S.bHp}</b>　｜　夥伴 <b class="num">${owned}</b> / ${HEROES.length}${combosNow?`　｜　組合技 <b class="num">${combosNow}</b>`:''}`,
-    `Gear: ATK <b class="num">+${S.bAtk}</b> · HP <b class="num">+${S.bHp}</b>　|　Crew <b class="num">${owned}</b>/${HEROES.length}${combosNow?`　|　Combos <b class="num">${combosNow}</b>`:''}`);
-  if($('payChip')) $('payChip').onclick=()=>{teamSel=null;openTeam()};
-  if($('lotChip')) $('lotChip').onclick=openLot;
+  /* fortune stick: a small chip beside the floor tag, only on floors that draw one */
+  const lotNow=busy||S.done?null:ensureLot(), lc=$('lotChip');
+  lc.hidden=!lotNow;
+  if(lotNow){ lc.textContent=`${LOTS[lotNow.id].e} ${N(LOTS[lotNow.id],'name')}`; lc.setAttribute('aria-label',tx('查看籤詩','See your fortune stick')); lc.onclick=openLot; }
   save();
 }
 
@@ -1199,129 +1199,340 @@ function openLot(){
   $('mOk').onclick=closeModal;
   $('mThrow').onclick=()=>{ if(rethrowLot()){ Sound.sfx.click(); renderUI(); openLot(); } };
 }
+/* ENGINE:BEGIN — InkQuest auto-battle engine, shared by Clock Out, Clear Out and Cash Out.
+   Source of truth: engine/engine.js. Edit it there, then run build.py; never edit this block inside a game file.
+
+   A fight is a list of party units against a list of foes (Clock Out: one foe; Clear Out / Cash Out: 1–4).
+   The engine knows nothing about any one game. Each game passes:
+     • rules  — plug-ins that hook into fixed points of a round (crew skills, combos, sticks/scrolls/orders, matchups)
+     • text   — functions that return [zh, en] log lines for the built-in foe abilities
+   Foes carry ABILITIES with settings, e.g. {ramp:{pct:.06}, sweep:{every:2}, enrage:{below:.5,add:.1}}.
+   A boss is just a foe with several abilities, so every boss can fight differently.
+   Hook phases, in the order a fight runs them:
+     prep        silent setup (team % bonuses, stat changes)
+     intro       opening log lines and opening effects
+     roundStart  once per round, before anyone attacks
+     preAttack   per attacker; return true to skip this attack (e.g. a dodge)
+     attackMod   per attacker; change st.a (damage) / st.nz,st.ne (log notes); return false to skip the attack
+     hitMod      per attacker; change st.hits (multi-hits)
+     finalMod    per attacker; last multipliers (matchups, trait bonuses)
+     afterParty  once per round, after the party has attacked
+     foeSkip     per foe; return true and the foe loses its turn (first rule that returns true wins)
+     hurt        per hit on a party member; return {t,d} to change it, or null to cancel it
+     afterHurt   per hit, after damage lands
+     down        when a party member drops to 0 HP; return true if a rule handled it (e.g. a revive)
+   Each hook is {o: order, fn}. Hooks run in ascending order inside a phase, so a game controls
+   exactly where its rules sit next to the built-in foe abilities (their orders are listed in ABILITIES).
+   All randomness goes through ctx.rng, so a seeded rng replays a fight exactly. */
+const Engine=(()=>{
+  const PHASES=['prep','intro','roundStart','preAttack','attackMod','hitMod','finalMod','afterParty','foeSkip','hurt','afterHurt','down'];
+
+  /* ---- pack budget: a pack of n foes shares this much of the single-foe HP and attack (Clear Out sim, Oct 4) ---- */
+  const PACK_BUDGET={hp:[0,1.00,1.15,1.30,1.45],atk:[0,1.00,1.26,1.36,1.41]};
+  /* share of the pack budget each role takes */
+  const ROLES={
+    plain:{hpW:1.0,atkW:1.0}, boss:{hpW:3.0,atkW:2.0}, minion:{hpW:.5,atkW:.6},
+    brute:{hpW:1.4,atkW:.8}, striker:{hpW:.7,atkW:1.4},
+    healer:{hpW:.9,atkW:.4,heal:.08},          /* heals the most-hurt packmate 8% of its max HP on its turn */
+    shaman:{hpW:.9,atkW:.6,partyAtkDown:.10}   /* party attack −10% while it stands */
+  };
+  /* split a single-foe budget {hp,atk} among foe defs that carry a role */
+  function makePack(defs,base,budget=PACK_BUDGET){
+    const n=defs.length, totHp=base.hp*budget.hp[n], totAtk=base.atk*budget.atk[n];
+    const R=d=>ROLES[d.role||'plain'];
+    const sh=defs.reduce((s,d)=>s+R(d).hpW,0), sa=defs.reduce((s,d)=>s+R(d).atkW,0);
+    return defs.map(d=>({...R(d),...d,hp:Math.round(totHp*R(d).hpW/sh),atk:Math.round(totAtk*R(d).atkW/sa)}));
+  }
+
+  /* ---- unit traits for packs (Clear Out classes, Cash Out weight classes) ---- */
+  const TRAIT={area:.65,splash:.05,assassin:1.10,sniper:1.10,taunt:3};
+
+  /* ---- built-in foe abilities. A foe def lists them in def.abilities, each with its own settings ----
+     Hook-based abilities (they plug into the round like rules):
+       ramp      attack grows every round from round 2: {pct: share of base attack} or {flat: n} (default flat 3)
+       disable   every N rounds one party member can't act: {every: 2}
+       evasive   attacks on this foe miss: {chance: .25}; units with noMiss ignore it
+       enrage    once, when HP falls below a share of max: {below: .5, add: n} (add < 1 = share of base attack, else flat; default 15)
+       lifesteal heals itself for a share of the damage it deals: {pct: 1}
+     Turn-shape abilities (read by the foe turn below):
+       sweep        every N rounds hits the whole party instead of one target: {every: 3, pct: .6}
+       multiAttack  attacks this many times each turn: {hits: 2}
+       multiStrike  chance to attack extra times this turn: {chance: .3, hits: 2}
+       focusWeakest always attacks the party member with the lowest HP
+     Passive:
+       steady       percent-based effects work at a share of their strength: {factor: .4}; rules read it with Engine.resist(f) */
+  const ABILITIES={
+    ramp:{roundStart:{o:10,fn:(c,f,a)=>{ if(c.r>1){ f.atk+=a.pct?Math.round(f.def.atk*a.pct):(a.flat!=null?a.flat:3); c.snap(()=>c.text.ramp(f),'bad'); } }}},
+    disable:{roundStart:{o:50,fn:(c,f,a)=>{ if(c.r%(a.every||2)===0){ const al=c.liveParty(); if(al.length){ const s=c.pick(al); c.stunned.add(s); c.snap(()=>c.text.disable(f,s),'bad'); } } }}},
+    evasive:{preAttack:{o:10,fn:(c,u,f,a)=>{ if(!u.noMiss&&c.rng()<(a.chance!=null?a.chance:.25)){ c.snap(()=>c.text.evasive(f,u),'sys'); return true; } }}},
+    enrage:{afterParty:{o:10,fn:(c,f,a)=>{ if(!f.enraged&&f.hp>0&&f.hp<f.max*(a.below!=null?a.below:.5)){ f.enraged=true; const g=a.add; f.atk+=g<1?Math.round(f.def.atk*g):(g||15); c.snap(()=>c.text.enrage(f),'bad'); } }}},
+    lifesteal:{afterHurt:{o:10,fn:(c,t,d,f,a)=>{ if(f) f.hp=Math.min(f.max,f.hp+Math.round(d*(a.pct!=null?a.pct:1))); }}}
+  };
+  const abil=(f,name)=>f&&f.abil[name];
+  /* how strongly percent effects work on this foe (1 = full, steady foes less) */
+  const resist=f=>{ const s=abil(f,'steady'); return s?(s.factor!=null?s.factor:.4):1; };
+
+  /* hook lists are sorted once per rule set and set of foe abilities, then reused (auto-team runs thousands of fights) */
+  const hookCache=new WeakMap();
+  function hooksFor(rules,foes){
+    const names=[...new Set(foes.flatMap(f=>Object.keys(f.abil)))].filter(n=>ABILITIES[n]).sort();
+    const key=names.join('|');
+    let byRules=hookCache.get(rules); if(!byRules){byRules=new Map();hookCache.set(rules,byRules)}
+    if(byRules.has(key)) return byRules.get(key);
+    const H={}; PHASES.forEach(p=>H[p]=[]);
+    rules.forEach(rule=>{ for(const p in rule) if(H[p]) H[p].push({o:rule[p].o,fn:rule[p].fn}); });
+    names.forEach(n=>{ const T=ABILITIES[n]; for(const p in T) H[p].push({o:T[p].o,fn:T[p].fn,ab:n}); });
+    PHASES.forEach(p=>H[p].sort((a,b)=>a.o-b.o));
+    byRules.set(key,H); return H;
+  }
+  function fight(cfg){
+    const rng=cfg.rng||Math.random, quiet=!!cfg.quiet, text=cfg.text;
+    const party=cfg.party.map(u=>({...u,cur:u.hp,max:u.hp,revived:false}));
+    const foes=cfg.foes.map((d,i)=>({def:d,abil:d.abilities||{},ix:i,hp:d.hp,max:d.hp,atk:d.atk,enraged:false,role:d.role||'plain',heal:d.heal||ROLES[d.role||'plain'].heal||0,partyAtkDown:d.partyAtkDown||ROLES[d.role||'plain'].partyAtkDown||0}));
+    const frames=[];
+    const c={rng,party,foes,frames,quiet,text,cfg,r:0,rmax:cfg.rounds||15,teamPct:0,teamAtk:0,roundPct:0,state:{},stunned:new Set(),win:false};
+    /* a frame records what the screen shows after each log line.
+       snap takes a function that builds the [zh, en] line, so quiet runs (auto-team) never build text */
+    /* hit: 'm' = a foe was hit, a number = that party member was hit; fi = which foe (index, -1 = all foes) */
+    c.snap=quiet?()=>{}:(mk,cls,hit,fi)=>{const f0=foes[0];frames.push({text:mk(),cls,hit,fi,mon:{hp:f0.hp,max:f0.max,atk:f0.atk,rage:f0.enraged},foes:foes.map(f=>({hp:f.hp,max:f.max,atk:f.atk,enraged:f.enraged})),u:party.map(u=>u.cur)})};
+    c.pick=a=>a[Math.floor(rng()*a.length)];
+    c.liveParty=()=>party.filter(u=>u.cur>0);
+    c.liveFoes=()=>foes.filter(f=>f.hp>0);
+    const anyFoe=()=>{for(const f of foes)if(f.hp>0)return true;return false};
+    const anyParty=()=>{for(const u of party)if(u.cur>0)return true;return false};
+    c.has=id=>party.some(u=>u.id===id&&u.cur>0);
+    c.lowestFoe=()=>{let b=null;for(const f of foes)if(f.hp>0&&(!b||f.hp<b.hp))b=f;return b};
+    /* default targeting: lowest-HP foe first (one foe: always that foe) */
+    c.targetFor=u=>c.lowestFoe();
+
+    const H=hooksFor(cfg.rules||[],foes);
+    /* ability hooks run once per foe that has the ability (and get its settings); rule hooks run once.
+       Fixed-arity dispatch (no per-call arrays): e0/e1/e2 = hooks that take 0/1/2 arguments after ctx.
+       tf = the foe this call is about; undefined = run an ability once for every live foe that has it */
+    const e0=(h,tf)=>{ if(!h.ab) return h.fn(c);
+      if(tf!==undefined){ const a=abil(tf,h.ab); return a?h.fn(c,tf,a):undefined; }
+      let out; for(const f of foes){ const a=f.hp>0&&f.abil[h.ab]; if(a){ const v=h.fn(c,f,a); if(v!==undefined) out=v; } } return out; };
+    const e1=(h,x,tf)=>{ if(!h.ab) return h.fn(c,x); const a=abil(tf,h.ab); return a?h.fn(c,x,tf,a):undefined; };
+    const e2=(h,x,y,tf)=>{ if(!h.ab) return h.fn(c,x,y); const a=abil(tf,h.ab); return a?h.fn(c,x,y,tf,a):undefined; };
+    c.run=phase=>{ for(const h of H[phase]) e0(h); };
+
+    /* one hit on a party member, from foe f (or null for rule damage) */
+    c.hurt=(t,d,f)=>{
+      let hit={t,d};
+      for(const h of H.hurt){ hit=h.ab?hit:h.fn(c,hit.t,hit.d,f); if(!hit) return; }
+      hit.t.cur-=hit.d;
+      c.snap(()=>text.hit(f,hit.t,hit.d),'bad',party.indexOf(hit.t));
+      for(const h of H.afterHurt) e2(h,hit.t,hit.d,f);
+      if(hit.t.cur<=0){
+        let saved=false; for(const h of H.down){ if(h.fn(c,hit.t,f)){saved=true;break} }
+        if(!saved) c.snap(()=>text.down(hit.t),'bad');
+      }
+    };
+    /* who a foe hits: Taunt units are TRAIT.taunt times as likely; with no Taunt this is a plain pick */
+    c.foeTarget=f=>{
+      const al=c.liveParty(); if(!al.length) return null;
+      if(f.abil.focusWeakest) return al.reduce((a,b)=>b.cur<a.cur?b:a);
+      if(!al.some(u=>u.taunt)) return c.pick(al);
+      let tot=0; for(const u of al) tot+=u.taunt?TRAIT.taunt:1;
+      let x=rng()*tot; for(const u of al){ x-=u.taunt?TRAIT.taunt:1; if(x<=0) return u; } return al[al.length-1];
+    };
+    /* deal damage from one attacker. Area: every foe at 65% (u.areaPct overrides; weak against a lone boss).
+       Cleave: overkill plus a 5% splash go to the next-lowest foe */
+    c.deal=(u,tgt,dmg)=>{
+      if(u.trait==='area'){ const d=Math.round(dmg*(u.areaPct||TRAIT.area)); for(const f of c.liveFoes()) f.hp-=d; return d; }
+      tgt.hp-=dmg;
+      if(u.trait==='cleave'){ const over=tgt.hp<0?-tgt.hp:0; let next=null; for(const f of foes) if(f!==tgt&&f.hp>0&&(!next||f.hp<next.hp)) next=f; if(next) next.hp-=Math.round(dmg*TRAIT.splash)+over; }
+      return dmg;
+    };
+
+    c.run('prep'); c.run('intro');
+    for(let r=1;r<=c.rmax;r++){
+      c.r=r; c.roundPct=0; c.stunned.clear();
+      c.run('roundStart');
+      /* party turn */
+      let shaman=0; for(const f of foes) if(f.hp>0&&f.partyAtkDown) shaman+=f.partyAtkDown;
+      for(const u of party){
+        if(u.cur<=0||!anyFoe()||c.stunned.has(u)) continue;
+        const tgt=c.targetFor(u);
+        let skip=false; for(const h of H.preAttack){ if(e1(h,u,tgt)){skip=true;break} } if(skip) continue;
+        const st={a:Math.round((u.atk+c.teamAtk)*(1+c.teamPct+c.roundPct-shaman)),nz:'',ne:'',hits:1,tgt};
+        for(const h of H.attackMod){ if(e2(h,u,st,tgt)===false){skip=true;break} } if(skip) continue;
+        for(const h of H.hitMod) e2(h,u,st,tgt);
+        for(const h of H.finalMod) e2(h,u,st,tgt);
+        /* pack traits (no Clock Out crew has one) */
+        if(u.trait==='assassin'&&st.tgt.hp<st.tgt.max/2) st.a=Math.round(st.a*TRAIT.assassin);
+        if(u.trait==='sniper'&&st.tgt.hp>st.tgt.max/2) st.a=Math.round(st.a*TRAIT.sniper);
+        st.dmg=st.a*st.hits;
+        const before=text.foeDown?foes.map(f=>f.hp>0):null;
+        const dmg=c.deal(u,st.tgt,st.dmg);
+        c.snap(()=>text.attack(u,st.tgt,dmg,st.nz,st.ne),'','m',u.trait==='area'?-1:st.tgt.ix);
+        /* packs: say when a foe falls (only if the game gives a line for it) */
+        if(before) foes.forEach((f,i)=>{ if(before[i]&&f.hp<=0) c.snap(()=>text.foeDown(f),'good','m',i); });
+      }
+      if(!anyFoe()){ c.win=true; break; }
+      c.run('afterParty');
+      /* foe turn */
+      for(const f of foes){
+        if(f.hp<=0) continue;
+        let frozen=false; for(const h of H.foeSkip){ if(h.ab?(f.abil[h.ab]&&h.fn(c,f,f.abil[h.ab])):h.fn(c,f)){frozen=true;break} }
+        if(f.heal&&!frozen){ const al=c.liveFoes(); const t=al.reduce((a,b)=>b.hp/b.max<a.hp/a.max?b:a); t.hp=Math.min(t.max,t.hp+Math.round(t.max*f.heal)); if(text.foeHeal) c.snap(()=>text.foeHeal(f,t),'bad'); }
+        const sw=f.abil.sweep, ma=f.abil.multiAttack, ms=f.abil.multiStrike;
+        if(frozen){}
+        else if(sw&&r%(sw.every||3)===0){
+          const d=Math.round(f.atk*(sw.pct!=null?sw.pct:.6));
+          c.snap(()=>text.sweep(f),'bad');
+          c.liveParty().forEach(u=>c.hurt(u,d,f));
+        } else {
+          let strikes=ma?(ma.hits||2):1;
+          if(ms&&rng()<(ms.chance!=null?ms.chance:.3)){ strikes=Math.max(strikes,ms.hits||2); c.snap(()=>text.multiStrike(f),'bad'); }
+          for(let s=0;s<strikes;s++){ const t=c.foeTarget(f); if(!t) break; c.hurt(t,f.atk,f); }
+        }
+        if(!anyParty()) break;
+      }
+      if(!anyParty()) break;
+      if(r===c.rmax) c.snap(()=>text.timeout(),'bad');
+    }
+    return {units:party,foes,frames,win:c.win,m0:foes[0].def};
+  }
+
+  return {fight,makePack,resist,PACK_BUDGET,ROLES,TRAIT,ABILITIES,PHASES};
+})();
+/* ENGINE:END */
+/* ---------- Clock Out combat: rules on top of the shared engine ----------
+   Every crew skill, combo, fortune stick and subject matchup is a rule: {phase:{o:order, fn}}.
+   The orders reproduce the original simulate() exactly (verified with seeded side-by-side runs). */
+const CO_TEXT=(f0)=>{
+  const mz=f=>N(f.def,'name','zh'), me=f=>N(f.def,'name','en');
+  const sz=u=>shortName(u.h,'zh'), se=u=>shortName(u.h,'en');
+  const fill=(pair,a,b)=>[pair[0].replace('{n}',a),pair[1].replace('{n}',b)];
+  return {
+    attack:(u,f,dmg,nz,ne)=>[`${u.h.e} ${sz(u)} 攻擊，造成 ${dmg} 傷害${nz}`,`${u.h.e} ${se(u)} attacks for ${dmg} damage${ne}`],
+    hit:(f,t,d)=>[`${f.def.e} ${mz(f)} 攻擊 ${sz(t)}，造成 ${d} 傷害。`,`${f.def.e} The ${me(f)} hits ${se(t)} for ${d} damage.`],
+    down:t=>[`${t.h.e} ${sz(t)} 躺平了……`,`${t.h.e} ${se(t)} is down for the count…`],
+    timeout:()=>['🔔 下班鐘響了，怪物還站著。大家默默收拾東西回家……','🔔 The clock-out bell rings, and the monster is still standing. Everyone quietly packs up and goes home…'],
+    ramp:f=>f.def.growQ?[f.def.growQ[0].replace('{a}',f.atk),f.def.growQ[1].replace('{a}',f.atk)]:[`🦇 KPI 又往上調了。攻擊力變成 ${f.atk}。`,`🦇 The KPI goes up again. Attack is now ${f.atk}.`],
+    disable:(f,s)=>f.def.stunQ?fill(f.def.stunQ,sz(s),se(s)):[`🐙 ${sz(s)} 被拉進會議，這回合無法行動。`,`🐙 ${se(s)} gets pulled into a meeting and can’t act this round.`],
+    evasive:(f,u)=>f.def.dodgeQ?fill(f.def.dodgeQ,`${u.h.e} ${sz(u)}`,`${u.h.e} ${se(u)}`):[`${u.h.e} ${sz(u)} 的攻擊……被已讀不回了。`,`${u.h.e} ${se(u)} attacks… and gets left on read.`],
+    enrage:f=>f.def.rageQ||['🕴️ 加班之王暴怒了！「今天誰都不准走！」攻擊 +15！','🕴️ The King of Overtime is furious! “Nobody leaves today!” Attack +15!'],
+    sweep:f=>f.def.aoeQ||(f.def.trait==='aoe'?['📊 月底結算！報表砸向全隊！','📊 Month-end report! Spreadsheets rain down on the team!']:['👻 狂風暴雨掃過全隊！','👻 Wind and rain sweep over the team!']),
+    multiStrike:f=>f.def.biteQ||['📎 喀嚓喀嚓！釘書機連咬兩口！','📎 Clack clack! The stapler bites twice!']
+  };
+};
+/* helpers the rules share */
+const coHeal=(c,p)=>c.party.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+Math.round(u.max*p))});
+const coC=(c,id)=>c.state.combos.some(x=>x.id===id);
+const coPct=f=>Engine.resist(f);   /* steady foes take percent effects at 40% */
+const coNames=f=>[N(f.def,'name','zh'),N(f.def,'name','en')];
+const CO_RULES=[
+  /* ---- prep: team % bonuses and silent stat changes ---- */
+  {prep:{o:10,fn:c=>{ c.state.combos=activeCombos(c.party.map(u=>u.id));
+    if(c.party.some(u=>u.id==='drill')) c.teamPct+=.10;
+    if(c.party.some(u=>u.id==='grandma')) c.teamPct+=.12;
+    if(coC(c,'night_market')) c.teamPct+=.08;
+    if(coC(c,'clockout')) c.teamPct+=.15;
+    if(coC(c,'procession')) c.teamPct+=.12;
+    if(coC(c,'feast')) c.teamPct+=.08;
+    if(coC(c,'pe_class')) c.teamPct+=.10; }}},
+  /* fortune sticks (Chapter 3, and later chapters once you own the keeper) */
+  {prep:{o:40,fn:c=>{ const f=c.cfg.floor; c.state.lot=S.lot&&S.lot.f===f&&lotFloor(f)?S.lot.id:null; c.state.lm=lotMult(c.party.map(u=>u.id));
+    const lot=c.state.lot, lm=c.state.lm;
+    if(lot==='great') c.teamPct+=LOTS.great.p/100*lm;
+    if(lot==='fair') c.foes.forEach(f=>f.atk=Math.round(f.atk*(1-LOTS.fair.p/100*lm))); }},
+   intro:{o:30,fn:c=>{ const lot=c.state.lot, lm=c.state.lm; if(lot) c.snap(()=>[`📜 ${LOTS[lot].name}：${lotFx(lot,lm,'zh')}${lm>1?'（廟公加倍）':''}。`,`📜 ${LOTS[lot].en.name}: ${lotFx(lot,lm,'en')}${lm>1?' (doubled by the Keeper)':''}.`],'gold'); }},
+   roundStart:{o:80,fn:c=>{ if(c.state.lot==='good'){const p=LOTS.good.p/100*c.state.lm;coHeal(c,p);c.snap(()=>[`📜 籤詩保佑，全隊回復 ${Math.round(p*100)}% 生命。`,`📜 The fortune stick protects you. Team heals ${Math.round(p*100)}% HP.`],'good')} }}},
+  /* ---- intro lines ---- */
+  {intro:{o:10,fn:c=>{ const f=c.foes[0],[mz,me]=coNames(f); c.snap(()=>[`— 第 ${c.cfg.floor} 層：${f.def.e} ${mz} 出現了！ —`,`— Floor ${c.cfg.floor}: ${f.def.e} The ${me} appears! —`],'sys'); }}},
+  {intro:{o:20,fn:c=>{ c.state.combos.forEach(x=>c.snap(()=>[`${x.e} 組合技發動：${x.name}！${x.desc}`,`${x.e} Combo: ${x.en.name}! ${x.en.desc}`],'gold')); }}},
+  {intro:{o:40,fn:c=>{ if(c.teamPct) c.snap(()=>[`全隊士氣高昂，攻擊力 +${Math.round(c.teamPct*100)}%。`,`The team is fired up! Attack +${Math.round(c.teamPct*100)}%.`],'good'); }}},
+  /* stinky tofu: every foe −20% attack */
+  {intro:{o:50,fn:c=>{ if(c.has('tofu')) c.foes.forEach(f=>{const [mz,me]=coNames(f);f.atk=Math.round(f.atk*.8);c.snap(()=>[`🦨 臭豆腐老闆掀開鍋蓋。${mz} 被臭到，攻擊力降到 ${f.atk}。`,`🦨 The Tofu Boss lifts the lid. The ${me} gags. Its attack drops to ${f.atk}.`],'good')}); }}},
+  /* class monitor: −10% now, −5% more every 3rd round (3 times), on every foe */
+  {intro:{o:60,fn:c=>{ c.state.marks=0; if(c.has('monitor')) c.foes.forEach(f=>{const [mz,me]=coNames(f);f.atk=Math.round(f.atk*.9);c.snap(()=>[`📋 風紀股長把 ${mz} 的名字寫在黑板上。攻擊力降到 ${f.atk}。`,`📋 The Monitor writes the ${me}’s name on the board. Its attack drops to ${f.atk}.`],'good')}); }},
+   roundStart:{o:70,fn:c=>{ if(c.has('monitor')&&c.r%3===0&&c.state.marks<3){c.state.marks++;c.foes.forEach(f=>{if(f.hp<=0)return;const [mz,me]=coNames(f);f.atk=Math.round(f.atk*.95);c.snap(()=>[`📋 風紀股長又記了一次。${mz} 攻擊力降到 ${f.atk}。`,`📋 The Monitor writes it down again. The ${me}’s attack drops to ${f.atk}.`],'good')})} }}},
+  /* subjects: announce, then +30% / −20% at the very end of the damage math */
+  {intro:{o:70,fn:c=>{ c.foes.forEach(f=>{ const s=f.def.sub; if(!s) return; const w=weakTo(s); c.snap(()=>[`📖 科目：${SUBJ[s].e} ${SUBJ[s].name}。${SUBJ[w].e} ${SUBJ[w].name}型的夥伴打它特別痛。`,`📖 Subject: ${SUBJ[s].e} ${SUBJ[s].en.name}. ${SUBJ[w].e} ${SUBJ[w].en.name} crew hit it extra hard.`],'sys'); }); }},
+   finalMod:{o:10,fn:(c,u,st)=>{ const e=subEdge(u.h.sub,st.tgt.def.sub); if(e>0){st.a=Math.round(st.a*SUB_ADV);st.nz+='（克制！）';st.ne+=' (Strong!)'} else if(e<0){st.a=Math.round(st.a*SUB_DIS);st.nz+='（被克制）';st.ne+=' (Weak)'} }}},
+  /* lion dance: foes too scared to attack for 2 rounds (1 if steady) */
+  {intro:{o:80,fn:c=>{ c.state.scared=0; if(c.has('lion')){ const f=c.foes[0],[mz,me]=coNames(f); const n=(f.abil.steady?1:2)+(coC(c,'procession')?1:0); c.state.scared=n; c.snap(()=>[`🦁 鑼鼓一響，舞獅衝上前！${mz} 嚇了一大跳，${n} 回合不敢動。`,`🦁 The drums start and the lion leaps out! The ${me} is too scared to attack for ${n} round${n>1?'s':''}.`],'good'); } }},
+   foeSkip:{o:10,fn:(c,f)=>{ if(c.r<=c.state.scared){ const [mz,me]=coNames(f); c.snap(()=>[`🦁 ${mz} 還在發抖，不敢攻擊。`,`🦁 The ${me} is still shaking and doesn’t attack.`],'good'); return true; } }}},
+  /* typhoon god: every foe loses 25% of its HP */
+  {intro:{o:90,fn:c=>{ if(c.has('typhoon')) c.foes.forEach(f=>{const [mz,me]=coNames(f);const d=Math.round(f.max*.25*coPct(f));f.hp-=d;c.snap(()=>[`🌀 颱風假之神宣布停班停課！${mz} 失去 ${d} 生命！`,`🌀 The Typhoon God cancels work and school! The ${me} loses ${d} HP!`],'gold','m')}); }}},
+  /* ---- each round ---- */
+  {roundStart:{o:0,fn:c=>{ if(c.r===MAX_ROUNDS+1) c.snap(()=>['⏰ 加班時間！魔王戰延長到 20 回合。','⏰ Overtime! Boss fights last up to 20 rounds.'],'gold');
+    c.snap(()=>c.r>MAX_ROUNDS?[`［第 ${c.r} 回合・加班中］`,`[Round ${c.r} · Overtime]`]:[`［第 ${c.r} 回合］`,`[Round ${c.r}]`],'sys'); }}},
+  {roundStart:{o:20,fn:c=>{ if(coC(c,'burnout')&&c.r>1) c.snap(()=>[`🔥 燃燒三人組越燒越旺！三人攻擊 +${Math.round(BURN.atk*c.r*100)}%。`,`🔥 The Burnout Trio burns brighter! Their attack is now +${Math.round(BURN.atk*c.r*100)}%.`],'good'); }}},
+  {roundStart:{o:30,fn:c=>{ if(c.state.singerB==null) c.state.singerB=0;
+    if(c.has('singer')){const cap=coC(c,'band')?.30:.15,inc=coC(c,'band')?.05:.03;if(c.state.singerB<cap-1e-9){const add=Math.min(inc,cap-c.state.singerB);c.state.singerB+=add;c.teamPct+=add;c.snap(()=>[`🎤 歌手越唱越嗨！全隊攻擊 +${Math.round(add*100)}%（累計 +${Math.round(c.state.singerB*100)}%）。`,`🎤 The Singer gets the crowd going! Team attack +${Math.round(add*100)}% (total +${Math.round(c.state.singerB*100)}%).`],'good')}} }}},
+  {roundStart:{o:40,fn:c=>{ if(c.has('oden')){const al=c.liveParty();if(al.length){const t=al.reduce((a,b)=>b.cur/b.max<a.cur/a.max?b:a),g=Math.round(t.max*(coC(c,'street_food')?.16:.08));t.cur=Math.min(t.max,t.cur+g);c.snap(()=>[`🍢 關東煮阿伯幫 ${shortName(t.h,'zh')} 舀了一碗熱湯，回復 ${g}。`,`🍢 The Oden Uncle gives ${shortName(t.h,'en')} a bowl of hot soup. +${g} HP.`],'good')}} }}},
+  {roundStart:{o:60,fn:c=>{ if(c.has('guru')&&c.rng()<(coC(c,'two_teachers')?.6:.4)){c.roundPct+=.4;c.snap(()=>['🎙️ 補教天王：「這題會考！」猜中了！全隊這回合攻擊 +40%。','🎙️ The Superstar: “This will be on the test!” He’s right! Team +40% attack this round.'],'gold')} }}},
+  {roundStart:{o:90,fn:c=>{ if(c.has('chef')&&c.r%(coC(c,'feast')?2:3)===0){coHeal(c,.12);c.snap(()=>['🧑‍🍳 總舖師：「出菜囉！」全隊回復 12% 生命。','🧑‍🍳 The Chef shouts, “Food’s up!” Team heals 12% HP.'],'good')} }}},
+  {roundStart:{o:100,fn:c=>{ if(c.has('boba')){const p=coC(c,'street_food')?.06:.03;coHeal(c,p);c.snap(()=>[`🧋 店長發飲料，全隊回復 ${Math.round(p*100)}% 生命。`,`🧋 The Tea Manager hands out drinks. Team heals ${Math.round(p*100)}% HP.`],'good')} }}},
+  {roundStart:{o:110,fn:c=>{ if(c.has('grandma')){const p=coC(c,'temple')?.06:.04;coHeal(c,p);c.snap(()=>[`👵 阿嬤端出滷肉飯，全隊回復 ${Math.round(p*100)}% 生命。`,`👵 A-má brings out braised pork rice. Team heals ${Math.round(p*100)}% HP.`],'good')} }}},
+  /* clerk: one of three; the noodle box hits the lowest-HP foe for a % of its own max HP */
+  {roundStart:{o:120,fn:c=>{ if(!c.has('clerk')) return; const x=Math.floor(c.rng()*3);
+    if(x===0){coHeal(c,.05);c.snap(()=>['🏪 店員發了茶葉蛋，全隊回復 5% 生命。','🏪 The Clerk hands out tea eggs. Team heals 5% HP.'],'good')}
+    else if(x===1){c.teamPct+=.05;c.snap(()=>['🏪 店員遞上能量飲料，全隊攻擊 +5%。','🏪 The Clerk passes around energy drinks. Team attack +5%.'],'good')}
+    else {const f=c.lowestFoe();if(!f)return;const d=Math.round(f.max*(coC(c,'nightshift')?.04:.02)*coPct(f));f.hp-=d;c.snap(()=>[`🏪 店員丟出一整箱泡麵，造成 ${d} 傷害！`,`🏪 The Clerk throws a whole box of instant noodles! ${d} damage!`],'gold','m')} }}},
+  /* ---- per attacker ---- */
+  {attackMod:{o:10,fn:(c,u,st)=>{
+    const r=c.r;
+    if(u.id==='xueba'&&r%2===0){st.a=Math.round(st.a*1.8);st.nz='（標準答案！）';st.ne=' (Model answer!)'}
+    if(c.has('pe')&&u.h.sub==='muscle') st.a=Math.round(st.a*1.2);
+    if(u.id==='jie'&&r>=4){st.a*=2;st.nz='（準時下班！）';st.ne=' (Leave on time!)'}
+    if(u.id==='uber'&&r===1){st.a*=coC(c,'typhoon_day')?5:3;st.nz='（準時送達！）';st.ne=' (Right on time!)'}
+    if(u.id==='medium'&&(u.cur<u.max/2||coC(c,'temple')||coC(c,'procession'))){st.a*=2;st.nz='（起乩！）';st.ne=' (Possessed!)'}
+    if(u.id==='fortune'&&c.rng()<(coC(c,'night_market')?.5:.3)){st.a=Math.round(st.a*2.5);st.nz='（鐵口直斷，暴擊！）';st.ne=' (Never wrong! Critical hit!)'}
+    if(u.id==='techie'&&r%4===0){c.snap(()=>['👓 乾眼新貴停下來點眼藥水……','👓 The Techie stops to put in eye drops…'],'sys');return false}
+    if(u.id==='techie'&&r%4===1&&r>1){st.a*=3;st.nz='（眼睛亮了！）';st.ne=' (Eyes wide open!)'}
+    if(u.id==='grad'&&r<=2){st.a=Math.round(st.a/2);st.nz='（還在拖延……）';st.ne=' (Still procrastinating…)'}
+    if(u.id==='grad'&&r>=8){st.a*=3;st.nz='（死線到了！）';st.ne=' (Deadline mode!)'}
+    if(coC(c,'burnout')&&['grad','manager','techie'].includes(u.id)) st.a=Math.round(st.a*(1+BURN.atk*r));
+    if(u.id==='santaizi'&&r>1){st.a=Math.round(st.a*(1+.1*(r-1)));st.nz=`（越跳越嗨 +${10*(r-1)}%）`;st.ne=` (Dancing +${10*(r-1)}%)`}
+    if(u.id==='parking'&&r<=2){st.a*=2;st.nz='（倒車入庫！）';st.ne=' (Backed right in!)'}
+    if(u.id==='claw'&&r%3===0){st.a*=3;st.nz='（保夾！）';st.ne=' (Guaranteed grab!)'}
+  }},
+   hitMod:{o:10,fn:(c,u,st)=>{
+    if(u.id==='intern'&&c.rng()<.25){st.hits=2;st.nz='（連印兩張！）';st.ne=' (Double copy!)'}
+    if(u.id==='dice'&&c.rng()<.5){st.hits=2;st.nz='（十八啦！再一下！）';st.ne=' (Rolled high! One more hit!)'}
+    if(c.has('chicken')&&c.rng()<.15*coPct(st.tgt)){st.hits*=2;st.nz+='（加辣！）';st.ne+=' (Extra spicy!)'}
+  }}},
+  /* ---- foe turn: Teacher Joe confuses the foe ---- */
+  {foeSkip:{o:20,fn:(c,f)=>{ if(c.has('teacher')&&c.rng()<(coC(c,'two_teachers')?.35:.25)){const [mz,me]=coNames(f);c.snap(()=>[`🧑‍🏫 外師 Joe 說了一長串英文。${mz} 聽不懂，這回合愣住了。`,`🧑‍🏫 Teacher Joe says something long in English. The ${me} doesn’t understand and freezes this round.`],'good');return true} }}},
+  /* ---- hits on the crew, in order: bark, block, lie flat, armor ---- */
+  {hurt:{o:10,fn:(c,t,d,f)=>{ if(c.has('dog')&&c.rng()<(coC(c,'pe_class')?.3:.15)){const [mz,me]=f?coNames(f):['怪物','monster'];c.snap(()=>[`🐕 小黑衝出去狂吠！${mz} 嚇得打歪了。`,`🐕 Blackie runs out barking! The ${me} misses.`],'good');return null} return {t,d}; }}},
+  {hurt:{o:20,fn:(c,t,d)=>{ const mg=c.party.find(u=>u.id==='manager'&&u.cur>0);
+    if(mg&&t!==mg&&c.rng()<.3){d=Math.max(1,Math.round(d/2));c.teamPct+=.02;c.snap(()=>[`🥪 夾心主管衝出來替 ${shortName(t.h,'zh')} 擋刀！（全隊攻擊 +2%）`,`🥪 The Manager jumps in front of ${shortName(t.h,'en')}! (Team attack +2%)`],'good');t=mg;}
+    return {t,d}; }}},
+  {hurt:{o:30,fn:(c,t,d)=>{ if(t.id==='lieflat'&&c.rng()<.3){c.snap(()=>[`🛌 躺平大師已經躺平了，完全不痛。`,`🛌 The Lie-Flat Master is already lying down. No damage.`],'good',c.party.indexOf(t));return null} return {t,d}; }}},
+  {hurt:{o:40,fn:(c,t,d)=>{ if(t.id==='guard')d=Math.max(1,Math.round(d*.75)); if(coC(c,'discipline'))d=Math.max(1,Math.round(d*.8)); return {t,d}; }}},
+  /* engineer reboots once (twice with Night Shift) */
+  {down:{o:10,fn:(c,t)=>{ if(t.id==='engineer'&&(t.reboots||0)<(coC(c,'nightshift')?2:1)){t.reboots=(t.reboots||0)+1;t.cur=Math.ceil(t.max/2);c.snap(()=>['💻 資深工程師重開機了！以一半生命復活。','💻 The Engineer reboots! She’s back with half HP.'],'good');return true} }}}
+];
+const CO_TEXT_ALL=CO_TEXT();
+/* Clock Out's monster data keeps its own trait names; this table turns them into engine abilities */
+const CO_ABILITIES={
+  bite:m=>({multiStrike:{chance:.3,hits:2}}),
+  dodge:m=>({evasive:{chance:.25}}),
+  meeting:m=>({disable:{every:2}}),
+  aoe:m=>({sweep:{every:3,pct:.6}}),
+  storm:m=>({sweep:{every:2,pct:.6}}),
+  kpi:m=>({ramp:m.grow?{pct:m.grow}:{flat:3}}),
+  weak:m=>({focusWeakest:{}}),
+  drain:m=>({lifesteal:{pct:1}}),
+  boss:m=>({multiAttack:{hits:2},enrage:{below:.5,add:m.rage}})
+};
+const coFoeCache=new WeakMap();
+function coFoe(m){
+  let d=coFoeCache.get(m); if(d) return d;
+  const ab=m.trait&&CO_ABILITIES[m.trait]?CO_ABILITIES[m.trait](m):{};
+  if(m.steady) ab.steady={factor:.4};
+  d={...m,abilities:ab}; coFoeCache.set(m,d); return d;
+}
+/* one Clock Out fight: one monster per floor */
 function simulate(ids,quiet,floorArg){
   const f=floorArg||S.floor, m0=monsterAt(f);
-  const mz=N(m0,'name','zh'), me=N(m0,'name','en');
-  const units=(ids?ids.map(heroStats):team()).map(x=>({...x,cur:x.hp,max:x.hp,revived:false}));
-  const has=id=>units.some(u=>u.id===id&&u.cur>0);
-  const mon={hp:m0.hp,max:m0.hp,atk:m0.atk,rage:false};
-  const frames=[]; const snap=quiet?()=>{}:(text,cls,hit)=>frames.push({text,cls,hit,mon:{...mon},u:units.map(u=>u.cur)});
-  const RMAX=roundsFor(f), pctMul=m0.steady?.4:1;
-  const sz=u=>shortName(u.h,'zh'), se=u=>shortName(u.h,'en');
-  let teamAtk=0, teamPct=0;
-  const combos=activeCombos(units.map(u=>u.id)), C=id=>combos.some(c=>c.id===id);
-  if(units.some(u=>u.id==='drill')){teamPct+=.10}
-  if(units.some(u=>u.id==='grandma')){teamPct+=.12}
-  if(C('night_market')) teamPct+=.08;
-  if(C('clockout')) teamPct+=.15;
-  if(C('procession')) teamPct+=.12;
-  if(C('feast')) teamPct+=.08;
-  if(C('pe_class')) teamPct+=.10;
-  const lot=S.lot&&S.lot.f===f&&lotFloor(f)?S.lot.id:null, lm=lotMult(units.map(u=>u.id));
-  if(lot==='great') teamPct+=LOTS.great.p/100*lm;
-  if(lot==='fair') mon.atk=Math.round(mon.atk*(1-LOTS.fair.p/100*lm));
-  snap([`— 第 ${f} 層：${m0.e} ${mz} 出現了！ —`,`— Floor ${f}: ${m0.e} The ${me} appears! —`],'sys');
-  combos.forEach(c=>snap([`${c.e} 組合技發動：${c.name}！${c.desc}`,`${c.e} Combo: ${c.en.name}! ${c.en.desc}`],'gold'));
-  if(lot) snap([`📜 ${LOTS[lot].name}：${lotFx(lot,lm,'zh')}${lm>1?'（廟公加倍）':''}。`,`📜 ${LOTS[lot].en.name}: ${lotFx(lot,lm,'en')}${lm>1?' (doubled by the Keeper)':''}.`],'gold');
-  if(teamPct) snap([`全隊士氣高昂，攻擊力 +${Math.round(teamPct*100)}%。`,`The team is fired up! Attack +${Math.round(teamPct*100)}%.`],'good');
-  if(has('tofu')){mon.atk=Math.round(mon.atk*.8);snap([`🦨 臭豆腐老闆掀開鍋蓋。${mz} 被臭到，攻擊力降到 ${mon.atk}。`,`🦨 The Tofu Boss lifts the lid. The ${me} gags. Its attack drops to ${mon.atk}.`],'good')}
-  let singerB=0, scared=0, marks=0;
-  if(has('monitor')){mon.atk=Math.round(mon.atk*.9);snap([`📋 風紀股長把 ${mz} 的名字寫在黑板上。攻擊力降到 ${mon.atk}。`,`📋 The Monitor writes the ${me}’s name on the board. Its attack drops to ${mon.atk}.`],'good')}
-  if(m0.sub){const w=weakTo(m0.sub);snap([`📖 科目：${SUBJ[m0.sub].e} ${SUBJ[m0.sub].name}。${SUBJ[w].e} ${SUBJ[w].name}型的夥伴打它特別痛。`,`📖 Subject: ${SUBJ[m0.sub].e} ${SUBJ[m0.sub].en.name}. ${SUBJ[w].e} ${SUBJ[w].en.name} crew hit it extra hard.`],'sys')}
-  if(has('lion')){scared=(m0.steady?1:2)+(C('procession')?1:0);snap([`🦁 鑼鼓一響，舞獅衝上前！${mz} 嚇了一大跳，${scared} 回合不敢動。`,`🦁 The drums start and the lion leaps out! The ${me} is too scared to attack for ${scared} round${scared>1?'s':''}.`],'good')}
-  const fill=(pair,a,b)=>[pair[0].replace('{n}',a),pair[1].replace('{n}',b)];
-  if(has('typhoon')){const d=Math.round(mon.max*.25*pctMul);mon.hp-=d;snap([`🌀 颱風假之神宣布停班停課！${mz} 失去 ${d} 生命！`,`🌀 The Typhoon God cancels work and school! The ${me} loses ${d} HP!`],'gold','m')}
-  let win=false, stunned=null;
-  const hurt=(t,d)=>{
-    if(has('dog')&&Math.random()<(C('pe_class')?.3:.15)){snap([`🐕 小黑衝出去狂吠！${mz} 嚇得打歪了。`,`🐕 Blackie runs out barking! The ${me} misses.`],'good');return}
-    const mg=units.find(u=>u.id==='manager'&&u.cur>0);
-    if(mg&&t!==mg&&Math.random()<.3){d=Math.max(1,Math.round(d/2));teamPct+=.02;snap([`🥪 夾心主管衝出來替 ${sz(t)} 擋刀！（全隊攻擊 +2%）`,`🥪 The Manager jumps in front of ${se(t)}! (Team attack +2%)`],'good');t=mg;}
-    if(t.id==='lieflat'&&Math.random()<.3){snap([`🛌 躺平大師已經躺平了，完全不痛。`,`🛌 The Lie-Flat Master is already lying down. No damage.`],'good',units.indexOf(t));return}
-    if(t.id==='guard')d=Math.max(1,Math.round(d*.75));
-    if(C('discipline'))d=Math.max(1,Math.round(d*.8));
-    t.cur-=d;
-    snap([`${m0.e} ${mz} 攻擊 ${sz(t)}，造成 ${d} 傷害。`,`${m0.e} The ${me} hits ${se(t)} for ${d} damage.`],'bad',units.indexOf(t));
-    if(m0.trait==='drain'){mon.hp=Math.min(mon.max,mon.hp+d)}
-    if(t.cur<=0){
-      if(t.id==='engineer'&&(t.reboots||0)<(C('nightshift')?2:1)){t.reboots=(t.reboots||0)+1;t.cur=Math.ceil(t.max/2);snap(['💻 資深工程師重開機了！以一半生命復活。','💻 The Engineer reboots! She’s back with half HP.'],'good')}
-      else snap([`${t.h.e} ${sz(t)} 躺平了……`,`${t.h.e} ${se(t)} is down for the count…`],'bad');
-    }
-  };
-  for(let r=1;r<=RMAX;r++){
-    if(r===MAX_ROUNDS+1) snap(['⏰ 加班時間！魔王戰延長到 20 回合。','⏰ Overtime! Boss fights last up to 20 rounds.'],'gold');
-    snap(r>MAX_ROUNDS?[`［第 ${r} 回合・加班中］`,`[Round ${r} · Overtime]`]:[`［第 ${r} 回合］`,`[Round ${r}]`],'sys');
-    if(m0.trait==='kpi'&&r>1){mon.atk+=m0.grow?Math.round(m0.atk*m0.grow):3;snap(m0.growQ?[m0.growQ[0].replace('{a}',mon.atk),m0.growQ[1].replace('{a}',mon.atk)]:[`🦇 KPI 又往上調了。攻擊力變成 ${mon.atk}。`,`🦇 The KPI goes up again. Attack is now ${mon.atk}.`],'bad')}
-    if(C('burnout')&&r>1){snap([`🔥 燃燒三人組越燒越旺！三人攻擊 +${Math.round(BURN.atk*r*100)}%。`,`🔥 The Burnout Trio burns brighter! Their attack is now +${Math.round(BURN.atk*r*100)}%.`],'good')}
-    if(has('singer')){const cap=C('band')?.30:.15,inc=C('band')?.05:.03;if(singerB<cap-1e-9){const add=Math.min(inc,cap-singerB);singerB+=add;teamPct+=add;snap([`🎤 歌手越唱越嗨！全隊攻擊 +${Math.round(add*100)}%（累計 +${Math.round(singerB*100)}%）。`,`🎤 The Singer gets the crowd going! Team attack +${Math.round(add*100)}% (total +${Math.round(singerB*100)}%).`],'good')}}
-    if(has('oden')){const al=units.filter(u=>u.cur>0);if(al.length){const t=al.reduce((a,b)=>b.cur/b.max<a.cur/a.max?b:a),g=Math.round(t.max*(C('street_food')?.16:.08));t.cur=Math.min(t.max,t.cur+g);snap([`🍢 關東煮阿伯幫 ${sz(t)} 舀了一碗熱湯，回復 ${g}。`,`🍢 The Oden Uncle gives ${se(t)} a bowl of hot soup. +${g} HP.`],'good')}}
-    stunned=null;
-    if(m0.trait==='meeting'&&r%2===0){
-      const alive=units.filter(u=>u.cur>0);
-      if(alive.length){stunned=pick(alive);snap(m0.stunQ?fill(m0.stunQ,sz(stunned),se(stunned)):[`🐙 ${sz(stunned)} 被拉進會議，這回合無法行動。`,`🐙 ${se(stunned)} gets pulled into a meeting and can’t act this round.`],'bad')}
-    }
-    let guess=0;
-    if(has('guru')&&Math.random()<(C('two_teachers')?.6:.4)){guess=.4;snap(['🎙️ 補教天王：「這題會考！」猜中了！全隊這回合攻擊 +40%。','🎙️ The Superstar: “This will be on the test!” He’s right! Team +40% attack this round.'],'gold')}
-    if(has('monitor')&&r%3===0&&marks<3){marks++;mon.atk=Math.round(mon.atk*.95);snap([`📋 風紀股長又記了一次。${mz} 攻擊力降到 ${mon.atk}。`,`📋 The Monitor writes it down again. The ${me}’s attack drops to ${mon.atk}.`],'good')}
-    if(lot==='good'){const p=LOTS.good.p/100*lm;units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+Math.round(u.max*p))});snap([`📜 籤詩保佑，全隊回復 ${Math.round(p*100)}% 生命。`,`📜 The fortune stick protects you. Team heals ${Math.round(p*100)}% HP.`],'good')}
-    if(has('chef')&&r%(C('feast')?2:3)===0){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+Math.round(u.max*.12))});snap(['🧑‍🍳 總舖師：「出菜囉！」全隊回復 12% 生命。','🧑‍🍳 The Chef shouts, “Food’s up!” Team heals 12% HP.'],'good')}
-    if(has('boba')){const p=C('street_food')?.06:.03;units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+Math.round(u.max*p))});snap([`🧋 店長發飲料，全隊回復 ${Math.round(p*100)}% 生命。`,`🧋 The Tea Manager hands out drinks. Team heals ${Math.round(p*100)}% HP.`],'good')}
-    if(has('grandma')){const p=C('temple')?.06:.04;units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+Math.round(u.max*p))});snap([`👵 阿嬤端出滷肉飯，全隊回復 ${Math.round(p*100)}% 生命。`,`👵 A-má brings out braised pork rice. Team heals ${Math.round(p*100)}% HP.`],'good')}
-    if(has('clerk')){
-      const x=Math.floor(Math.random()*3);
-      if(x===0){units.forEach(u=>{if(u.cur>0)u.cur=Math.min(u.max,u.cur+Math.round(u.max*.05))});snap(['🏪 店員發了茶葉蛋，全隊回復 5% 生命。','🏪 The Clerk hands out tea eggs. Team heals 5% HP.'],'good')}
-      else if(x===1){teamPct+=.05;snap(['🏪 店員遞上能量飲料，全隊攻擊 +5%。','🏪 The Clerk passes around energy drinks. Team attack +5%.'],'good')}
-      else {const d=Math.round(mon.max*(C('nightshift')?.04:.02)*pctMul);mon.hp-=d;snap([`🏪 店員丟出一整箱泡麵，造成 ${d} 傷害！`,`🏪 The Clerk throws a whole box of instant noodles! ${d} damage!`],'gold','m')}
-    }
-    for(const u of units){
-      if(u.cur<=0||mon.hp<=0||u===stunned)continue;
-      if(m0.trait==='dodge'&&u.id!=='xueba'&&Math.random()<.25){snap(m0.dodgeQ?fill(m0.dodgeQ,`${u.h.e} ${sz(u)}`,`${u.h.e} ${se(u)}`):[`${u.h.e} ${sz(u)} 的攻擊……被已讀不回了。`,`${u.h.e} ${se(u)} attacks… and gets left on read.`],'sys');continue}
-      let a=Math.round((u.atk+teamAtk)*(1+teamPct+guess)), nz='', ne='';
-      if(u.id==='xueba'&&r%2===0){a=Math.round(a*1.8);nz='（標準答案！）';ne=' (Model answer!)'}
-      if(has('pe')&&u.h.sub==='muscle') a=Math.round(a*1.2);
-      if(u.id==='jie'&&r>=4){a*=2;nz='（準時下班！）';ne=' (Leave on time!)'}
-      if(u.id==='uber'&&r===1){a*=C('typhoon_day')?5:3;nz='（準時送達！）';ne=' (Right on time!)'}
-      if(u.id==='medium'&&(u.cur<u.max/2||C('temple')||C('procession'))){a*=2;nz='（起乩！）';ne=' (Possessed!)'}
-      if(u.id==='fortune'&&Math.random()<(C('night_market')?.5:.3)){a=Math.round(a*2.5);nz='（鐵口直斷，暴擊！）';ne=' (Never wrong! Critical hit!)'}
-      if(u.id==='techie'&&r%4===0){snap(['👓 乾眼新貴停下來點眼藥水……','👓 The Techie stops to put in eye drops…'],'sys');continue}
-      if(u.id==='techie'&&r%4===1&&r>1){a*=3;nz='（眼睛亮了！）';ne=' (Eyes wide open!)'}
-      if(u.id==='grad'&&r<=2){a=Math.round(a/2);nz='（還在拖延……）';ne=' (Still procrastinating…)'}
-      if(u.id==='grad'&&r>=8){a*=3;nz='（死線到了！）';ne=' (Deadline mode!)'}
-      if(C('burnout')&&['grad','manager','techie'].includes(u.id)) a=Math.round(a*(1+BURN.atk*r));
-      if(u.id==='santaizi'&&r>1){a=Math.round(a*(1+.1*(r-1)));nz=`（越跳越嗨 +${10*(r-1)}%）`;ne=` (Dancing +${10*(r-1)}%)`}
-      if(u.id==='parking'&&r<=2){a*=2;nz='（倒車入庫！）';ne=' (Backed right in!)'}
-      if(u.id==='claw'&&r%3===0){a*=3;nz='（保夾！）';ne=' (Guaranteed grab!)'}
-      let hits=1; if(u.id==='intern'&&Math.random()<.25){hits=2;nz='（連印兩張！）';ne=' (Double copy!)'}
-      if(u.id==='dice'&&Math.random()<.5){hits=2;nz='（十八啦！再一下！）';ne=' (Rolled high! One more hit!)'}
-      if(has('chicken')&&Math.random()<.15*pctMul){hits*=2;nz+='（加辣！）';ne+=' (Extra spicy!)'}
-      const edge=subEdge(u.h.sub,m0.sub);
-      if(edge>0){a=Math.round(a*SUB_ADV);nz+='（克制！）';ne+=' (Strong!)'} else if(edge<0){a=Math.round(a*SUB_DIS);nz+='（被克制）';ne+=' (Weak)'}
-      const dmg=a*hits; mon.hp-=dmg;
-      snap([`${u.h.e} ${sz(u)} 攻擊，造成 ${dmg} 傷害${nz}`,`${u.h.e} ${se(u)} attacks for ${dmg} damage${ne}`],'','m');
-    }
-    if(mon.hp<=0){win=true;break}
-    if(m0.trait==='boss'&&!mon.rage&&mon.hp<mon.max/2){mon.rage=true;mon.atk+=m0.rage<1?Math.round(m0.atk*m0.rage):(m0.rage||15);snap(m0.rageQ||['🕴️ 加班之王暴怒了！「今天誰都不准走！」攻擊 +15！','🕴️ The King of Overtime is furious! “Nobody leaves today!” Attack +15!'],'bad')}
-    let frozen=false;
-    if(r<=scared){snap([`🦁 ${mz} 還在發抖，不敢攻擊。`,`🦁 The ${me} is still shaking and doesn’t attack.`],'good');frozen=true}
-    else if(has('teacher')&&Math.random()<(C('two_teachers')?.35:.25)){snap([`🧑‍🏫 外師 Joe 說了一長串英文。${N(m0,'name','zh')} 聽不懂，這回合愣住了。`,`🧑‍🏫 Teacher Joe says something long in English. The ${N(m0,'name','en')} doesn’t understand and freezes this round.`],'good');frozen=true}
-    const aoe=(m0.trait==='aoe'&&r%3===0)||(m0.trait==='storm'&&r%2===0);
-    if(frozen){}
-    else if(aoe){
-      const d=Math.round(mon.atk*.6);
-      snap(m0.aoeQ||(m0.trait==='aoe'?['📊 月底結算！報表砸向全隊！','📊 Month-end report! Spreadsheets rain down on the team!']:['👻 狂風暴雨掃過全隊！','👻 Wind and rain sweep over the team!']),'bad');
-      units.filter(u=>u.cur>0).forEach(u=>hurt(u,d));
-    } else {
-      let strikes=m0.trait==='boss'?2:1;
-      if(m0.trait==='bite'&&Math.random()<.3){strikes=2;snap(m0.biteQ||['📎 喀嚓喀嚓！釘書機連咬兩口！','📎 Clack clack! The stapler bites twice!'],'bad')}
-      for(let s=0;s<strikes;s++){
-        const alive=units.filter(u=>u.cur>0); if(!alive.length)break;
-        const t=m0.trait==='weak'?alive.reduce((a,b)=>b.cur<a.cur?b:a):pick(alive);
-        hurt(t,mon.atk);
-      }
-    }
-    if(units.every(u=>u.cur<=0))break;
-    if(r===RMAX) snap(['🔔 下班鐘響了，怪物還站著。大家默默收拾東西回家……','🔔 The clock-out bell rings, and the monster is still standing. Everyone quietly packs up and goes home…'],'bad');
-  }
-  return {units,frames,win,m0};
+  const party=(ids?ids.map(heroStats):team()).map(x=>({...x,noMiss:x.id==='xueba'}));
+  return Engine.fight({party,foes:[coFoe(m0)],rounds:roundsFor(f),floor:f,quiet,rules:CO_RULES,text:CO_TEXT_ALL});
 }
 /* ---------- stalls: shop floors, no fighting ---------- */
 const SHOP_ITEMS={
@@ -1956,7 +2167,7 @@ function reset(){S=fresh();logLines.length=0;$('log').innerHTML='';intro();rende
 function chapterIntro(){ chapterAt(S.floor).intro.forEach((l,i)=>log(l,i===0?'sys':'good')); }
 function intro(){
   chapterIntro();
-  log(['抽卡補強隊伍，然後按「出發！」。','Pull cards to build your team, then press “Go!”.'],'sys');
+  log(['抽卡組隊，再按「出發！」。','Pull cards, then press “Go!”.'],'sys');
 }
 
 /* ---------- language switch ---------- */
