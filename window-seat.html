@@ -326,6 +326,18 @@ input,textarea,select{font-size:max(16px,1em);}
 .read p.mail{margin-left:0;padding:10px 14px 10px 16px;background:var(--surface);border-left:3px solid var(--accent);border-radius:0;font-family:ui-monospace,"SF Mono",Menlo,monospace;}
 .read p.mail .en{font-size:.95em;line-height:1.7;}
 .read p.mail + p.mail{margin-top:-1em;padding-top:0;}
+/* contract / legal text inside a reading */
+.read p.doc{margin-left:0;padding:12px 14px 12px 16px;background:var(--surface);border:1px solid var(--rule);border-left:3px double var(--ink);border-radius:4px;font-family:Georgia,"Times New Roman",serif;}
+.read p.doc .en{font-size:.95em;line-height:1.7;}
+/* "say it like a local" */
+.loc{list-style:none;margin:0;padding:0;display:grid;gap:10px;}
+.loc li{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:10px 12px;}
+.loc-h{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0;}
+.loc-h .ex{font-weight:700;}
+.loc-z{font-size:.9em;color:var(--muted);}
+.loc-d{margin:6px 0 0;font-size:.9em;line-height:1.75;}
+.rainfall{animation:rainfall .9s linear infinite;}
+@keyframes rainfall{from{transform:translateY(-6px)}to{transform:translateY(6px)}}
 /* cover: a small plane taking off */
 .takeoff{animation:takeoff 9s linear infinite;}
 @keyframes takeoff{0%{transform:translate(-14px,10px);opacity:0}10%{opacity:1}80%{opacity:1}100%{transform:translate(70px,-26px);opacity:0}}
@@ -454,7 +466,7 @@ mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
   #reader{padding-top:20px;}
 }
 @media (prefers-reduced-motion:reduce){
-  .drift,.steam rect,.bee,.wing,.zz,.blink,.eq i{animation:none;}
+  .drift,.steam rect,.bee,.wing,.zz,.blink,.eq i,.rainfall{animation:none;}
   #pop,#drawer,#scrim,#toast{transition:none;}
 }
 </style>
@@ -734,8 +746,8 @@ const L = [
      "陳阿姨在街角開了一家小早餐店。她叫每個人「帥哥」或「美女」。「早安，美女！老樣子嗎？」她問。"],
     ["“Yes, please!” I say. My usual is an [[egg pancake|c:danbing]] and a cup of milk tea.",
      "「對，麻煩了！」我說。我的老樣子是一份蛋餅和一杯奶茶。"],
-    ["I eat on the bus. The egg pancake is hot. The milk tea is [[sweet]]. My morning is crazy, but my breakfast is [[perfect]].",
-     "我在公車上吃早餐。蛋餅熱熱的，奶茶甜甜的。我的早晨很瘋狂，但我的早餐很完美。"]
+    ["I eat at the bus stop. The egg pancake is hot. The milk tea is [[sweet]]. My morning is crazy, but my breakfast is [[perfect]].",
+     "我站在公車站把早餐吃完。蛋餅熱熱的，奶茶甜甜的。我的早晨很瘋狂，但我的早餐很完美。"]
   ],
   words:["alarm","late","brush","wash","street","corner","breakfast","usual","sweet","perfect"],
   gram:["g:l1a","g:l1b","g:l1c"],
@@ -1649,7 +1661,7 @@ function hwBody(i, t){
     steps:["先按課文上方的 Listen 朗讀，完整聽一遍。","自己念兩遍，卡住的字點一下聽發音。","第三遍用手機內建的「語音備忘錄」錄下來。","把錄音檔傳給老師。"],
     tip:"不用完美，念完就是勝利！念錯了不要重來，繼續往下念就好。老師想聽的是你現在的樣子。"};
   case "cards": return {why:"每天花幾分鐘把單字「叫出來」，比看十遍更記得住。",
-    steps:["看英文，先在心裡說出中文意思。","按「翻面」確認答案。記得就按「記得」；還不熟就按「放到後面再考」，這張卡會排到最後面再出現一次。","十個都記得就完成了！"],
+    steps:["看英文，先在心裡說出中文意思。","按「翻面」確認答案。記得就按「記得」；還不熟就按「放到後面再考」，這張卡會排到最後面再出現一次。",`${l.words.length} 個都記得就完成了！`],
     extra:`<div class="fc" data-i="${i}"></div>`,
     tip:"忘記是正常的，大腦就是靠「忘記 → 想起來」變強的。"};
   case "write": return {why:"用自己的生活造句，單字才會真正變成你的。",
@@ -1663,7 +1675,11 @@ function hwBody(i, t){
   case "shadow": return {why:"Shadowing（影子跟讀）是模仿母語者的節奏和語調，聽力和口說一起練。",
     steps:["到設定把朗讀速度調成「慢」。","按課文每一段旁邊的喇叭，只聽那一段，聽完照著念一次，連語氣都模仿。也可以用「Listen 朗讀」一路播，想跟念時按「暫停」。","熟了以後試試「同步跟讀」：聲音一出來，你晚半秒跟著念，像影子一樣。","對話的每一句旁邊也有喇叭，挑一個角色來模仿。"],
     tip:"模仿語調比每個字都念對更重要。想像你在演一齣戲！"};
-  case "signs": return {why:`台灣雖然沒什麼講英文的環境，但很多標語都有中英對照。${x.sign}`,
+  case "signs": if(x.web) return {why:x.web.why,
+    steps:x.web.steps,
+    extra:`<p class="hwlab">可以這樣記：</p><ul class="hwex">${x.web.ex.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>${ta(0,x.web.ex[0],3)}${copy}`,
+    tip:"看不懂整頁沒關係，找到要找的資訊就好。官方網頁的英文也是真實的英文，讀懂一句就是一句！"};
+  return {why:`台灣雖然沒什麼講英文的環境，但很多標語都有中英對照。${x.sign}`,
     steps:["出門時留意有英文的標語、菜單或看板。","拍下來，或把英文記在手機裡。",x.signDo],
     extra:`<ul class="hwex">${x.signEx.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`,
     tip:"一天找到一個就很棒了。練習時在心裡說，或說給朋友聽就好，不用跟店員講英文；等出國或遇到外國朋友時，這些句子就派上用場了！"};
@@ -1719,7 +1735,7 @@ function hwRender(){
       h += `<details class="hwt${on?" done":""}" data-id="${t.id}"><summary>
         <button class="star${on?" on":""}" data-star="${t.id}" aria-label="${on?"取消完成":"標記完成"}" aria-pressed="${on}">★</button>
         <span class="hwt-i">${hwIcon(t.icon)}</span>
-        <span class="hwt-t"><b>${esc(t.t)}</b><span>${t.min} 分鐘 · ${t.tags.map(esc).join("、")}${t.send?' · <em>傳給老師</em>':""}</span></span>
+        <span class="hwt-t"><b>${esc(t.id==="signs" && HW_LOCAL[i].web ? HW_LOCAL[i].web.t : t.t)}</b><span>${t.min} 分鐘 · ${t.tags.map(esc).join("、")}${t.send?' · <em>傳給老師</em>':""}</span></span>
         <span class="chev">›</span></summary>
         <div class="hwt-b"><p class="why">${b.why}</p><ol class="steps">${b.steps.map(s=>`<li>${s}</li>`).join("")}</ol>${b.extra||""}
         <p class="tip"><span class="px">TIP</span>${b.tip}</p>
@@ -2045,7 +2061,8 @@ function voiceFor(who){
   return pool[same.indexOf(who) % pool.length];
 }
 if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
-const speakable = t => plain(t).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/_{3}/g,"blank").replace(/…/g,"...");
+const sayAs = t => Object.entries(BOOK.sayAs || {}).reduce((x,[w,r])=>x.split(w).join(r), t);  /* voice-only respellings for names TTS gets wrong */
+const speakable = t => sayAs(plain(t)).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/_{3}/g,"blank").replace(/…/g,"...");
 function sentences(t){
   const s = speakable(t).replace(/\b([ap])\.m\./g,"$1_m_");
   return (s.match(/[^.!?]+(?:[.!?]+["']?|$)/g) || [s]).map(x=>x.replace(/([ap])_m_/g,"$1.m.").trim()).filter(Boolean);
@@ -2194,7 +2211,7 @@ function render(i){
   h += l.read.map((p,j)=>`<p class="rp ${p[2]||""}" data-i="${j}"><button class="spk pspk" data-para="${j}" aria-label="聽這一段">${SVGI.spk}</button><span class="en"><span class="hl">${mk(p[0])}</span></span><span class="zh">${esc(p[1])}</span></p>`).join("");
   h += `</div></section>`;
 
-  h += secHead("words","WORDS","單字 10");
+  h += secHead("words","WORDS",`單字 ${l.words.length}`);
   h += `<ul class="wl">` + l.words.map(k=>{
     const v = VOCAB[k], hi = BOOK.hi.test(v.lv);
     return `<li><button class="wr" data-k="${esc(k)}"><span class="wr-w">${esc(v.w)}</span><span class="wr-kk">${esc(v.kk)}</span><span class="lv${hi?" hi":""}">${v.lv}</span><span class="wr-zh"><i>${v.pos}</i>${esc(v.zh)}</span></button><button class="spk" data-say="${esc(v.w)}" aria-label="聽 ${esc(v.w)}">${SVGI.spk}</button></li>`;
@@ -2213,6 +2230,12 @@ function render(i){
     const s = cast.indexOf(ln[0]);
     return `<div class="ln s${s}" data-j="${j}"><span class="who">${esc(l.talk.cast[ln[0]])}</span><div><span class="ln-en"><span class="hl">${mk(ln[1])}</span></span><span class="zh">${esc(ln[2])}</span></div><button class="spk" data-line="${j}" aria-label="聽這句">${SVGI.spk}</button></div>`;
   }).join("") + `</div></section>`;
+
+  /* optional "Say it like a local" box (Book 3 on) */
+  if(l.local && l.local.length){
+    h += secHead("local","SAY IT LIKE A LOCAL","道地說法");
+    h += `<ul class="loc">` + l.local.map(x=>`<li><p class="loc-h"><button class="ex" data-say="${esc(x[0])}">${SVGI.spk}<span>${esc(x[0])}</span></button><span class="loc-z">${esc(x[1])}</span></p><p class="loc-d">${esc(x[2])}</p></li>`).join("") + `</ul></section>`;
+  }
 
   h += secHead("ask","YOUR TURN","說說你的看法");
   h += `<ol class="al">` + l.ask.map((a,j)=>`<li data-a="${j}"><p class="aq">${mk(a[0])}</p><p class="zh">${esc(a[1])}</p><p class="frame"><span class="px">TRY</span>${frame(a[2])}</p></li>`).join("") + `</ol></section>`;
@@ -2254,8 +2277,10 @@ function popHTML(k){
       <button class="p-go" data-jump="${gid(k)}">看完整文法說明 ↓</button>`;
   }
   const c = CULT[k]; if(!c) return "";
-  return `<div class="p-tag"><b class="cu">文化 CULTURE</b></div><div class="p-h"><span class="p-w">${esc(c.h)}</span><button class="spk" data-say="${esc(c.h)}" aria-label="聽發音">${SVGI.spk}</button></div>
-    <p class="p-zh">${esc(c.zh)}</p><p class="p-d">${esc(c.d)}</p>`;
+  /* names and places can carry a pronunciation key: kk + an easy respelling */
+  const pk = c.kk ? `<p class="p-kk">${esc(c.kk)}${c.say ? ` · 念起來像 <b>${esc(c.say)}</b>` : ""}</p>` : "";
+  return `<div class="p-tag"><b class="cu">${c.name ? "名字發音 NAME" : "文化 CULTURE"}</b></div><div class="p-h"><span class="p-w">${esc(c.h)}</span><button class="spk" data-say="${esc(c.h)}" aria-label="聽發音">${SVGI.spk}</button></div>
+    ${pk}<p class="p-zh">${esc(c.zh)}</p><p class="p-d">${c.d}</p>`;
 }
 function openPop(k){
   const h = popHTML(k); if(!h) return;
@@ -2417,7 +2442,7 @@ function bankDetail(k){
     return `<p>${g.d}</p>` + g.ex.map(e=>`<p class="bx-ex"><button class="ex" data-say="${esc(e[0])}">${SVGI.spk}<span>${esc(e[0])}</span></button> <span class="exz">${esc(e[1])}</span></p>`).join("") +
       `<div class="row"><button class="tbtn" data-goto="${g.l}" data-sel="#${gid(k)}">到第 ${g.l+1} 課 →</button></div>`; }
   const c = CULT[k];
-  return `<p>${esc(c.d)}</p><div class="row"><button class="tbtn" data-goto="${c.l}" data-sel='.g[data-k="${k}"]'>到第 ${c.l+1} 課 →</button></div>`;
+  return `<p>${c.d}</p><div class="row"><button class="tbtn" data-goto="${c.l}" data-sel='.g[data-k="${k}"]'>到第 ${c.l+1} 課 →</button></div>`;
 }
 $("#bq").addEventListener("input", buildBank);
 $("#bankMode").addEventListener("click", e=>{

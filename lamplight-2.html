@@ -282,6 +282,7 @@ const LEVEL = {
   zh:"燈下小書・第二級", kicker:"INKQUEST · LEVEL 2 · A2",
   version:"1.0・2026 年 10 月",
   rank:2,
+  sayAs:{"Thames":"Temz"},
   /* dusk instead of a rainy night */
   scene:{sky:["#2B2350","#5B3768","#A8566F","#E58E6A"], moon:false, stars:false, rain:false, sun:true, birds:true},
   tracks:[
@@ -393,7 +394,7 @@ const S = [
   by:"O. Henry, 1907 · retold",
   intro:"美國短篇小說大師歐．亨利最好笑的故事之一。兩個笨賊綁架了有錢人家的兒子，想要一大筆贖金。問題是，這個孩子比他們可怕多了。",
   paras:[
-    ["It looked like a good idea at the time. Bill and I had six hundred dollars, and we needed two thousand more. In the little town of Summit, Alabama, there was a rich man named Ebenezer Dorset. He had a ten-year-old son.",
+    ["It looked like a good idea at the time. Bill and I had six hundred dollars, and we needed two thousand more. In the little town of Summit, [[Alabama|c:n-alabama]], there was a rich man named [[Ebenezer Dorset|c:n-ebenezer]]. He had a ten-year-old son.",
      "當時看起來是個好主意。比爾和我手上有六百塊，還需要兩千塊。在阿拉巴馬州一個叫桑米特的小鎮上，住著一個叫艾比尼澤．多賽特的有錢人。他有一個十歲的兒子。","calm"],
     ["“Fathers always pay to get their children back,” said Bill. So one evening we drove a [[buggy|c:buggy]] past the Dorset house. The boy was in the street, throwing stones at a cat.",
      "「當爸爸的一定會付錢把孩子要回來。」比爾說。於是有天傍晚，我們駕著一輛馬車經過多賽特家。那個男孩正在街上拿石頭丟貓。","thoughtful"],
@@ -441,9 +442,9 @@ const S = [
   by:"H. G. Wells, 1898 · retold",
   intro:"《時光機器》作者威爾斯的短篇。一個平凡的小職員，突然說什麼就成真。他會怎麼用這份力量？",
   paras:[
-    ["George Fotheringay was a small man with a loud opinion: [[miracles|miracle]] are impossible.",
+    ["[[George Fotheringay|c:n-fotheringay]] was a small man with a loud opinion: [[miracles|miracle]] are impossible.",
      "喬治．佛瑟林蓋是個個子小、意見卻很大聲的人：奇蹟是不可能的。","deadpan"],
-    ["One evening at the Long Dragon, a little [[pub|c:pub]], he was arguing about it with a man named Toddy Beamish. “A miracle is something that can’t happen,” said Fotheringay. “For example, that lamp can’t burn upside down. Watch. Lamp, turn upside down and keep burning!”",
+    ["One evening at the Long Dragon, a little [[pub|c:pub]], he was arguing about it with a man named [[Toddy Beamish|c:n-beamish]]. “A miracle is something that can’t happen,” said Fotheringay. “For example, that lamp can’t burn upside down. Watch. Lamp, turn upside down and keep burning!”",
      "某天晚上，在一間叫「長龍」的小酒館裡，他正和一個叫陶迪．比米許的人爭論這件事。「奇蹟就是不可能發生的事，」佛瑟林蓋說，「比如說，那盞燈不可能倒過來燒。看好了。燈，倒過來，繼續燒！」","annoyed"],
     ["The lamp turned upside down. It hung in the air, burning quietly, with its [[flame]] pointing down.",
      "那盞燈倒了過來。它懸在半空中，靜靜地燒著，火焰朝下。","surprised"],
@@ -457,7 +458,7 @@ const S = [
      "警察抓住他的手臂。佛瑟林蓋嚇壞了。「走開！」他大喊，「去——去月球啦！」警察就不見了。","panicked"],
     ["Fotheringay stood alone in the dark street. “Oh no,” he said. “Can people breathe on the moon?” Quickly he said, “Policeman, leave the moon and go to San Francisco!” Far away, on a sunny street in America, a very surprised policeman appeared.",
      "佛瑟林蓋一個人站在漆黑的街上。「糟了，」他說，「人在月球上能呼吸嗎？」他趕緊說：「警察先生，離開月球，到舊金山去！」在遙遠的美國，一條陽光燦爛的街上，出現了一個非常驚訝的警察。","worried"],
-    ["The next day he went to see Mr. Maydig, the [[minister|c:minister]] of his church, and told him everything. Mr. Maydig was delighted. “This is a gift!” he said. “Think of all the good you can do!”",
+    ["The next day he went to see Mr. [[Maydig|c:n-maydig]], the [[minister|c:minister]] of his church, and told him everything. Mr. Maydig was delighted. “This is a gift!” he said. “Think of all the good you can do!”",
      "隔天，他去找教會的梅迪格牧師，把一切都告訴他。梅迪格牧師高興極了。「這是上天的恩賜！」他說，「想想你能做多少好事！」","excited"],
     ["That night, they walked through the town together, doing good miracles. Fotheringay fixed the broken bridge. He made the sick dog next door well again. He turned the beer in the pub into water. That one was Mr. Maydig’s idea.",
      "那天晚上，他們一起走遍小鎮，到處行善。佛瑟林蓋修好了斷掉的橋，治好了隔壁生病的狗，還把酒館裡的啤酒都變成了水。最後這個是梅迪格牧師的主意。","cheerful"],
@@ -529,7 +530,7 @@ const S = [
      "「大杯紅茶，」護理師說，「去冰，無糖。」","tired"],
     ["Ivy smiles. That’s her hobby: she guesses orders. She’s right about eight times out of ten. Her coworker A-Bin thinks it’s [[creepy]]. Her boss thinks it’s good for business. The [[regulars|regular]] think it’s a game, and they love it.",
      "艾薇笑了。這是她的嗜好：猜客人會點什麼。她十次大概猜中八次。她的同事阿斌覺得這樣有點毛毛的。老闆覺得這對生意有幫助。常客們把它當成遊戲，愛得不得了。","cheerful"],
-    ["On her breaks, Ivy reads [[detective]] novels. Sherlock Holmes is her hero. “You see, but you don’t [[observe]],” she likes to tell A-Bin. A-Bin doesn’t understand. He goes back to washing cups.",
+    ["On her breaks, Ivy reads [[detective]] novels. [[Sherlock Holmes|c:n-holmes]] is her hero. “You see, but you don’t [[observe]],” she likes to tell A-Bin. A-Bin doesn’t understand. He goes back to washing cups.",
      "休息時間，艾薇都在看偵探小說。福爾摩斯是她的偶像。「你只是在看，沒有在觀察。」她很愛這樣跟阿斌說。阿斌聽不懂，繼續回去洗杯子。","playful"],
     ["At 5:55 p.m. one rainy Friday, a man in a gray suit walks in. He shakes his umbrella. He is also holding a second umbrella, a small pink one with cartoon rabbits on it. He looks at the menu board for a long time. Then he looks at Ivy.",
      "某個下雨的星期五，傍晚五點五十五分，一個穿灰色西裝的男人走進店裡。他甩了甩雨傘。他手上還拿著另一把傘，是一把印著卡通兔子的粉紅色小傘。他盯著菜單看了很久，然後看向艾薇。","curious"],
@@ -693,7 +694,7 @@ const S = [
      "背景會再幫你加一點。士兵可以讓力量加 2、體質加 1。現在她的力量是 17，一隻手就能舉起一個木桶。","proud"],
     ["Step 4: Choose an [[alignment|c:alignment]]. Is your hero good? Does she follow rules, or break them? For your first game, “good” is an easy choice. Most groups don’t play evil heroes.",
      "第四步：選擇陣營。你的英雄是好人嗎？她守規矩，還是愛打破規矩？第一次玩的話，選「善良」最簡單。大部分的團不玩邪惡的英雄。","friendly"],
-    ["Step 5: Fill in the details. This is the best part. Give your hero a name: Brunna Ironpot. What does she look like? A red [[braid]], a broken nose, and a big laugh. What does she want? To find her missing brother. What is she afraid of? Spiders. Of course.",
+    ["Step 5: Fill in the details. This is the best part. Give your hero a name: [[Brunna Ironpot|c:n-ironpot]]. What does she look like? A red [[braid]], a broken nose, and a big laugh. What does she want? To find her missing brother. What is she afraid of? Spiders. Of course.",
      "第五步：填寫細節。這是最好玩的部分。替你的英雄取名字：布魯娜．鐵鍋。她長什麼樣子？一條紅辮子、一個斷過的鼻子、笑聲很大。她想要什麼？找到失蹤的兄弟。她怕什麼？蜘蛛。那還用說。","excited"],
     ["Three tips for your first game. One: don’t learn every rule. Your Dungeon Master will help you. Two: talk like your hero. Don’t say, “Brunna kicks the door.” Say, “I kick the door!” Three: bad rolls make good stories. When you roll a 1, laugh. Something funny is about to happen.",
      "第一次玩的三個小提醒。第一：不用把規則全部學會，地下城主會幫你。第二：用英雄的口吻說話。不要說「布魯娜踢門」，要說「我踢門！」第三：擲壞了也能變成好故事。擲出 1 的時候就笑吧，好笑的事情要發生了。","cheerful"],
@@ -711,7 +712,7 @@ const S = [
   by:"InkQuest travel guide",
   intro:"倫敦很大，但最精彩的地方，很多都在泰晤士河邊。沿著南岸，從大笨鐘一路走到倫敦塔橋，順便學幾句英國人一定會說的話。",
   paras:[
-    ["London is big. Very big. But many of its best sights stand next to the same river, the Thames. Put on comfortable shoes, bring an umbrella (in London, always bring an umbrella), and let’s walk. From Westminster to Tower Bridge, it’s a long, flat walk: two or three hours, with stops.",
+    ["London is big. Very big. But many of its best sights stand next to the same river, the [[Thames|c:n-thames]]. Put on comfortable shoes, bring an umbrella (in London, always bring an umbrella), and let’s walk. From [[Westminster|c:n-westminster]] to Tower Bridge, it’s a long, flat walk: two or three hours, with stops.",
      "倫敦很大，非常大。不過很多最棒的景點都在同一條河邊：泰晤士河。穿上好走的鞋，帶把傘（在倫敦，永遠要帶傘），我們出發吧。從西敏到倫敦塔橋，是一段長長的平路：連停下來逛的時間，大約要走兩三個小時。","bright"],
     ["Start at Westminster. The tall clock tower here is famous all over the world as Big Ben. But here’s a secret: [[Big Ben|c:bigben]] is the name of the great bell inside. The tower is called the Elizabeth Tower. Wait for the hour, and you can hear Big Ben ring.",
      "從西敏出發。這裡那座高高的鐘樓，以「大笨鐘」聞名全世界。不過告訴你一個秘密：大笨鐘其實是塔裡那口大鐘的名字。這座塔叫做伊莉莎白塔。等到整點，就能聽見大笨鐘響。","informative"],
@@ -721,11 +722,11 @@ const S = [
      "對岸就是倫敦眼，一座 135 公尺高的巨大摩天輪。轉一圈大約三十分鐘。天氣晴朗時，可以看得很遠。下雨天的時候，可以看到很多雨。","playful"],
     ["Turn left and walk east along the river. This is the South Bank. You’ll see street [[performers|performer]], a book market under a bridge, and young people on skateboards under a big [[concrete]] building.",
      "左轉，沿著河往東走。這裡就是南岸。你會看到街頭藝人、橋下的書市，還有一群年輕人在一棟水泥大建築底下玩滑板。","cheerful"],
-    ["Soon you’ll see a huge brick building with a tall [[chimney]]. This is the Tate Modern. It was once a power station. Now it’s an art museum, and the main [[collection]] is free. Go up to the top floor for a free view of the city.",
+    ["Soon you’ll see a huge brick building with a tall [[chimney]]. This is the [[Tate Modern|c:n-tate]]. It was once a power station. Now it’s an art museum, and the main [[collection]] is free. Go up to the top floor for a free view of the city.",
      "很快你會看到一棟有高煙囪的巨大磚造建築。這是泰特現代美術館。它以前是一座發電廠，現在是美術館，主要館藏免費參觀。到頂樓去，可以免費欣賞整座城市的景色。","informative"],
-    ["In front of the museum is the Millennium Bridge, a thin silver bridge for people only. It opened in June 2000. On the first day, it moved so much under people’s feet that it closed after only two days. Londoners called it the [[Wobbly Bridge|wobbly]]. Engineers fixed it, and it opened again in 2002. Today it is very still. Across it, you can see the great dome of St Paul’s Cathedral.",
+    ["In front of the museum is the [[Millennium Bridge|c:n-millennium]], a thin silver bridge for people only. It opened in June 2000. On the first day, it moved so much under people’s feet that it closed after only two days. Londoners called it the [[Wobbly Bridge|wobbly]]. Engineers fixed it, and it opened again in 2002. Today it is very still. Across it, you can see the great dome of [[St Paul’s Cathedral|c:n-stpauls]].",
      "美術館前面是千禧橋，一座只給行人走的細長銀色橋。它在 2000 年 6 月開放。第一天，橋在行人腳下晃得太厲害，開放兩天就關閉了。倫敦人叫它「搖搖橋」。工程師把它修好，2002 年重新開放。現在它非常穩。從橋上望過去，可以看到聖保羅大教堂的大圓頂。","amused"],
-    ["Hungry? Keep walking to Borough Market, one of the oldest food markets in London. Try a hot sandwich, fresh bread, or cheese from all over Britain. It’s busiest at lunchtime on weekends, so come early.",
+    ["Hungry? Keep walking to [[Borough Market|c:n-borough]], one of the oldest food markets in London. Try a hot sandwich, fresh bread, or cheese from all over Britain. It’s busiest at lunchtime on weekends, so come early.",
      "餓了嗎？繼續走到波羅市集，倫敦最古老的食物市集之一。來份熱騰騰的三明治、新鮮麵包，或來自英國各地的起司。週末中午人最多，早點去吧。","cheerful"],
     ["Finally, Tower Bridge. It has two tall towers, and it’s painted blue and white. Many visitors call it London Bridge. Don’t! London Bridge is the plain gray bridge near the market. Tower Bridge opened in 1894, and its road can still lift up to let tall ships pass.",
      "最後是倫敦塔橋。它有兩座高塔，漆成藍白兩色。很多遊客叫它「倫敦橋」。別這樣叫！倫敦橋是市集附近那座樸素的灰色橋。倫敦塔橋 1894 年開放，到現在橋面還能升起來，讓高大的船通過。","playful"],
@@ -747,13 +748,13 @@ const S = [
   by:"Rabindranath Tagore, 1892 · retold",
   intro:"諾貝爾文學獎得主泰戈爾的名篇。加爾各答一位作家的小女兒，和一個從阿富汗來賣乾果的大個子，成了最好的朋友。",
   paras:[
-    ["My daughter Mini is five years old, and she cannot stop talking. One morning I was trying to write my novel. Mini ran to the window and shouted, “Kabuliwala! Kabuliwala!”",
+    ["My daughter Mini is five years old, and she cannot stop talking. One morning I was trying to write my novel. Mini ran to the window and shouted, “[[Kabul|c:n-kabul]]iwala! Kabuliwala!”",
      "我的女兒米妮五歲，她的嘴巴停不下來。某天早上，我正想寫我的小說，米妮跑到窗邊大喊：「喀布爾人！喀布爾人！」","cheerful"],
-    ["Down in the street walked a tall man in loose clothes, with a [[turban]] on his head and a big bag on his shoulder. He was a [[Kabuliwala|c:kabuliwala]], a man from Kabul in Afghanistan. Every winter he came to Calcutta to sell dried fruit: [[raisins|raisin]], [[almonds|almond]], and nuts.",
+    ["Down in the street walked a tall man in loose clothes, with a [[turban]] on his head and a big bag on his shoulder. He was a [[Kabuliwala|c:kabuliwala]], a man from Kabul in Afghanistan. Every winter he came to [[Calcutta|c:n-calcutta]] to sell dried fruit: [[raisins|raisin]], [[almonds|almond]], and nuts.",
      "樓下的街上走著一個高大的男人，穿著寬鬆的衣服，頭上纏著頭巾，肩上扛著一個大袋子。他是個「喀布爾人」，從阿富汗喀布爾來的。他每年冬天都到加爾各答賣乾果：葡萄乾、杏仁和各種堅果。","calm"],
     ["When he looked up at our window, Mini screamed and ran to hide. She thought there were children inside his big bag.",
      "他一抬頭看向我們的窗戶，米妮就尖叫著跑去躲起來。她以為他的大袋子裡裝著小孩。","amused"],
-    ["A few days later, I found her sitting on a bench by our door, talking and laughing with the big man. Her lap was full of raisins and almonds. His name was Rahmat.",
+    ["A few days later, I found her sitting on a bench by our door, talking and laughing with the big man. Her lap was full of raisins and almonds. His name was [[Rahmat|c:n-rahmat]].",
      "幾天後，我發現她坐在我們家門口的長凳上，跟那個大個子有說有笑。她的腿上堆滿了葡萄乾和杏仁。他的名字叫拉赫瑪特。","warm"],
     ["They became great friends. Every morning they told the same joke. “Little one,” Rahmat said, “when are you going to your [[father-in-law’s house|c:inlaw]]?” Mini didn’t know what a father-in-law was. So she answered, “Are you going to your father-in-law’s house?” Rahmat shook his fist. “I will beat my father-in-law!” he said. And Mini laughed and laughed.",
      "他們成了好朋友。每天早上，他們都講同一個笑話。「小傢伙，」拉赫瑪特說，「妳什麼時候要去妳公公家？」米妮不知道公公是什麼。所以她回答：「那你要去你岳父家嗎？」拉赫瑪特揮揮拳頭。「我要揍我岳父！」他說。米妮就笑個不停。","playful"],
@@ -893,7 +894,24 @@ const CULT = {
 "c:mindgap":{h:"Mind the gap",zh:"小心月台間隙",d:"倫敦地鐵（the Tube）最有名的廣播和標語。mind 在英式英語裡有「小心、注意」的意思。"},
 "c:kabuliwala":{h:"Kabuliwala",zh:"喀布爾人",d:"孟加拉語，意思是「從喀布爾來的人」。當時常有阿富汗商人冬天到印度加爾各答（現在叫 Kolkata）賣乾果和披肩。"},
 "c:inlaw":{h:"father-in-law’s house",zh:"公公家／岳父家",d:"在米妮的文化裡，女孩「去公公家」就是出嫁。可是在拉赫曼的家鄉，這句話是「坐牢」的委婉說法。所以同一句玩笑，兩個人聽到的意思不一樣。"},
-"c:sari":{h:"sari",zh:"紗麗",d:"印度女性的傳統服裝，用一整塊長布纏繞在身上。新娘常穿紅色的紗麗。"}
+"c:sari":{h:"sari",zh:"紗麗",d:"印度女性的傳統服裝，用一整塊長布纏繞在身上。新娘常穿紅色的紗麗。"},
+/* ---- names and places: pronunciation keys ---- */
+"c:n-alabama":{name:1,h:"Alabama",kk:"[͵æləˋbæmə]",say:"al-uh-BAM-uh",zh:"阿拉巴馬州",d:"美國南部的一州。重音在第三個音節 BAM。"},
+"c:n-ebenezer":{name:1,h:"Ebenezer Dorset",kk:"[͵ɛbəˋnizɚ ˋdɔrsɪt]",say:"eb-uh-NEE-zer DOR-sit",zh:"艾比尼澤．多賽特",d:"Ebenezer 是很老派的英文名字，狄更斯《小氣財神》的主角也叫 Ebenezer Scrooge。"},
+"c:n-fotheringay":{name:1,h:"Fotheringay",kk:"[ˋfɑðərɪŋ͵ge]",say:"FODH-uh-ring-gay",zh:"佛瑟林蓋",d:"很少見的英國姓氏。th 念 [ð]，像 mother 的 th；結尾念 [ge]。"},
+"c:n-beamish":{name:1,h:"Toddy Beamish",kk:"[ˋtɑdɪ ˋbimɪʃ]",say:"TOD-ee BEE-mish",zh:"陶迪．比米許",d:"英國姓氏。beamish 本身是個老字，意思是「笑容滿面的」。"},
+"c:n-maydig":{name:1,h:"Maydig",kk:"[ˋmedɪg]",say:"MAY-dig",zh:"梅迪格",d:"威爾斯筆下虛構的姓氏，重音在前面。"},
+"c:n-holmes":{name:1,h:"Sherlock Holmes",kk:"[ˋʃɝlɑk homz]",say:"SHUR-lock HOHMZ",zh:"福爾摩斯",d:"柯南．道爾筆下的名偵探。Holmes 的 l 不發音，念 [homz]，跟 homes 同音。"},
+"c:n-ironpot":{name:1,h:"Brunna Ironpot",kk:"[ˋbrʊnə ˋaɪɚn͵pɑt]",say:"BROO-nuh EYE-urn-pot",zh:"布魯娜．鐵鍋",d:"故事裡虛構的矮人名字。iron 念 [ˋaɪɚn]，像 EYE-urn，不念 i-ron。"},
+"c:n-thames":{name:1,h:"Thames",kk:"[tɛmz]",say:"TEMZ",zh:"泰晤士河",d:"流過倫敦市中心的河，也是最常被念錯的英國地名之一：th 念 [t]，a 念 [ɛ]，跟 gems 押韻，不念 thaymz。"},
+"c:n-westminster":{name:1,h:"Westminster",kk:"[ˋwɛst͵mɪnstɚ]",say:"WEST-min-stuh",zh:"西敏",d:"倫敦市中心的區，國會大廈和西敏寺都在這裡。是 minster（大教堂），不是 minister（部長）。英國腔結尾的 r 不捲舌。"},
+"c:n-tate":{name:1,h:"Tate Modern",kk:"[tet ˋmɑdɚn]",say:"TAYT MOD-un",zh:"泰特現代美術館",d:"Tate 念 [tet]，跟 date 押韻。"},
+"c:n-millennium":{name:1,h:"Millennium Bridge",kk:"[mɪˋlɛnɪəm brɪdʒ]",say:"mi-LEN-ee-um",zh:"千禧橋",d:"millennium 是「一千年」。拼字有兩個 l、兩個 n，重音在 LEN。"},
+"c:n-stpauls":{name:1,h:"St Paul’s Cathedral",kk:"[sənt ˋpɔlz kəˋθidrəl]",say:"s’nt PAWLZ kuh-THEE-drul",zh:"聖保羅大教堂",d:"St 是 Saint 的縮寫，英國人念得又輕又快，像 s’nt。英式寫法 St 後面通常不加點。"},
+"c:n-borough":{name:1,h:"Borough Market",kk:"[ˋbʌrə ˋmɑrkɪt]",say:"BUH-ruh MAR-kit",zh:"波羅市集",d:"borough 的 ough 在英式英語裡念 [ə]：BUH-ruh。美國人常念成 BUR-oh。愛丁堡 Edinburgh 的結尾也是這種念法。"},
+"c:n-kabul":{name:1,h:"Kabul",kk:"[ˋkɑbʊl]",say:"KAH-bool",zh:"喀布爾",d:"阿富汗的首都，重音在前面。"},
+"c:n-calcutta":{name:1,h:"Calcutta",kk:"[kælˋkʌtə]",say:"kal-KUT-uh",zh:"加爾各答",d:"印度東部的大城市，泰戈爾就在這裡出生。2001 年正式改名為 Kolkata，念 [kolˋkɑtə]。"},
+"c:n-rahmat":{name:1,h:"Rahmat",kk:"[ˋrɑmət]",say:"RAH-mut",zh:"拉赫瑪特",d:"來自阿拉伯語的名字，意思是「慈悲」。中間的 h 很輕。"}
 };
 
 /* =========================================================
@@ -1167,7 +1185,8 @@ function narrator(s){
   return VOICES.m.find(v=>v.lang === (VOICES.main && VOICES.main.lang)) || VOICES.m[0] || VOICES.main;
 }
 if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
-const speakable = t => plain(t).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/…/g,"...").replace(/—/g,", ").replace(/\$(\d+)/g,"$1 dollars");
+const sayAs = t => Object.entries(LEVEL.sayAs || {}).reduce((x,[w,r])=>x.split(w).join(r), t);  /* voice-only respellings */
+const speakable = t => sayAs(plain(t)).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/…/g,"...").replace(/—/g,", ").replace(/\$(\d+)/g,"$1 dollars");
 function sentences(t){
   const s = speakable(t).replace(/\b([ap])\.m\./g,"$1_m_").replace(/\b(Mr|Mrs|Ms|Dr|St)\./g,"$1_");
   return (s.match(/[^.!?]+(?:[.!?]+["']?|$)/g) || [s]).map(x=>x.replace(/([ap])_m_/g,"$1.m.").replace(/\b(Mr|Mrs|Ms|Dr|St)_/g,"$1.").trim()).filter(Boolean);
@@ -1225,7 +1244,7 @@ function runQueue(){
   };
   setTimeout(next, 60);
 }
-function sayWord(t){ if(!SYN) return; stopSpeech(); const u = new SpeechSynthesisUtterance(t); const v = VOICES.main;
+function sayWord(t){ if(!SYN) return; stopSpeech(); const u = new SpeechSynthesisUtterance(sayAs(t)); const v = VOICES.main;
   if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "en-US"; u.rate = Math.min(1, rate); SYN.speak(u); }
 let speechUnlocked = false;
 function unlockSpeech(){ if(speechUnlocked || !SYN) return; speechUnlocked = true;
@@ -1337,8 +1356,9 @@ function stamp(){
 const pop = $("#pop");
 function popHTML(k){
   if(k.startsWith("c:")){ const c = CULT[k]; if(!c) return "";
-    return `<div class="ph"><span class="pw">${esc(c.h)}</span><span class="lvb">文化小知識</span><span class="px2"><button class="ib" data-say="${esc(c.h)}" aria-label="聽發音">${SVGI.spk}</button><button class="ib" data-close aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg></button></span></div>
-      <p class="pz">${esc(c.zh)}</p><p class="pd">${esc(c.d)}</p>`; }
+    const pk = c.kk ? `<span class="pk">${esc(c.kk)}</span>` : "";
+    return `<div class="ph"><span class="pw">${esc(c.h)}</span>${pk}<span class="lvb">${c.name ? "名字發音" : "文化小知識"}</span><span class="px2"><button class="ib" data-say="${esc(c.h)}" aria-label="聽發音">${SVGI.spk}</button><button class="ib" data-close aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg></button></span></div>
+      <p class="pz">${esc(c.zh)}</p>${c.say ? `<p class="pd">念起來像 <b>${esc(c.say)}</b></p>` : ""}<p class="pd">${esc(c.d)}</p>`; }
   const v = VOCAB[k]; if(!v) return "";
   const hi = (CEFR[v.lv] || 1) > LEVEL.rank, st = stars.includes(k);
   return `<div class="ph"><span class="pw">${esc(v.w)}</span><span class="pk">${esc(v.kk)}</span><span class="lvb${hi ? " hi" : ""}">${esc(v.lv)}${hi ? " · 超出本級" : ""}</span>
