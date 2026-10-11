@@ -1587,6 +1587,9 @@ const BADGES = [
 let HW = {}, HWTXT = {}, HWQ = {}, HWB = [];
 function hwLoad(){
   HW = store.get("hw", {}) || {}; HWTXT = store.get("hwtxt", {}) || {};
+  /* earlier versions auto-filled skipped lessons (flag a:1); those stars were never earned, so drop them */
+  let fixed = false; Object.keys(HW).forEach(k=>{ if(HW[k] && HW[k].a){ delete HW[k]; fixed = true; } });
+  if(fixed) store.set("hw", HW);
   HWQ = store.get("hwq", {}) || {}; HWB = store.get("badges", []) || [];
 }
 function hwSave(){ store.set("hw", HW); store.set("hwq", HWQ); store.set("badges", HWB); }
@@ -1597,17 +1600,11 @@ const hwAll = () => HW_TASKS.map(t=>t.id);
 
 function hwSet(i, id, on){
   const before = plantStage(hwTotal());
-  let filled = [];
-  if(on){
-    /* a student jumping ahead probably did the earlier lessons in class — count them as done */
-    for(let j=0; j<i; j++) if(!HW[j]){ HW[j] = {t:hwAll(), a:1}; filled.push(j+1); }
-  }
   const cur = new Set(hwDone(i));
   on ? cur.add(id) : cur.delete(id);
   HW[i] = {t:[...cur]};
   hwSave();
   if(on) toast("★ 完成！做得好");
-  if(filled.length) toast(`第 ${filled[0]}${filled.length>1?`–${filled[filled.length-1]}`:""} 課也幫你標記完成了`);
   const after = plantStage(hwTotal());
   if(on && after > before) toast(BOOK.reward.grow(PLANT[after].n));
   hwBadges();
@@ -1636,7 +1633,7 @@ function hwBadges(){
 /* ---- lesson-page call to action ---- */
 function hwCTA(i){
   const n = hwCount(i);
-  return `<section class="sec hwcta"><button class="hwopen" id="hwOpen">
+  return `<section class="sec hwcta"><button class="hwopen" id="hwOpen" data-i="${i}">
     <span class="hw-plant">${plantSVG(plantStage(hwTotal()))}</span>
     <span class="hwo-t"><span class="px">HOMEWORK</span><b>本課自習作業</b><span class="hwo-s">一週 12 個小任務，一天約 15 分鐘</span></span>
     <span class="hwo-n"><span class="px">★ ${n}/${HW_N}</span><span class="bar"><i style="width:${Math.round(n/HW_N*100)}%"></i></span></span>
@@ -1822,7 +1819,7 @@ function hwInit(){
       return;
     }
     const g = e.target.closest("[data-gonext]");
-    if(g){ $("#hw").hidden = true; document.body.classList.remove("hwon"); go(+g.dataset.gonext); }
+    if(g){ $("#hw").hidden = true; hwBlur(); document.body.classList.remove("hwon"); go(+g.dataset.gonext); }
   });
   hw.addEventListener("focusout", ()=>setTimeout(()=>{ window.scrollTo(window.scrollX, window.scrollY); hwFit(); }, 60));
   hw.addEventListener("input", e=>{
@@ -1854,7 +1851,7 @@ function hwRestore(code){
   try{
     const d = JSON.parse(decodeURIComponent(escape(atob(code.trim().replace(/^WS\d-/,"")))));
     if(!d || typeof d.hw !== "object") throw 0;
-    HW = d.hw; HWQ = d.q || {}; HWB = d.b || []; hwSave(); buildToc(); render(cur); return true;
+    HW = d.hw; Object.keys(HW).forEach(k=>{ if(HW[k] && HW[k].a) delete HW[k]; }); HWQ = d.q || {}; HWB = d.b || []; hwSave(); buildToc(); render(cur); return true;
   }catch(e){ return false; }
 }
 
@@ -2194,7 +2191,7 @@ function render(i){
   let h = `<header class="lh"><div class="tile">${pix(l.icon)}</div><div>
     <p class="eyebrow">LESSON ${pad(i+1)} <span class="chip t-${l.theme}">${th.zh} ${th.en}</span></p>
     <h1 class="lt">${esc(l.title)}</h1><p class="lzt">${esc(l.zt)}</p></div></header>` +
-    (hwCount(i) ? `<button class="hwjump" id="hwJump"><span class="px">★ ${hwCount(i)}/${HW_N}</span>繼續本課作業<span class="sp"></span>→</button>` : "");
+    (hwCount(i) ? `<button class="hwjump" id="hwJump" data-i="${i}"><span class="px">★ ${hwCount(i)}/${HW_N}</span>繼續本課作業<span class="sp"></span>→</button>` : "");
 
   h += secHead("read","READ","課文",
     `<button class="tbtn" id="playRead"></button><button class="tbtn" id="playReadRe" hidden aria-label="從頭朗讀">${SVGI.restart}<span>從頭</span></button><button class="tbtn${showZh?" on":""}" id="zhBtn" aria-pressed="${showZh}">中文</button>`);
@@ -2294,13 +2291,13 @@ $("#reader").addEventListener("click", e=>{
   if(ln){ const l = L[cur], j = +ln.dataset.line, x = l.talk.lines[j];
     if(Q && Q.mode === "t"+j){ stopSpeech(); return; }
     sayQueue([{text:x[1], who:l.talk.cast[x[0]], mood:DELIVERY[cur].talk[j], clip:clipId(cur,"talk",j), el:ln.closest(".ln")}], "t"+j); return; }
-  if(e.target.closest("#hwOpen")){ openHW(cur); return; }
+  /* open the homework of the lesson the button belongs to, not whatever cur says */
+  const ho = e.target.closest("#hwOpen, #hwJump"); if(ho){ openHW(ho.dataset.i != null ? +ho.dataset.i : cur); return; }
   if(e.target.closest("#zhBtn")){ setZh(!showZh); return; }
   const pp = e.target.closest("[data-para]");
   if(pp){ const j = +pp.dataset.para;
     if(Q && Q.mode === "p"+j){ stopSpeech(); return; }   /* tap again to stop */
     sayQueue([{text:L[cur].read[j][0], who:"Mia", mood:DELIVERY[cur].read[j], clip:clipId(cur,"read",j), el:pp.closest(".rp")}], "p"+j); return; }
-  if(e.target.closest("#hwJump")){ openHW(cur); return; }
   const rr = e.target.closest("#playReadRe, #playTalkRe");
   if(rr){ stopSpeech(); (rr.id === "playReadRe" ? $("#playRead") : $("#playTalk")).click(); return; }
   if(e.target.closest("#playRead")){
