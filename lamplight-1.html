@@ -46,7 +46,8 @@ body.cover{overflow:hidden;}
 #cover .go{font-family:var(--f-dot);font-size:20px;letter-spacing:.06em;background:#E3A95C;color:#1C1A25;border:0;border-radius:30px;padding:10px 26px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.35);}
 #cover .go:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
 #cover .cm{font-family:var(--f-dot);font-size:14px;letter-spacing:.1em;opacity:.7;margin-top:14px;}
-#cover .cc{font-family:var(--f-zh);font-size:12px;opacity:.5;margin-top:18px;}
+#cover .cc{font-family:var(--f-zh);font-size:12px;opacity:.5;margin-top:8px;}
+#cover{cursor:pointer;}
 
 /* ---------- top bar ---------- */
 .bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:6px;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top));background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);}
@@ -213,13 +214,11 @@ select.sbox{appearance:auto;}
 <body>
 
 
-<div id="cover" role="button" tabindex="0" aria-label="開始">
+<div id="cover" role="button" tabindex="0" aria-label="開始閱讀">
   <div class="stage"><canvas id="cv" width="320" height="180" aria-label="夜晚的書桌：窗外下著雨，檯燈亮著，桌上有打開的書和一杯冒著熱氣的茶"></canvas></div>
   <p class="ck" id="cvK"></p>
   <h1>Lamplight Readers</h1>
   <p class="cz" id="cvZ"></p>
-  <button class="go" id="goBtn">Open the book 開始閱讀</button>
-  <p class="cm" id="coverMusic">♪ TAP ANYWHERE FOR MUSIC</p>
   <p class="cc">© 2026 Wen-Hung Fang. All rights reserved.</p>
 </div>
 
@@ -678,20 +677,20 @@ const S = [
 /* ---------------- 10 ---------------- */
 { id:"bus", thread:"", kind:"orig", title:"The Last Bus", zt:"末班車", voice:"m",
   by:"InkQuest original",
-  intro:"深夜的末班公車上，有一位老先生每天在第三站上車，繞完一整圈，又在第三站下車。司機黃先生終於開口問他要去哪裡。",
+  intro:"深夜的末班公車上，有一位老先生每天在第三站上車，坐到終點站醫院，卻從來不進去。司機黃先生終於開口問他。",
   paras:[
-    ["The last bus leaves the station at 11:40 p.m. It goes around the city in a big circle and comes back to the station. Mr. Huang drives it. He likes the last bus. The streets are empty, and most of the lights turn green for him, like old friends.",
-     "末班車晚上十一點四十分從總站出發，繞城市一大圈再回到總站。開車的是黃先生。他喜歡開末班車。街道空蕩蕩的，大部分的紅綠燈都為他變綠，像老朋友一樣。","calm"],
-    ["Most nights, the [[passengers|passenger]] are tired. Students with heavy bags. Nurses after a long [[shift]]. A man asleep with his mouth open.",
-     "大多數的夜晚，乘客都很累。背著沉重書包的學生。剛下班的護理師。一個張著嘴睡著的男人。","tired"],
+    ["The last bus leaves the station at 11:10 p.m. It crosses the river and ends at the city hospital. Mr. Huang drives it. He likes the last bus. The streets are empty, and most of the lights turn green for him, like old friends.",
+     "末班車晚上十一點十分從總站出發，過河之後，終點是市立醫院。開車的是黃先生。他喜歡開末班車。街道空蕩蕩的，大部分的紅綠燈都為他變綠，像老朋友一樣。","calm"],
+    ["Most nights, the [[passengers|passenger]] are tired. Students with heavy bags. Workers after a long day. A man asleep with his mouth open.",
+     "大多數的夜晚，乘客都很累。背著沉重書包的學生。忙了一整天的上班族。一個張著嘴睡著的男人。","tired"],
     ["At the third stop, an old man always gets on. He wears a gray [[jacket]] and carries nothing. He says, “Good evening,” sits in the second row, and looks out the window.",
      "在第三站，總有一位老先生上車。他穿著灰色外套，什麼也沒帶。他說聲「晚安」，坐在第二排，望著窗外。","gentle"],
-    ["He doesn’t get off at the hospital, or the night market, or the river. He rides the whole circle and gets off at the third stop again, right where he got on. Then he walks home.",
-     "他不在醫院下車，不在夜市下車，也不在河邊下車。他坐完一整圈，又在第三站下車，就是他上車的地方。然後他走路回家。","thoughtful"],
-    ["For a month, Mr. Huang says nothing. Then one night, at a red light, he asks, “Sir, where are you going?”",
-     "有一個月，黃先生什麼也沒說。後來有一天晚上，在一個紅燈前，他問：「先生，您要去哪裡？」","gentle"],
-    ["The old man smiles. “Nowhere,” he says. “My wife took this bus to work for thirty years. She was a nurse at the hospital. Night shift. She always sat right here.” He touches the seat.",
-     "老先生笑了。「哪裡也不去，」他說，「我太太坐這班車上班，坐了三十年。她是醫院的護理師，上大夜班。她總是坐在這個位子。」他摸了摸座椅。","nostalgic"],
+    ["He always rides to the last stop, the hospital. But he never goes inside. He stands at the bus stop for a minute and looks at the lights on the top floor. Then he takes a taxi home.",
+     "他每次都坐到終點站，也就是醫院。可是他從來不進去。他在公車站牌旁站一會兒，看著頂樓的燈光，然後搭計程車回家。","thoughtful"],
+    ["For a month, Mr. Huang says nothing. Then one night, at a red light, he asks, “Sir, are you visiting someone at the hospital?”",
+     "有一個月，黃先生什麼也沒說。後來有一天晚上，在一個紅燈前，他問：「先生，您是去醫院看人嗎？」","gentle"],
+    ["The old man smiles. “No,” he says. “My wife took this bus to work for thirty years. She was a nurse at the hospital. [[Night shift|shift]]. She always sat right here.” He touches the seat.",
+     "老先生笑了。「不是，」他說，「我太太坐這班車上班，坐了三十年。她是這家醫院的護理師，上大夜班。她總是坐在這個位子。」他摸了摸座椅。","nostalgic"],
     ["“She always said the city is beautiful at night. Sometimes I rode with her, but I never saw it. I always fell asleep.”",
      "「她總說這座城市晚上很美。我有時候會陪她坐，可是從來沒看到。我每次都睡著。」","wistful"],
     ["“And now?” asks Mr. Huang.",
@@ -704,13 +703,13 @@ const S = [
      "他們開上橋。河水黑黑的，映滿了燈光。整座城市閃閃發亮，像一整盒星星。","nostalgic"],
     ["“She was right,” says the old man. His voice is very quiet.",
      "「她說得對。」老先生說。他的聲音很輕。","tender"],
-    ["After that night, Mr. Huang always keeps the second row free. And when the bus goes over the bridge, he drives slowly, so there is time to look.",
-     "從那天晚上起，黃先生總是把第二排的位子留著。每次公車開上那座橋，他都開得很慢，好讓人有時間好好看看。","warm"]
+    ["After that night, Mr. Huang always saves the second row for the old man. And when the bus goes over the bridge, he drives slowly, so there is time to look.",
+     "從那天晚上起，黃先生總是把第二排的位子留給老先生。每次公車開上那座橋，他都開得很慢，好讓人有時間好好看看。","warm"]
   ],
   quiz:[
-    ["Where does the old man go?", ["To the hospital","Nowhere — he rides the whole circle","To his daughter’s home"], 1, "“Nowhere.” 他坐完一整圈，又在上車的第三站下車。"],
+    ["Why doesn’t the old man go into the hospital?", ["He is afraid of doctors.","He isn’t visiting anyone. His wife worked there.","The hospital is closed."], 1, "他不是去看病人。那是他過世的太太工作了三十年的地方。"],
     ["Why does he ride the last bus?", ["His wife took this bus to work for thirty years.","He works at night.","He likes the driver."], 0, "他太太當了三十年大夜班護理師，每天坐這班末班車去上班。"],
-    ["What does Mr. Huang do after that night?", ["He drives faster.","He changes to a day bus.","He drives slowly over the bridge."], 2, "他把第二排留著，過橋時開得很慢。"]
+    ["What does Mr. Huang do after that night?", ["He drives faster.","He changes to a day bus.","He drives slowly over the bridge."], 2, "他把第二排留給老先生，過橋時開得很慢。"]
   ]
 }
 ];
@@ -901,10 +900,14 @@ const Scene = (()=>{
   vgrad(0,0,W,120,["#2A2336","#352B40","#3F3246"]);
   for(let xx=0;xx<W;xx+=16) rect(xx,0,1,120,"#2E2639");
   rect(18,14,132,92,"#1B1726");
-  vgrad(22,18,124,84,["#15183A","#232A5A","#3B3872","#5A4A83"]);
-  [[30,24],[52,30],[70,21],[96,28],[118,23],[134,34],[42,40],[88,44]].forEach(p=>put(p[0],p[1],hex("#E8E3FF")));
-  for(let yy=-9;yy<=9;yy++) for(let xx=-9;xx<=9;xx++){ if(xx*xx+yy*yy<=81) put(120+xx,36+yy,hex((xx+yy)>6?"#D9CFAE":"#F4EBCB")); }
-  rect(116,32,3,2,"#E2D7B6"); rect(123,39,2,2,"#E2D7B6");
+  /* each level can set its own window: night sky with moon and rain (default), or a dusk sky with a setting sun */
+  const SC = Object.assign({sky:["#15183A","#232A5A","#3B3872","#5A4A83"], moon:true, stars:true, rain:true, birds:false}, LEVEL.scene || {});
+  vgrad(22,18,124,84,SC.sky);
+  if(SC.stars) [[30,24],[52,30],[70,21],[96,28],[118,23],[134,34],[42,40],[88,44]].forEach(p=>put(p[0],p[1],hex("#E8E3FF")));
+  if(SC.moon){ for(let yy=-9;yy<=9;yy++) for(let xx=-9;xx<=9;xx++){ if(xx*xx+yy*yy<=81) put(120+xx,36+yy,hex((xx+yy)>6?"#D9CFAE":"#F4EBCB")); }
+    rect(116,32,3,2,"#E2D7B6"); rect(123,39,2,2,"#E2D7B6"); }
+  if(SC.sun){ for(let yy=-14;yy<=14;yy++) for(let xx=-14;xx<=14;xx++){ if(xx*xx+yy*yy<=196) put(58+xx,76+yy,hex(yy>4?"#F59A62":yy>-3?"#FDB46E":"#FFD08A")); }
+    for(let yy=56;yy<100;yy+=5) rect(22,yy,124,1,yy>80?"#E58A6A":"#D9798A"); }
   const sk=[[22,78,14,24],[36,70,12,32],[48,82,16,20],[64,66,10,36],[74,76,18,26],[92,72,12,30],[104,80,16,22],[120,68,12,34],[132,78,14,24]];
   sk.forEach(b=>rect(b[0],b[1],b[2],b[3],"#241F3C"));
   for(let i=0;i<46;i++){ const b=sk[i%sk.length]; const wx=b[0]+2+((i*5)%(b[2]-3)), wy=b[1]+3+((i*7)%(b[3]-6)); if(i%3) put(wx,wy,hex(i%4?"#F2C46B":"#FFE3A3")); }
@@ -931,14 +934,19 @@ const Scene = (()=>{
   const baseImg = new Uint8ClampedArray(d);
   const drops = Array.from({length:44},()=>({x:22+Math.random()*124, y:18+Math.random()*84, v:1.6+Math.random()*1.4}));
   const steam = Array.from({length:10},(_,i)=>({t:i/10}));
+  const birds = [{x:40,y:34,v:.35,p:0},{x:56,y:40,v:.3,p:2},{x:100,y:28,v:.4,p:4}], bird = hex("#3A2440");
   const rain = hex("#9DB2E6"), rain2 = hex("#6F7FB8"), st1 = hex("#F4EFE6"), st2 = hex("#C9BFB6");
   let frame = 0, last = 0, on = false;
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   function paint(){
     d.set(baseImg);
     const fl = 1 + (Math.sin(frame*.7)+Math.sin(frame*1.9))*.03;
-    glow(276,96,90,"#F6C57A",.72*fl); glow(276,112,40,"#FFE2A8",.8*fl); glow(120,36,26,"#CFC8FF",.35);
-    drops.forEach(p=>{ p.y+=p.v; if(p.y>100){ p.y=18; p.x=22+Math.random()*124; } put(p.x|0,p.y|0,rain); put(p.x|0,(p.y|0)-1,rain2); });
+    glow(276,96,90,"#F6C57A",.72*fl); glow(276,112,40,"#FFE2A8",.8*fl);
+    if(SC.moon) glow(120,36,26,"#CFC8FF",.35);
+    if(SC.sun) glow(58,72,44,"#FFC38A",.42);
+    if(SC.birds) birds.forEach(b=>{ b.x+=b.v; if(b.x>146) b.x=22; const bx=b.x|0, flap=(frame+b.p)%6<3;
+      put(bx,b.y+(flap?0:1),bird); put(bx+1,b.y+1,bird); put(bx+2,b.y+(flap?0:1),bird); });
+    if(SC.rain) drops.forEach(p=>{ p.y+=p.v; if(p.y>100){ p.y=18; p.x=22+Math.random()*124; } put(p.x|0,p.y|0,rain); put(p.x|0,(p.y|0)-1,rain2); });
     steam.forEach((s,i)=>{ s.t=(s.t+.02)%1; const sy=122-s.t*22, sx=118+Math.round(Math.sin(s.t*6+i)*3)+(i%3)*2;
       if(s.t<.85){ const c=s.t<.4?st1:st2; put(sx,sy|0,c); if(i%2) put(sx+1,sy|0,c); } });
     x.putImageData(img,0,0);
@@ -1034,7 +1042,6 @@ const Music = (()=>{
   function ui(){
     $("#musicBtn").classList.toggle("on", cur >= 0);
     $$(".trk").forEach(b=>{ const on = +b.dataset.t === cur; b.classList.toggle("on", on); b.querySelector(".pl").textContent = on ? "❚❚" : "▶"; });
-    $("#coverMusic").textContent = cur >= 0 ? "♪ " + TR[cur].n.toUpperCase() : "♪ TAP ANYWHERE FOR MUSIC";
   }
   document.addEventListener("visibilitychange", ()=>{
     if(!ctx || cur < 0) return;
@@ -1083,7 +1090,8 @@ function narrator(s){
   return VOICES.m.find(v=>v.lang === (VOICES.main && VOICES.main.lang)) || VOICES.m[0] || VOICES.main;
 }
 if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
-const speakable = t => plain(t).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/…/g,"...").replace(/—/g,", ").replace(/\$(\d+)/g,"$1 dollars");
+const sayAs = t => Object.entries(LEVEL.sayAs || {}).reduce((x,[w,r])=>x.split(w).join(r), t);  /* voice-only respellings */
+const speakable = t => sayAs(plain(t)).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/…/g,"...").replace(/—/g,", ").replace(/\$(\d+)/g,"$1 dollars");
 function sentences(t){
   const s = speakable(t).replace(/\b([ap])\.m\./g,"$1_m_").replace(/\b(Mr|Mrs|Ms|Dr|St)\./g,"$1_");
   return (s.match(/[^.!?]+(?:[.!?]+["']?|$)/g) || [s]).map(x=>x.replace(/([ap])_m_/g,"$1.m.").replace(/\b(Mr|Mrs|Ms|Dr|St)_/g,"$1.").trim()).filter(Boolean);
@@ -1141,7 +1149,7 @@ function runQueue(){
   };
   setTimeout(next, 60);
 }
-function sayWord(t){ if(!SYN) return; stopSpeech(); const u = new SpeechSynthesisUtterance(t); const v = VOICES.main;
+function sayWord(t){ if(!SYN) return; stopSpeech(); const u = new SpeechSynthesisUtterance(sayAs(t)); const v = VOICES.main;
   if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "en-US"; u.rate = Math.min(1, rate); SYN.speak(u); }
 let speechUnlocked = false;
 function unlockSpeech(){ if(speechUnlocked || !SYN) return; speechUnlocked = true;
@@ -1253,8 +1261,9 @@ function stamp(){
 const pop = $("#pop");
 function popHTML(k){
   if(k.startsWith("c:")){ const c = CULT[k]; if(!c) return "";
-    return `<div class="ph"><span class="pw">${esc(c.h)}</span><span class="lvb">文化小知識</span><span class="px2"><button class="ib" data-say="${esc(c.h)}" aria-label="聽發音">${SVGI.spk}</button><button class="ib" data-close aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg></button></span></div>
-      <p class="pz">${esc(c.zh)}</p><p class="pd">${esc(c.d)}</p>`; }
+    const pk = c.kk ? `<span class="pk">${esc(c.kk)}</span>` : "";
+    return `<div class="ph"><span class="pw">${esc(c.h)}</span>${pk}<span class="lvb">${c.name ? "名字發音" : "文化小知識"}</span><span class="px2"><button class="ib" data-say="${esc(c.h)}" aria-label="聽發音">${SVGI.spk}</button><button class="ib" data-close aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg></button></span></div>
+      <p class="pz">${esc(c.zh)}</p>${c.say ? `<p class="pd">念起來像 <b>${esc(c.say)}</b></p>` : ""}<p class="pd">${esc(c.d)}</p>`; }
   const v = VOCAB[k]; if(!v) return "";
   const hi = (CEFR[v.lv] || 1) > LEVEL.rank, st = stars.includes(k);
   return `<div class="ph"><span class="pw">${esc(v.w)}</span><span class="pk">${esc(v.kk)}</span><span class="lvb${hi ? " hi" : ""}">${esc(v.lv)}${hi ? " · 超出本級" : ""}</span>
@@ -1306,6 +1315,7 @@ function buildAbout(){
     <p>目前進度：讀完 ${readCount()} 篇，共 ${wordsRead().toLocaleString()} 個英文字。</p>
     <p><b>經典故事來源</b>（皆為公有領域作品，由 InkQuest 改寫為 ${LEVEL.cefr} 程度）</p>
     <ul>${LEVEL.credits.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>
+    ${(LEVEL.notes || []).map(n=>`<p style="font-size:13px">${esc(n)}</p>`).join("")}
     <p>字型：Jersey 15、Literata（SIL Open Font License）。音樂為瀏覽器即時 FM 合成。</p>
     <p>Created with Claude.</p>
     <p>© 2026 Wen-Hung Fang. All rights reserved.</p>`;
@@ -1389,16 +1399,18 @@ $("#vol").addEventListener("input", e=>Music.setVol(e.target.value/100));
 
 /* ---------------- cover ---------------- */
 function leaveCover(){ document.body.classList.remove("cover"); Scene.stop(); }
+/* one tap anywhere on the cover starts the music and opens the book.
+   click (not touchend) so the tap can't fall through to a word underneath; click still counts as a user gesture on iOS */
 let musicTried = false;
 function coverTap(e){
   if(!document.body.classList.contains("cover")) return;
-  if(!musicTried){ musicTried = true; Music.play(store.get("trk", 0) || 0); }
-  if(e.target.closest("#goBtn")) leaveCover();
+  if(e.type === "keydown" && !/^(Enter| |Spacebar)$/.test(e.key)) return;
+  e.preventDefault(); e.stopPropagation();
+  if(!musicTried){ musicTried = true; if(Music.cur < 0) Music.play(store.get("trk", 0) || 0); }
+  leaveCover();
 }
-/* touchend/click count as a user gesture on iOS; pointerdown doesn't */
-$("#cover").addEventListener("touchend", coverTap);
 $("#cover").addEventListener("click", coverTap);
-$("#cover").addEventListener("keydown", e=>{ if(e.key === "Enter") leaveCover(); });
+$("#cover").addEventListener("keydown", coverTap);
 ["touchend","click"].forEach(t=>document.addEventListener(t, ()=>Music.wake(), true));
 
 /* ---------------- boot ---------------- */

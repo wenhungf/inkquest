@@ -46,7 +46,8 @@ body.cover{overflow:hidden;}
 #cover .go{font-family:var(--f-dot);font-size:20px;letter-spacing:.06em;background:#DB97A2;color:#1C1A25;border:0;border-radius:30px;padding:10px 26px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.35);}
 #cover .go:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
 #cover .cm{font-family:var(--f-dot);font-size:14px;letter-spacing:.1em;opacity:.7;margin-top:14px;}
-#cover .cc{font-family:var(--f-zh);font-size:12px;opacity:.5;margin-top:18px;}
+#cover .cc{font-family:var(--f-zh);font-size:12px;opacity:.5;margin-top:8px;}
+#cover{cursor:pointer;}
 
 /* ---------- top bar ---------- */
 .bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:6px;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top));background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);}
@@ -213,13 +214,11 @@ select.sbox{appearance:auto;}
 <body>
 
 
-<div id="cover" role="button" tabindex="0" aria-label="開始">
+<div id="cover" role="button" tabindex="0" aria-label="開始閱讀">
   <div class="stage"><canvas id="cv" width="320" height="180" aria-label="夜晚的書桌：窗外下著雨，檯燈亮著，桌上有打開的書和一杯冒著熱氣的茶"></canvas></div>
   <p class="ck" id="cvK"></p>
   <h1>Lamplight Readers</h1>
   <p class="cz" id="cvZ"></p>
-  <button class="go" id="goBtn">Open the book 開始閱讀</button>
-  <p class="cm" id="coverMusic">♪ TAP ANYWHERE FOR MUSIC</p>
   <p class="cc">© 2026 Wen-Hung Fang. All rights reserved.</p>
 </div>
 
@@ -1136,7 +1135,6 @@ const Music = (()=>{
   function ui(){
     $("#musicBtn").classList.toggle("on", cur >= 0);
     $$(".trk").forEach(b=>{ const on = +b.dataset.t === cur; b.classList.toggle("on", on); b.querySelector(".pl").textContent = on ? "❚❚" : "▶"; });
-    $("#coverMusic").textContent = cur >= 0 ? "♪ " + TR[cur].n.toUpperCase() : "♪ TAP ANYWHERE FOR MUSIC";
   }
   document.addEventListener("visibilitychange", ()=>{
     if(!ctx || cur < 0) return;
@@ -1494,16 +1492,18 @@ $("#vol").addEventListener("input", e=>Music.setVol(e.target.value/100));
 
 /* ---------------- cover ---------------- */
 function leaveCover(){ document.body.classList.remove("cover"); Scene.stop(); }
+/* one tap anywhere on the cover starts the music and opens the book.
+   click (not touchend) so the tap can't fall through to a word underneath; click still counts as a user gesture on iOS */
 let musicTried = false;
 function coverTap(e){
   if(!document.body.classList.contains("cover")) return;
-  if(!musicTried){ musicTried = true; Music.play(store.get("trk", 0) || 0); }
-  if(e.target.closest("#goBtn")) leaveCover();
+  if(e.type === "keydown" && !/^(Enter| |Spacebar)$/.test(e.key)) return;
+  e.preventDefault(); e.stopPropagation();
+  if(!musicTried){ musicTried = true; if(Music.cur < 0) Music.play(store.get("trk", 0) || 0); }
+  leaveCover();
 }
-/* touchend/click count as a user gesture on iOS; pointerdown doesn't */
-$("#cover").addEventListener("touchend", coverTap);
 $("#cover").addEventListener("click", coverTap);
-$("#cover").addEventListener("keydown", e=>{ if(e.key === "Enter") leaveCover(); });
+$("#cover").addEventListener("keydown", coverTap);
 ["touchend","click"].forEach(t=>document.addEventListener(t, ()=>Music.wake(), true));
 
 /* ---------------- boot ---------------- */

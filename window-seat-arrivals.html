@@ -268,16 +268,16 @@ body.showzh .zh{display:block;}
 
 /* ---------- cover ---------- */
 body.cover #bar,body.cover #reader,body.cover #nav{display:none;}
-#cover{display:none;max-width:34rem;margin:0 auto;padding:30px 18px 44px;text-align:center;flex-direction:column;align-items:center;}
+#cover{display:none;max-width:34rem;margin:0 auto;padding:16px 18px 14px;cursor:pointer;min-height:100vh;min-height:100dvh;box-sizing:border-box;justify-content:center;text-align:center;flex-direction:column;align-items:center;}
 body.cover #cover{display:flex;}
-.cv-k{font-family:var(--f-px);font-size:12.5px;letter-spacing:.24em;color:var(--accent);margin:0 0 16px;}
+.cv-k{font-family:var(--f-px);font-size:12.5px;letter-spacing:.24em;color:var(--accent);margin:0 0 12px;}
 .screen{width:100%;max-width:440px;border:3px solid var(--ink);box-shadow:7px 7px 0 var(--accent);background:#E9D8BD;line-height:0;}
 .screen svg{width:100%;height:auto;display:block;}
-.cv-t{font-family:var(--f-disp);font-weight:700;font-size:clamp(2.6rem,12vw,3.6rem);line-height:1;margin:28px 0 4px;letter-spacing:-.02em;}
+.cv-t{font-family:var(--f-disp);font-weight:700;font-size:clamp(2.3rem,10vw,3.4rem);line-height:1;margin:18px 0 2px;letter-spacing:-.02em;}
 .cv-sub{font-family:var(--f-px);font-size:15px;letter-spacing:.3em;color:var(--accent);margin:2px 0 8px;text-transform:uppercase;}
-.cv-z{font-family:var(--f-zh);font-size:16px;color:var(--muted);margin:0 0 14px;letter-spacing:.1em;}
-.cv-b{max-width:27rem;margin:0 0 18px;font-size:1rem;line-height:1.65;}
-.cv-b span{display:block;font-family:var(--f-zh);font-size:14px;color:var(--muted);margin-top:4px;}
+.cv-z{font-family:var(--f-zh);font-size:15px;color:var(--muted);margin:0 0 8px;letter-spacing:.1em;}
+.cv-b{max-width:27rem;margin:0;font-size:.95rem;line-height:1.5;}
+.cv-b span{display:block;font-family:var(--f-zh);font-size:13px;line-height:1.55;color:var(--muted);margin-top:4px;}
 .cv-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:0 0 26px;}
 .cv-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
 .pbtn{font-family:var(--f-px);font-weight:600;font-size:17px;letter-spacing:.08em;padding:13px 26px;border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);cursor:pointer;background:var(--accent);color:var(--accent-ink);}
@@ -304,7 +304,7 @@ body.cover #cover{display:flex;}
 input,textarea,select{font-size:max(16px,1em);}
 
 /* ---------- about ---------- */
-.cv-copy{margin:30px 0 0;font-size:12.5px;color:var(--muted);letter-spacing:.02em;}
+.cv-copy{margin:12px 0 0;font-size:12.5px;color:var(--muted);letter-spacing:.02em;}
 .tab{white-space:nowrap;}
 .ab{padding:18px 18px 10px;font-family:var(--f-zh);font-size:14.5px;line-height:1.8;}
 .ab-art{border:2px solid var(--ink);box-shadow:4px 4px 0 var(--accent);line-height:0;margin-bottom:18px;background:#E9D8BD;}
@@ -481,14 +481,6 @@ mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
   <p class="cv-sub" id="cvS"></p>
   <p class="cv-z" id="cvZ"></p>
   <p class="cv-b" id="cvB"></p>
-  <div class="cv-chips">
-    <span class="chip t-fun">輕鬆活潑 Fun</span><span class="chip t-feel">抒情感性 Feelings</span><span class="chip t-know">新知分享 Discover</span><span class="chip t-think">理性討論 Think</span>
-  </div>
-  <div class="cv-row">
-    <button class="pbtn" id="coverGo"><span class="blink">▶</span> <span id="goLbl">START</span></button>
-    <button class="pbtn alt" id="coverMusic">♪ MUSIC</button>
-  </div>
-  <p class="tap" id="tapHint"><span class="blink">♪</span> 輕觸畫面任一處，開始播放背景音樂 · Tap anywhere for music</p>
   <p class="cv-copy">© 2026 Wen-Hung Fang. All rights reserved.</p>
 </section>
 
@@ -740,13 +732,13 @@ const L = [
      "飛機早上六點降落在希斯洛機場。大家站起來搶著拿行李的時候，我靜靜坐著看窗外。天空是灰的。當然是灰的。「哈囉，倫敦。」我小聲說。旁邊的男人說：「早！」他以為我在跟他說話。"],
     ["After [[passport control|c:border]], I followed the signs to the [[Underground|c:tube]]. The [[Piccadilly line|c:n-piccadilly]] goes all the way to [[King’s Cross|c:n-kingscross]] with no changes. [[It takes about an hour|g:1c]]. I didn’t even buy a ticket. I just [[tapped|tap]] my credit card on the yellow reader, and the gates opened. [[Magic.|c:contactless]]",
      "通過入境審查後，我跟著指標走到地鐵站。皮卡迪利線可以直達國王十字站，不用轉車，大約一個小時。我連票都沒買，只把信用卡在黃色感應器上嗶一下，閘門就開了。太神奇了。"],
-    ["I [[was studying|g:1a]] the map on the wall when the train stopped in a dark [[tunnel]]. The lights went off for a second. Nobody said a word. A woman kept reading her book. A boy kept eating his crisps. Then the train moved again, and everyone [[pretended|pretend]] nothing had happened. So I pretended too. I was learning already.",
+    ["I [[was studying|g:1a]] the map on the wall when the train stopped in a dark [[tunnel]]. The lights went off for a second. [[Nobody said a word|c:held]]. A woman kept reading her book. A boy kept eating his [[crisps|c:crisps]]. Then the train moved again, and everyone [[pretended|pretend]] nothing had happened. So I pretended too. I was learning already.",
      "我正在研究牆上的路線圖時，列車停在漆黑的隧道裡。燈熄了一秒。沒有人說話。一個女人繼續看她的書，一個男孩繼續吃他的洋芋片。然後列車又動了，大家都假裝什麼事也沒發生。所以我也假裝。我已經開始學了。"],
     ["At every station, a calm [[recorded]] voice said, “[[Mind the gap.|c:mindgap]]” By the tenth station, I was saying it with her. At King’s Cross, I [[dragged|drag]] my twenty-two-point-nine-kilo suitcase toward the stairs, one [[step]] at a time. A man in a suit stopped. “Need a hand?” he asked. He carried it to the top before I could answer.",
      "每一站都有一個冷靜的錄音說：「小心月台間隙。」到第十站，我已經跟著她一起念了。在國王十字站，我拖著二十二點九公斤的行李箱往樓梯走，一次一階。一個穿西裝的男人停下來。「需要幫忙嗎？」他問。我還來不及回答，他就把行李提到樓上了。"],
     ["[[Élise|c:n-elise]] was waiting outside the station, holding a paper sign: WELCOME TO THE RAIN, MIA! I knew her from our video calls: [[Camille|c:n-camille]]’s little sister, with the same big smile. “Welcome to London!” she said, and hugged me. “You must be [[exhausted]].” I was. But I was also here.",
      "Élise 在車站外面等我，手上舉著一張紙牌：「歡迎來到雨都，MIA！」我在視訊裡見過她：Camille 的妹妹，有一樣燦爛的笑容。「歡迎來到倫敦！」她說，給了我一個擁抱。「妳一定累壞了吧。」我是累壞了。可是我也真的到了。"],
-    ["My hostel was ten minutes away, but I couldn’t [[check in]] until three. So we left my suitcase in the [[luggage]] room, and Élise took me for my first English breakfast: eggs, beans, sausages and a lot of tea. At three, I climbed into my top [[bunk]] and put my head on the [[pillow]], “just for a minute.” When I opened my eyes, it was midnight. Welcome to [[jet lag]].",
+    ["My hostel was ten minutes away, but I couldn’t [[check in]] until three. So we left my suitcase in the [[luggage]] room, and Élise took me for my first [[English breakfast|c:fry]]: eggs, [[beans|c:beans]], [[sausages|c:banger]] and a lot of [[tea|c:tea]]. At three, I climbed into my top [[bunk]] and put my head on the [[pillow]], “just for a minute.” When I opened my eyes, it was midnight. Welcome to [[jet lag]].",
      "青年旅館離車站十分鐘，可是三點才能入住。所以我們把行李箱寄放在行李室，Élise 帶我去吃人生第一頓英式早餐：蛋、焗豆、香腸，還有很多很多茶。三點，我爬上上鋪，把頭靠在枕頭上，「只躺一下下」。等我睜開眼睛，已經是半夜了。時差，歡迎光臨。"]
   ],
   words:["land","grab","tap","tunnel","pretend","recorded","drag","step","exhausted","check in","luggage","bunk","pillow","jet lag"],
@@ -1368,6 +1360,12 @@ const GRAM = {
 
 /* ---------------- CULTURE ---------------- */
 const CULT = {
+"c:held":{h:"Stuck in a tunnel",zh:"列車停在隧道裡",d:"倫敦地鐵列車在隧道裡停個幾十秒，是很常見的事。通常是前面那班車還在月台，號誌亮紅燈，列車要等一下，保持安全距離。司機常廣播：<i>“We’re being held at a red signal”</i>（我們在紅燈前等候），或 <i>“to regulate the service”</i>（調整班距）。比較老的車廂，燈有時會閃一下或暗一秒。<br><br>倫敦人的反應通常就是沒反應：繼續看書、看手機。地鐵車廂裡大家很安靜，很少大聲聊天，跟陌生人也不太交談。"},
+"c:crisps":{h:"crisps",kk:"[krɪsps]",zh:"洋芋片（英式說法）",d:"英國的 <b>crisps</b> 是洋芋片，美國叫 <b>chips</b>；英國說的 <b>chips</b> 則是薯條。<br><br><b>在倫敦地鐵能吃東西嗎？</b>可以。這點跟台北捷運不一樣，倫敦地鐵和公車沒有禁止飲食，早上很多人在車上吃三明治、喝咖啡。不過禮貌上要看吃什麼：洋芋片、餅乾、水果沒問題；漢堡、炸雞、咖哩這種味道重的熱食，在擠滿人的車廂裡會招來白眼，被認為不體貼。另外，2008 年起倫敦交通局（TfL）的地鐵、公車上<b>禁止喝酒</b>，也不能拿著打開的酒。"},
+"c:fry":{h:"full English breakfast",zh:"英式全套早餐",d:"也叫 <b>a full English</b> 或 <b>a fry-up</b>（因為幾乎都是煎的）。一盤通常有：煎蛋或炒蛋、培根、香腸、焗豆、烤番茄、蘑菇、吐司，有些店還有 <b>black pudding</b>（用豬血和燕麥做的黑色香腸）。<br><br>分量很大，英國人多半週末、度假或宿醉時才吃。平常日的早餐常常只是吐司、麥片或一杯咖啡。咖啡館菜單上常寫 <i>All Day Breakfast</i>，表示整天都能點。"},
+"c:beans":{h:"beans (baked beans)",kk:"[bekt binz]",zh:"茄汁焗豆",d:"英式早餐的 <b>beans</b> 指的是罐頭 <b>baked beans</b>：小小的白色豆子（haricot beans，美國叫 navy beans），泡在微甜的番茄醬汁裡，加熱就能吃。<br><br>不是紅豆、綠豆、黃豆或黑豆，也不是甜湯。英國人很愛它，也常倒在吐司上當一餐，叫 <b>beans on toast</b>。"},
+"c:banger":{h:"sausages (bangers)",kk:"[ˋbæŋɚz]",zh:"英式香腸",d:"英國香腸大多是新鮮的生豬肉香腸，要煎熟或烤熟才能吃。外皮淺褐色，裡面除了肉，還加了麵包屑和香料，所以口感比較軟、味道鹹香、不甜。<br><br>跟台灣紅紅的、甜甜的、帶酒香的香腸很不一樣，也不是夜市的大腸包小腸。英國人暱稱香腸 <b>bangers</b>，據說是因為以前的香腸煎的時候會「砰」一聲爆開。"},
+"c:tea":{h:"tea",zh:"英式紅茶（加牛奶）",d:"在英國，只說 <b>tea</b> 的時候，指的是<b>紅茶</b>，而且通常<b>加牛奶</b>，有人再加糖。早上常喝的是 <b>English Breakfast</b> 這種濃濃的紅茶，多半是用茶包直接在馬克杯裡泡。不是綠茶、烏龍茶，也不是手搖飲。<br><br>英國人問 <i>“How do you take your tea?”</i>，是問你要不要加牛奶、加幾顆糖。小提醒：在英格蘭北部和蘇格蘭，<b>tea</b> 也可能是「晚餐」的意思，例如 <i>“What’s for tea?”</i>（晚餐吃什麼？）。"},
 "c:border":{h:"passport control",zh:"入境審查",d:"下飛機後要先排隊通關。英國機場的標示多半寫 Border Control 或 Arrivals。打工度假的人要記得，簽證資料現在都是電子化的（eVisa），護照要和申請時用的是同一本。"},
 "c:tube":{h:"the Underground / the Tube",zh:"倫敦地鐵",d:"倫敦地鐵 1863 年開通，是全世界最早的地下鐵。倫敦人都叫它 the Tube。皮卡迪利線（Piccadilly line）可以從希斯洛機場直達市中心，不用轉車。"},
 "c:contactless":{h:"contactless",zh:"感應支付",d:"倫敦的地鐵、公車都可以直接用感應式信用卡、金融卡或手機付款，進站、出站都要嗶同一張卡，車資和牡蠣卡（Oyster card）一樣，每天還有上限。用外國的卡可能會被收海外手續費，出發前先問發卡銀行。"},
@@ -2048,7 +2046,6 @@ const Music = (()=>{
   function ui(){
     $("#musicBtn").classList.toggle("on", cur >= 0);
     $$(".trk").forEach(b=> b.classList.toggle("on", +b.dataset.t === cur));
-    $("#coverMusic").textContent = cur >= 0 ? "♪ " + TR[cur].n.toUpperCase() : "♪ MUSIC";
   }
   document.addEventListener("visibilitychange", ()=>{
     if(!ctx || cur < 0) return;
@@ -2526,20 +2523,27 @@ $("#mpList").onclick = e=>{ const b = e.target.closest(".trk"); if(!b) return; c
 $("#mpOff").onclick = ()=> Music.stop();
 function toggleMp(){ $("#mp").hidden = !$("#mp").hidden; }
 $("#musicBtn").onclick = e=>{ e.stopPropagation(); toggleMp(); };
-$("#coverMusic").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(store.get("trk",0)); toggleMp(); };
 document.addEventListener("click", e=>{
-  if(!$("#mp").hidden && !e.target.closest("#mp") && !e.target.closest("#musicBtn") && !e.target.closest("#coverMusic")) $("#mp").hidden = true;
+  if(!$("#mp").hidden && !e.target.closest("#mp") && !e.target.closest("#musicBtn")) $("#mp").hidden = true;
   if(pop.classList.contains("on") && !e.target.closest("#pop") && !e.target.closest(".g") && !e.target.closest(".wr") && !e.target.closest("[data-word]")) closePop();
 });
 
 /* cover */
 function showCover(){
   stopSpeech(); document.body.classList.add("cover"); window.scrollTo(0,0);
-  $("#goLbl").textContent = cur > 0 ? `CONTINUE · L${pad(cur+1)}` : "START";
   try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){}
 }
 function leaveCover(){ document.body.classList.remove("cover"); }
-$("#coverGo").onclick = ()=>{ leaveCover(); go(cur); };
+/* the whole title screen is the start button: one tap starts the music and opens the book where the reader left off */
+function enterBook(e){
+  if(!document.body.classList.contains("cover")) return;
+  if(e.type === "keydown" && !/^(Enter| |Spacebar)$/.test(e.key)) return;
+  e.preventDefault(); e.stopPropagation();
+  if(Music.cur < 0) Music.play(store.get("trk", 0));
+  leaveCover(); go(cur);
+}
+document.addEventListener("click", enterBook, true);
+document.addEventListener("keydown", enterBook, true);
 
 /* keys */
 document.addEventListener("keydown", e=>{
@@ -2564,18 +2568,6 @@ window.addEventListener("hashchange", ()=>{
   if(m && +m[1] >= 1 && +m[1] <= L.length && +m[1]-1 !== cur){ leaveCover(); go(+m[1]-1); }
 });
 
-/* first press anywhere on the title screen starts the music (browsers block autoplay until then) */
-let autoMusicDone = false;
-function autoMusic(e){
-  if(autoMusicDone || !document.body.classList.contains("cover")) return;
-  if(e.type === "keydown" && !/^(Enter| |Spacebar)$/.test(e.key)) return;
-  autoMusicDone = true;
-  if(Music.cur < 0) Music.play(store.get("trk", 0));
-  const h = $("#tapHint"); if(h) h.hidden = true;
-}
-document.addEventListener("touchend", autoMusic, true);
-document.addEventListener("click", autoMusic, true);
-document.addEventListener("keydown", autoMusic, true);
 /* any later tap re-wakes a context the browser suspended */
 ["touchend","click","keydown"].forEach(t=> document.addEventListener(t, ()=>Music.wake(), true));
 
