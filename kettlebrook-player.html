@@ -1,0 +1,1233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kettlebrook · Player's Book</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#15111f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,wght@0,400;0,600;1,400&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Jersey+15&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#15111f; --bg2:#1b1528; --panel:#221a31; --panel2:#2b2140; --ink:#f3eadb; --muted:#ab9fc0; --line:#3d3156; --line2:#54466f;
+  --gold:#f4c542; --gold2:#e0952f; --red:#e0604f; --green:#7cc58a; --blue:#86b6ff; --purple:#b48cff; --shadow:rgba(0,0,0,.45);
+  --on-gold:#1d1426;
+  --f-px:'Jersey 15',"PingFang TC","Noto Sans TC",monospace;
+  --f-body:'Atkinson Hyperlegible',"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-zh:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+  --fs:17px;
+}
+:root[data-theme="light"]{
+  --bg:#efe4cc; --bg2:#e7dabd; --panel:#fbf4e4; --panel2:#f1e5c9; --ink:#2a2032; --muted:#6c607c; --line:#d4c29c; --line2:#bca77c;
+  --gold:#a8740f; --gold2:#b8591c; --red:#b6402f; --green:#2f7a42; --blue:#2f5fb0; --purple:#6a3fb0; --shadow:rgba(80,50,20,.25);
+  --on-gold:#fff8e6;
+}
+html,body{background:var(--bg) !important;}
+*{box-sizing:border-box;}
+body{margin:0;color:var(--ink);font-family:var(--f-body);font-size:var(--fs);line-height:1.55;-webkit-text-size-adjust:100%;overflow-x:hidden;}
+button,input,select,textarea{font:inherit;color:inherit;}
+button{cursor:pointer;}
+a{color:var(--blue);}
+.px{font-family:var(--f-px);font-weight:400;letter-spacing:.03em;}
+.zh{font-family:var(--f-zh);color:var(--muted);font-size:.86em;line-height:1.55;}
+body.nozh .zh{display:none !important;}
+.muted{color:var(--muted);}
+.hide{display:none !important;}
+h1,h2,h3{font-family:var(--f-px);font-weight:400;letter-spacing:.03em;line-height:1.05;margin:0;}
+h2{font-size:30px;} h3{font-size:22px;}
+.gold{color:var(--gold);}
+
+/* ---------- title ---------- */
+#title{position:fixed;inset:0;z-index:50;background:#0c0816;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:10px;overflow:hidden;}
+body:not(.titled) #title{display:none;}
+#title .stage{width:min(96vw,calc(62vh * 16 / 9),960px);aspect-ratio:16/9;position:relative;box-shadow:0 0 0 3px #3a2a52,0 0 0 6px #120a1e,0 18px 50px rgba(0,0,0,.6);}
+#title canvas{width:100%;height:100%;image-rendering:pixelated;display:block;}
+#title h1{font-size:clamp(44px,10vw,84px);color:#f4c542;text-shadow:3px 3px 0 #7a2a1a,6px 6px 0 #1a0e24;text-align:center;margin-top:6px;}
+#title .sub{font-family:var(--f-zh);color:#e8dcc6;letter-spacing:.3em;font-size:15px;margin-top:-4px;}
+#title .kick{font-family:var(--f-px);color:#b99be0;letter-spacing:.16em;font-size:16px;}
+#title .go{font-family:var(--f-px);font-size:26px;background:#f4c542;color:#1d1426;border:0;padding:8px 30px 10px;box-shadow:0 5px 0 #9a6a14,0 5px 0 3px #1a0e24;border-radius:4px;margin-top:6px;}
+#title .go:active{transform:translateY(4px);box-shadow:0 1px 0 #9a6a14;}
+#title .tap{font-family:var(--f-px);color:#8f7fb0;font-size:15px;letter-spacing:.12em;animation:blink 1.4s steps(2) infinite;}
+#title .cc{font-size:11px;color:#6d5f86;text-align:center;max-width:560px;}
+@keyframes blink{50%{opacity:.35}}
+
+/* ---------- toolbar ---------- */
+.bar{position:sticky;top:0;z-index:30;background:var(--bg2);border-bottom:3px solid var(--line);display:flex;align-items:center;gap:6px;padding:6px 10px;padding-top:max(6px,env(safe-area-inset-top));}
+.bar .logo{display:flex;align-items:center;gap:8px;flex:1;min-width:0;background:none;border:0;padding:0;text-align:left;}
+.bar .logo canvas{width:86px;height:36px;image-rendering:pixelated;border:2px solid var(--line2);border-radius:3px;flex:none;background:#0c0816;}
+.bar .logo b{font-family:var(--f-px);font-weight:400;font-size:24px;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ib{width:42px;height:42px;display:grid;place-items:center;border:2px solid var(--line);background:var(--panel);border-radius:6px;padding:0;font-size:20px;line-height:1;flex:none;box-shadow:0 3px 0 var(--shadow);}
+.ib:active{transform:translateY(2px);box-shadow:0 1px 0 var(--shadow);}
+.ib.on{border-color:var(--gold);color:var(--gold);}
+.ib svg{width:22px;height:22px;fill:currentColor;}
+
+main{max-width:780px;margin:0 auto;padding:14px 16px 110px;}
+.crumbs{display:flex;gap:6px;align-items:center;margin:0 0 10px;flex-wrap:wrap;}
+
+/* ---------- panels & buttons ---------- */
+.panel{background:var(--panel);border:2px solid var(--line);border-radius:6px;padding:14px;box-shadow:4px 4px 0 var(--shadow);margin:0 0 14px;}
+.panel.tight{padding:10px 12px;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f-px);font-size:21px;line-height:1;padding:9px 16px 11px;border:2px solid var(--line2);background:var(--panel2);border-radius:5px;box-shadow:0 4px 0 var(--shadow);min-height:44px;}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--shadow);}
+.btn.pri{background:var(--gold);color:var(--on-gold);border-color:var(--gold);}
+.btn.red{background:transparent;color:var(--red);border-color:var(--red);}
+.btn.sm{font-size:17px;padding:6px 11px 7px;min-height:36px;}
+.btn[disabled]{opacity:.45;pointer-events:none;}
+.btn small{font-family:var(--f-zh);font-size:13px;opacity:.85;}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.row.end{justify-content:flex-end;}
+.row.sp{justify-content:space-between;}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;}
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;}
+
+/* choice cards */
+.card{position:relative;text-align:left;background:var(--panel);border:2px solid var(--line);border-radius:6px;padding:10px 12px;box-shadow:0 3px 0 var(--shadow);display:block;width:100%;}
+.card:hover{border-color:var(--line2);}
+.card.sel{border-color:var(--gold);background:var(--panel2);box-shadow:0 0 0 2px var(--gold) inset,0 3px 0 var(--shadow);}
+.card .t{font-family:var(--f-px);font-size:22px;line-height:1.05;display:flex;align-items:center;gap:8px;}
+.card .t .ico{width:28px;height:28px;flex:none;image-rendering:pixelated;}
+.card .d{font-size:14.5px;margin-top:4px;line-height:1.45;}
+.card .zh{font-size:13px;margin-top:2px;display:block;}
+.card .badge{display:inline-block;margin:0 0 6px;}
+.card .t .badge{margin:0 0 0 4px;}
+.badge{font-family:var(--f-px);font-size:14px;line-height:1;padding:3px 7px 4px;border-radius:3px;background:var(--gold);color:var(--on-gold);}
+.badge.soft{background:var(--panel2);color:var(--muted);border:1px solid var(--line2);}
+.stars{font-family:var(--f-px);color:var(--gold);font-size:15px;letter-spacing:1px;}
+
+/* term chips (tap to explain) */
+.term{border-bottom:2px dotted var(--gold2);cursor:help;}
+.info{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--gold2);color:var(--gold2);font-size:12px;line-height:1;cursor:help;vertical-align:middle;font-family:var(--f-body);font-weight:700;}
+.info:active{transform:scale(.9);}
+.say{border:0;background:none;padding:0 2px;font-size:.95em;line-height:1;cursor:pointer;vertical-align:baseline;filter:saturate(.8);}
+.say:active{transform:scale(.9);}
+
+/* steps */
+.steps{display:flex;gap:4px;flex-wrap:wrap;margin:0 0 12px;}
+.steps button{font-family:var(--f-px);font-size:15px;border:2px solid var(--line);background:var(--panel);border-radius:4px;padding:3px 8px 4px;color:var(--muted);}
+.steps button.on{border-color:var(--gold);color:var(--gold);}
+.steps button.ok{color:var(--green);}
+.tip{display:flex;gap:10px;background:var(--panel2);border:2px dashed var(--line2);border-radius:6px;padding:10px 12px;margin:0 0 14px;font-size:15px;}
+.tip .i{font-size:22px;line-height:1;}
+.tip p{margin:0;}
+.tip .zh{display:block;}
+.tip .ico{width:30px;height:30px;image-rendering:pixelated;}
+.navbar{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--bg2);border-top:3px solid var(--line);padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));}
+.navbar .in{max-width:780px;margin:0 auto;display:flex;gap:10px;align-items:center;}
+.navbar .in .grow{flex:1;min-width:0;font-size:14px;color:var(--muted);text-align:center;}
+
+/* ability boxes */
+.abgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+@media (min-width:620px){ .abgrid{grid-template-columns:repeat(6,1fr);} }
+.ab{background:var(--panel);border:2px solid var(--line);border-radius:6px;text-align:center;padding:8px 4px 10px;position:relative;}
+button.ab{width:100%;}
+.ab.sel{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold) inset;}
+.ab .n{font-family:var(--f-px);font-size:17px;color:var(--muted);line-height:1;}
+.ab .m{font-family:var(--f-px);font-size:38px;line-height:.95;margin:4px 0 2px;}
+.ab .v{display:inline-block;font-family:var(--f-px);font-size:17px;border:2px solid var(--line2);border-radius:20px;padding:0 10px 1px;}
+.ab .plus{font-family:var(--f-px);font-size:14px;color:var(--green);}
+.ab.prim::after{content:"★";position:absolute;top:3px;right:6px;color:var(--gold);font-size:13px;}
+
+/* sheet */
+.stat3{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.stat{background:var(--panel);border:2px solid var(--line);border-radius:6px;text-align:center;padding:6px 4px 8px;}
+.stat .k{font-family:var(--f-px);font-size:15px;color:var(--muted);line-height:1.1;}
+.stat .val{font-family:var(--f-px);font-size:32px;line-height:1;}
+.hpbox{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;}
+.hpbar{height:18px;background:var(--bg);border:2px solid var(--line2);border-radius:3px;overflow:hidden;position:relative;}
+.hpbar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--red),#f08a5b);transition:width .3s;}
+.hpbar i.tmp{background:var(--blue);opacity:.7;}
+.hpnum{font-family:var(--f-px);font-size:34px;line-height:1;}
+.hpnum small{font-size:20px;color:var(--muted);}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:0 0 12px;border-bottom:3px solid var(--line);}
+.tabs::-webkit-scrollbar{display:none;}
+.tabwrap{position:relative;}
+.tabarrow{position:absolute;top:0;bottom:15px;width:34px;border:0;padding:0;color:var(--gold);font-size:14px;display:grid;place-items:center;z-index:2;}
+.tabarrow[hidden]{display:none;}
+.tabarrow.l{left:0;background:linear-gradient(to right,var(--bg) 55%,transparent);justify-content:start;padding-left:2px;}
+.tabarrow.r{right:0;background:linear-gradient(to left,var(--bg) 55%,transparent);justify-content:end;padding-right:2px;}
+.tabs button{font-family:var(--f-px);font-size:19px;border:0;background:none;color:var(--muted);padding:6px 10px 7px;border-bottom:3px solid transparent;margin-bottom:-3px;white-space:nowrap;}
+.tabs button.on{color:var(--gold);border-bottom-color:var(--gold);}
+.list{display:grid;gap:6px;}
+.li{display:flex;align-items:center;gap:10px;background:var(--panel);border:2px solid var(--line);border-radius:5px;padding:7px 10px;}
+.li .main{flex:1;min-width:0;}
+.li .main b{font-weight:700;}
+.li .main .zh{display:block;}
+.li .num{font-family:var(--f-px);font-size:22px;min-width:40px;text-align:center;}
+button.li{width:100%;text-align:left;}
+.pip{width:22px;height:22px;border:2px solid var(--line2);border-radius:4px;background:var(--bg);display:inline-block;vertical-align:middle;padding:0;}
+.pip.on{background:var(--gold);border-color:var(--gold);}
+.pip.x{background:var(--red);border-color:var(--red);}
+.pips{display:flex;gap:5px;flex-wrap:wrap;}
+.skill{display:grid;grid-template-columns:18px 1fr auto;gap:8px;align-items:center;padding:5px 8px;border-radius:4px;background:none;border:0;width:100%;text-align:left;}
+.skill:nth-child(odd){background:var(--panel);}
+.skill .dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--line2);}
+.skill .dot.p{background:var(--gold);border-color:var(--gold);}
+.skill .dot.e{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 3px var(--panel),0 0 0 5px var(--gold);}
+.skill .b{font-family:var(--f-px);font-size:20px;}
+.skill .ab3{font-family:var(--f-px);font-size:13px;color:var(--muted);margin-left:4px;}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:15px;}
+.kv dt{color:var(--muted);}
+.kv dd{margin:0;}
+textarea,input[type=text],input[type=number],select{width:100%;background:var(--bg);border:2px solid var(--line2);border-radius:5px;padding:8px 10px;}
+textarea{min-height:70px;resize:vertical;}
+label.fl{display:block;font-weight:700;margin:10px 0 4px;}
+label.fl .zh{font-weight:400;margin-left:6px;}
+
+/* roster */
+.slot{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;text-align:left;}
+.por{width:64px;height:64px;flex:none;image-rendering:pixelated;background:var(--bg);border:2px solid var(--line2);border-radius:4px;padding:6px;}
+.slotsfree{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;padding:8px 12px;border:2px dashed var(--line);border-radius:6px;color:var(--muted);font-size:14px;letter-spacing:2px;}
+.slotsfree span{letter-spacing:0;}
+.howcard{display:block;width:100%;text-align:left;margin-top:12px;border-color:var(--gold);} .howcard .t{font-family:var(--f-px);font-size:21px;color:var(--gold);} .howcard .d{font-size:15px;margin-top:4px;}
+.pillars{margin-top:10px;} .pillars .card{text-align:left;} .pillars .t{font-family:var(--f-px);font-size:20px;}
+.pillars .d{font-size:15px;margin-top:6px;}
+.abhelp{margin:6px 0 0;padding-left:20px;} .abhelp li{margin-bottom:8px;} .abhelp .zh{display:block;}
+.slot.empty{border-style:dashed;color:var(--muted);grid-template-columns:1fr;text-align:center;padding:18px;}
+.slot .nm{font-family:var(--f-px);font-size:25px;line-height:1;}
+
+/* overlays */
+.ov{position:fixed;inset:0;z-index:40;background:rgba(8,5,14,.72);display:none;align-items:flex-end;justify-content:center;}
+.ov.on{display:flex;}
+.sheet{background:var(--panel);border:3px solid var(--line2);border-bottom:0;border-radius:10px 10px 0 0;width:min(100%,640px);max-height:88vh;overflow:auto;padding:14px 16px;padding-bottom:max(18px,env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.4);}
+@media (min-width:700px){ .ov{align-items:center;} .sheet{border-radius:10px;border-bottom:3px solid var(--line2);} }
+.sheet .hd{display:flex;align-items:center;gap:10px;margin:0 0 10px;}
+.sheet .hd h3{flex:1;}
+.pop h3{font-size:28px;color:var(--gold);}
+.pop .zhbig{font-family:var(--f-zh);font-size:18px;margin:2px 0 8px;}
+
+/* dice */
+.dice{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
+.die{aspect-ratio:1;border:2px solid var(--line2);background:var(--panel2);border-radius:6px;display:grid;place-items:center;padding:2px;box-shadow:0 3px 0 var(--shadow);}
+.die svg{width:78%;height:78%;}
+.die span{font-family:var(--f-px);font-size:16px;line-height:1;margin-top:-4px;}
+.die.on{border-color:var(--gold);}
+.tray{min-height:120px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;background:var(--bg);border:2px solid var(--line);border-radius:6px;padding:10px;margin:10px 0;}
+.rd{width:58px;height:58px;display:grid;place-items:center;position:relative;}
+.rd svg{position:absolute;inset:0;width:100%;height:100%;}
+.rd b{position:relative;font-family:var(--f-px);font-weight:400;font-size:26px;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.5);}
+.rd.drop{opacity:.35;}
+.rd.spin{animation:spin .5s steps(6) infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.total{font-family:var(--f-px);font-size:54px;line-height:1;text-align:center;}
+.total.crit{color:var(--gold);text-shadow:0 0 12px var(--gold);}
+.total.fail{color:var(--red);}
+.hist{font-size:13.5px;color:var(--muted);max-height:120px;overflow:auto;}
+.seg{display:inline-flex;border:2px solid var(--line2);border-radius:5px;overflow:hidden;}
+.seg button{border:0;background:var(--panel);padding:6px 10px;font-family:var(--f-px);font-size:17px;}
+.seg button.on{background:var(--gold);color:var(--on-gold);}
+
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translate(-50%,30px);opacity:0;transition:all .25s;z-index:60;background:var(--ink);color:var(--bg);font-size:15px;padding:9px 16px;border-radius:6px;max-width:90vw;text-align:center;pointer-events:none;}
+#toast.on{opacity:1;transform:translate(-50%,0);}
+#mp{position:fixed;top:58px;right:10px;z-index:35;width:min(92vw,21rem);max-height:calc(100vh - 72px);max-height:calc(100dvh - 72px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:var(--panel);border:3px solid var(--line2);border-radius:8px;box-shadow:0 12px 30px rgba(0,0,0,.35);padding:10px;}
+.trk{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:center;width:100%;text-align:left;border:2px solid transparent;background:transparent;border-radius:6px;padding:6px 8px;}
+.trk:hover{background:var(--panel2);}
+.trk .pl{width:36px;height:36px;border-radius:4px;background:var(--gold);color:var(--on-gold);display:grid;place-items:center;font-size:13px;}
+.trk.on{border-color:var(--gold);}
+.trk .tn{font-family:var(--f-px);font-size:19px;display:block;line-height:1.1;}
+.trk .tz{font-family:var(--f-zh);font-size:12.5px;color:var(--muted);display:block;}
+.vol{display:flex;align-items:center;gap:10px;margin:8px 4px 2px;font-size:13px;color:var(--muted);}
+.vol input{flex:1;accent-color:var(--gold);}
+.lvup{animation:glow 1.2s ease-in-out 2;}
+@keyframes glow{50%{box-shadow:0 0 0 3px var(--gold),0 0 24px var(--gold);}}
+.qopt{display:grid;gap:8px;}
+.qopt .card{padding:12px 14px;}
+.hero-toggle{font-size:14px;margin:8px 0 0;}
+.chip{display:inline-flex;align-items:center;gap:4px;border:2px solid var(--line2);border-radius:20px;padding:3px 10px;font-size:14px;background:var(--panel);margin:2px;}
+.chip.sel{border-color:var(--gold);background:var(--gold);color:var(--on-gold);}
+.chip.sel .zh{color:inherit;opacity:.85;}
+.lock{border:2px solid var(--line2);background:var(--panel2);border-radius:5px;width:36px;height:36px;display:grid;place-items:center;font-size:17px;padding:0;}
+.lock.on{border-color:var(--gold);background:var(--gold);}
+.rev{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:2px dashed var(--line);}
+.rev:last-child{border-bottom:0;}
+.rev .k{font-family:var(--f-px);font-size:15px;color:var(--muted);line-height:1;}
+.rev .v{font-size:16px;}
+.rev .v b{font-family:var(--f-px);font-weight:400;font-size:22px;}
+.rev .act{display:flex;gap:6px;}
+.split{display:grid;gap:14px;}
+@media (min-width:700px){ .split{grid-template-columns:1fr 1fr;} }
+.sp-lv{font-family:var(--f-px);font-size:19px;color:var(--gold);margin:14px 0 6px;display:flex;align-items:center;gap:8px;}
+.sp-lv:first-child{margin-top:0;}
+.cnt{font-family:var(--f-px);font-size:16px;padding:2px 8px;border-radius:3px;background:var(--panel2);border:1px solid var(--line2);color:var(--muted);}
+.cnt.full{background:var(--green);color:#10200f;border-color:var(--green);}
+.spl{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;}
+.spl .ck{width:26px;height:26px;border:2px solid var(--line2);border-radius:4px;display:grid;place-items:center;font-size:16px;background:var(--bg);}
+.spl.sel .ck{background:var(--gold);border-color:var(--gold);color:var(--on-gold);}
+.spl .tg{display:flex;gap:4px;}
+.spl .tg i{font-style:normal;font-size:14px;}
+details.more summary{cursor:pointer;color:var(--muted);font-size:14px;margin-top:6px;}
+details.more p{font-size:14px;line-height:1.5;margin:6px 0 0;}
+.kbd{font-family:var(--f-px);font-size:16px;background:var(--panel2);border:1px solid var(--line2);border-radius:3px;padding:0 5px;}
+.center{text-align:center;}
+.big-emoji{font-size:40px;line-height:1;}
+.hr{height:3px;background:var(--line);margin:14px 0;border:0;}
+@media (max-width:420px){ h2{font-size:26px;} .bar .logo b{font-size:20px;} .bar .logo canvas{width:64px;height:27px;} .ib{width:38px;height:38px;} .stat .val{font-size:26px;} }
+@media (prefers-reduced-motion:reduce){ *{animation:none !important;transition:none !important;} }
+@media print{
+  .bar,.navbar,.tabs,#toast,.ov,.noprint{display:none !important;}
+  body,html{background:#fff !important;color:#000;}
+  :root{--panel:#fff;--panel2:#f4f4f4;--ink:#000;--muted:#444;--line:#999;--line2:#777;--gold:#000;}
+  .panel{box-shadow:none;break-inside:avoid;}
+  .printall .tabpane{display:block !important;}
+}
+.ptitle{margin:4px 0 14px;}
+.ptitle .kick{color:var(--purple);font-size:15px;letter-spacing:.1em;}
+.ptitle h2{font-size:34px;color:var(--gold);margin-top:2px;}
+.bh{font-size:25px;margin:22px 0 8px;color:var(--gold);border-bottom:2px solid var(--line);padding-bottom:4px;}
+.dm p{margin:0 0 10px;}
+.small{font-size:13.5px;}
+.lnk{color:var(--gold);border-bottom:2px dotted var(--gold2);cursor:pointer;}
+.readbox{background:#f3e6c4;color:#2a1d14;border:3px solid #8a5a3c;border-radius:6px;box-shadow:4px 4px 0 var(--shadow),inset 0 0 0 2px #e2cf9e;padding:12px 14px;margin:0 0 14px;font-family:'Literata',Georgia,serif;}
+:root[data-theme="light"] .readbox{background:#fff7e0;}
+.readbox .rbh{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--f-px);font-size:16px;color:#8a5a3c;margin-bottom:6px;}
+.readbox .rbh .zh{color:#8a5a3c;}
+.readbox .rbb{display:flex;gap:6px;}
+.readbox .btn{background:#e8d6a6;border-color:#8a5a3c;color:#3a2418;box-shadow:0 3px 0 rgba(0,0,0,.2);}
+.readbox .btn.live{background:#8a5a3c;color:#fff;}
+.readbox .rtx p{margin:0 0 10px;font-size:1.06em;line-height:1.7;}
+.readbox .rzh{border-top:2px dashed #c9a36a;margin-top:6px;padding-top:8px;font-family:var(--f-zh);color:#5a4030;font-size:15px;line-height:1.8;}
+.readbox .rzh p{margin:0 0 8px;}
+.sayline{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:start;margin:0 0 8px;padding:8px 12px;border-left:4px solid var(--purple);background:var(--panel);}
+.sayline .who{font-weight:700;grid-column:1 / -1;}
+.sayline q{font-style:italic;}
+.sayline .say{align-self:start;margin-top:2px;}
+.sayline .sz{grid-column:1 / -1;font-size:14.5px;}
+.gl{border-bottom:2px dotted #b98a4a;cursor:help;}
+.readbox .gl{border-bottom-color:#b07a3a;}
+.readbox .btn.on{background:#8a5a3c;color:#fff6e0;box-shadow:inset 0 2px 0 rgba(0,0,0,.3);transform:translateY(2px);}
+.check{border:2px solid var(--gold2);border-radius:6px;background:var(--panel);margin:0 0 12px;overflow:hidden;}
+.check .ck-h{background:var(--panel2);padding:6px 10px;font-size:15.5px;}
+.dc{font-family:var(--f-px);background:var(--gold);color:var(--on-gold);border-radius:3px;padding:0 6px 1px;font-size:15px;}
+.ck-r{display:grid;grid-template-columns:22px 1fr;gap:6px;padding:6px 10px;font-size:15px;}
+.ck-r.ok span{color:var(--green);font-weight:700;} .ck-r.no span{color:var(--red);font-weight:700;}
+.ck-r.no{border-top:1px dashed var(--line);}
+.ckmini{font-size:14px;margin:4px 0;}
+.clue{display:grid;grid-template-columns:34px 1fr;gap:10px;background:var(--panel);border:2px solid var(--line);border-radius:6px;padding:10px;margin:0 0 10px;}
+.clue.on{border-color:var(--green);}
+.ctag{font-family:var(--f-px);font-size:15px;color:var(--muted);}
+.clue.on .ctag{color:var(--green);}
+.cbox{width:30px;height:30px;border:2px solid var(--line2);border-radius:5px;background:var(--bg);font-size:18px;color:var(--on-gold);padding:0;display:grid;place-items:center;}
+.clue.on .cbox,.cbox.on{background:var(--green);border-color:var(--green);color:#10200f;}
+.concl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin:0 0 14px;}
+.cc{border:2px dashed var(--line2);border-radius:6px;padding:8px 10px;display:grid;gap:2px;}
+.cc.on{border-style:solid;border-color:var(--green);background:var(--panel2);}
+.cc b{font-size:15px;}
+.ul{margin:0 0 12px;padding-left:1.25em;} .ul li{margin:0 0 6px;} .ul.tight li{margin:0 0 3px;}
+.qa{display:grid;gap:6px;margin:0 0 12px;}
+.qrow{background:var(--panel);border:2px solid var(--line);border-radius:5px;padding:8px 10px;}
+.qrow .q{font-weight:700;color:var(--blue);margin-bottom:2px;}
+.tbl{width:100%;border-collapse:collapse;margin:0 0 12px;font-size:15px;}
+.tbl th{font-family:var(--f-px);font-weight:400;font-size:17px;text-align:left;border-bottom:3px solid var(--line2);padding:4px 6px;}
+.tbl td{border-bottom:1px solid var(--line);padding:6px;vertical-align:top;}
+.tbl td:first-child{font-family:var(--f-px);font-size:18px;width:36px;text-align:center;}
+.flow{display:grid;gap:6px;margin:0 0 12px;}
+.fstep{display:grid;grid-template-columns:78px 1fr auto;gap:2px 10px;text-align:left;background:var(--panel);border:2px solid var(--line);border-radius:5px;padding:8px 10px;}
+.fstep .n{font-family:var(--f-px);color:var(--gold);font-size:16px;grid-row:span 2;}
+.fstep .d{font-size:14px;color:var(--muted);grid-column:2;}
+.fstep .tm{font-size:13px;color:var(--muted);grid-row:1;grid-column:3;white-space:nowrap;}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:0 0 12px;}
+.lg{display:grid;grid-template-columns:30px 1fr;gap:8px;font-size:14.5px;background:var(--panel);border:2px solid var(--line);border-radius:5px;padding:8px;}
+.lg>span{font-size:22px;}
+.tip{align-items:flex-start;}
+.tip p{margin:0 0 6px;} .tip p:last-child{margin:0;}
+.tip.rest{border-color:var(--blue);}
+.handout{margin:4px auto 16px;max-width:360px;text-align:center;font-family:'Literata',Georgia,serif;font-weight:700;letter-spacing:.12em;line-height:1.7;color:#3a2410;background:linear-gradient(135deg,#f6d27a,#c9973a 55%,#f0c864);border:4px solid #7a5418;border-radius:10px;padding:18px 14px;box-shadow:inset 0 0 0 3px #f8e2a0,5px 5px 0 var(--shadow);}
+.map{margin:0 0 14px;} .map svg{width:100%;height:auto;border:3px solid var(--line2);border-radius:6px;image-rendering:pixelated;display:block;}
+.map figcaption{font-size:14px;color:var(--muted);margin-top:6px;}
+.combat{border:3px solid var(--red);border-radius:8px;background:var(--panel);padding:12px;margin:0 0 14px;}
+.cbh{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.cbh h3{color:var(--red);font-size:24px;}
+.cm.down{opacity:.5;text-decoration:line-through;}
+.hpt{display:flex;align-items:center;gap:6px;} .hpt .px{font-size:22px;min-width:54px;text-align:center;}
+.btn.xs{font-size:15px;padding:3px 8px 4px;min-height:30px;box-shadow:0 2px 0 var(--shadow);}
+.initlist{background:var(--bg);border:2px solid var(--line);border-radius:5px;padding:8px 10px;margin-bottom:10px;display:grid;gap:3px;}
+.initlist .px{display:inline-block;min-width:30px;font-size:20px;color:var(--gold);}
+.card-npc,.sblock{background:var(--panel);border:2px solid var(--line);border-radius:6px;padding:12px 14px;margin:0 0 14px;box-shadow:4px 4px 0 var(--shadow);}
+.nh{display:flex;gap:12px;align-items:center;margin-bottom:8px;} .nh .big{font-size:38px;}
+.kv dt{font-weight:700;} .kv dd{margin-bottom:6px;}
+.secret{background:var(--panel2);border-left:4px solid var(--purple);padding:4px 8px;}
+.sblock{border-top:5px solid var(--red);border-bottom:5px solid var(--red);font-size:15px;}
+.sblock .sh{display:flex;justify-content:space-between;gap:8px;align-items:center;}
+.sblock h3{color:var(--red);font-size:26px;} .sblock h4{font-family:var(--f-px);font-weight:400;font-size:20px;color:var(--red);border-bottom:2px solid var(--red);margin:12px 0 6px;}
+hr.red{border:0;height:2px;background:var(--red);opacity:.6;margin:8px 0;}
+.abt{width:100%;text-align:center;border-collapse:collapse;font-size:14px;}
+.abt td{padding:2px;}
+.act{margin:0 0 8px;}
+.idiom{border:3px double var(--gold);border-radius:8px;padding:12px 14px;background:var(--panel);}
+.wlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;}
+.li.cur{border-color:var(--gold);}
+.navbar .in .grow.btn{flex:1;font-size:17px;}
+
+.showable{position:relative;cursor:zoom-in;margin:0 0 14px;}
+.showable .map,.showable .handout{margin-bottom:4px;}
+.showhint{font-size:13px;color:var(--muted);text-align:center;}
+#present{position:fixed;inset:0;z-index:90;background:#000;display:none;align-items:center;justify-content:center;padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));cursor:zoom-out;}
+#present.on{display:flex;}
+#present .map{margin:0;width:100%;max-width:min(100vw,calc(100vh * 1.6));}
+#present .map svg{border:0;max-height:94vh;width:100%;}
+#present .handout.big{max-width:none;width:min(94vw,860px);padding:6vh 3vw;letter-spacing:.1em;}
+body.presenting{overflow:hidden;}
+
+.handout .hl{white-space:nowrap;}
+.handout{font-size:min(15px,3.4vw);}
+
+/* interlinear Chinese for the DM: a quiet gloss under the English */
+#main div.zh, #ov div.zh{border-left:2px solid rgba(217,164,65,.38);padding:1px 0 1px 9px;margin:5px 0 2px;font-size:.84em;line-height:1.6;color:#a79fbf;letter-spacing:.02em;}
+[data-theme=light] #main div.zh, [data-theme=light] #ov div.zh{color:#6d6480;border-left-color:rgba(160,110,30,.45);}
+#main .card-npc .nh div.zh, #main .sblock > div.zh, #main .card-npc > div.zh:first-of-type, #main .ptitle div.zh, #ov .card-npc .nh div.zh, #ov .sblock > div.zh, #ov .card-npc > div.zh:first-of-type, #ov .ptitle div.zh{border-left:0;padding-left:0;margin:0;}
+body.nodmzh #main div.zh, body.nodmzh #ov div.zh{display:none;}
+body.nodmzh #main .card-npc .nh div.zh, body.nodmzh #main .sblock > div.zh, body.nodmzh #main .card-npc > div.zh:first-of-type, body.nodmzh #main .ptitle div.zh, body.nodmzh #ov .card-npc .nh div.zh, body.nodmzh #ov .sblock > div.zh, body.nodmzh #ov .card-npc > div.zh:first-of-type, body.nodmzh #ov .ptitle div.zh{display:block;}
+body.nodmzh #main .sblock > div.zh ~ div.zh, body.nodmzh #ov .sblock > div.zh ~ div.zh, body.nodmzh #main .power .ph span.zh, body.nodmzh #ov .power .ph span.zh{display:none;}
+body.nodmzh .tr{display:none !important;}
+
+/* ---------- chapters ---------- */
+.chdiv{margin:26px 0 10px;padding:6px 10px;border-radius:8px;background:rgba(244,197,66,.12);color:#f4c542;font-size:15px;letter-spacing:.04em;}
+.tocch{padding:12px 6px 4px;color:#f4c542;font-size:14px;letter-spacing:.03em;border-bottom:1px solid rgba(244,197,66,.25);margin-top:6px;}
+.tocch .zh{display:block;font-size:12px;color:#a79fbf;}
+[data-theme=light] .chdiv, [data-theme=light] .tocch{color:#8a5a10;}
+
+/* ---------- widgets ---------- */
+.wdg{margin:12px 0;}
+.bellsvg{width:100%;height:auto;display:block;border-radius:12px;border:3px solid #241a2a;touch-action:manipulation;}
+.bellsvg .bg{cursor:pointer;}
+.bellsvg .outline{fill:rgba(0,0,0,.18);stroke:#e8c77a;stroke-width:1.5;stroke-dasharray:3 2;transition:fill .3s, stroke .3s;}
+.bellsvg .bg.lit .outline{fill:#fff3b0;stroke:#fff8d0;stroke-width:3;stroke-dasharray:none;}
+.bellsvg .bellbody{fill:#f4c542;stroke:#241a2a;stroke-width:2;}
+.bellsvg .bg:hover .bellbody{fill:#ffd766;}
+.bellsvg .bn{font-family:"Jersey 15",monospace;font-size:13px;fill:#fff3b0;}
+.bellsvg .ansn{font-family:"Jersey 15",monospace;font-size:15px;fill:#7dff9a;}
+.swing.go{animation:bswing .9s ease-out;}
+@keyframes bswing{0%{transform:rotate(0)}15%{transform:rotate(14deg)}35%{transform:rotate(-10deg)}55%{transform:rotate(6deg)}75%{transform:rotate(-3deg)}100%{transform:rotate(0)}}
+.wlog{margin:8px 2px 6px;font-size:14px;min-height:22px;}
+.okc{color:#7ddf8a;} .noc{color:#ef8a7a;}
+[data-theme=light] .okc{color:#1f7a32;} [data-theme=light] .noc{color:#b0392a;}
+.wbtns{gap:6px;flex-wrap:wrap;}
+.btn.on{background:#f4c542;color:#241a2a;}
+.pile{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px;border-radius:12px;background:#3a2c4a;border:3px solid #241a2a;}
+.sock{display:block;aspect-ratio:1;border-radius:10px;cursor:pointer;transition:transform .15s;}
+.sock svg{width:100%;height:100%;display:block;}
+.sock.sel{background:rgba(255,243,176,.35);outline:3px solid #fff3b0;}
+.sock.gone{visibility:hidden;}
+#present .wdg.big{width:min(96vw,150vh);display:flex;flex-direction:column;align-items:center;gap:10px;}
+#present .bellw.big .bellsvg{max-height:78vh;width:auto;max-width:96vw;}
+#present .sockw.big .pile{width:min(94vw,86vh);}
+#present .wmsg{color:#fff3b0;font-size:18px;text-align:center;}
+#present .wclose{position:fixed;top:12px;right:12px;}
+
+/* ---------- at a glance ---------- */
+.glance{margin:4px 0 18px;padding:10px 12px;border-radius:12px;border:2px solid rgba(125,223,138,.45);background:rgba(125,223,138,.08);}
+.glance .gh{display:flex;align-items:baseline;gap:8px;color:#7ddf8a;font-size:16px;margin-bottom:6px;}
+.glance .gh .zh{font-size:12px;color:#a79fbf;}
+.glance .gt{margin-left:auto;font-size:13px;color:#a79fbf;}
+.glance .gr{display:grid;grid-template-columns:24px 1fr;gap:4px;margin:5px 0;font-size:.95em;line-height:1.45;}
+.glance .gr b{color:#e8e2f4;margin-right:4px;}
+[data-theme=light] .glance{border-color:rgba(31,122,50,.4);background:rgba(31,122,50,.06);}
+[data-theme=light] .glance .gh{color:#1f7a32;} [data-theme=light] .glance .gr b{color:#241a2a;}
+.navbar .grow.btn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px;}
+
+.bellsvg .halo{fill:none;stroke:#fff3b0;stroke-width:10;stroke-linejoin:round;opacity:0;transition:opacity .3s;}
+.bellsvg .bg.lit .halo{opacity:.45;}
+.sock img{width:100%;height:100%;display:block;pointer-events:none;-webkit-user-drag:none;}
+.bellsvg .bg:focus,.sock:focus{outline:none;} .bellsvg .bg:focus-visible,.sock:focus-visible{outline:2px dashed #fff3b0;}
+
+/* ---------- growing hero boxes ---------- */
+.power{margin:14px 0;padding:10px 12px;border-radius:12px;border:2px solid rgba(186,140,255,.5);background:linear-gradient(135deg,rgba(186,140,255,.10),rgba(244,197,66,.08));}
+.power .ph{color:#d4b8ff;font-size:16px;margin-bottom:4px;}
+.power p{margin:4px 0 8px;}
+.power .pi{margin:6px 0;font-size:.94em;line-height:1.5;}
+.power .cls{font-family:"Jersey 15",monospace;font-size:14px;color:#241a2a;background:#d4b8ff;border-radius:6px;padding:0 6px;margin-right:6px;white-space:nowrap;}
+[data-theme=light] .power .ph{color:#6a3fb0;}
+/* ---------- clock ---------- */
+.clocksvg{width:min(72vw,260px);height:auto;display:block;margin:0 auto;}
+#present .clockw.big .clocksvg{width:min(80vw,72vh);}
+
+.chjump{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:4px 0 14px;}
+.chjump .btn.on{background:#f4c542;color:#1a1020;border-color:#f4c542;}
+.chdiv[id]{scroll-margin-top:70px;}
+
+/* ---------- marble pit ---------- */
+.mpile{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:10px;border-radius:12px;background:radial-gradient(circle at 50% 40%,#3e3250,#241a2a);border:3px solid #241a2a;}
+.mpile.hard{grid-template-columns:repeat(5,1fr);}
+.mrb{display:block;aspect-ratio:1;border-radius:50%;cursor:pointer;transition:transform .15s;}
+.mrb img{width:100%;height:100%;display:block;pointer-events:none;-webkit-user-drag:none;}
+.mrb:active{transform:scale(.92);}
+.mrb.got{background:radial-gradient(circle,rgba(255,243,176,.75),rgba(255,243,176,0) 70%);}
+.mrb.ans{outline:2px dashed #7dff9a;outline-offset:-4px;}
+.mrb:focus{outline:none;} .mrb:focus-visible{outline:2px dashed #fff3b0;}
+.mlist{margin:6px 0 8px;padding-left:22px;font-size:15px;line-height:1.45;}
+.mlist li{margin:3px 0;} .mlist li.got{color:#7ddf8a;} .mlist li.gone{opacity:.65;}
+.mlist .zh{display:block;font-size:12px;}
+[data-theme=light] .mlist li.got{color:#1f7a32;}
+#present .marblew.big .mpile{width:min(94vw,60vh);}
+#present .marblew.big .mlist{color:#fff3d0;font-size:18px;}
+
+/* per-box Chinese toggle: .zx flips the global setting for that one box */
+body:not(.nodmzh) .zx div.zh:not(.nh div.zh):not(.card-npc > div.zh:first-of-type), body:not(.nodmzh) .zx p.zh, body:not(.nodmzh) .zx span.zh.tr, body:not(.nodmzh) .zx span.zh.sz{display:none !important;}
+body.nodmzh .zx div.zh{display:block !important;}
+body.nodmzh .zx span.zh.tr{display:block !important;}
+#main :is(.dm, .tip, .sayline, .qrow, .clue, .power, .idiom, .gr, .ck-r, .kv dd, .act, .ul > li, .tbl tbody tr):has(.zh), #ov :is(.dm, .tip, .sayline, .qrow, .clue, .power, .idiom, .gr, .ck-r, .kv dd, .act, .ul > li, .tbl tbody tr):has(.zh){cursor:pointer;}
+.hcap{cursor:pointer;margin-top:4px;}
+:is(.mapcap, .lg, .cc, .hwrap, .mlist > li).zx{--z:1}
+body:not(.nodmzh) :is(.mapcap, .lg, .cc, .hwrap, .mlist > li).zx .zh:not(.hcap .zh){display:none !important;}
+body.nodmzh :is(.mapcap, .lg, .cc, .hwrap, .mlist > li).zx .zh:not(.hcap .zh){display:block !important;}
+#main :is(.lg, .cc, .mlist > li):has(.zh){cursor:pointer;}
+.mapcap{font-size:14px;color:var(--muted);margin:6px 0 2px;cursor:pointer;}
+.mapcap span.zh.tr{display:block;}
+body.nodmzh #main .fstep span.zh{display:none !important;}
+
+/* ---------- player's book ---------- */
+#main{max-width:820px;margin:0 auto;padding:14px 16px 60px;}
+.ptitle{margin:6px 0 14px;} .ptitle h2{margin:4px 0 2px;}
+.ptitle .kick{color:var(--purple);font-size:15px;letter-spacing:.1em;}
+.bh{margin:26px 0 10px;font-size:24px;color:var(--gold);}
+.wh{margin:16px 0 6px;font-family:var(--f-px);font-weight:400;font-size:19px;color:var(--purple);}
+.dm{background:var(--panel);border:2px solid var(--line);border-radius:8px;padding:10px 14px;margin-bottom:12px;} .dm p{margin:0 0 6px;}
+.zh.tr{display:block;}
+.chlist{display:grid;gap:8px;margin:12px 0;}
+.chcard{display:flex;gap:14px;align-items:center;text-align:left;background:var(--panel);border:2px solid var(--line);border-radius:8px;padding:10px 14px;box-shadow:0 3px 0 var(--shadow);}
+.chcard:hover{border-color:var(--gold);}
+.chcard .num{font-size:38px;color:var(--gold);width:30px;text-align:center;}
+.chcard b{display:block;font-size:1.05em;}
+.plock{display:flex;gap:14px;align-items:center;width:100%;height:auto;min-height:84px;text-align:left;margin:10px 0;padding:14px 16px;line-height:1.45;color:var(--ink);border:2px dashed var(--line2);border-radius:8px;background:var(--bg2);}
+.plock:hover{border-color:var(--gold);} .plock .lk{font-size:30px;flex:none;} .plock .lt{display:flex;flex-direction:column;gap:2px;min-width:0;} .plock b{font-size:1.05em;} .plock .zh{display:block;}
+.pz{background:var(--panel);border:2px solid var(--line);border-radius:10px;padding:12px;margin:10px 0 16px;}
+.pz h4{margin:0 0 4px;font-size:22px;font-weight:400;} .pz p{margin:0 0 8px;}
+.pzw .wdg.big{display:flex;flex-direction:column;align-items:center;gap:8px;margin:6px 0;}
+.pzw .wclose{display:none;}
+.pzw .bellsvg{width:100%;max-width:640px;height:auto;}
+.pzw .clocksvg{width:min(100%,320px);}
+.pzw .pile,.pzw .mpile{width:100%;max-width:560px;}
+.pzw .wmsg{text-align:center;font-size:18px;color:var(--gold);}
+.pzw .mlist{width:100%;max-width:560px;}
+.ptools{flex-wrap:wrap;gap:6px;justify-content:center;} .pans{flex-basis:100%;text-align:center;font-size:20px;}
+.notes{width:100%;min-height:110px;border:2px solid var(--line);border-radius:8px;background:var(--panel);padding:10px;resize:vertical;}
+.chnav{justify-content:center;gap:8px;flex-wrap:wrap;margin-top:28px;}
+.hwrap .showable{cursor:zoom-in;}
+#present .wclose{position:fixed;top:12px;right:12px;}
+
+</style>
+</head>
+<body class="titled">
+<div id="title" role="dialog" aria-label="The Lost-and-Found of Kettlebrook: Player's Book">
+  <div class="kick">INKQUEST · A 5E ADVENTURE</div>
+  <div class="stage"><canvas id="cv" width="320" height="180" aria-label="Kettlebrook: a river town with an empty bell tower, a crooked old mill, and music notes rising from a dry pit. 凱托溪鎮：空蕩的鐘塔、歪斜的舊磨坊，乾涸的坑裡飄出音符。"></canvas></div>
+  <h1 style="font-size:clamp(34px,8vw,64px)">The Lost-and-Found<br>of Kettlebrook</h1>
+  <div class="sub">凱托溪鎮的失物招領處</div>
+  <div class="kick" style="color:#f4c542">PLAYER'S BOOK · 玩家手冊</div>
+  <button class="go" id="goBtn">▶ Open the book 開始</button>
+  <div class="cc">Handouts, puzzles and words for the players · Uses material from the SRD 5.2.1 (CC-BY-4.0)</div>
+</div>
+<header class="bar">
+  <button class="logo" id="homeBtn" aria-label="All chapters 全部章節"><canvas id="mini" width="120" height="50"></canvas><b>Player's Book</b></button>
+  <button class="ib" id="setBtn" aria-label="Settings 設定" title="Settings 設定">⚙️</button>
+</header>
+<main id="main"></main>
+<div class="ov" id="ov"><div class="sheet" id="ovIn" role="dialog" aria-modal="true"></div></div>
+<div id="present" role="dialog" aria-label="Full screen. Tap outside to go back."></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+/* =========================================================
+   HERO WORKSHOP · 英雄工坊 — a bilingual 5E character builder for new players
+   Single file, no build step. Heroes live in this browser (localStorage).
+   ========================================================= */
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem("kbp-"+k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem("kbp-"+k, JSON.stringify(v)); }catch(e){} }
+};
+
+/* =========================================================
+   FM MUSIC · SOUND EFFECTS · SPEECH
+   Engine carried over from Lamplight Readers (FM voices, iOS unlock, ducking).
+   Steps are eighth notes. "_" holds, "-" rests, "|" is only a bar marker.
+   Drum parts use k (kick), s (snare), h (hat), t (tom), c (crash).
+   ========================================================= */
+const TRACKS = [
+  {n:"Heroes' March", z:"英雄進行曲・明亮冒險", bpm:112, swing:0, parts:[
+    {p:"brass", s:"C5 _ _ G4 C5 _ E5 _ | F5 _ E5 _ D5 _ C5 _ | D5 _ _ B4 G4 _ B4 D5 | C5 _ _ _ _ _ - - | E5 _ _ C5 A4 _ C5 E5 | F5 _ _ A5 G5 _ F5 _ | E5 _ D5 _ C5 _ D5 _ | D5 _ _ _ G4 _ - -"},
+    {p:"pad", s:"C4+E4+G4 _ _ _ _ _ _ _ | F3+A3+C4 _ _ _ _ _ _ _ | G3+B3+D4 _ _ _ _ _ _ _ | C4+E4+G4 _ _ _ _ _ _ _ | A3+C4+E4 _ _ _ _ _ _ _ | F3+A3+C4 _ _ _ _ _ _ _ | G3+B3+D4 _ _ _ _ _ _ _ | G3+B3+D4+F4 _ _ _ _ _ _ _"},
+    {p:"bass", s:"C2 _ C3 _ G2 _ C3 _ | F2 _ F3 _ C3 _ F3 _ | G2 _ G3 _ D3 _ G3 _ | C2 _ C3 _ G2 _ E3 _ | A1 _ A2 _ E2 _ A2 _ | F2 _ F3 _ C3 _ F3 _ | G2 _ G3 _ D3 _ G3 _ | G2 _ B2 _ D3 _ G2 _"},
+    {p:"drum", s:"k - h - s - h - | k - h k s - h - | k - h - s - h - | k - h k s - h h | k - h - s - h - | k - h k s - h - | k - h - s - h - | k - s s s - t t"}]},
+  {n:"Tavern Hearth", z:"酒館爐火・溫暖熱鬧", bpm:126, swing:.22, parts:[
+    {p:"pluck", s:"G3 B3 D4 G4 D4 B3 G3 D4 | C4 E4 G4 C5 G4 E4 C4 G3 | D4 F#4 A4 D5 A4 F#4 D4 A3 | G3 B3 D4 G4 D4 B3 G3 B3 | E4 G4 B4 E5 B4 G4 E4 B3 | C4 E4 G4 C5 G4 E4 C4 E4 | D4 F#4 A4 C5 A4 F#4 D4 F#4 | G3 B3 D4 G4 B4 G4 D4 B3", vel:.7},
+    {p:"flute", s:"D5 _ B4 _ G4 _ A4 B4 | C5 _ E5 _ D5 _ C5 _ | A4 _ F#4 _ D4 _ E4 F#4 | G4 _ _ _ _ _ - - | B4 _ G4 _ E4 _ G4 B4 | C5 _ _ B4 A4 _ G4 _ | A4 _ B4 _ C5 _ A4 _ | G4 _ _ _ _ _ - -"},
+    {p:"bass", s:"G2 _ _ _ D2 _ _ _ | C2 _ _ _ G2 _ _ _ | D2 _ _ _ A2 _ _ _ | G2 _ _ _ D2 _ _ _ | E2 _ _ _ B1 _ _ _ | C2 _ _ _ G2 _ _ _ | D2 _ _ _ A2 _ _ _ | G2 _ _ _ D2 _ G2 _"},
+    {p:"drum", s:"k - h - s - h - | k - h - s - h h | k - h - s - h - | k - h - s - h h | k - h - s - h - | k - h - s - h h | k - h - s - h - | k - h h s - - -", vel:.6}]},
+  {n:"Whispering Woods", z:"低語森林・寧靜", bpm:66, swing:0, parts:[
+    {p:"pad", s:"D3+A3+C#4+F#4 _ _ _ _ _ _ _ | G2+D3+F#3+B3 _ _ _ _ _ _ _ | E3+B3+D4+G4 _ _ _ _ _ _ _ | A2+E3+G3+D4 _ _ _ _ _ _ _ | D3+A3+C#4+F#4 _ _ _ _ _ _ _ | G2+D3+F#3+B3 _ _ _ _ _ _ _ | E3+B3+D4+G4 _ _ _ _ _ _ _ | A2+E3+G3+C#4 _ _ _ _ _ _ _"},
+    {p:"bell", s:"F#5 - A5 - C#6 - A5 - | D5 - F#5 - B5 - A5 - | G5 - B5 - D6 - B5 - | E5 - A5 - D6 - - - | F#5 - A5 - C#6 - E6 - | D5 - F#5 - B5 - D6 - | G5 - B5 - D6 - B5 - | E5 - G5 - C#6 - - -", vel:.5},
+    {p:"flute", s:"- - - - A5 _ _ _ | B5 _ _ _ A5 _ F#5 _ | G5 _ _ _ E5 _ _ _ | E5 _ _ _ _ _ - - | - - - - F#5 _ A5 _ | D6 _ _ _ B5 _ A5 _ | B5 _ G5 _ E5 _ F#5 _ | E5 _ _ _ _ _ - -", vel:.7},
+    {p:"bass", s:"D2 _ _ _ _ _ _ _ | G1 _ _ _ _ _ _ _ | E2 _ _ _ _ _ _ _ | A1 _ _ _ _ _ _ _ | D2 _ _ _ _ _ _ _ | G1 _ _ _ _ _ _ _ | E2 _ _ _ _ _ _ _ | A1 _ _ _ _ _ _ _", vel:.7}]},
+  {n:"Into the Deep", z:"深入地城・懸疑", bpm:76, swing:0, parts:[
+    {p:"pad", s:"A2+E3+C4 _ _ _ _ _ _ _ | F2+C3+A3 _ _ _ _ _ _ _ | A2+E3+C4 _ _ _ _ _ _ _ | G#2+D3+B3 _ _ _ _ _ _ _ | A2+E3+C4 _ _ _ _ _ _ _ | D3+F3+A3 _ _ _ _ _ _ _ | A#2+F3+D4 _ _ _ _ _ _ _ | E2+G#3+B3 _ _ _ _ _ _ _", vel:.9},
+    {p:"bell", s:"- - - - E5 _ - - | - - F5 _ - - - - | - - - - E5 _ D#5 _ | - - - - - - B4 _ | - - - - C5 _ - - | - - D5 _ - - F5 _ | - - - - E5 _ - - | - - - - G#4 _ - -", vel:.45},
+    {p:"mar", s:"A3 - - C4 - - B3 - | A3 - - C4 - - F4 - | A3 - - C4 - - B3 - | G#3 - - B3 - - D4 - | A3 - - C4 - - E4 - | D3 - - F3 - - A3 - | A#3 - - D4 - - F4 - | E3 - - G#3 - - B3 -", vel:.55},
+    {p:"bass", s:"A1 _ A1 _ - - - - | F1 _ F1 _ - - - - | A1 _ A1 _ - - - - | G#1 _ G#1 _ - - - - | A1 _ A1 _ - - - - | D2 _ D2 _ - - - - | A#1 _ A#1 _ - - - - | E1 _ E1 _ - - - -"},
+    {p:"drum", s:"k - k - - - - - | k - k - - - - - | k - k - - - - - | k - k - - - - h | k - k - - - - - | k - k - - - - - | k - k - - - - - | k - k - - - t t", vel:.7}]},
+  {n:"Steel and Fire", z:"鋼鐵與烈火・激烈戰鬥", bpm:152, swing:0, parts:[
+    {p:"brass", s:"E4 _ G4 _ B4 _ E5 _ | E5 _ D5 _ C5 _ B4 _ | A4 _ B4 _ C5 _ D5 _ | B4 _ _ _ F#4 _ B4 _ | E5 _ _ D5 E5 _ G5 _ | G5 _ F#5 _ E5 _ C5 _ | D5 _ E5 _ F#5 _ A5 _ | B5 _ _ _ _ _ - -"},
+    {p:"pad", s:"E3+B3+E4 _ _ _ _ _ _ _ | C3+G3+C4 _ _ _ _ _ _ _ | D3+A3+D4 _ _ _ _ _ _ _ | B2+F#3+B3 _ _ _ _ _ _ _ | E3+B3+E4 _ _ _ _ _ _ _ | C3+G3+C4 _ _ _ _ _ _ _ | D3+A3+D4 _ _ _ _ _ _ _ | B2+F#3+B3 _ _ _ _ _ _ _", vel:.8},
+    {p:"bass", s:"E2 E2 E3 E2 E2 E2 E3 E2 | C2 C2 C3 C2 C2 C2 C3 C2 | D2 D2 D3 D2 D2 D2 D3 D2 | B1 B1 B2 B1 B1 B1 B2 B1 | E2 E2 E3 E2 E2 E2 E3 E2 | C2 C2 C3 C2 C2 C2 C3 C2 | D2 D2 D3 D2 D2 D2 D3 D2 | B1 B1 B2 B1 D#2 D#2 F#2 F#2", vel:.85},
+    {p:"drum", s:"k h s h k k s h | k h s h k k s h | k h s h k k s h | k h s h k s s s | c h s h k k s h | k h s h k k s h | k h s h k k s h | k s s s t t t t"}]},
+  {n:"Dragon's Shadow", z:"巨龍之影・魔王戰", bpm:124, swing:0, parts:[
+    {p:"brass", s:"D4 _ _ _ F4 _ A4 _ | A#4 _ _ _ A4 _ G4 _ | G4 _ _ _ E4 _ C4 _ | C#4 _ _ _ _ _ E4 _ | D5 _ _ C5 A#4 _ A4 _ | G4 _ A#4 _ D5 _ F5 _ | E5 _ D5 _ C5 _ A#4 _ | A4 _ _ _ C#5 _ E5 _"},
+    {p:"pad", s:"D3+F3+A3 _ _ _ _ _ _ _ | A#2+D3+F3 _ _ _ _ _ _ _ | C3+E3+G3 _ _ _ _ _ _ _ | A2+C#3+E3 _ _ _ _ _ _ _ | D3+F3+A3 _ _ _ _ _ _ _ | G2+A#2+D3 _ _ _ _ _ _ _ | C3+E3+G3 _ _ _ _ _ _ _ | A2+C#3+E3+G3 _ _ _ _ _ _ _"},
+    {p:"bass", s:"D2 _ D2 D3 D2 _ A1 _ | A#1 _ A#1 A#2 A#1 _ F2 _ | C2 _ C2 C3 C2 _ G2 _ | A1 _ A1 A2 A1 _ C#2 _ | D2 _ D2 D3 D2 _ A1 _ | G1 _ G1 G2 G1 _ D2 _ | C2 _ C2 C3 C2 _ G2 _ | A1 _ A1 A2 A1 _ E2 _"},
+    {p:"drum", s:"k - s - k k s - | k - s - k k s - | k - s - k k s - | k - s - t t t t | c - s - k k s - | k - s - k k s - | k - s - k k s - | k k s s t t c -"}]}
+];
+
+const Music = (()=>{
+  let ctx=null, bus, out, fx, timer=null, cur=-1, step=0, nextT=0, keeper=null, ducked=false, noise=null;
+  let vol = store.get("vol", 40) / 100, sfxVol = store.get("sfx", 60) / 100;
+  const midi = n=>{ const m=/^([A-G])(#?)(\d)$/.exec(n); return 12*(+m[3]+1)+{C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+(m[2]?1:0); };
+  const hz = m=>440*Math.pow(2,(m-69)/12);
+  const P = {
+    ep:   {mods:[{r:1,i:1.6,d:.9},{r:14,i:.5,d:.07}], a:.004, dec:2.2, sus:0, g:.16, lp:3200},
+    bell: {mods:[{r:3.5,i:2.6,d:1.6}], a:.002, dec:2.6, sus:0, g:.10, lp:6000},
+    bass: {mods:[{r:1,i:2.2,d:.22}], a:.005, dec:.9, sus:.35, g:.24, lp:900},
+    pad:  {mods:[{r:2,i:.7,d:9}], a:.6, dec:4, sus:.8, g:.06, lp:2200, det:6},
+    mar:  {mods:[{r:4,i:2.4,d:.09}], a:.002, dec:.55, sus:0, g:.13, lp:4200},
+    brass:{mods:[{r:1,i:3.2,d:.35}], a:.03, dec:.8, sus:.6, g:.085, lp:2600, det:4},
+    flute:{mods:[{r:1,i:.6,d:2},{r:3,i:.2,d:1}], a:.05, dec:1.2, sus:.7, g:.075, lp:3800},
+    pluck:{mods:[{r:3,i:2,d:.12},{r:1,i:1,d:.3}], a:.002, dec:.45, sus:0, g:.11, lp:3000}
+  };
+  function parse(str){ const t=str.split(/\s+/).filter(z=>z&&z!=="|"), ev={}; let last=null;
+    t.forEach((k,i)=>{ if(k==="-"){last=null;return;} if(k==="_"){ if(last) last.len++; return; }
+      if(/^[kshtc]$/.test(k)){ ev[i]={d:k,len:1}; last=null; return; }
+      last={ms:k.split("+").map(midi),len:1}; ev[i]=last; });
+    return {n:t.length, ev}; }
+  TRACKS.forEach(t=>t.parts.forEach(p=>p.q=parse(p.s)));
+  function silentWav(){
+    const n = 4000, buf = new ArrayBuffer(44+n), v = new DataView(buf), w = (o,s)=>{ for(let i=0;i<s.length;i++) v.setUint8(o+i,s.charCodeAt(i)); };
+    w(0,"RIFF"); v.setUint32(4,36+n,true); w(8,"WAVE"); w(12,"fmt "); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+    v.setUint32(24,8000,true); v.setUint32(28,8000,true); v.setUint16(32,1,true); v.setUint16(34,8,true); w(36,"data"); v.setUint32(40,n,true);
+    for(let i=0;i<n;i++) v.setUint8(44+i,128);
+    let s = ""; new Uint8Array(buf).forEach(b=> s += String.fromCharCode(b));
+    return "data:audio/wav;base64," + btoa(s);
+  }
+  /* iOS: play through the silent switch, and keep the session alive */
+  function unlockIOS(){
+    try{ if(navigator.audioSession) navigator.audioSession.type = "playback"; }catch(e){}
+    try{ if(!keeper){ keeper = new Audio(silentWav()); keeper.loop = true; keeper.setAttribute("playsinline",""); keeper.volume = 0.01; }
+      const pr = keeper.play(); if(pr && pr.catch) pr.catch(()=>{}); }catch(e){}
+  }
+  function impulse(sec){ const n=ctx.sampleRate*sec, b=ctx.createBuffer(2,n,ctx.sampleRate);
+    for(let c=0;c<2;c++){ const ch=b.getChannelData(c); for(let i=0;i<n;i++) ch[i]=(Math.random()*2-1)*Math.pow(1-i/n,3.2); } return b; }
+  function init(){
+    if(ctx) return true;
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false;
+    ctx=new AC(); out=ctx.createGain(); bus=ctx.createGain(); fx=ctx.createGain(); fx.gain.value=sfxVol;
+    const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-18; comp.ratio.value=3;
+    const rev=ctx.createConvolver(); rev.buffer=impulse(2.6); const rg=ctx.createGain(); rg.gain.value=.26;
+    const dly=ctx.createDelay(1); dly.delayTime.value=.36; const fb=ctx.createGain(); fb.gain.value=.22;
+    const dlp=ctx.createBiquadFilter(); dlp.type="lowpass"; dlp.frequency.value=1800; const dg=ctx.createGain(); dg.gain.value=.14;
+    bus.connect(comp); bus.connect(rev); rev.connect(rg); rg.connect(comp);
+    bus.connect(dly); dly.connect(dlp); dlp.connect(fb); fb.connect(dly); dlp.connect(dg); dg.connect(comp);
+    comp.connect(out); out.connect(ctx.destination); out.gain.value=0;
+    const fcomp=ctx.createDynamicsCompressor(); fx.connect(fcomp); fcomp.connect(ctx.destination);
+    const n=ctx.sampleRate, b=ctx.createBuffer(1,n,n), ch=b.getChannelData(0); for(let i=0;i<n;i++) ch[i]=Math.random()*2-1; noise=b;
+    return true;
+  }
+  function applyVol(){ if(out) out.gain.setTargetAtTime(cur < 0 ? 0 : vol*(ducked?.3:1), ctx.currentTime, .08); }
+  function voice(t, m, dur, p, vel, dest){
+    const f=hz(m), amp=ctx.createGain(), lp=ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=p.lp; const nodes=[amp,lp];
+    const carriers=[f]; if(p.det) carriers.push(f*Math.pow(2,p.det/1200));
+    const stopAt=t+dur+p.dec+.2;
+    carriers.forEach(cf=>{
+      const c=ctx.createOscillator(); c.frequency.value=cf; nodes.push(c);
+      p.mods.forEach(md=>{ const o=ctx.createOscillator(), g=ctx.createGain(); o.frequency.value=cf*md.r; nodes.push(o,g);
+        const idx=cf*md.i; g.gain.setValueAtTime(idx,t); g.gain.setTargetAtTime(idx*.15,t+.005,md.d/3);
+        o.connect(g); g.connect(c.frequency); o.start(t); o.stop(stopAt); });
+      c.connect(lp); c.start(t); c.stop(stopAt);
+    });
+    const pk=p.g*(vel||1)/carriers.length;
+    amp.gain.setValueAtTime(0,t); amp.gain.linearRampToValueAtTime(pk,t+p.a);
+    amp.gain.setTargetAtTime(pk*p.sus,t+p.a,p.dec/3);
+    amp.gain.setTargetAtTime(0,t+Math.max(p.a,dur),p.sus?.25:.2);
+    lp.connect(amp); amp.connect(dest||bus);
+    /* free the whole voice when it ends (some iOS versions keep connected nodes alive) */
+    nodes[2].onended=()=>nodes.forEach(n=>{ try{ n.disconnect(); }catch(e){} });
+  }
+  function drum(t, k, vel, dest){
+    vel = vel || 1; dest = dest || bus;
+    if(k==="k"||k==="t"){
+      const o=ctx.createOscillator(), g=ctx.createGain(), f0 = k==="k" ? 150 : 220, f1 = k==="k" ? 42 : 90;
+      o.frequency.setValueAtTime(f0,t); o.frequency.exponentialRampToValueAtTime(f1,t+.12);
+      g.gain.setValueAtTime(.55*vel,t); g.gain.exponentialRampToValueAtTime(.001,t+(k==="k"?.28:.22));
+      o.connect(g); g.connect(dest); o.onended=()=>{ o.disconnect(); g.disconnect(); }; o.start(t); o.stop(t+.3); return;
+    }
+    const s=ctx.createBufferSource(); s.buffer=noise; const f=ctx.createBiquadFilter(), g=ctx.createGain();
+    if(k==="h"){ f.type="highpass"; f.frequency.value=7000; g.gain.setValueAtTime(.11*vel,t); g.gain.exponentialRampToValueAtTime(.001,t+.05); }
+    else if(k==="c"){ f.type="highpass"; f.frequency.value=4000; g.gain.setValueAtTime(.16*vel,t); g.gain.exponentialRampToValueAtTime(.001,t+1.1); }
+    else { f.type="bandpass"; f.frequency.value=1800; f.Q.value=.7; g.gain.setValueAtTime(.32*vel,t); g.gain.exponentialRampToValueAtTime(.001,t+.16);
+      const o=ctx.createOscillator(), og=ctx.createGain(); o.frequency.value=190; og.gain.setValueAtTime(.18*vel,t); og.gain.exponentialRampToValueAtTime(.001,t+.09); o.connect(og); og.connect(dest); o.onended=()=>{ o.disconnect(); og.disconnect(); }; o.start(t); o.stop(t+.1); }
+    s.connect(f); f.connect(g); g.connect(dest); s.onended=()=>{ s.disconnect(); f.disconnect(); g.disconnect(); }; s.start(t, Math.random()*.5); s.stop(t+1.2);
+  }
+  function tick(){
+    const T=TRACKS[cur], sd=60/T.bpm/2;
+    while(nextT < ctx.currentTime+.25){
+      const sw = step%2 ? sd*T.swing : 0;
+      T.parts.forEach(pt=>{ const e=pt.q.ev[step%pt.q.n]; if(!e) return;
+        if(e.d){ drum(nextT+sw, e.d, pt.vel); return; }
+        e.ms.forEach((m,k)=>voice(nextT+sw+(pt.strum||0)*k, m, e.len*sd*.96, P[pt.p], pt.vel)); });
+      nextT += sd; step++;
+    }
+  }
+  function start(){ if(!init()){ toast("This browser can't play music. 這個瀏覽器無法播放音樂"); return false; }
+    unlockIOS(); const r = ctx.resume(); if(r && r.catch) r.catch(()=>{}); return true; }
+  function play(i){
+    if(!TRACKS[i]) i = 0;   /* a track saved by another page (e.g. Kettlebrook's extra tracks) may not exist here */
+    if(!start()) return;
+    setTimeout(()=>{ if(cur >= 0 && ctx.state !== "running") toast("Tap ♪ again, and check your phone isn't on silent. 請再點一次 ♪，並確認手機沒有靜音"); }, 700);
+    clearInterval(timer); cur=i; step=0; nextT=ctx.currentTime+.1; applyVol();
+    tick(); timer=setInterval(tick,40); store.set("trk", i); ui();
+  }
+  function stop(){ clearInterval(timer); timer=null; cur=-1; if(ctx) applyVol(); ui(); }
+  function ui(){
+    const b = $("#musicBtn"); if(b) b.classList.toggle("on", cur >= 0);
+    $$(".trk").forEach(b=>{ const on = +b.dataset.trk === cur; b.classList.toggle("on", on); b.querySelector(".pl").textContent = on ? "❚❚" : "▶"; });
+    const c = $("#coverMusic"); if(c) c.textContent = cur >= 0 ? "♪ " + TRACKS[cur].n.toUpperCase() + " · " + TRACKS[cur].z.split("・")[0] : "♪ TAP FOR MUSIC 點一下播放音樂";
+  }
+  document.addEventListener("visibilitychange", ()=>{
+    if(!ctx || cur < 0) return;
+    if(document.hidden){ clearInterval(timer); ctx.suspend(); }
+    else ctx.resume().then(()=>{ nextT = ctx.currentTime + .05; clearInterval(timer); timer = setInterval(tick,40); });
+  });
+  /* ---- sound effects ---- */
+  const N = n => midi(n);
+  function sfx(kind){
+    if(sfxVol <= 0 || !start()) return;
+    const t = ctx.currentTime + .02;
+    if(kind === "roll"){ for(let i=0;i<7;i++) drum(t+i*.05+Math.random()*.02, i%2?"h":"s", .5 + Math.random()*.3, fx); }
+    else if(kind === "crit"){ ["C5","E5","G5","C6","E6","G6"].forEach((n,i)=>voice(t+i*.07, N(n), .25, P.bell, 1.4, fx)); voice(t+.45, N("C4"), .8, P.brass, 1.6, fx); voice(t+.45, N("G4"), .8, P.brass, 1.4, fx); voice(t+.45, N("C5"), .8, P.brass, 1.4, fx); }
+    else if(kind === "fail"){ ["G3","F#3","F3","E3"].forEach((n,i)=>voice(t+i*.22, N(n), i===3?.6:.18, P.brass, 1.3, fx)); }
+    else if(kind === "click"){ voice(t, N("E6"), .03, P.mar, .6, fx); }
+    else if(kind === "ok"){ voice(t, N("C6"), .06, P.bell, .9, fx); voice(t+.08, N("G6"), .1, P.bell, .9, fx); }
+    else if(kind === "save"){ ["G5","C6","E6"].forEach((n,i)=>voice(t+i*.09, N(n), .2, P.bell, 1.1, fx)); }
+    else if(kind === "heal"){ ["C6","E6","G6","B6"].forEach((n,i)=>voice(t+i*.06, N(n), .2, P.bell, .8, fx)); }
+    else if(kind === "hurt"){ drum(t, "k", 1, fx); drum(t+.02, "s", .6, fx); }
+    else if(kind === "level"){ ["C5","E5","G5","C6"].forEach((n,i)=>voice(t+i*.12, N(n), .12, P.brass, 1.4, fx)); voice(t+.5, N("C6"), .9, P.brass, 1.5, fx); voice(t+.5, N("E5"), .9, P.brass, 1.3, fx); voice(t+.5, N("G5"), .9, P.brass, 1.3, fx); drum(t+.5, "c", 1, fx); }
+    else if(kind === "page"){ const s=ctx.createBufferSource(); s.buffer=noise; const f=ctx.createBiquadFilter(); f.type="bandpass"; f.frequency.setValueAtTime(900,t); f.frequency.linearRampToValueAtTime(3000,t+.15); const g=ctx.createGain(); g.gain.setValueAtTime(.12,t); g.gain.exponentialRampToValueAtTime(.001,t+.2); s.connect(f); f.connect(g); g.connect(fx); s.onended=()=>{ s.disconnect(); f.disconnect(); g.disconnect(); }; s.start(t); s.stop(t+.25); }
+  }
+  /* one struck bell (used by the Kettlebrook bell door): the note plus a soft octave below */
+  function ring(n, vel){ if(sfxVol <= 0 || !start()) return; const t = ctx.currentTime + .02, v = vel || 1;
+    voice(t, N(n), .5, P.bell, 1.5*v, fx); voice(t, N(n)-12, 1.2, P.bell, .7*v, fx); voice(t+.01, N(n)+12, .15, P.mar, .25*v, fx); }
+  function noise2(t, f0, f1, dur, g){ const s=ctx.createBufferSource(); s.buffer=noise; const f=ctx.createBiquadFilter(); f.type="bandpass"; f.frequency.setValueAtTime(f0,t); f.frequency.linearRampToValueAtTime(f1,t+dur); const gg=ctx.createGain(); gg.gain.setValueAtTime(g,t); gg.gain.exponentialRampToValueAtTime(.001,t+dur); s.connect(f); f.connect(gg); gg.connect(fx); s.onended=()=>{ s.disconnect(); f.disconnect(); gg.disconnect(); }; s.start(t, Math.random()*.5); s.stop(t+dur+.05); }
+  function sfx2(kind){ if(sfxVol <= 0 || !start()) return; const t = ctx.currentTime + .02;
+    if(kind === "clunk"){ drum(t, "t", .8, fx); voice(t, N("C3"), .12, P.mar, 1, fx); }
+    else if(kind === "zip"){ noise2(t, 600, 4000, .18, .18); voice(t+.12, N("G6"), .05, P.bell, .7, fx); }
+    else if(kind === "door"){ drum(t, "k", 1, fx); noise2(t+.1, 200, 90, 1.6, .22); [0,.25,.5,.75,1].forEach((d,i)=>voice(t+.2+d, N(["C4","G3","C4","G3","C3"][i]), .1, P.mar, .9, fx)); ["G4","C5","E5","G5","C6"].forEach((n,i)=>voice(t+1.4+i*.1, N(n), .5, P.bell, 1.1, fx)); }
+  }
+  function addTrack(tr){ tr.parts.forEach(p=>p.q=parse(p.s)); TRACKS.push(tr); return TRACKS.length - 1; }
+  return { play, stop, ui, sfx, start, ring, sfx2, addTrack,
+    get cur(){ return cur; },
+    setVol(v){ vol=v; store.set("vol", Math.round(v*100)); if(ctx) applyVol(); }, get vol(){ return vol; },
+    setSfx(v){ sfxVol=v; store.set("sfx", Math.round(v*100)); if(fx) fx.gain.value=v; }, get sfxVol(){ return sfxVol; },
+    duck(on){ ducked=on; if(ctx) applyVol(); } };
+})();
+
+/* ---------------- speech (carried over from Window Seat) ---------------- */
+const SYN = window.speechSynthesis || null;
+let rate = store.get("rate", .85);
+let voiceURI = store.get("voiceURI", "");
+const VOICES = {all:[], main:null};
+const FEM = /Samantha|Ava|Allison|Susan|Zira|Aria|Jenny|Michelle|Emma|Joanna|Salli|Kendra|Kimberly|Ivy|Karen|Moira|Tessa|Victoria|Serena|Kate|Fiona|Veena|Libby|Sonia|Natasha|Nicky|Sara|Female|Google US English/i;
+const NOVELTY = /Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Deranged|Good News|Hysterical|Jester|Junior|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Ralph|Fred|Kathy|Princess|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley/i;
+/* 0 normal, 1 enhanced, 2 premium — iPhone gives enhanced voices the same name, so read the voiceURI too */
+function vq(v){ const s = (v.voiceURI || "") + " " + v.name;
+  if(/premium|高品質|優質/i.test(s)) return 2; if(/enhanced|增強|加強|Natural|Neural|Online/i.test(s)) return 1; return 0; }
+const QLABEL = ["一般音質","增強音質","高品質"];
+function pickVoice(){
+  if(!SYN) return;
+  const us = v => /^en[-_]US/i.test(v.lang) ? 0 : 1, hq = v => 2 - vq(v);
+  const vs = SYN.getVoices().filter(v=>/^en/i.test(v.lang) && !NOVELTY.test(v.name)).sort((a,b)=>us(a)-us(b) || hq(a)-hq(b));
+  VOICES.all = vs;
+  VOICES.main = vs.find(v=>v.voiceURI === voiceURI)
+    || vs.find(v=>us(v)===0 && /Samantha|Google US English|Aria|Jenny|Ava|Allison/i.test(v.name)) || vs.find(v=>FEM.test(v.name)) || vs[0] || null;
+}
+if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
+let sayId = 0;
+function say(text, btn){
+  if(!SYN){ toast("This browser can't read aloud. 這個瀏覽器不支援朗讀"); return; }
+  const my = ++sayId; SYN.cancel();
+  const u = new SpeechSynthesisUtterance(String(text).replace(/[’‘]/g,"'").replace(/×/g," times ").replace(/\bd(\d+)\b/g,"d $1").replace(/\bAC\b/g,"A C").replace(/\bHP\b/g,"H P").replace(/\bDC\b/g,"D C").replace(/\bDM\b/g,"D M").replace(/\bXP\b/g,"X P"));
+  const v = VOICES.main; if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "en-US";  /* iOS ignores a voice whose lang doesn't match */
+  u.rate = rate; Music.duck(true);
+  if(btn) btn.classList.add("live");
+  const end = ()=>{ if(my === sayId){ Music.duck(false); } if(btn) btn.classList.remove("live"); };
+  u.onend = end; u.onerror = end; SYN.speak(u);
+}
+/* iOS unlocks speech only when speak() runs inside a tap */
+let speechUnlocked = false;
+function unlockSpeech(){ if(speechUnlocked || !SYN) return; speechUnlocked = true;
+  try{ const u = new SpeechSynthesisUtterance(" "); u.volume = 0; u.lang = "en-US"; SYN.speak(u); }catch(e){} }
+["touchend","click","keydown"].forEach(t=>document.addEventListener(t, unlockSpeech, true));
+
+/* helpers the DM-guide widgets expect (loaded before widgets.js) */
+const esc = s => String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const rnd = n => Math.floor(Math.random() * n);
+const plainText = s => String(s).replace(/\*\*?([^*]+)\*\*?/g,"$1");
+const SAY = t => `<span class="say" role="button" tabindex="0" data-say="${esc(plainText(t))}" aria-label="Listen 朗讀">🔊</span>`;
+const mdi = s => esc(s).replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/\*([^*]+)\*/g,"<i>$1</i>");
+let toastT = null;
+function toast(m){ const t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove("on"), 2600); }
+const ACTS = {};
+const hlines = s => String(s).split("\n").map(l=>`<div class="hl"><span>${esc(l) || "&nbsp;"}</span></div>`).join("");
+
+
+/* =========================================================
+   INTERACTIVE TABLE WIDGETS (Chapter 2)
+   · the bell door: tap the Five Sisters to ring them
+   · the odd-sock pile: tap two matching socks to pair them
+   Both can be shown full screen to the player.
+   ========================================================= */
+
+/* ---------- the bell door ---------- */
+const BELL = {
+  seq:["dora","dot","delia","dinah","doris"],                 /* the lullaby: One for Dora ... Five, Big Doris */
+  info:{ dot:{n:"Dot", note:"E5", x:64, y:132, k:.62}, dora:{n:"Dora", note:"C5", x:101, y:86, k:.86}, doris:{n:"Big Doris", note:"G4", x:160, y:62, k:1.18},
+         dinah:{n:"Dinah", note:"A4", x:219, y:86, k:.92}, delia:{n:"Delia", note:"D5", x:256, y:132, k:.74} },
+  order:["dot","dora","doris","dinah","delia"],               /* left to right on the arch */
+  k:0, lit:[], log:[], open:store.get("kb-door", false), ans:false, busy:false,
+  glow: store.get("kb-glow", false)
+};
+function bellsHTML(big){
+  const B = BELL, I = B.info;
+  const bells = B.order.map(id=>{ const b = I[id], w = 22*b.k*1.25, h = 24*b.k*1.25, x = b.x, y = b.y;
+    const path = `M${x-w*.35} ${y+6} Q${x-w*.4} ${y+6+h*.55} ${x-w*.62} ${y+6+h} L${x+w*.62} ${y+6+h} Q${x+w*.4} ${y+6+h*.55} ${x+w*.35} ${y+6} Q${x} ${y+1} ${x-w*.35} ${y+6}Z`;
+    const lit = B.glow && B.lit.includes(id), n = B.seq.indexOf(id) + 1;
+    /* the carved outline sits a little larger, behind the bell */
+    const o = `M${x-w*.46} ${y+2} Q${x-w*.52} ${y+6+h*.6} ${x-w*.78} ${y+10+h} L${x+w*.78} ${y+10+h} Q${x+w*.52} ${y+6+h*.6} ${x+w*.46} ${y+2} Q${x} ${y-5} ${x-w*.46} ${y+2}Z`;
+    return `<g class="bg${lit ? " lit" : ""}" data-act="ringBell" data-b="${id}" role="button" tabindex="0" aria-label="Ring ${b.n}">
+      <path class="halo" d="${o}"/><path class="outline" d="${o}"/>
+      <path d="M${x} ${y-8} v8" stroke="#caa24a" stroke-width="3"/>
+      <g class="swing" id="bell-${big?"P":"D"}-${id}" style="transform-origin:${x}px ${y}px"><path d="${path}" class="bellbody"/><ellipse cx="${x}" cy="${y+7+h}" rx="${w*.12}" ry="${w*.12}" fill="#7a5a1a"/></g>
+      <rect x="${x-w*.8}" y="${y-14}" width="${w*1.6}" height="${h+30}" fill="transparent"/>
+      <text x="${x}" y="${y+26+h}" text-anchor="middle" class="bn">${b.n}</text>
+      ${!big && B.ans ? `<text x="${x}" y="${y-12}" text-anchor="middle" class="ansn">${n}</text>` : ""}</g>`; }).join("");
+  const svg = `<svg viewBox="0 0 320 200" class="bellsvg" role="img" aria-label="The five bells hanging over the brass door. Tap a bell to ring it.">
+    <rect width="320" height="200" fill="#4a3526"/>
+    <g fill="#5a4332">${[0,1,2,3,4,5,6,7].map(r=>[0,1,2,3,4,5,6,7,8,9].map(c=>`<rect x="${c*38+(r%2?-19:0)}" y="${r*28}" width="36" height="26"/>`).join("")).join("")}</g>
+    <circle cx="160" cy="236" r="70" fill="${B.open ? "#1a1020" : "#d9a441"}" stroke="#241a2a" stroke-width="4"/>
+    ${B.open ? `<path d="M100 200 A70 70 0 0 1 160 166" stroke="#d9a441" stroke-width="10" fill="none"/><text x="160" y="195" text-anchor="middle" class="bn" style="fill:#f4c542">✨ OPEN ✨</text>` : `<circle cx="160" cy="236" r="60" fill="none" stroke="#b98a2a" stroke-width="3"/>`}
+    <g>${bells}</g></svg>`;
+  if(big) return `<div class="wdg bellw big">${svg}<div class="wmsg">${B.open ? "The door is open! 門開了！" : "Tap a bell to ring it. 點鐘來敲響。"}</div><button class="btn sm wclose" data-act="endPresent">✕ Done</button></div>`;
+  return `<div class="wdg bellw">${svg}<div class="wlog">${bellLog()}</div>
+    <div class="row wbtns"><button class="btn sm${B.glow ? " on" : ""}" data-act="bellGlow">🎵 Glow ${B.glow ? "ON" : "OFF"}</button><button class="btn sm${B.ans ? " on" : ""}" data-act="bellAns">🔑 Answer</button><button class="btn sm" data-act="bellReset">↺ Reset</button></div></div>`;
+}
+function bellLog(){ const B = BELL, I = B.info;
+  const log = B.log.slice(-6).map(l=>`<span class="${l[1] ? "okc" : "noc"}">${esc(I[l[0]].n)}${l[1] ? " ✓" : " ✗"}</span>`).join(" · ");
+  return B.open ? `<b class="okc">The door is open! 門開了！</b>` : log ? `Rings: ${log}` : `<span class="muted">Tap a bell to ring it. The note plays out loud.</span>`;
+}
+/* after a ring, only flip the glow classes and the log line; no redrawing */
+function bellsUpdate(){ const B = BELL; $$(".bellw .bg").forEach(g=>g.classList.toggle("lit", B.glow && B.lit.includes(g.dataset.b))); $$(".bellw:not(.big) .wlog").forEach(l=>l.innerHTML = bellLog()); }
+function bellsRefresh(){ $$(".bellw").forEach(w=>{ const big = w.classList.contains("big"); w.outerHTML = bellsHTML(big); }); }
+function bellSwing(id){ ["D","P"].forEach(v=>{ const g = document.getElementById(`bell-${v}-${id}`); if(g){ g.classList.remove("go"); void g.getBoundingClientRect(); g.classList.add("go"); } }); }
+ACTS.ringBell = b => { const B = BELL, id = b.dataset.b; if(B.busy) return;
+  Music.ring(B.info[id].note, id === "doris" ? 1.2 : 1); Music.duck(true); clearTimeout(B.dt); B.dt = setTimeout(()=>Music.duck(false), 2500);
+  if(B.open){ bellSwing(id); return; }
+  const right = id === B.seq[B.k];
+  if(right){ B.k++; B.lit.push(id); }
+  else { B.k = id === B.seq[0] ? 1 : 0; B.lit = B.k ? [id] : []; if(B.glow) setTimeout(()=>Music.sfx2("clunk"), 350); }
+  B.log.push([id, right]); if(B.log.length > 50) B.log = B.log.slice(-6);
+  if(B.k === 5){ B.open = true; store.set("kb-door", true); setTimeout(()=>{ Music.sfx2("door"); }, 700); toast("The door opens! 門開了！");
+    /* after the door sound, the lullaby takes over the background music */
+    setTimeout(()=>{ const t = TRACKS.findIndex(x=>x.n === "The Sisters' Lullaby"); if(t >= 0 && Music.cur !== t){ Music.play(t); if(typeof uiTracks === "function") uiTracks(); } }, 3400); }
+  if(B.open) bellsRefresh(); else bellsUpdate(); bellSwing(id); };
+ACTS.bellGlow = () => { BELL.glow = !BELL.glow; store.set("kb-glow", BELL.glow); bellsRefresh(); };
+ACTS.bellAns = () => { BELL.ans = !BELL.ans; bellsRefresh(); };
+ACTS.bellReset = () => { Object.assign(BELL, {k:0, lit:[], log:[], open:false}); store.set("kb-door", false); bellsRefresh(); };
+ACTS.bellPlay = () => { const B = BELL; if(B.busy) return; B.busy = true; Music.duck(true);
+  B.seq.forEach((id,i)=>setTimeout(()=>{ Music.ring(B.info[id].note, id === "doris" ? 1.2 : 1); bellSwing(id); }, i*650));
+  setTimeout(()=>{ B.busy = false; Music.duck(false); }, B.seq.length*650 + 800); };
+ACTS.endPresent = () => endPresent();
+
+/* ---------- the odd-sock pile ---------- */
+const SOCKTYPES = [
+  {c:"#d94a4a", p:"stripes", en:"red striped", zh:"紅色條紋"},   {c:"#4a7fd9", p:"dots", en:"blue spotted", zh:"藍色圓點"},
+  {c:"#4fae5a", p:"stars", en:"green starry", zh:"綠色星星"},    {c:"#f0c53a", p:"stripes", en:"yellow striped", zh:"黃色條紋"},
+  {c:"#9a5ad0", p:"dots", en:"purple spotted", zh:"紫色圓點"},   {c:"#f08a2e", p:"plain", en:"orange plain", zh:"橘色素面"},
+  {c:"#f08ab4", p:"stars", en:"pink starry", zh:"粉紅星星"},     {c:"#9aa0a8", p:"zigzag", en:"gray zigzag", zh:"灰色鋸齒"}];
+const SOCK = { order:[], gone:[], sel:-1, tilt:[] };
+function sockDeal(){ const o = []; SOCKTYPES.forEach((_,i)=>{ o.push(i, i); }); for(let i=o.length-1;i>0;i--){ const j = rnd(i+1); [o[i],o[j]] = [o[j],o[i]]; }
+  Object.assign(SOCK, {order:o, gone:[], sel:-1, tilt:o.map(()=>rnd(40)-20)}); }
+sockDeal();
+function sockSVG(t, i){ const T = SOCKTYPES[t], id = "sk" + i;
+  const shape = "M18 4 h26 v44 q0 8 6 12 l14 9 q8 6 3 14 q-5 7 -14 3 l-26 -13 q-10 -5 -10 -16 z";
+  let pat = "";
+  if(T.p === "stripes") pat = [14,26,38,50].map(y=>`<rect x="0" y="${y}" width="90" height="6" fill="rgba(255,255,255,.75)"/>`).join("");
+  if(T.p === "dots") pat = [[26,14],[38,26],[26,38],[40,50],[30,62],[48,70],[60,78]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.6" fill="rgba(255,255,255,.85)"/>`).join("");
+  if(T.p === "stars") pat = [[28,16],[36,34],[28,52],[46,68],[60,80]].map(p=>`<polygon points="${[0,1,2,3,4,5,6,7,8,9].map(k=>{ const r = k%2 ? 2.2 : 5.2, a = Math.PI/5*k - Math.PI/2; return (p[0]+r*Math.cos(a)).toFixed(1)+","+(p[1]+r*Math.sin(a)).toFixed(1); }).join(" ")}" fill="#fff6b0"/>`).join("");
+  if(T.p === "zigzag") pat = [16,34,52,70].map(y=>`<polyline points="10,${y} 18,${y-6} 26,${y} 34,${y-6} 42,${y} 50,${y-6} 58,${y} 66,${y-6} 74,${y} 82,${y-6}" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="3"/>`).join("");
+  return `<svg viewBox="0 0 90 90" class="socksvg"><defs><clipPath id="${id}"><path d="${shape}"/></clipPath></defs>
+    <path d="${shape}" fill="${T.c}" stroke="#241a2a" stroke-width="3"/><g clip-path="url(#${id})">${pat}</g>
+    <rect x="16" y="2" width="30" height="8" rx="2" fill="#fff" stroke="#241a2a" stroke-width="2"/></svg>`; }
+const SOCKIMG = [];
+function sockImg(t){ if(!SOCKIMG[t]) SOCKIMG[t] = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(sockSVG(t, "x").replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" ')); return SOCKIMG[t]; }
+function socksHTML(big){
+  const S = SOCK, left = SOCKTYPES.length - S.gone.length;
+  const pile = S.order.map((t,i)=> S.gone.includes(t) ? `<span class="sock gone"></span>` :
+    `<span class="sock${S.sel === i ? " sel" : ""}" data-act="sockTap" data-i="${i}" role="button" tabindex="0" aria-label="sock" style="transform:rotate(${S.tilt[i]}deg)"><img src="${sockImg(t)}" alt="" draggable="false"></span>`).join("");
+  const msg = left ? `Tap two socks that match. 點兩隻一樣的襪子。` : `All the socks have partners! 所有襪子都配成對了！`;
+  if(big) return `<div class="wdg sockw big"><div class="pile">${pile}</div><div class="wmsg">${msg}</div><button class="btn sm wclose" data-act="endPresent">✕ Done</button></div>`;
+  return `<div class="wdg sockw"><div class="pile">${pile}</div>
+    <div class="wlog">${sockLog()}</div>
+    <div class="row wbtns"><button class="btn sm" data-act="sockDeal">↺ New pile</button></div></div>`; }
+function sockLog(){ const S = SOCK; return `Pairs matched: <b>${S.gone.length}</b> / ${SOCKTYPES.length} ${S.gone.length ? `<span class="muted small">(${S.gone.map(g=>SOCKTYPES[g].en).join(", ")})</span>` : ""}`; }
+function socksUpdate(){ const S = SOCK;
+  $$(".sockw .sock[data-i]").forEach(el=>{ const i = +el.dataset.i; el.classList.toggle("sel", S.sel === i); if(S.gone.includes(S.order[i])) el.classList.add("gone"); });
+  $$(".sockw:not(.big) .wlog").forEach(l=>l.innerHTML = sockLog());
+  if(S.gone.length === SOCKTYPES.length) $$(".sockw.big .wmsg").forEach(m=>m.textContent = "All the socks have partners! 所有襪子都配成對了！"); }
+function socksRefresh(){ $$(".sockw").forEach(w=>{ w.outerHTML = socksHTML(w.classList.contains("big")); }); }
+ACTS.sockTap = b => { const S = SOCK, i = +b.dataset.i;
+  if(S.sel < 0){ S.sel = i; Music.sfx("click"); }
+  else if(S.sel === i){ S.sel = -1; }
+  else if(S.order[S.sel] === S.order[i]){ const T = SOCKTYPES[S.order[i]]; S.gone.push(S.order[i]); S.sel = -1; Music.sfx2("zip"); toast(`A pair! ${T.en} 配對成功！${T.zh}`); }
+  else { S.sel = -1; Music.sfx2("clunk"); }
+  socksUpdate(); };
+ACTS.sockDeal = () => { sockDeal(); socksRefresh(); };
+
+/* ---------- the clock: tell the time in English ---------- */
+const NUMW = ["twelve","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve"];
+const CLOCK = { h:3, m:0, hard: store.get("kb-clockhard", false), shown:false };
+function clockNew(){ const C = CLOCK; let h, m;
+  do { h = 1 + rnd(12); m = C.hard ? rnd(12)*5 : [0,30,15,45][rnd(4)]; } while(h === C.h && m === C.m);
+  C.h = h; C.m = m; }
+clockNew();
+function clockWords(h, m){
+  const next = h % 12 + 1;
+  let en, en2 = `${NUMW[h]} ${m === 0 ? "o'clock" : m < 10 ? "oh " + ["","","","","","five"][m] : ({15:"fifteen",30:"thirty",45:"forty-five",10:"ten",20:"twenty",25:"twenty-five",35:"thirty-five",40:"forty",50:"fifty",55:"fifty-five"})[m]}`;
+  if(m === 0) en = `${NUMW[h]} o'clock`;
+  else if(m === 15) en = `quarter past ${NUMW[h]}`;
+  else if(m === 30) en = `half past ${NUMW[h]}`;
+  else if(m === 45) en = `quarter to ${NUMW[next]}`;
+  else if(m < 30) en = `${({5:"five",10:"ten",20:"twenty",25:"twenty-five"})[m]} past ${NUMW[h]}`;
+  else en = `${({35:"twenty-five",40:"twenty",50:"ten",55:"five"})[m]} to ${NUMW[next]}`;
+  const zhN = ["十二","一","二","三","四","五","六","七","八","九","十","十一","十二"];
+  const zm = {5:"零五",10:"十",15:"十五",20:"二十",25:"二十五",35:"三十五",40:"四十",45:"四十五",50:"五十",55:"五十五"};
+  const zh = m === 0 ? `${zhN[h]}點整` : m === 30 ? `${zhN[h]}點半` : `${zhN[h]}點${zm[m]}分`;
+  return {en:`It's ${en}.`, en2: m === 0 ? null : `It's ${en2}.`, zh};
+}
+function clockHTML(big){ const C = CLOCK, W = clockWords(C.h, C.m);
+  const ha = ((C.h % 12) + C.m/60) * 30, ma = C.m * 6;
+  const ticks = [...Array(60)].map((_,i)=>{ const a = i*6*Math.PI/180, r1 = i%5 ? 86 : 80; return `<line x1="${100+Math.sin(a)*r1}" y1="${100-Math.cos(a)*r1}" x2="${100+Math.sin(a)*90}" y2="${100-Math.cos(a)*90}" stroke="#3a2a1a" stroke-width="${i%5?1:3}"/>`; }).join("");
+  const nums = [...Array(12)].map((_,i)=>{ const n = i+1, a = n*30*Math.PI/180; return `<text x="${100+Math.sin(a)*66}" y="${100-Math.cos(a)*66+7}" text-anchor="middle" font-family="Georgia,serif" font-size="19" font-weight="700" fill="#3a2a1a">${n}</text>`; }).join("");
+  const svg = `<svg viewBox="0 0 200 200" class="clocksvg" role="img" aria-label="A clock face">
+    <circle cx="100" cy="100" r="97" fill="#b98a2a" stroke="#241a2a" stroke-width="4"/><circle cx="100" cy="100" r="92" fill="#fff8e6"/>
+    ${ticks}${nums}
+    <line x1="100" y1="100" x2="${100+Math.sin(ha*Math.PI/180)*44}" y2="${100-Math.cos(ha*Math.PI/180)*44}" stroke="#241a2a" stroke-width="7" stroke-linecap="round"/>
+    <line x1="100" y1="100" x2="${100+Math.sin(ma*Math.PI/180)*72}" y2="${100-Math.cos(ma*Math.PI/180)*72}" stroke="#241a2a" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="100" cy="100" r="6" fill="#d94a4a" stroke="#241a2a" stroke-width="2"/></svg>`;
+  if(big) return `<div class="wdg clockw big">${svg}<div class="wmsg">What time is it? 現在幾點？</div><button class="btn sm wclose" data-act="endPresent">✕ Done</button></div>`;
+  return `<div class="wdg clockw">${svg}
+    <div class="wlog">${C.shown ? `<b class="okc">${esc(W.en)}</b> ${SAY(W.en)}${W.en2 ? `<div class="muted small">or: ${esc(W.en2)}</div>` : ""}<div class="zh">${esc(W.zh)}</div>` : `<span class="muted">Ask: "What time is it?" Tap 🔑 to check the answer.</span>`}</div>
+    <div class="row wbtns"><button class="btn sm" data-act="clockNew">🎲 New time</button><button class="btn sm${C.shown ? " on" : ""}" data-act="clockShow">🔑 Answer</button><button class="btn sm${C.hard ? " on" : ""}" data-act="clockHard">${C.hard ? "Harder: every 5 min" : "Easy: o'clock, quarter, half"}</button></div></div>`; }
+function clockRefresh(){ $$(".clockw").forEach(w=>{ w.outerHTML = clockHTML(w.classList.contains("big")); }); }
+ACTS.clockNew = () => { clockNew(); CLOCK.shown = false; Music.sfx("click"); clockRefresh(); };
+ACTS.clockShow = () => { CLOCK.shown = !CLOCK.shown; clockRefresh(); };
+ACTS.clockHard = () => { CLOCK.hard = !CLOCK.hard; store.set("kb-clockhard", CLOCK.hard); clockNew(); CLOCK.shown = false; clockRefresh(); };
+
+/* ---------- the Marble Pit (Chapter 4): find the king's marbles by description ---------- */
+const MCOL = {gold:["#f0c53a","金色"], blue:["#4a7fd9","藍色"], green:["#4fae5a","綠色"], purple:["#9a5ad0","紫色"], red:["#d94a4a","紅色"], white:["#e8e2f4","白色"], orange:["#f08a2e","橘色"]};
+const MPAT = {swirly:"漩渦紋", spotted:"圓點", striped:"條紋", starry:"星星", plain:"素面"};
+const MROYAL = [{s:"big",c:"gold",p:"swirly",en:"Memory",zh:"記憶"},{s:"small",c:"blue",p:"spotted",en:"Manners",zh:"禮貌"},
+                {s:"big",c:"green",p:"striped",en:"Good Sense",zh:"判斷力"},{s:"small",c:"purple",p:"swirly",en:"Dignity",zh:"威嚴"}];
+const MLABELS = [["Lost by Pip Tumble, age 5.","皮普・湯柏弄丟的，五歲。"],["Lost by Poppy Tumble, age 5. (Pip took it.)","波比・湯柏弄丟的，五歲。（被皮普拿走了。）"],
+  ["Lost down a drain. Very sad.","掉進水溝裡弄丟的。非常難過。"],["Lost by young Horace, age 8.","小霍瑞斯弄丟的，八歲。"],
+  ["Swallowed by a goose. Returned by the goose.","被一隻鵝吞下去。由那隻鵝歸還。"],["Lost by Nettie Marsh, age 7. Her best one.","妮蒂・馬許弄丟的，七歲。她最好的一顆。"],
+  ["Lost in the Great Custard Row.","在卡士達大爭吵中弄丟的。"],["Owner: unknown. Found in a pie.","失主：不明。在派裡面找到的。"]];
+const MARB = { hard: store.get("kb-marblehard", false), pile:[], found:[], ans:false, msg:"" };
+const mdesc = m => `a ${m.s} ${m.c} ${m.p} marble`;
+const mdescz = m => `一顆${m.s === "big" ? "大" : "小"}的${MCOL[m.c][1]}${MPAT[m.p]}彈珠`;
+const msame = (a,b) => a.s === b.s && a.c === b.c && a.p === b.p;
+const mdiff = (a,b) => (a.s !== b.s) + (a.c !== b.c) + (a.p !== b.p);
+function marbleDeal(){ const M = MARB, cols = Object.keys(MCOL), pats = Object.keys(MPAT), pile = [], used = [];
+  const rand = () => ({s: rnd(2) ? "big" : "small", c: cols[rnd(cols.length)], p: pats[rnd(pats.length)]});
+  const RED = {s:"big", c:"red", p:"starry"};   /* the fifth royal marble rolled away: never in the pit */
+  const ok = m => !MROYAL.some(r=>msame(r,m)) && !msame(RED,m) && !used.some(u=>msame(u,m));
+  MROYAL.forEach((r,i)=>pile.push({...r, royal:i}));
+  if(M.hard){ /* near misses: one thing different from a royal marble */
+    let tries = 0; while(used.length < 8 && tries++ < 400){ const r = MROYAL[rnd(4)], m = {...r}, k = rnd(3);
+      if(k === 0) m.s = r.s === "big" ? "small" : "big"; else if(k === 1) m.c = cols[rnd(cols.length)]; else m.p = pats[rnd(pats.length)];
+      if(ok(m)){ used.push({s:m.s, c:m.c, p:m.p}); } } }
+  let tries = 0; const want = M.hard ? 16 : 8;
+  while(used.length < want && tries++ < 2000){ const m = rand(); if(ok(m) && (M.hard || MROYAL.every(r=>mdiff(r,m) >= 2))) used.push(m); }
+  used.forEach(m=>pile.push({...m, royal:-1, lab:rnd(MLABELS.length)}));
+  for(let i=pile.length-1;i>0;i--){ const j = rnd(i+1); [pile[i],pile[j]] = [pile[j],pile[i]]; }
+  Object.assign(M, {pile, found:[], msg:""}); }
+marbleDeal();
+function marbleSVG(m){ const r = m.s === "big" ? 40 : 27, col = MCOL[m.c][0], id = "mb" + m.s + m.c + m.p;
+  let pat = "";
+  if(m.p === "striped") pat = [-24,-8,8,24].map(y=>`<rect x="0" y="${50+y-3.5}" width="100" height="7" fill="rgba(255,255,255,.75)"/>`).join("");
+  if(m.p === "spotted") pat = [[38,36],[60,40],[44,58],[64,62],[30,56],[52,74],[70,50]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="rgba(255,255,255,.88)"/>`).join("");
+  if(m.p === "swirly") pat = `<polyline points="${[...Array(57)].map((_,k)=>{ const t = k*Math.PI/14, rr = 2.4*t; return (50+rr*Math.cos(t)).toFixed(1)+","+(50+rr*Math.sin(t)).toFixed(1); }).join(" ")}" fill="none" stroke="rgba(255,255,255,.82)" stroke-width="5" stroke-linecap="round"/>`;
+  if(m.p === "starry") pat = [[38,38],[62,44],[46,62],[66,66],[30,58]].map(p=>`<polygon points="${[0,1,2,3,4,5,6,7,8,9].map(k=>{ const rr = k%2 ? 2.6 : 6.4, a = Math.PI/5*k - Math.PI/2; return (p[0]+rr*Math.cos(a)).toFixed(1)+","+(p[1]+rr*Math.sin(a)).toFixed(1); }).join(" ")}" fill="#fff6b0"/>`).join("");
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><clipPath id="${id}"><circle cx="50" cy="50" r="${r}"/></clipPath>
+    <radialGradient id="${id}g" cx="35%" cy="32%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></radialGradient></defs>
+    <circle cx="50" cy="50" r="${r}" fill="${col}"/><g clip-path="url(#${id})" transform="translate(50 50) scale(${r/40}) translate(-50 -50)">${pat}</g>
+    <circle cx="50" cy="50" r="${r}" fill="url(#${id}g)" stroke="#241a2a" stroke-width="3"/></svg>`; }
+const MIMG = {};
+function marbleImg(m){ const k = m.s + m.c + m.p; if(!MIMG[k]) MIMG[k] = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(marbleSVG(m)); return MIMG[k]; }
+function marbleList(big){ const M = MARB;
+  return `<ol class="mlist">${MROYAL.map((r,i)=>`<li class="${M.found.includes(i) ? "got" : ""}">${M.found.includes(i) ? "✓ " : ""}${esc(mdesc(r))}${big ? "" : ` <span class="muted small">(${esc(r.en)})</span>`}<span class="zh tr">${esc(mdescz(r))}</span></li>`).join("")}
+    <li class="gone">a big red starry marble <span class="muted small">— rolled away down the stairs!</span><span class="zh tr">一顆大的紅色星星彈珠：滾下樓梯不見了！</span></li></ol>`; }
+function marblesHTML(big){ const M = MARB;
+  const pile = M.pile.map((m,i)=>{ const got = m.royal >= 0 && M.found.includes(m.royal);
+    return `<span class="mrb${got ? " got" : ""}${!big && M.ans && m.royal >= 0 ? " ans" : ""}" data-act="marbleTap" data-i="${i}" role="button" tabindex="0" aria-label="marble"><img src="${marbleImg(m)}" alt="" draggable="false"></span>`; }).join("");
+  const done = M.found.length === MROYAL.length;
+  const msg = done ? "All four! 四顆都找到了！" : M.msg || "Find the king's marbles. 找出國王的彈珠。";
+  if(big) return `<div class="wdg marblew big"><div class="mpile${M.hard ? " hard" : ""}">${pile}</div>${marbleList(true)}<div class="wmsg">${msg}</div><button class="btn sm wclose" data-act="endPresent">✕ Done</button></div>`;
+  return `<div class="wdg marblew"><div class="mpile${M.hard ? " hard" : ""}">${pile}</div>
+    <div class="wlog">${done ? `<b class="okc">All four found! 四顆都找到了！</b>` : M.msg ? M.msg : `<span class="muted">Tap a marble. Found: ${M.found.length} / ${MROYAL.length}</span>`}</div>
+    ${marbleList(false)}
+    <div class="row wbtns"><button class="btn sm" data-act="marbleDeal">↺ New pile</button><button class="btn sm${M.ans ? " on" : ""}" data-act="marbleAns">🔑 Answer</button><button class="btn sm${M.hard ? " on" : ""}" data-act="marbleHard">${M.hard ? "Harder: almost-the-same marbles" : "Easy: clearly different"}</button></div></div>`; }
+function marblesRefresh(){ $$(".marblew").forEach(w=>{ w.outerHTML = marblesHTML(w.classList.contains("big")); }); }
+ACTS.marbleTap = b => { const M = MARB, m = M.pile[+b.dataset.i]; if(!m) return;
+  const d = `That's ${esc(mdesc(m))}. <span class="zh" style="display:inline">${esc(mdescz(m))}</span>`;
+  if(m.royal >= 0){ if(!M.found.includes(m.royal)){ M.found.push(m.royal); Music.ring(["E6","G6","C6","A5"][m.royal]); }
+    const R = MROYAL[m.royal]; M.msg = `<b class="okc">✨ The King's ${esc(R.en)}! 國王的${esc(R.zh)}！</b> ${d}`; }
+  else { const L = MLABELS[m.lab]; Music.sfx2("clunk"); M.msg = `<span class="noc">Not this one.</span> ${d} <span class="muted small">Label: "${esc(L[0])}"</span> <span class="zh" style="display:inline">${esc(L[1])}</span>`; }
+  marblesRefresh(); };
+ACTS.marbleDeal = () => { marbleDeal(); Music.sfx("click"); marblesRefresh(); };
+ACTS.marbleAns = () => { MARB.ans = !MARB.ans; marblesRefresh(); };
+ACTS.marbleHard = () => { MARB.hard = !MARB.hard; store.set("kb-marblehard", MARB.hard); marbleDeal(); marblesRefresh(); };
+
+/* ---------- handouts on the page: lines never wrap, so shrink the text until the longest line fits ---------- */
+function fitHandouts(root){ (root || document).querySelectorAll(".handout:not(.big)").forEach(H=>{
+  H.style.fontSize = ""; const spans = [...H.querySelectorAll(".hl span")]; if(!spans.length || !H.clientWidth) return;
+  let f = parseFloat(getComputedStyle(H).fontSize); const w = () => H.clientWidth * .92;
+  while(f > 7 && spans.some(s=>s.offsetWidth > w())){ f -= .5; H.style.fontSize = f + "px"; } }); }
+let fitT = null; window.addEventListener("resize", ()=>{ clearTimeout(fitT); fitT = setTimeout(()=>fitHandouts(), 120); });
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>fitHandouts());
+
+/* =========================================================
+   Kettlebrook title art (320×180): town, empty bell tower, the old mill,
+   ghost-bell notes rising from the dry wheel pit, a goose, a goblin in a bell hat
+   ========================================================= */
+const KScene = (()=>{
+  const cv = $("#cv"); if(!cv) return {start(){}, stop(){}};
+  const x = cv.getContext("2d"), W = 320, H = 180;
+  const B4 = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+  const hex = h => [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+  const img = x.createImageData(W,H), d = img.data;
+  const put = (px,py,c)=>{ px|=0; py|=0; if(px<0||py<0||px>=W||py>=H) return; const i=(py*W+px)*4; d[i]=c[0]; d[i+1]=c[1]; d[i+2]=c[2]; d[i+3]=255; };
+  const rect = (x0,y0,w,h,c)=>{ c=hex(c); for(let yy=y0;yy<y0+h;yy++) for(let xx=x0;xx<x0+w;xx++) put(xx,yy,c); };
+  const vgrad = (x0,y0,w,h,cols)=>{ const cs=cols.map(hex), n=cs.length-1;
+    for(let yy=0;yy<h;yy++){ const t=yy/(h-1)*n, k=Math.min(n-1,Math.floor(t)), f=t-k;
+      for(let xx=0;xx<w;xx++){ const b=(B4[yy&3][xx&3]+.5)/16; put(x0+xx,y0+yy, f>b?cs[k+1]:cs[k]); } } };
+  const glow = (cx,cy,r,col,str)=>{ const c=hex(col);
+    for(let yy=cy-r;yy<=cy+r;yy++) for(let xx=cx-r;xx<=cx+r;xx++){ if(xx<0||yy<0||xx>=W||yy>=H) continue;
+      const dd=Math.hypot(xx-cx,(yy-cy)*1.1)/r; if(dd>1) continue; const t=(1-dd)*(1-dd)*str, b=(B4[yy&3][xx&3]+.5)/16;
+      const i=(yy*W+xx)*4, a = t>b ? .5 : t>b*.5 ? .22 : 0; if(a){ d[i]+=(c[0]-d[i])*a; d[i+1]+=(c[1]-d[i+1])*a; d[i+2]+=(c[2]-d[i+2])*a; } } };
+  function Layer(){ const a = new Uint8Array(W*H);
+    const L = {a, set(px,py,c){ px=Math.round(px); py=Math.round(py); if(px<0||py<0||px>=W||py>=H) return; a[py*W+px]=c; },
+      get(px,py){ if(px<0||py<0||px>=W||py>=H) return 0; return a[py*W+px]; },
+      rect(x0,y0,w,h,c){ for(let yy=y0;yy<y0+h;yy++) for(let xx=x0;xx<x0+w;xx++) L.set(xx,yy,c); },
+      ell(cx,cy,rx,ry,c){ for(let yy=Math.floor(cy-ry);yy<=cy+ry;yy++) for(let xx=Math.floor(cx-rx);xx<=cx+rx;xx++){ if(((xx-cx)/rx)**2+((yy-cy)/ry)**2<=1) L.set(xx,yy,c); } },
+      poly(pts,c){ let y0=1e9,y1=-1e9; pts.forEach(p=>{y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1]);});
+        for(let yy=Math.floor(y0);yy<=y1;yy++){ const xs=[]; for(let i=0;i<pts.length;i++){ const p=pts[i], q=pts[(i+1)%pts.length];
+          if((p[1]<=yy+.5&&q[1]>yy+.5)||(q[1]<=yy+.5&&p[1]>yy+.5)) xs.push(p[0]+(yy+.5-p[1])/(q[1]-p[1])*(q[0]-p[0])); }
+          xs.sort((m,n)=>m-n); for(let k=0;k<xs.length;k+=2) for(let xx=Math.round(xs[k]);xx<Math.round(xs[k+1]);xx++) L.set(xx,yy,c); } },
+      line(x0,y0,x1,y1,c){ const n=Math.ceil(Math.max(Math.abs(x1-x0),Math.abs(y1-y0)))||1; for(let i=0;i<=n;i++) L.set(x0+(x1-x0)*i/n, y0+(y1-y0)*i/n, c); } };
+    return L; }
+  function blit(L, pal, opt){ opt = opt || {}; const out = hex(opt.outline || "#241a2a"), shade = opt.shade || {}, hi = opt.hi || {};
+    for(let yy=0;yy<H;yy++) for(let xx=0;xx<W;xx++){ const c = L.a[yy*W+xx];
+      if(!c){ if(L.get(xx-1,yy)||L.get(xx+1,yy)||L.get(xx,yy-1)||L.get(xx,yy+1)) put(xx,yy,out); continue; }
+      let col = pal[c]; if(shade[c] && !L.get(xx,yy+1)) col = shade[c]; else if(shade[c] && !L.get(xx+1,yy) && ((xx+yy)&1)) col = shade[c];
+      if(hi[c] && !L.get(xx,yy-1)) col = hi[c]; put(xx,yy,hex(col)); } }
+
+  /* sky: late afternoon, warm and friendly */
+  vgrad(0,0,W,120,["#5a7fc8","#86a8dc","#c9c6d8","#f2c89a","#f4a878"]);
+  [[40,22,34],[128,14,26],[230,30,40]].forEach(c=>{ for(let k=0;k<5;k++) for(let yy=-5;yy<=5;yy++) for(let xx=-12;xx<=12;xx++){ const cx=c[0]+k*9-18, cy=c[1]+(k%2?2:0); if((xx*xx)/144+(yy*yy)/25<=1 && cy+yy<c[1]+4) put(cx+xx,cy+yy,hex(yy>1?"#e6dcea":"#fbf6f2")); } });
+  glow(270,86,46,"#ffe0a0",.6);
+  /* hills */
+  const ridge=(base,amp,seed,col)=>{ for(let xx=0;xx<W;xx++){ const h=base-Math.round(amp*(.6*Math.sin(xx/31+seed)+.4*Math.sin(xx/13+seed*2))); rect(xx,h,1,180-h,col); } };
+  ridge(96,10,1,"#7f9f7a"); ridge(110,7,3,"#5f8a5c");
+  /* ground */
+  vgrad(0,128,W,52,["#6c9a55","#4f7e43","#3e6636"]);
+  /* the river, now east of the mill; the old riverbed a dry brown ditch */
+  for(let yy=128;yy<180;yy++){ const cx=292+Math.round(Math.sin(yy/9)*4); rect(cx-10,yy,20,1,(yy%5)?"#4f8fc9":"#7fb6e3"); }
+  for(let yy=134;yy<180;yy++){ const cx=232+Math.round(Math.sin(yy/11)*3); rect(cx-9,yy,18,1,(yy%4)?"#7a5a3e":"#6a4c34"); }
+  /* town */
+  const T = Layer();
+  const house=(hx,hy,w,h,wall,roof)=>{ T.rect(hx,hy,w,h,wall); T.poly([[hx-2,hy],[hx+w+2,hy],[hx+w/2,hy-Math.round(w*.55)]],roof); T.rect(hx+2,hy+3,2,2,6); T.rect(hx+w-4,hy+3,2,2,6); T.rect(hx+Math.floor(w/2)-1,hy+h-4,3,4,7); };
+  house(14,120,18,14,1,2); house(36,124,14,11,3,4); house(96,122,16,12,3,2); house(116,126,14,10,1,4); house(160,124,16,12,1,2);
+  /* Moot Hall with bell tower (five empty arches) */
+  T.rect(58,112,32,24,3); T.poly([[55,112],[93,112],[74,98]],4); T.rect(68,70,12,32,1); T.poly([[66,70],[82,70],[74,56]],2);
+  for(let i=0;i<5;i++){ T.rect(69+i*2,76,1,5,8); }
+  T.rect(71,118,6,18,7); T.rect(62,118,4,4,6); T.rect(82,118,4,4,6);
+  /* bakery chimney */
+  T.rect(118,112,3,8,5);
+  /* the old mill, leaning, over the dry ditch */
+  T.poly([[196,132],[222,132],[224,104],[198,102]],1); T.poly([[194,102],[226,104],[212,88]],4); T.rect(206,118,6,14,7); T.rect(201,110,4,4,6); T.rect(214,111,4,4,6);
+  blit(T,{1:"#efe2c6",2:"#c4553e",3:"#d9c29a",4:"#7a5a8e",5:"#8a6a58",6:"#ffe79a",7:"#6b4a34",8:"#3a2a3a"},{shade:{1:"#cdbb98",3:"#b7a079",2:"#8e3a2c",4:"#553c66"},hi:{2:"#e07a5c",4:"#9b7ab0"}});
+  /* water wheel */
+  const Wh = Layer(); Wh.ell(232,128,15,15,9); Wh.ell(232,128,11,11,0);
+  for(let k=0;k<8;k++){ const a=k*Math.PI/4; Wh.line(232,128,232+Math.cos(a)*15,128+Math.sin(a)*15,9); } Wh.ell(232,128,3,3,9);
+  blit(Wh,{9:"#8a5a3c"},{outline:"#3a2418"});
+  /* a goblin with a bell on its head, peeking from the ditch */
+  const G = Layer(); G.ell(250,151,4,4,1); G.rect(247,154,7,4,2); G.poly([[246,148],[254,148],[250,142]],3); G.set(248,151,4); G.set(251,151,4); G.poly([[244,150],[246,151],[244,152]],1); G.poly([[256,150],[254,151],[256,152]],1);
+  blit(G,{1:"#8fbf6a",2:"#6a7a5a",3:"#e2b84a",4:"#1a1020"},{shade:{3:"#b88a2a"}});
+  /* Sergeant Honk, foreground left */
+  const Gs = Layer(); Gs.ell(40,160,11,7,1); Gs.rect(44,146,4,12,1); Gs.ell(46,145,4,3.5,1); Gs.poly([[49,144],[55,145],[49,147]],2); Gs.rect(38,165,2,6,2); Gs.rect(44,165,2,6,2);
+  Gs.rect(43,150,6,3,3); Gs.rect(43,150,2,3,4); Gs.rect(47,150,2,3,5); Gs.set(47,144,6);
+  blit(Gs,{1:"#fbfbf6",2:"#f09a3c",3:"#d9463a",4:"#4f86d0",5:"#f4c542",6:"#1a1020"},{shade:{1:"#cfd3dc"}});
+  /* flags for the Pie Fair */
+  for(let i=0;i<24;i++){ const fx=92+i*4, fy=106+Math.round(Math.sin(i/3)*2); rect(fx,fy,3,3,["#d9463a","#f4c542","#4f86d0","#7cc58a"][i%4]); }
+  for(let xx=92;xx<188;xx++) put(xx,105+Math.round(Math.sin((xx-92)/12)*2),hex("#4a3a3a"));
+
+  const base = new Uint8ClampedArray(d);
+  const notes = Array.from({length:6},(_,i)=>({t:i/6, x:0}));
+  const smoke = Array.from({length:8},(_,i)=>({t:i/8}));
+  let frame = 0, last = 0, on = false; const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const NOTE = ["..kk","..kkk",".k.k","..k.","..k.",".kk.","kkk.",".k.."];
+  function paint(){
+    d.set(base);
+    notes.forEach((n,i)=>{ n.t=(n.t+.012)%1; const nx=232+Math.round(Math.sin(n.t*9+i)*10)+(i%3-1)*6, ny=150-n.t*90; if(n.t>.05&&n.t<.9){ const col=hex(n.t<.5?"#fff3b0":"#f4c542");
+      NOTE.forEach((row,yy)=>{ for(let xx=0;xx<row.length;xx++) if(row[xx]==="k") put(nx+xx,ny+yy,col); }); } });
+    smoke.forEach((s,i)=>{ s.t=(s.t+.015)%1; const sx=119+Math.round(Math.sin(s.t*6+i)*2), sy=110-s.t*30; if(s.t<.8) put(sx,sy,hex(s.t<.4?"#f4f0ea":"#cfc6c0")); });
+    for(let k=0;k<6;k++){ const yy=130+((frame*2+k*9)%50); put(292+Math.round(Math.sin(yy/9)*4)+(k%3)*3-3,yy,hex("#d8ecff")); }
+    x.putImageData(img,0,0);
+  }
+  function loop(ts){ if(!on) return; if(ts-last>=80){ last=ts; frame++; paint(); } requestAnimationFrame(loop); }
+  paint();
+  const mini = $("#mini"); if(mini){ const m = mini.getContext("2d"); m.imageSmoothingEnabled = false; m.drawImage(cv, 40, 50, 240, 100, 0, 0, 120, 50); }
+  return {start(){ if(on) return; on = true; if(!reduce) requestAnimationFrame(loop); }, stop(){ on = false; }};
+})();
+
+const PLAYER_DATA = {"chapters":[{"n":1,"t":"Ring Out, Wild Bells","z":"第一章・鐘聲響起"},{"n":2,"t":"Please Ring for Service","z":"第二章・請按鈴服務"},{"n":3,"t":"Lost Track of Time","z":"第三章・忘了時間"},{"n":4,"t":"The King's Marbles","z":"第四章・國王的彈珠"},{"n":5,"t":"Keep Your Temper","z":"第五章・留住你的脾氣"}],"handouts":[{"ch":1,"cap":"The brass plaque on the door.","x":"THIMBLEWICK'S\nLOST & FOUND\n~ Nothing Is Lost Forever ~\n\nPlease Ring for Service\n\n(Closed for Repairs)","zh":"門上的黃銅銘牌：希姆布威克的失物招領處／沒有東西會永遠遺失／請按鈴（敲鐘）服務／（維修中，暫停營業）"},{"ch":2,"cap":"The Sisters' Song, all five lines.","x":"THE SISTERS' SONG\n\nOne for Dora, soft and round,\nTwo for Dot, the highest sound,\nThree for Delia, sweet as tea,\nFour for Dinah, low and free,\nFive, Big Doris, last and deep:\nGoodnight, Kettlebrook. Go to sleep.","zh":"五姊妹之歌，五句全部：一是朵拉，圓圓又輕柔／二是朵特，聲音最高／三是迪莉亞，甜得像茶／四是黛娜，低沉又自在／五是大朵莉絲，最後也最低沉：／晚安，凱托溪鎮。睡覺吧。"},{"ch":4,"cap":"The Royal Marble List.","x":"THE KING'S MARBLES\n\n1  a big gold swirly marble\n2  a small blue spotted marble\n3  a big green striped marble\n4  a small purple swirly marble\n5  a big red starry marble\n\nPlease bring them home.","zh":"皇家彈珠清單：國王的彈珠／1 一顆大的金色漩渦紋彈珠／2 一顆小的藍色圓點彈珠／3 一顆大的綠色條紋彈珠／4 一顆小的紫色漩渦紋彈珠／5 一顆大的紅色星星彈珠／請把它們帶回家。"},{"ch":5,"cap":"The riddle stone the company found.","x":"(a big grinning face)\n\nI sleep where lost things sleep.\nCome and find me!\n\nP.","zh":"長路隊找到的謎語石：（一張咧嘴大笑的臉）我睡在失物沉睡的地方。來找我吧！P."},{"ch":5,"cap":"Card: true things the Mayor can say to his temper.","x":"WORDS FOR THE MAYOR\n\nI'm sorry.\nI was scared of you.\nI missed you.","zh":"卡片：鎮長可以對他的脾氣說的真心話：I'm sorry.（對不起。）I was scared of you.（我很怕你。）I missed you.（我很想你。）"},{"ch":5,"cap":"Joke card 1: riddles.","x":"RIDDLES\n\nWhat has hands\nbut can't clap?\n\nWhat has keys\nbut can't open a door?\n\nWhat gets wetter\nwhen it dries?\n\nWhat has a neck\nbut no head?\n\nWhat goes up and down\nbut never moves?\n\n(Answers: a clock · a piano · a towel · a bottle · stairs)","zh":"笑話卡一：謎語：什麼東西有手卻不能拍手？什麼東西有鑰匙（琴鍵）卻打不開門？什麼東西越擦越濕？什麼東西有脖子卻沒有頭？什麼東西會上上下下卻從來不動？（答案：時鐘・鋼琴・毛巾・瓶子・樓梯）"},{"ch":5,"cap":"Joke card 2: knock-knock jokes.","x":"KNOCK, KNOCK\n\nKnock, knock.\nWho's there?\nBoo.\nBoo who?\nDon't cry! It's only a joke!\n\nKnock, knock.\nWho's there?\nInterrupting dragon.\nInterrupting drag-\nROAR!","zh":"笑話卡二：叩叩叩笑話：「叩叩叩。」「誰？」「布。」「布什麼？」（Boo who 聽起來像哭聲 boohoo）「別哭！只是個笑話！」——「叩叩叩。」「誰？」「插嘴的龍。」「插嘴的龍什……」「吼！」"},{"ch":5,"cap":"Joke card 3: fill in the gap.","x":"FILL IN THE GAP\n\nWhy did the goose\ncross the road?\nTo find a ______!\n\nOnce, I lost my ______\nin the ______,\nand a ______ found it!","zh":"笑話卡三：填空：鵝為什麼要過馬路？為了找一個＿＿！——有一次，我把我的＿＿弄丟在＿＿裡，結果一隻＿＿找到了它！"},{"ch":5,"cap":"The new brass plaque over the cellar door.","x":"THIMBLEWICK'S LOST & FOUND\n~ Nothing Is Lost Forever ~\nOPEN","zh":"地窖門上新的黃銅牌子：希姆布威克的失物招領處／～沒有東西會永遠遺失～／營業中"}],"puzzles":[{"ch":2,"t":"bells"},{"ch":2,"t":"socks"},{"ch":3,"t":"clock"},{"ch":4,"t":"marbles"}],"words":{"1":[{"h":"People & creatures · 人物與生物","list":[["baker","烘焙師"],["mayor","鎮長"],["sheriff ★","警長"],["wizard","巫師；法師"],["gnome ★","地侏"],["goblin","哥布林"],["goose / geese","鵝（單數／複數）"],["sergeant ★","中士"],["a thief / thieves","小偷（單數／複數）"]]},{"h":"Places & things · 地點與物品","list":[["town square","廣場"],["bell tower","鐘塔"],["arch / arches ★","拱門"],["hook","鉤子"],["stairs","樓梯"],["pond","池塘"],["mill / watermill ★","磨坊／水車磨坊"],["water wheel","水車"],["pit","坑"],["trapdoor ★","地板活門"],["ladder","梯子"],["brass ★","黃銅"],["plaque ★","銘牌"],["grille ★","格柵"],["slot","投入口"],["chute ★","滑槽"],["wheelbarrow ★","獨輪手推車"],["button","鈕扣"],["helmet","頭盔"],["scarf","圍巾"],["cardigan ★","開襟毛衣"],["teacup","茶杯"],["rolling pin ★","擀麵棍"]]},{"h":"Food · 食物","list":[["pie","派"],["custard ★","卡士達"],["flour","麵粉"],["bread","麵包"],["cheese","起司"]]},{"h":"Investigating · 調查","list":[["a clue","線索"],["footprints","腳印"],["handprints","手印"],["tracks ★","痕跡；足跡"],["a trail","一路留下的痕跡"],["to steal / stolen","偷／被偷的"],["to search","搜尋"],["to follow","跟蹤；沿著走"],["to investigate ★","調查"],["to surrender ★","投降"]]},{"h":"Describing people · 形容人","list":[["loud / quiet","大聲的／安靜的"],["meek ★","溫順的、軟弱的"],["grumpy ★","脾氣不好的"],["huffy ★","氣呼呼的"],["proud","驕傲的"],["nervous","緊張的"],["hungry","餓的"],["professional ★","專業的"]]},{"h":"Sounds · 聲音","list":[["to ring","（鐘）響；敲鐘"],["BONG","噹（鐘聲）"],["to honk","（鵝）呱呱叫"],["to shout","大喊"],["to whisper","小聲說"],["to hum","哼歌"],["a lullaby ★","搖籃曲"]]},{"h":"Animals & magic · 動物與魔法","list":[["a beast ★","野獸、動物"],["to change shape ★","變身、變形"],["a familiar ★","魔寵"],["a wing","翅膀"],["a beak","鳥嘴"],["a feather","羽毛"],["to swim","游泳"],["to fly","飛"],["Honk!","呱！（鵝叫聲）"],["Be nice!","乖一點！"],["Good goose!","好鵝！乖鵝！"]]},{"h":"Useful phrases · 實用句子","list":[["It's not fair!","這不公平！"],["Lost and found","失物招領"],["Please ring for service.","需要服務請按鈴。"],["What do you do?","你要做什麼？"],["Where did you go last night?","你昨晚去了哪裡？"],["Can I roll Investigation?","我可以擲調查檢定嗎？"]]},{"idiom":1,"en":"to lose your temper","zh":"發脾氣、失去冷靜","ex":"The Mayor never loses his temper. Not anymore.","exz":"鎮長再也不發脾氣了。現在不會了。","note":"Your *temper* is your mood: how calm or angry you are. When you *lose your temper*, your calm is gone, and you suddenly get very angry and shout. English uses *lose* for lots of things you can't hold in your hand: you can lose your temper, your way (get lost), your nerve (get scared), or your marbles (go a little crazy). In Kettlebrook, some of those things might end up somewhere very strange...","nz":"temper 是你的脾氣、心情：你有多冷靜或多生氣。lose your temper 就是你的冷靜不見了，你突然非常生氣、大吼大叫。英文很多摸不到的東西也可以用 lose（弄丟）：lose your temper（發脾氣）、lose your way（迷路）、lose your nerve（失去勇氣、害怕）、lose your marbles（有點瘋了）。在凱托溪鎮，這些東西有些可能會跑到很奇怪的地方去……"}],"2":[{"h":"Counting and order · 數字與順序","list":[["one, two, three, four, five","一、二、三、四、五"],["first, second, third, fourth, fifth","第一、第二、第三、第四、第五"],["last","最後的"],["next","下一個"],["in the right order","照正確的順序"],["Which one is first?","哪一個是第一個？"]]},{"h":"Songs and sounds · 歌與聲音","list":[["a song / to sing","歌／唱歌"],["a line (of a song) ★","（歌的）一句"],["a rhyme ★","押韻的詩；童謠"],["high / low","高的／低的（聲音）"],["soft / deep","輕柔的／低沉的"],["to chant ★","有節奏地唸"],["to jump rope","跳繩"],["to glow ★","發光"]]},{"h":"The Lost-and-Found · 失物招領處","list":[["a notice board ★","公告欄"],["lost / found","遺失的／找到的"],["a counter","櫃台"],["a drawer","抽屜"],["a cabinet ★","櫃子"],["a shelf / shelves","架子（單數／複數）"],["a key","鑰匙"],["to wind up ★","上發條"],["clockwork ★","發條裝置"],["a clerk ★","辦事員"],["a form","表格"],["a stamp","印章"],["a ticket","票；單子"],["to return","歸還"]]},{"h":"Socks · 襪子","list":[["a sock / a pair of socks","一隻襪子／一雙襪子"],["striped","條紋的"],["spotted","有圓點的"],["starry","有星星的"],["plain","素面的"],["zigzag","鋸齒紋的"],["They match!","它們是一對！"]]},{"h":"Things people lost · 大家弄丟的東西","list":[["a wedding ring","結婚戒指"],["a spoon","湯匙"],["an ear trumpet ★","助聽喇叭"],["a wedding","婚禮"],["a cousin","表／堂兄弟姊妹"],["a recipe ★","食譜"],["cabbage","高麗菜"]]},{"h":"Useful phrases · 實用句子","list":[["Please ring for service.","需要服務請按鈴。"],["Next, please.","下一位。"],["What did you lose?","你弄丟了什麼？"],["When did you lose it?","你什麼時候弄丟的？"],["Does that ring a bell?","有印象嗎？（聽起來耳熟嗎？）"],["I forgot what I was saying.","我忘了我要說什麼。"],["Please, I am a friend.","拜託，我是朋友。"],["What does he say?","他說什麼？"]]},{"idiom":1,"en":"to lose your train of thought","zh":"忘了自己要說什麼、思路中斷","ex":"Barty lost his train of thought. Twelve years later, Tock found it.","exz":"巴提忘了他要說什麼。十二年後，托克找到了他的思路列車。","note":"A *train* is a line of cars, one after another. A *train of thought* is a line of ideas, one after another, like those cars. If you *lose your train of thought*, the line breaks, and you forget what you were going to say. In the Lost-and-Found, it became a real toy train.","nz":"train 是一節接一節的火車車廂。train of thought（思路）就是一個接一個的想法，像一列火車。lose your train of thought 就是這串想法斷掉了，你忘了自己本來要說什麼。在失物招領處裡，它變成了一列真的玩具火車。"},{"idiom":1,"en":"to ring a bell","zh":"聽起來耳熟、有印象","ex":"\"Does 'One for Dora' ring a bell?\" \"RING A BELL? I RING FIVE!\"","exz":"「『一是朵拉』有沒有讓你想起什麼？」「想起什麼？我每天敲五口鐘！」","note":"A bell rings to remind you of something, like a school bell or a doorbell. If a name or a face *rings a bell*, it reminds you of something: you remember it a little, but not everything. Gus is a bell-ringer, so he takes it very personally.","nz":"鈴聲會提醒你某件事，像學校的鐘聲或門鈴。如果一個名字或一張臉 rings a bell，就是它讓你想起了什麼：你記得一點點，但不是全部。格斯是敲鐘的人，所以他對這句話特別有感覺。"}],"3":[{"h":"Telling the time · 看時間","list":[["What time is it?","現在幾點？"],["It's three o'clock.","三點整。"],["It's quarter past three.","三點十五分。"],["It's half past three.","三點半。"],["It's quarter to four.","三點四十五分（差十五分四點）。"],["It's ten past three.","三點十分。"],["It's twenty to four.","三點四十分（差二十分四點）。"],["midnight / noon","午夜／中午"],["a minute / a second / an hour","一分鐘／一秒／一小時"],["late / on time / early","遲到的／準時的／早到的"]]},{"h":"Days · 日子","list":[["Friday / Saturday","星期五／星期六"],["yesterday / today / tomorrow","昨天／今天／明天"],["again","又；再一次"],["the same day","同一天"],["every day","每天"],["a wedding","婚禮"]]},{"h":"The Time Department · 時間部","list":[["a clock / a clock face","時鐘／鐘面"],["the hands (of a clock)","（時鐘的）指針"],["a pendulum ★","鐘擺"],["a gear ★","齒輪"],["an hourglass ★","沙漏"],["sand","沙子"],["a track ★","軌道"],["a bridge","橋"],["a sprite ★","小精靈"],["a cuckoo clock ★","布穀鳥鐘"]]},{"h":"Useful phrases · 實用句子","list":[["I've been here before.","我來過這裡。"],["It happened again!","又發生了！"],["Hurry up!","快一點！"],["We're running out of time.","我們快沒時間了。"],["Just in time!","剛好來得及！"],["Can I try again?","我可以再試一次嗎？"]]},{"idiom":1,"en":"to lose track of time","zh":"忘了時間、沒注意到時間過了多久","ex":"The twins lost track of time jumping rope. The spell took their track.","exz":"雙胞胎跳繩跳到忘了時間。咒語就把他們的「軌道」拿走了。","note":"A *track* is a path, like a railway track. To *keep track* of something means to follow it, so you always know where it is or how it's changing. When you *lose track of time*, you stop following the clock, because you are busy or happy, and you don't know what time it is anymore. In the Lost-and-Found, the \"track\" became a real piece of railway track.","nz":"track 是一條路，像鐵軌（railway track）。keep track of 某件事，就是一直跟著它，所以你總是知道它在哪裡、怎麼變化。lose track of time 就是你因為太忙或太開心，不再注意時鐘，已經不知道現在幾點了。在失物招領處裡，這個 track 變成了一段真的鐵軌。"},{"idiom":1,"en":"to lose your marbles","zh":"（口語）瘋了、失去理智","ex":"\"My king has lost his marbles!\"","exz":"「我的國王失去了他的彈珠！」（也就是：我的國王瘋了！）","note":"*Marbles* are small glass balls children play with. In old American slang, your *marbles* were your good sense. So if someone has *lost their marbles*, they have lost their good sense: they are acting a little crazy. What happens when the Lost-and-Found takes that literally? Chapter 4.","nz":"marbles 是小孩玩的小玻璃彈珠。在老式的美國俚語裡，你的 marbles 指的是你的理智。所以如果有人 lost their marbles，就是他失去了理智：行為有點瘋瘋的。如果失物招領處把這句話當真，會發生什麼事？請看第四章。"}],"4":[{"h":"Describing things · 形容東西","list":[["big / small","大的／小的"],["gold / blue / green / purple / red","金色／藍色／綠色／紫色／紅色"],["striped","有條紋的"],["spotted","有圓點的"],["swirly ★","有漩渦紋的"],["starry","有星星的"],["plain","素面的、沒有花紋的"],["a big gold swirly marble","一顆大的金色漩渦紋彈珠"]]},{"h":"Under the ground · 地底下","list":[["a mine","礦坑"],["a tunnel ★","隧道"],["a hole","洞"],["to dig / dug","挖／挖了"],["a cave","洞穴"],["stone / marble ★","石頭／大理石"],["a lamp / a lantern ★","燈／燈籠"],["to crawl","爬"]]},{"h":"Lost Luggage · 遺失行李","list":[["luggage ★","行李"],["a suitcase","行李箱"],["a bag","袋子、包包"],["a trunk ★","大皮箱"],["a hatbox ★","帽盒"],["a label","標籤"],["Do not open.","請勿打開。"],["a mimic ★","擬態怪"]]},{"h":"Making peace · 和平相處","list":[["We come in peace.","我們是帶著和平來的。"],["Please stop!","請停下來！"],["Let's talk.","我們談談吧。"],["I'm sorry.","對不起。"],["It's a deal.","一言為定。"],["Who are you?","你是誰？"],["I promise.","我保證。"],["Thank you for telling me.","謝謝你告訴我。"]]},{"h":"Useful phrases · 實用句子","list":[["Which way is the Marble Mine?","彈珠礦坑往哪邊走？"],["Is it far?","很遠嗎？"],["Where is the king?","國王在哪裡？"],["We're here to help.","我們是來幫忙的。"],["Have you seen a red marble?","你有看到一顆紅色彈珠嗎？"],["It rolled down the stairs.","它滾下樓梯了。"],["Please let us through. ★","請讓我們過去。"]]},{"idiom":1,"en":"to lose your marbles","zh":"（口語）瘋了、失去理智","ex":"\"My king has lost his marbles!\"","exz":"「我的國王失去了他的彈珠！」（也就是：我的國王瘋了！）","note":"*Marbles* are small glass balls. In old American slang, your *marbles* were your good sense, so someone who has *lost their marbles* is acting a little crazy. King Clattertail lost five real ones: his Memory, Manners, Good Sense, Dignity, and Good Aim.","nz":"marbles 是小玻璃彈珠。在老式的美國俚語裡，你的 marbles 指的是你的理智，所以 lost their marbles 的人，行為有點瘋瘋的。叮噹尾國王弄丟了五顆真的彈珠：他的記性、禮貌、判斷力、尊嚴，還有準頭。"},{"idiom":1,"en":"to lose your temper","zh":"發脾氣、生氣失控","ex":"Fifty years ago, Horace lost his temper at the Pie Fair.","exz":"五十年前，霍瑞斯在派餅市集上發了脾氣。","note":"Your *temper* is your mood: how calm or angry you are. When you *lose your temper*, your calm is gone. You suddenly get very angry and shout. Most people get their temper back a minute later. Horace never did. It's still in Deep Storage.","nz":"temper 是你的脾氣、心情：你有多冷靜或多生氣。lose your temper 就是你的冷靜不見了，你突然非常生氣、大吼大叫。大部分的人一分鐘後就會把脾氣找回來。霍瑞斯從來沒有。它還在深層倉庫裡。"}],"5":[{"h":"Saying no, kindly · 溫和地說不","list":[["No.","不。"],["No, thank you.","不了，謝謝。"],["I was wrong to promise.","我不該答應的。"],["That isn't mine to give.","那不是我可以送人的。"],["But I can...","但是我可以……"],["May I borrow it? ★","我可以借它嗎？"],["I'm sorry about your chimney.","你家煙囪的事，對不起。"]]},{"h":"Jokes and riddles · 笑話與謎語","list":[["a joke","笑話"],["a riddle ★","謎語"],["funny","好笑的"],["to laugh / a laugh","笑（動詞／名詞）"],["boring","無聊的"],["Knock, knock. / Who's there?","叩叩叩。／是誰？"],["I don't get it!","我聽不懂笑點！"]]},{"h":"Dragons · 龍","list":[["a dragon","龍"],["wings / a tail / claws ★","翅膀／尾巴／爪子"],["treasure ★","寶藏"],["to fly / flew","飛／飛了"],["to sulk ★","生悶氣"],["copper ★","銅"]]},{"h":"Feelings · 感覺","list":[["calm","平靜的"],["angry","生氣的"],["brave ★","勇敢的"],["scared","害怕的"],["proud","驕傲的"],["upset","難過的、不高興的"]]},{"h":"Useful phrases · 實用句子","list":[["Are you OK?","你還好嗎？"],["Do you want to hear a joke?","你想聽一個笑話嗎？"],["Let me tell you a story.","讓我說個故事給你聽。"],["Here's a gift for you.","這是送你的禮物。"],["It was my fault. ★","是我的錯。"],["This is mine. I lost it.","這是我的。是我弄丟的。"],["I'd like to claim this, please. ★","我想認領這個，麻煩你。"]]},{"idiom":1,"en":"to keep your temper","zh":"保持冷靜、不發脾氣","ex":"\"You're not twenty-two anymore. You can keep your temper this time.\"","exz":"「你已經不是二十二歲了。這次你可以留住你的脾氣。」（也就是：這次你可以保持冷靜。）","note":"To *keep your temper* means to stay calm, even when you're angry. In Kettlebrook it means two things: stay calm, and hold on to your temper so you don't lose it again.","nz":"keep your temper 就是即使生氣也保持冷靜。在凱托溪鎮，它有兩個意思：保持冷靜，還有緊緊抓住你的脾氣，別再把它弄丟了。"},{"idiom":1,"en":"a storm in a teacup","zh":"茶杯裡的風暴（小題大作）","ex":"\"All that noise, and it was only a storm in a teacup.\"","exz":"「吵成那樣，結果只是茶杯裡的風暴。」（也就是：小事一樁，大驚小怪。）","note":"A storm is huge, and a teacup is tiny. A *storm in a teacup* is a lot of anger or worry about something very small. In Deep Storage, the Mayor's temper is a real storm in a real teacup.","nz":"暴風雨很大，茶杯很小。a storm in a teacup（茶杯裡的風暴）就是為了一件很小的事大發脾氣或大驚小怪。在深層倉庫裡，鎮長的脾氣真的是一個真茶杯裡的真風暴。"},{"idiom":1,"en":"fair and square","zh":"公平公正、光明正大","ex":"\"Let's settle it fair and square: three riddles each.\"","exz":"「我們公平公正地解決吧：各出三題謎語。」","note":"*Fair* means everyone gets the same chance. *Square* is an old word for honest: a *square deal* is an honest deal. The two words rhyme, so people say them together: *fair and square* means honestly, with no tricks. Penny and Rowan need a fair and square way to settle the harp.","nz":"fair 是公平，每個人都有一樣的機會。square 是「誠實」的老說法：a square deal 就是一筆誠實的交易。這兩個字押韻，所以大家把它們放在一起說：fair and square 就是光明正大、沒有耍花招。小銅和羅雯需要一個公平公正的方法來解決豎琴的事。"},{"idiom":1,"en":"I'm losing it!","zh":"我快抓狂了！（我快弄丟它了！）","ex":"\"Oh no, I'm losing it!\"","exz":"「糟了，我快抓不住了！」","note":"Usually, *it* means your calm. People say *I'm losing it!* when they're about to get very angry or upset. Penny meant something else: her harp, really slipping out of her claws. The spell heard the words, and took the harp.","nz":"通常這裡的 it 指的是你的冷靜。快要非常生氣或崩潰的時候，大家會說 I'm losing it!（我快抓狂了！）。小銅的意思不一樣：她指的是她的豎琴，真的正從她的爪子間滑走。咒語聽到了這句話，就把豎琴收走了。"}]}};
+const PLAYER_LOCKED_GROUPS = ["4|Lost Luggage · 遺失行李"];
+/* =========================================================
+   KETTLEBROOK · PLAYER'S BOOK — handouts, puzzles and words for the players.
+   No DM text: everything here comes from PLAYER_DATA, which build_player.py
+   pulls from the DM guide's chapter data, so the two never drift apart.
+   Locked items open with one tap, when the DM says so.
+   ========================================================= */
+const D = PLAYER_DATA;
+/* ---------- state ---------- */
+let opened = store.get("open", {});
+let curCh = store.get("ch", 0);
+const isOpen = id => !!opened[id];
+
+/* ---------- locks ---------- */
+const lockBox = (id, en, zh) => `<button class="plock" data-act="unlock" data-id="${id}">
+  <span class="lk">🔒</span><span class="lt"><b>${esc(en)}</b><span class="zh">${esc(zh)}</span>
+  <span class="small muted">Open it when your DM says. <span class="zh tr">主持人說可以時再打開。</span></span></span></button>`;
+ACTS.unlock = b => { opened[b.dataset.id] = 1; store.set("open", opened); Music.sfx("click"); render(); };
+
+/* ---------- pieces ---------- */
+const PUZ = {
+  bells:  {en:"The bell door", zh:"鐘門", how:"Ring the five bells in the right order.", hz:"照正確的順序敲響五口鐘。"},
+  socks:  {en:"The odd-sock pile", zh:"單隻襪子堆", how:"Find two socks that match. Say what they look like!", hz:"找出兩隻一樣的襪子，說說看它們長什麼樣子！"},
+  clock:  {en:"What time is it?", zh:"現在幾點？", how:"Look at the clock. Say the time in English.", hz:"看時鐘，用英文說出時間。"},
+  marbles:{en:"The Marble Pit", zh:"彈珠池", how:"Find the king's marbles. Read the list, then look carefully.", hz:"找出國王的彈珠。先讀清單，再仔細找。"}
+};
+const widget = t => t === "bells" ? bellsHTML(true) : t === "socks" ? socksHTML(true) : t === "clock" ? clockHTML(true) : marblesHTML(true);
+function puzzleTools(t){
+  const full = `<button class="btn sm" data-act="full" data-t="${t}">⛶ Full screen 全螢幕</button>`;
+  if(t === "bells") return `<button class="btn sm${BELL.glow ? " on" : ""}" data-act="pSing">🎵 We sing the song 我們唱歌</button><button class="btn sm" data-act="pBellReset">↺ Start again 重來</button>${full}`;
+  if(t === "socks") return `<button class="btn sm" data-act="sockDeal">↺ New pile 新的一堆</button>${full}`;
+  if(t === "clock"){ const W = clockWords(CLOCK.h, CLOCK.m);
+    return `<button class="btn sm" data-act="clockNew">🎲 New time 換時間</button><button class="btn sm${CLOCK.shown ? " on" : ""}" data-act="clockShow">✓ Check 對答案</button><button class="btn sm${CLOCK.hard ? " on" : ""}" data-act="clockHard">${CLOCK.hard ? "Hard: every 5 minutes 難" : "Easy: o'clock, quarter, half 簡單"}</button>${full}
+      <div class="pans">${CLOCK.shown ? `<b class="okc">${esc(W.en)}</b> ${SAY(W.en)}${W.en2 ? `<div class="muted small">or: ${esc(W.en2)} ${SAY(W.en2)}</div>` : ""}<div class="zh">${esc(W.zh)}</div>` : ""}</div>`; }
+  return `<button class="btn sm" data-act="marbleDeal">↺ New pile 新的一堆</button><button class="btn sm${MARB.hard ? " on" : ""}" data-act="marbleHard">${MARB.hard ? "Hard: almost the same 難" : "Easy: clearly different 簡單"}</button>${full}`;
+}
+function puzzleHTML(t){ const P = PUZ[t];
+  return `<div class="pz" data-pz="${t}"><h4 class="px gold">${esc(P.en)} <span class="zh">${esc(P.zh)}</span></h4>
+    <p class="small">${esc(P.how)} <span class="zh tr">${esc(P.hz)}</span></p>
+    <div class="pzw">${widget(t)}</div><div class="row wbtns ptools">${puzzleTools(t)}</div></div>`; }
+/* the DM-guide widgets redraw themselves; the player's buttons sit outside them, so refresh those too */
+const toolsRefresh = () => $$(".pz").forEach(p=>{ const b = p.querySelector(".ptools"); if(b) b.innerHTML = puzzleTools(p.dataset.pz); });
+["clockNew","clockShow","clockHard","marbleHard","sockDeal","marbleDeal"].forEach(k=>{ const f = ACTS[k]; ACTS[k] = b => { f(b); toolsRefresh(); }; });
+ACTS.pSing = () => { BELL.glow = !BELL.glow; store.set("kb-glow", BELL.glow); bellsRefresh(); toolsRefresh(); };
+ACTS.pBellReset = () => { ACTS.bellReset(); toolsRefresh(); };
+ACTS.full = b => { const P = $("#present"); P.innerHTML = widget(b.dataset.t); P.classList.add("on"); document.body.classList.add("presenting"); };
+function endPresent(){ const P = $("#present"); P.classList.remove("on"); P.innerHTML = ""; document.body.classList.remove("presenting"); }
+
+function handoutHTML(h, i){
+  return `<div class="hwrap"><div class="showable" data-act="showH" data-i="${i}" role="button" tabindex="0" title="Show big 放大"><div class="handout">${hlines(h.x)}</div></div>
+    <div class="mapcap">${esc(h.cap)} <span class="small muted">(tap to see it big 點一下放大)</span>${h.zh ? `<span class="zh tr">${esc(h.zh)}</span>` : ""}</div></div>`; }
+ACTS.showH = b => { const h = D.handouts[+b.dataset.i]; const P = $("#present");
+  P.innerHTML = `<div class="handout big">${hlines(h.x)}</div>`; P.classList.add("on"); document.body.classList.add("presenting");
+  const H = P.querySelector(".handout"); let f = 12; H.style.fontSize = f + "px";
+  const fits = ()=>[...H.querySelectorAll(".hl span")].every(l=>l.offsetWidth <= H.clientWidth * .86) && H.offsetHeight < innerHeight * .9;
+  while(f < 64 && fits()){ f += 1; H.style.fontSize = f + "px"; } H.style.fontSize = (f - 1) + "px"; };
+
+const wordsHTML = list => `<div class="wlist">${list.map(w=>`<div class="li"><div class="main"><b>${esc(w[0])}</b> ${SAY(w[0].replace(/ ★$/,""))}<span class="zh">${esc(w[1])}</span></div></div>`).join("")}</div>`;
+const idiomHTML = b => `<div class="idiom"><div class="px gold" style="font-size:24px">${esc(b.en)} ${SAY(b.en)}</div><div class="zh">${esc(b.zh)}</div>
+  <p><i>${esc(b.ex)}</i> ${SAY(b.ex)}<span class="zh">${esc(b.exz)}</span></p><p class="small">${mdi(b.note)}</p>${b.nz ? `<p class="zh small">${esc(b.nz)}</p>` : ""}</div>`;
+/* word groups that would give away a surprise stay locked, like the handouts */
+const LOCKED_GROUPS = PLAYER_LOCKED_GROUPS;
+
+/* ---------- pages ---------- */
+function home(){
+  return `<div class="ptitle"><div class="kick px">PLAYER'S BOOK · 玩家手冊</div><h2 class="gold">The Lost-and-Found of Kettlebrook</h2><div class="zh">凱托溪鎮的失物招領處</div></div>
+  <div class="dm"><p>Handouts, puzzles and words for your adventure. Pick the chapter you're playing. Some things are 🔒 locked: open them when your DM says.</p>
+  <div class="zh">冒險要用的講義、謎題和單字。選你正在玩的章節。有些東西上了 🔒 鎖：主持人說可以時再打開。</div></div>
+  <div class="chlist">${D.chapters.map(c=>`<button class="chcard" data-act="goCh" data-ch="${c.n}"><span class="px num">${c.n}</span><span><b>${esc(c.t)}</b><span class="zh">${esc(c.z)}</span></span></button>`).join("")}</div>
+  <p class="small muted">Tap 🔊 to hear a word. Tap ⚙️ to hide the Chinese, change the text size, or slow down the voice. <span class="zh tr">點 🔊 聽發音。點 ⚙️ 可以隱藏中文、調整文字大小，或放慢朗讀速度。</span></p>`; }
+function chapter(n){
+  const C = D.chapters[n-1];
+  const hs = D.handouts.map((h,i)=>[h,i]).filter(([h])=>h.ch === n);
+  const pz = D.puzzles.filter(p=>p.ch === n);
+  let k = 0, out = `<div class="ptitle"><div class="kick px">CHAPTER ${n} · 第 ${n} 章</div><h2 class="gold">${esc(C.t)}</h2><div class="zh">${esc(C.z)}</div></div>`;
+  if(hs.length) out += `<h3 class="bh">📜 Handouts <span class="zh">講義</span></h3>` + hs.map(([h,i],j)=>{ const id = "h" + i; return isOpen(id) ? handoutHTML(h,i) : lockBox(id, `Handout ${j+1}`, `講義 ${j+1}`); }).join("");
+  if(pz.length) out += `<h3 class="bh">🧩 Puzzles <span class="zh">謎題</span></h3>` + pz.map((p,j)=>{ const id = "p" + p.t; return isOpen(id) ? puzzleHTML(p.t) : lockBox(id, `Puzzle ${j+1}`, `謎題 ${j+1}`); }).join("");
+  out += `<h3 class="bh">✏️ My notes <span class="zh">我的筆記</span></h3>
+    <textarea class="notes" data-ch="${n}" placeholder="Names, clues, words to remember… 名字、線索、想記住的字……">${esc(store.get("notes" + n, ""))}</textarea>`;
+  const W = D.words[n] || [];
+  out += `<h3 class="bh">📖 Words <span class="zh">單字</span></h3><p class="small muted">★ = a harder word. <span class="zh tr">★ = 比較難的字。</span></p>`;
+  W.forEach(g=>{ if(g.idiom){ const id = `i${n}-${k++}`;
+      out += isOpen(id) ? `<h4 class="wh">💬 Idiom <span class="zh">慣用語</span></h4>` + idiomHTML(g) : lockBox(id, `Idiom ${k}`, `慣用語 ${k}`);
+    } else { const id = `w${n}-${g.h}`;
+      out += `<h4 class="wh">${esc(g.h)}</h4>` + (LOCKED_GROUPS.includes(`${n}|${g.h}`) && !isOpen(id) ? lockBox(id, "More words", "更多單字") : wordsHTML(g.list)); } });
+  out += `<div class="row chnav">${n > 1 ? `<button class="btn" data-act="goCh" data-ch="${n-1}">◀ Chapter ${n-1}</button>` : ""}<button class="btn" data-act="goCh" data-ch="0">☰ All chapters 全部章節</button>${n < 5 ? `<button class="btn" data-act="goCh" data-ch="${n+1}">Chapter ${n+1} ▶</button>` : ""}</div>`;
+  return out; }
+function render(){ const y = window.scrollY; $("#main").innerHTML = curCh ? chapter(curCh) : home(); fitHandouts($("#main")); window.scrollTo(0, y); }
+ACTS.goCh = b => { curCh = +b.dataset.ch; store.set("ch", curCh); render(); window.scrollTo(0, 0); };
+document.addEventListener("input", e=>{ const t = e.target.closest(".notes"); if(t) store.set("notes" + t.dataset.ch, t.value); });
+
+/* ---------- settings ---------- */
+let fs = store.get("fs", 17);
+function applyPrefs(){ document.documentElement.style.setProperty("--fs", fs + "px");
+  if(store.get("theme", "dark") === "light") document.documentElement.setAttribute("data-theme","light"); else document.documentElement.removeAttribute("data-theme");
+  document.body.classList.toggle("nozh", !store.get("zh", 1)); }
+function openSettings(){
+  const seg = (act, vals, cur) => `<div class="seg">${vals.map(([v,l])=>`<button data-act="${act}" data-v="${v}" class="${String(cur)===String(v)?"on":""}">${l}</button>`).join("")}</div>`;
+  $("#ovIn").innerHTML = `<div class="hd"><h3>⚙️ Settings 設定</h3><button class="ib" data-act="closeOv" aria-label="Close 關閉">✕</button></div>
+    <label class="fl">Chinese <span class="zh">中文</span></label>${seg("setZh", [[1,"Show 顯示"],[0,"Hide 隱藏"]], store.get("zh",1))}
+    <label class="fl">Text size <span class="zh">文字大小</span></label>${seg("setFs", [[15,"S"],[17,"M"],[19,"L"],[21,"XL"]], fs)}
+    <label class="fl">Look <span class="zh">外觀</span></label>${seg("setTheme", [["dark","Night 夜晚"],["light","Day 白天"]], store.get("theme","dark"))}
+    <label class="fl">Reading speed <span class="zh">朗讀速度</span></label>${seg("setRate", [[.7,"Slow 慢"],[.85,"A bit slow 稍慢"],[1,"Normal 正常"]], rate)}
+    <label class="fl">Sound effects <span class="zh">音效</span></label>${seg("setSfx", [[1,"On 開"],[0,"Off 關"]], Music.sfxVol > 0 ? 1 : 0)}
+    <hr class="hr"><p class="small">New players? Lock everything again, clear the notes and reset the puzzles.<span class="zh tr">換新玩家了嗎？重新上鎖、清除筆記，並重設所有謎題。</span></p>
+    <button class="btn sm red" data-act="resetBook">↺ Reset this book 重設手冊</button>`;
+  $("#ov").classList.add("on"); }
+ACTS.closeOv = () => $("#ov").classList.remove("on");
+ACTS.setZh = b => { store.set("zh", +b.dataset.v); applyPrefs(); openSettings(); };
+ACTS.setFs = b => { fs = +b.dataset.v; store.set("fs", fs); applyPrefs(); fitHandouts(); openSettings(); };
+ACTS.setTheme = b => { store.set("theme", b.dataset.v); applyPrefs(); openSettings(); };
+ACTS.setRate = b => { rate = +b.dataset.v; store.set("rate", rate); openSettings(); say("What time is it?"); };
+ACTS.setSfx = b => { Music.setSfx(+b.dataset.v ? .7 : 0); openSettings(); };
+ACTS.resetBook = () => { opened = {}; store.set("open", opened); [1,2,3,4,5].forEach(n=>store.set("notes" + n, ""));
+  ACTS.bellReset(); BELL.glow = false; store.set("kb-glow", false); sockDeal(); marbleDeal(); clockNew(); CLOCK.shown = false;
+  curCh = 0; store.set("ch", 0); ACTS.closeOv(); render(); toast("The book is ready for new players. 手冊已重設。"); };
+$("#ov").addEventListener("click", e=>{ if(e.target === $("#ov")) ACTS.closeOv(); });
+
+/* ---------- clicks ---------- */
+document.addEventListener("click", e=>{
+  const s = e.target.closest("[data-say]"); if(s){ e.preventDefault(); e.stopPropagation(); say(s.dataset.say, s); return; }
+  const a = e.target.closest("[data-act]"); if(a && ACTS[a.dataset.act]){ e.preventDefault(); ACTS[a.dataset.act](a, e); return; }
+});
+document.addEventListener("keydown", e=>{ if(e.key === "Escape"){ if(document.body.classList.contains("presenting")) endPresent(); else ACTS.closeOv(); }
+  if((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches("[data-say],[data-act]:not(button)")){ e.preventDefault(); e.target.click(); } });
+$("#present").addEventListener("click", e=>{ if(e.target.closest(".wdg") && !e.target.closest(".wclose")) return; endPresent(); });
+$("#setBtn").addEventListener("click", openSettings);
+$("#homeBtn").addEventListener("click", ()=>{ curCh = 0; store.set("ch", 0); render(); window.scrollTo(0,0); });
+$("#goBtn").addEventListener("click", e=>{ e.stopPropagation(); document.body.classList.remove("titled"); KScene.stop(); render(); });
+applyPrefs(); KScene.start(); render();
+
+</script>
+</body>
+</html>

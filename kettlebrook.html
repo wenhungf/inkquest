@@ -1868,7 +1868,7 @@ function gotoPage(id){ closeOv(); closeOv("#pop"); const i = PAGES.findIndex(p=>
 function renderPage(keepScroll){
   const P = PAGES[pageIdx], y = window.scrollY; stopSay();
   store.set("kb-page", P.id); if(P.ch) store.set("kb-lastch", P.ch);
-  $("#main").innerHTML = `<div class="ptitle"><div class="kick px">${esc(chapterName(P.ch || 0))}</div><h2>${esc(P.title)}</h2><div class="zh">${esc(P.zh)}</div></div>${P.blocks.map((b,bi)=>block(b, pageIdx, bi)).join("")}`;
+  $("#main").innerHTML = `<div class="ptitle"><div class="kick px">${esc(chapterName(P.ch || 0))}</div><h2>${esc(P.title)}</h2><div class="zh">${esc(P.zh)}</div></div>${P.blocks.map((b,bi)=>block(b, pageIdx, bi)).join("")}`; if(typeof fitHandouts === "function") fitHandouts($("#main"));
   if(!P.ch) chipRow();
   $("#navIn").innerHTML = `<button class="btn" data-act="prev" ${pageIdx===0?"disabled":""}>←</button><button class="grow btn" data-act="toc">${pageIdx+1} / ${PAGES.length} · Contents</button><button class="btn pri" data-act="next" ${pageIdx===PAGES.length-1?"disabled":""}>→</button>`;
   if(keepScroll) window.scrollTo(0, y); else { window.scrollTo(0,0); Music.sfx("page"); if(Music.cur >= 0 && P.music != null && Music.cur !== P.music){ Music.play(P.music); } }
@@ -2091,6 +2091,14 @@ ACTS.marbleDeal = () => { marbleDeal(); Music.sfx("click"); marblesRefresh(); };
 ACTS.marbleAns = () => { MARB.ans = !MARB.ans; marblesRefresh(); };
 ACTS.marbleHard = () => { MARB.hard = !MARB.hard; store.set("kb-marblehard", MARB.hard); marbleDeal(); marblesRefresh(); };
 
+/* ---------- handouts on the page: lines never wrap, so shrink the text until the longest line fits ---------- */
+function fitHandouts(root){ (root || document).querySelectorAll(".handout:not(.big)").forEach(H=>{
+  H.style.fontSize = ""; const spans = [...H.querySelectorAll(".hl span")]; if(!spans.length || !H.clientWidth) return;
+  let f = parseFloat(getComputedStyle(H).fontSize); const w = () => H.clientWidth * .92;
+  while(f > 7 && spans.some(s=>s.offsetWidth > w())){ f -= .5; H.style.fontSize = f + "px"; } }); }
+let fitT = null; window.addEventListener("resize", ()=>{ clearTimeout(fitT); fitT = setTimeout(()=>fitHandouts(), 120); });
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>fitHandouts());
+
 /* ---------- dice ---------- */
 const DIE_SHAPES = {
   4:'<polygon points="50,6 94,88 6,88" />', 6:'<rect x="10" y="10" width="80" height="80" rx="8"/>', 8:'<polygon points="50,4 94,50 50,96 6,50"/>',
@@ -2173,7 +2181,7 @@ function openSettings(){
   const s = $("#voiceSel"); if(s) s.onchange = e=>{ const v = VOICES.all[+e.target.value]; if(v){ VOICES.main = v; voiceURI = v.voiceURI; store.set("voiceURI", voiceURI); say("Welcome to Kettlebrook."); } };
 }
 ACTS.setZh = b => { store.set("dmzh", +b.dataset.v); applyZh(); openSettings(); };
-ACTS.setFs = b => { fs = +b.dataset.v; store.set("fs", fs); applyPrefs(); openSettings(); };
+ACTS.setFs = b => { fs = +b.dataset.v; store.set("fs", fs); applyPrefs(); fitHandouts(); openSettings(); };
 ACTS.setTheme = b => { store.set("theme", b.dataset.v); applyPrefs(); openSettings(); };
 ACTS.setRate = b => { rate = +b.dataset.v; store.set("rate", rate); openSettings(); };
 function uiTracks(){ $$("#tracks .trk").forEach(b=>{ const on = +b.dataset.trk === Music.cur; b.classList.toggle("on", on); b.querySelector(".pl").textContent = on ? "❚❚" : "▶"; }); $("#musicBtn").classList.toggle("on", Music.cur >= 0); }
