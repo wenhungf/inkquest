@@ -323,6 +323,9 @@ const GLOSS = {
   "oops":{w:"oops", kk:"[ups]", zh:"哎呀（不小心出錯時說）"},
   "portfolio":{w:"portfolio", kk:"[portˋfolɪˏo]", zh:"作品集"},
   "mutual-benefit":{w:"mutual-benefit", kk:"[ˋmjutʃʊəl ˋbɛnəfɪt]", zh:"互惠的", d:"互惠外拍：攝影師和模特兒互不收費，各自拿照片累積作品。"},
+  "deposit":{w:"deposit", kk:"[dɪˋpɑzɪt]", zh:"存款、入帳", d:"在銀行通知裡指「錢存進來了」。租屋時的「押金」也叫 deposit。"},
+  "salary":{w:"salary", kk:"[ˋsælərɪ]", zh:"薪水、月薪"},
+  "balance":{w:"balance", kk:"[ˋbæləns]", zh:"（帳戶）餘額", d:"也有「平衡」的意思。"},
   "pose":{w:"pose", kk:"[poz]", zh:"姿勢、擺姿勢"},
   "blink":{w:"blink", kk:"[blɪŋk]", zh:"眨眼"},
   "stinky tofu":{w:"stinky tofu", kk:"[ˋstɪŋkɪ ˋtofu]", zh:"臭豆腐"},
@@ -1003,11 +1006,15 @@ function runDay(S, i){
   /* one paycheck per job on payday, for all the days it covers */
   const due = S.payQ.filter(p=>p.date <= date), bySrc = {};
   due.forEach(p=>{ const b = bySrc[p.src] = bySrc[p.src] || {amt:0, n:0, from:p.from}; b.amt += p.amt; b.n++; S.money += p.amt; out.pay.push(p); });
-  Object.entries(bySrc).forEach(([src, b])=>{
+  Object.entries(bySrc).forEach(([src, b])=>{  /* labels for each job */
     const en = src === "dept" ? "the department store" : "the café", zh = src === "dept" ? "百貨公司" : "咖啡館";
     const mon = b.from ? MON_FULL[+b.from.slice(5,7)-1] : "last month", mzh = b.from ? `${+b.from.slice(5,7)} 月` : "上個月";
-    out.msgs.push(["bank", `Payday! ${en[0].toUpperCase() + en.slice(1)} pays you NT$${b.amt.toLocaleString("en-US")} for ${b.n} ${b.n === 1 ? "day" : "days"} of work in ${mon}.`,
-      `發薪日！${zh}匯來 ${mzh}${b.n} 天的薪水，共 NT$${b.amt.toLocaleString("en-US")}。`]); });
+    b.msg = [en, zh, mon, mzh];
+  });
+  /* a real-world bank notice, sent after the deposits land */
+  Object.values(bySrc).forEach(b=>{ const [en, zh, mon, mzh] = b.msg;
+    out.msgs.push(["bank", `[[Deposit]] received: NT$${b.amt.toLocaleString("en-US")}, your ${mon} [[salary]] from ${en} (${b.n} ${b.n === 1 ? "day" : "days"}). Your [[balance]] is now NT$${Math.round(S.money).toLocaleString("en-US")}.`,
+      `入帳通知：${zh}匯入 ${mzh}薪資 NT$${b.amt.toLocaleString("en-US")}（${b.n} 天）。目前帳戶餘額 NT$${Math.round(S.money).toLocaleString("en-US")}。`]); });
   S.payQ = S.payQ.filter(p=>p.date > date);
   /* money out: rent, bills, food */
   STAGE.bills.forEach(b=>{ if(D.day(date) === b.day){ S.money -= b.amt; out.msgs.push(["bank", `Rent and bills: −NT$${b.amt.toLocaleString("en-US")}.`, `房租和水電：−NT$${b.amt.toLocaleString("en-US")}。`]); } });
