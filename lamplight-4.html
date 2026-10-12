@@ -1,0 +1,1468 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>Lamplight Readers · Level 4</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jersey+15&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F5EFE3; --card:#FBF7EF; --ink:#2B2536; --muted:#6D6478; --rule:#E2D8C6; --shade:rgba(43,37,54,.06);
+  --lv:#5F71A6; --lv-soft:#DAE0F0; --hl:#F6E3B8; --ok:#4E8A5B; --no:#B5524A; --stamp:#B5524A;
+  --f-body:'Literata',Georgia,"PingFang TC","Noto Serif TC","Microsoft JhengHei",serif;
+  --f-dot:'Jersey 15',"PingFang TC","Noto Sans TC",sans-serif;
+  --f-zh:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+  --fs:19px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){color-scheme:dark;
+    --paper:#1C1A25; --card:#24212F; --ink:#EDE6D6; --muted:#A79FB3; --rule:#383345; --shade:rgba(0,0,0,.25);
+    --lv:#98A8D6; --lv-soft:#232A3D; --hl:#4A3B24; --ok:#8CC596; --no:#E08A80; --stamp:#E08A80;}
+}
+:root[data-theme="dark"]{color-scheme:dark;
+  --paper:#1C1A25; --card:#24212F; --ink:#EDE6D6; --muted:#A79FB3; --rule:#383345; --shade:rgba(0,0,0,.25);
+  --lv:#98A8D6; --lv-soft:#232A3D; --hl:#4A3B24; --ok:#8CC596; --no:#E08A80; --stamp:#E08A80;}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:var(--fs);line-height:1.75;}
+button{font:inherit;color:inherit;}
+input,textarea,select{font-size:max(16px,1em);}
+[hidden]{display:none !important;}
+.zh,.zhs{font-family:var(--f-zh);}
+.dot{font-family:var(--f-dot);font-weight:400;letter-spacing:.03em;}
+svg.px{width:1em;height:1em;image-rendering:pixelated;}
+
+/* ---------- cover ---------- */
+#cover{position:fixed;inset:0;z-index:50;background:#141222;color:#F3EBDD;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(20px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom));overflow:auto;cursor:pointer;}
+body:not(.cover) #cover{display:none;}
+body.cover{overflow:hidden;}
+#cover .stage{width:min(100%,720px);border-radius:14px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.5);line-height:0;}
+#cover canvas{width:100%;height:auto;display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
+#cover .ck{font-family:var(--f-dot);font-size:15px;letter-spacing:.14em;color:#98A8D6;margin:22px 0 4px;text-align:center;}
+#cover h1{font-family:var(--f-dot);font-weight:400;font-size:clamp(2.6rem,11vw,4.2rem);line-height:1;margin:0;letter-spacing:.02em;text-align:center;}
+#cover .cz{font-family:var(--f-zh);font-size:16px;opacity:.85;margin:8px 0 18px;text-align:center;letter-spacing:.08em;}
+#cover .go{font-family:var(--f-dot);font-size:20px;letter-spacing:.06em;background:#98A8D6;color:#1C1A25;border:0;border-radius:30px;padding:10px 26px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.35);}
+#cover .go:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.35);}
+#cover .cm{font-family:var(--f-dot);font-size:14px;letter-spacing:.1em;opacity:.7;margin-top:14px;}
+#cover .cc{font-family:var(--f-zh);font-size:12px;opacity:.5;margin-top:14px;}
+#cover .crow{display:flex;gap:12px;justify-content:center;}
+#cover .go{font-size:16px;padding:7px 18px;}
+#cover .go.alt{background:transparent;color:#F3EBDD;box-shadow:inset 0 0 0 1.5px rgba(243,235,221,.6);}
+#cover .go.alt.on{background:#F3EBDD;color:#1C1A25;box-shadow:none;}
+
+/* ---------- top bar ---------- */
+.bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:6px;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top));background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);}
+.ib{width:42px;height:42px;border:0;background:transparent;border-radius:12px;display:grid;place-items:center;cursor:pointer;flex:none;}
+.ib:hover{background:var(--shade);}
+.ib svg{width:22px;height:22px;fill:currentColor;}
+.ib.on{color:var(--lv);}
+.brand{font-family:var(--f-dot);font-size:20px;letter-spacing:.04em;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;}
+.brand small{font-size:15px;color:var(--lv);margin-left:6px;}
+
+main{max-width:42rem;margin:0 auto;padding:18px 18px 90px;}
+
+/* ---------- home ---------- */
+.lib{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:16px 16px 14px;margin:6px 0 22px;position:relative;overflow:hidden;}
+.lib:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--lv);}
+.libh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.libh b{font-family:var(--f-dot);font-weight:400;font-size:22px;letter-spacing:.04em;}
+.libh span{font-family:var(--f-zh);font-size:13px;color:var(--muted);}
+.stamps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:12px 0 10px;}
+.st{aspect-ratio:1;border:2px dashed var(--rule);border-radius:50%;display:grid;place-items:center;font-family:var(--f-dot);font-size:18px;color:var(--rule);cursor:pointer;background:none;padding:0;}
+.st.on{border:3px double var(--stamp);color:var(--stamp);transform:rotate(-12deg);}
+.st.on svg{width:58%;height:58%;}
+.st.new{animation:thump .5s cubic-bezier(.2,1.6,.4,1);}
+@keyframes thump{0%{transform:scale(2.2) rotate(-30deg);opacity:0}100%{transform:scale(1) rotate(-12deg);opacity:1}}
+.libs{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--f-zh);font-size:13.5px;color:var(--muted);}
+.libs b{font-family:var(--f-dot);font-weight:400;font-size:20px;color:var(--ink);margin-right:3px;}
+.hh{font-family:var(--f-dot);font-weight:400;font-size:22px;letter-spacing:.05em;margin:8px 0 10px;}
+.cards{display:grid;gap:10px;}
+.card{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;text-align:left;width:100%;background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:12px 14px;cursor:pointer;}
+.card:hover{border-color:var(--lv);}
+.ico{width:48px;height:48px;border-radius:10px;background:var(--lv-soft);display:grid;place-items:center;}
+.ico svg{width:34px;height:34px;}
+.cn{font-family:var(--f-dot);font-size:19px;line-height:1.2;display:block;}
+.cz2{font-family:var(--f-zh);font-size:13.5px;color:var(--muted);display:block;line-height:1.5;}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.tag{font-family:var(--f-zh);font-size:11.5px;line-height:1;padding:4px 7px;border-radius:20px;background:var(--shade);color:var(--muted);white-space:nowrap;}
+.tag.t{background:var(--lv-soft);color:var(--ink);}
+.cr{font-family:var(--f-dot);font-size:14px;color:var(--muted);text-align:right;line-height:1.2;}
+.cr .ok{color:var(--stamp);font-size:22px;display:block;}
+
+/* ---------- story ---------- */
+.sk{font-family:var(--f-dot);font-size:15px;letter-spacing:.12em;color:var(--lv);margin:4px 0 2px;}
+.story h1{font-family:var(--f-dot);font-weight:400;font-size:clamp(2.1rem,8vw,2.9rem);line-height:1.05;margin:0 0 4px;letter-spacing:.02em;}
+.story .szt{font-family:var(--f-zh);font-size:17px;color:var(--muted);margin:0 0 10px;letter-spacing:.06em;}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px;}
+.intro{font-family:var(--f-zh);font-size:15px;line-height:1.85;color:var(--muted);background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:12px 14px;margin:0 0 16px;}
+.by{font-family:var(--f-body);font-style:italic;font-size:14px;color:var(--muted);display:block;margin-top:6px;}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 18px;position:sticky;top:59px;z-index:5;padding:8px 0;background:var(--paper);}
+.pb{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);background:var(--card);border-radius:24px;padding:7px 14px;cursor:pointer;font-family:var(--f-zh);font-size:14.5px;line-height:1.2;}
+.pb svg{width:16px;height:16px;fill:currentColor;}
+.pb.on{background:var(--lv);border-color:var(--lv);color:#fff;}
+.pb.sel{border-color:var(--lv);box-shadow:0 0 0 3px var(--lv-soft);}
+.pp{position:relative;padding-left:40px;margin:0 0 1.05em;}
+.pspk{position:absolute;left:0;top:.2em;width:30px;height:30px;border-radius:50%;border:1px solid var(--rule);background:var(--card);display:grid;place-items:center;cursor:pointer;padding:0;color:var(--muted);}
+.pspk svg{width:15px;height:15px;fill:currentColor;}
+.pspk.live{background:var(--lv);border-color:var(--lv);color:#fff;}
+.pp .en{margin:0;}
+.pp .en .t{border-radius:4px;transition:background .25s;-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 2px;margin:0 -2px;}
+.pp.speaking .en .t{background:var(--hl);}
+.pp .zh{margin:.35em 0 0;font-size:.8em;line-height:1.8;color:var(--muted);display:none;}
+body.showzh .pp .zh{display:block;}
+.g{cursor:pointer;border-bottom:2px dotted var(--lv);}
+.g.cu{border-bottom-style:dashed;border-bottom-color:var(--muted);}
+.g:focus-visible{outline:2px solid var(--lv);outline-offset:2px;}
+.flash{animation:flash 1.8s ease;}
+@keyframes flash{0%,40%{background:var(--hl)}100%{background:transparent}}
+.end{text-align:center;font-family:var(--f-dot);font-size:22px;letter-spacing:.2em;color:var(--lv);margin:28px 0 20px;}
+.box{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:16px;margin:0 0 18px;}
+.bh{font-family:var(--f-dot);font-size:20px;letter-spacing:.04em;margin:0;}
+.bz{font-family:var(--f-zh);font-size:13px;color:var(--muted);margin:0 0 10px;}
+.q{margin:14px 0 0;}
+.qt{margin:0 0 6px;font-weight:600;font-size:.95em;}
+.qo{display:grid;gap:6px;}
+.qo button{text-align:left;border:1px solid var(--rule);background:var(--paper);border-radius:10px;padding:8px 12px;cursor:pointer;font-size:.9em;line-height:1.45;}
+.qo button.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--paper));}
+.qo button.wrong{border-color:var(--no);background:color-mix(in srgb,var(--no) 12%,var(--paper));text-decoration:line-through;}
+.qx{font-family:var(--f-zh);font-size:14px;line-height:1.75;margin:6px 0 0;color:var(--muted);}
+.qx b{color:var(--ink);}
+.done{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;}
+.bigst{font-family:var(--f-dot);font-size:21px;letter-spacing:.05em;background:var(--lv);color:#fff;border:0;border-radius:30px;padding:10px 24px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.18);}
+.bigst[disabled]{background:transparent;color:var(--stamp);box-shadow:none;border:3px double var(--stamp);transform:rotate(-3deg);cursor:default;}
+.done small{font-family:var(--f-zh);font-size:13px;color:var(--muted);}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:10px;}
+.nav button{flex:1;max-width:48%;border:1px solid var(--rule);background:var(--card);border-radius:14px;padding:10px 12px;cursor:pointer;text-align:left;line-height:1.3;}
+.nav button:last-child{text-align:right;margin-left:auto;}
+.nav small{display:block;font-family:var(--f-zh);font-size:12px;color:var(--muted);}
+.nav span{font-family:var(--f-dot);font-size:17px;}
+
+/* ---------- popover ---------- */
+#pop{position:fixed;left:0;right:0;bottom:0;z-index:40;transform:translateY(110%);transition:transform .25s ease;display:flex;justify-content:center;pointer-events:none;}
+#pop.on{transform:none;}
+#pop .in{pointer-events:auto;width:min(100%,40rem);background:var(--card);border:1px solid var(--rule);border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.18);padding:16px 18px max(18px,env(safe-area-inset-bottom));max-height:60vh;overflow:auto;}
+.ph{display:flex;align-items:center;gap:4px 10px;flex-wrap:wrap;position:relative;padding-right:140px;min-height:42px;}
+.pw{font-family:var(--f-body);font-weight:600;font-size:1.3em;}
+.pk{font-family:"Lucida Sans Unicode","Arial Unicode MS",var(--f-body);color:var(--muted);font-size:.95em;}
+.lvb{font-family:var(--f-dot);font-size:14px;padding:1px 8px;border-radius:12px;background:var(--shade);color:var(--muted);}
+.lvb.hi{background:var(--lv-soft);color:var(--ink);}
+.px2{position:absolute;right:-6px;top:-4px;display:flex;gap:2px;}
+.pz{font-family:var(--f-zh);font-size:17px;margin:6px 0 2px;}
+.pd{font-family:var(--f-zh);font-size:14.5px;line-height:1.8;color:var(--muted);margin:0;}
+.pn{font-family:var(--f-zh);font-size:12.5px;color:var(--muted);margin:8px 0 0;}
+.star svg{width:22px;height:22px;}
+.star.on{color:#D9A21B;}
+
+/* ---------- drawer ---------- */
+#scrim{position:fixed;inset:0;background:rgba(15,10,25,.4);z-index:30;opacity:0;pointer-events:none;transition:opacity .2s;}
+#scrim.on{opacity:1;pointer-events:auto;}
+#drawer{position:fixed;top:0;bottom:0;left:0;width:min(92vw,26rem);z-index:35;background:var(--paper);border-right:1px solid var(--rule);transform:translateX(-102%);transition:transform .25s ease;display:flex;flex-direction:column;}
+#drawer.on{transform:none;}
+.dtop{display:flex;align-items:center;gap:6px;padding:10px 10px 0;padding-top:max(10px,env(safe-area-inset-top));}
+.dtop b{font-family:var(--f-dot);font-weight:400;font-size:20px;flex:1;}
+.tabs{display:flex;gap:4px;padding:8px 10px;border-bottom:1px solid var(--rule);overflow-x:auto;}
+.tabs button{border:0;background:transparent;border-radius:20px;padding:6px 12px;cursor:pointer;font-family:var(--f-zh);font-size:14px;white-space:nowrap;}
+.tabs button.on{background:var(--lv);color:#fff;}
+.pane{flex:1;overflow:auto;padding:14px 14px max(30px,env(safe-area-inset-bottom));font-size:16px;}
+.toc a{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:8px 6px;border-radius:10px;color:inherit;text-decoration:none;cursor:pointer;}
+.toc a:hover,.toc a.cur{background:var(--shade);}
+.toc svg{width:28px;height:28px;}
+.toc .n{font-family:var(--f-dot);font-size:17px;line-height:1.2;}
+.toc .z{font-family:var(--f-zh);font-size:12.5px;color:var(--muted);display:block;}
+.toc .ok{color:var(--stamp);font-family:var(--f-dot);}
+.sbox{width:100%;border:1px solid var(--rule);background:var(--card);border-radius:12px;padding:10px 12px;color:var(--ink);font-family:var(--f-body);}
+.res{margin-top:12px;display:grid;gap:8px;}
+.res a{display:block;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:8px 10px;cursor:pointer;color:inherit;text-decoration:none;font-size:15px;line-height:1.55;}
+.res small{display:block;font-family:var(--f-dot);font-size:13px;color:var(--lv);letter-spacing:.06em;}
+.res mark{background:var(--hl);color:inherit;border-radius:3px;}
+.hint{font-family:var(--f-zh);font-size:13.5px;color:var(--muted);line-height:1.75;}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 16px;}
+.seg button{border:1px solid var(--rule);background:var(--card);border-radius:20px;padding:6px 13px;cursor:pointer;font-family:var(--f-zh);font-size:14px;}
+.seg button.on{border-color:var(--lv);box-shadow:0 0 0 3px var(--lv-soft);}
+.lab{font-family:var(--f-zh);font-size:14px;font-weight:600;margin:0;}
+select.sbox{appearance:auto;}
+.wl{display:grid;gap:4px;}
+.wl h4{font-family:var(--f-dot);font-weight:400;font-size:16px;color:var(--lv);margin:12px 0 2px;letter-spacing:.04em;}
+.wl a{display:flex;gap:8px;align-items:baseline;padding:5px 6px;border-radius:8px;cursor:pointer;color:inherit;text-decoration:none;}
+.wl a:hover{background:var(--shade);}
+.wl a b{font-weight:600;}
+.wl a span{font-family:var(--f-zh);font-size:13.5px;color:var(--muted);}
+.wl a i{margin-left:auto;font-style:normal;color:#D9A21B;}
+.about p{font-family:var(--f-zh);font-size:14.5px;line-height:1.85;margin:0 0 12px;}
+.about .big{font-family:var(--f-dot);font-size:26px;line-height:1.1;margin:4px 0 2px;}
+.about .mot{font-family:var(--f-body);font-style:italic;color:var(--muted);margin:0 0 14px;}
+.about ul{font-family:var(--f-zh);font-size:14px;line-height:1.8;padding-left:1.2em;margin:0 0 12px;}
+.danger{border:1px solid var(--no);color:var(--no);background:transparent;border-radius:20px;padding:6px 14px;cursor:pointer;font-family:var(--f-zh);font-size:14px;}
+
+/* ---------- music panel ---------- */
+#mp{position:fixed;top:62px;right:10px;z-index:25;width:min(92vw,20rem);background:var(--card);border:1px solid var(--rule);border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.2);padding:12px;}
+.trk{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;width:100%;text-align:left;border:1px solid transparent;background:transparent;border-radius:12px;padding:8px;cursor:pointer;}
+.trk:hover{background:var(--shade);}
+.trk .pl{width:34px;height:34px;border-radius:50%;background:var(--lv);color:#fff;display:grid;place-items:center;font-size:13px;}
+.trk.on{border-color:var(--lv);}
+.trk.on .pl{background:var(--ink);color:var(--paper);}
+.trk .tn{font-family:var(--f-dot);font-size:17px;display:block;line-height:1.2;}
+.trk .tz{font-family:var(--f-zh);font-size:12.5px;color:var(--muted);display:block;}
+.vol{display:flex;align-items:center;gap:10px;margin:8px 4px 2px;font-family:var(--f-zh);font-size:13px;color:var(--muted);}
+.vol input{flex:1;accent-color:var(--lv);}
+
+#toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom));transform:translate(-50%,30px);opacity:0;transition:all .25s;z-index:60;background:var(--ink);color:var(--paper);font-family:var(--f-zh);font-size:14.5px;padding:10px 16px;border-radius:24px;max-width:90vw;text-align:center;pointer-events:none;}
+#toast.on{opacity:1;transform:translate(-50%,0);}
+@media (max-width:480px){ .cr{display:none} .card{grid-template-columns:44px 1fr} .ico{width:44px;height:44px} main{padding:14px 16px 90px} }
+@media (prefers-reduced-motion:reduce){ *{transition:none !important;animation:none !important;} }
+</style>
+</head>
+<body>
+
+
+<div id="cover">
+  <div class="stage"><canvas id="cv" width="320" height="180" aria-label="夜晚的書桌：窗外下著雨，檯燈亮著，桌上有打開的書和一杯冒著熱氣的茶"></canvas></div>
+  <p class="ck" id="cvK"></p>
+  <h1>Lamplight Readers</h1>
+  <p class="cz" id="cvZ"></p>
+  <div class="crow"><button class="go" id="goBtn">▶ START</button><button class="go alt" id="coverMusic" aria-pressed="false">♪ MUSIC</button></div>
+  <p class="cc">© 2026 Wen-Hung Fang. All rights reserved.</p>
+</div>
+
+<header class="bar">
+  <button class="ib" id="menuBtn" aria-label="選單"><svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg></button>
+  <div class="brand" id="brand" role="button" tabindex="0">Lamplight <small id="brandLv"></small></div>
+  <button class="ib" id="musicBtn" aria-label="音樂"><svg viewBox="0 0 24 24"><path d="M12 3v10.6A4 4 0 1 0 14 17V7h4V3h-6z"/></svg></button>
+  <button class="ib" id="setBtn" aria-label="設定"><svg viewBox="0 0 24 24"><path d="M9.2 5h2.1l4.6 13h-2.2l-1.1-3.3H7.8L6.7 18H4.6L9.2 5zm-.8 7.9h3.9L10.3 7l-1.9 5.9zM17 11h1.6l2.9 7h-1.7l-.6-1.6h-2.8l-.6 1.6h-1.7l2.9-7zm-.1 4.1h1.9l-.9-2.6-1 2.6z"/></svg></button>
+</header>
+
+<div id="mp" hidden>
+  <div id="tracks"></div>
+  <div class="vol"><span>音量</span><input type="range" id="vol" min="0" max="100" aria-label="音量"><button class="pb" id="mStop">停止</button></div>
+</div>
+
+<main id="main"></main>
+
+<div id="scrim"></div>
+<aside id="drawer" aria-label="選單">
+  <div class="dtop"><b>Lamplight Readers</b><button class="ib" id="dClose" aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg></button></div>
+  <nav class="tabs" id="tabs">
+    <button data-p="toc" class="on">目錄</button><button data-p="find">搜尋</button><button data-p="words">詞彙</button><button data-p="set">設定</button><button data-p="about">有關</button>
+  </nav>
+  <div class="pane" id="p-toc"><div class="toc" id="toc"></div></div>
+  <div class="pane" id="p-find" hidden>
+    <input class="sbox" id="q" type="search" placeholder="搜尋英文或中文…" autocomplete="off">
+    <div class="res" id="res"><p class="hint">可以搜尋故事內容、中文翻譯和詞彙。</p></div>
+  </div>
+  <div class="pane" id="p-words" hidden>
+    <div class="seg" id="wseg"><button data-w="all" class="on">全部詞彙</button><button data-w="star">★ 我的收藏</button></div>
+    <div class="wl" id="wl"></div>
+  </div>
+  <div class="pane" id="p-set" hidden>
+    <p class="lab">文字大小</p>
+    <div class="seg" id="sizes"><button data-v="17">小</button><button data-v="19">中</button><button data-v="21">大</button><button data-v="23">特大</button></div>
+    <p class="lab">朗讀速度</p>
+    <div class="seg" id="rates"><button data-v="0.7">慢</button><button data-v="0.85">稍慢</button><button data-v="1">正常</button></div>
+    <p class="lab">朗讀聲音</p>
+    <select class="sbox" id="voiceSel" aria-label="朗讀聲音"></select>
+    <p class="hint" id="voiceNow" style="margin:6px 0 4px"></p>
+    <p class="hint" style="margin:0 0 16px">iPhone 小提醒：Safari 只能用手機內建的聲音，下載的「增強音質」聲音網頁用不到。</p>
+    <p class="lab">打開故事時</p>
+    <div class="seg" id="zhset"><button data-v="0">只顯示英文</button><button data-v="1">英文＋中文</button></div>
+    <p class="lab">外觀</p>
+    <div class="seg" id="themes"><button data-v="auto">跟著系統</button><button data-v="light">淺色</button><button data-v="dark">深色</button></div>
+    <p class="lab">閱讀紀錄</p>
+    <p class="hint" style="margin:4px 0 8px">借書證的印章、收藏的單字都存在這台裝置的瀏覽器裡。換手機或清除瀏覽資料就會不見。</p>
+    <button class="danger" id="resetBtn">清除閱讀紀錄</button>
+  </div>
+  <div class="pane about" id="p-about" hidden></div>
+</aside>
+
+<div id="pop" aria-hidden="true"><div class="in" id="popIn"></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* LAMPLIGHT READERS · LEVEL 4 — settings */
+const LEVEL = {
+  n:4, cefr:"B2", prefix:"lr4-", audio:"lr4-audio/",
+  zh:"燈下小書・第四級", kicker:"INKQUEST · LEVEL 4 · B2",
+  version:"1.0・2026 年 10 月",
+  rank:4,
+  sayAs:{"Thames":"Temz","Harwich":"Harrij","Keawe":"Kay-ah-vay","Bazalgette":"Bazzle-jet","Porto":"Portoo","São Bento":"Sow Bentoo","Lyme":"Lime","Belém":"Beh-lem","Valentin":"Valentan","Flambeau":"Flahm-bo"},
+  /* a moonless night: deep blue sky full of stars, for the last light */
+  scene:{sky:["#0B1030","#141C48","#22295E","#323A73"], moon:false, stars:true, rain:false, sun:false, birds:false},
+  storyTracks:[2,0,2,1,2,0,1,0,1,2],
+  tracks:[
+    {n:"Harbor Light", z:"港口燈火・鋪底與鐘聲", bpm:72, swing:0, parts:[
+      {p:"pad", s:"D3+A3+D4+F#4 _ _ _ _ _ _ _ | B2+F#3+B3+D4 _ _ _ _ _ _ _ | G2+D3+G3+B3 _ _ _ _ _ _ _ | A2+E3+A3+C#4 _ _ _ _ _ _ _ | D3+A3+D4+F#4 _ _ _ _ _ _ _ | B2+F#3+B3+D4 _ _ _ _ _ _ _ | G2+D3+G3+B3 _ _ _ _ _ _ _ | A2+E3+A3+C#4 _ _ _ _ _ _ _"},
+      {p:"bell", s:"F#5 _ _ _ A5 _ _ _ | D6 _ _ _ C#6 _ B5 _ | B5 _ _ _ G5 _ _ _ | A5 _ _ _ _ _ - - | F#5 _ A5 _ D6 _ E6 _ | F#6 _ _ _ D6 _ _ _ | B5 _ G5 _ E5 _ G5 _ | A5 _ _ _ _ _ - -", vel:.7},
+      {p:"bass", s:"D2 _ _ _ A2 _ _ _ | B1 _ _ _ F#2 _ _ _ | G1 _ _ _ D2 _ _ _ | A1 _ _ _ E2 _ _ _ | D2 _ _ _ A2 _ _ _ | B1 _ _ _ F#2 _ _ _ | G1 _ _ _ D2 _ _ _ | A1 _ _ _ E2 _ _ _", vel:.8}]},
+    {n:"Fado Steps", z:"法朵階梯・木琴與鐘聲", bpm:92, swing:0, parts:[
+      {p:"mar", s:"D4 F4 A4 D5 A4 F4 D4 F4 | C4 E4 G4 C5 G4 E4 C4 E4 | A#3 D4 F4 A#4 F4 D4 A#3 D4 | A3 C#4 E4 A4 E4 C#4 A3 C#4 | G3 A#3 D4 G4 D4 A#3 G3 A#3 | A3 C#4 E4 G4 E4 C#4 A3 C#4 | D4 F4 A4 D5 A4 F4 D4 A3 | D4 _ _ _ - - - -", vel:.6},
+      {p:"bell", s:"A5 _ _ _ G5 F5 E5 _ | E5 _ _ _ D5 _ C5 _ | D5 _ _ _ F5 _ A#5 _ | A5 _ _ _ _ _ - - | G5 _ _ _ A#5 _ A5 G5 | A5 _ _ _ E5 _ - - | F5 _ E5 _ D5 _ C#5 _ | D5 _ _ _ _ _ - -", vel:.6},
+      {p:"bass", s:"D2 _ _ _ A1 _ _ _ | C2 _ _ _ G1 _ _ _ | A#1 _ _ _ F1 _ _ _ | A1 _ _ _ E1 _ _ _ | G1 _ _ _ D2 _ _ _ | A1 _ _ _ E2 _ _ _ | D2 _ _ _ A1 _ _ _ | D2 _ _ _ - - - -", vel:.8}]},
+    {n:"Foggy Streets", z:"霧中街道・搖擺電鋼琴", bpm:100, swing:.16, parts:[
+      {p:"ep", s:"E3+G3+B3+D4 _ _ _ - - E3+G3+B3+D4 _ | C3+E3+G3+B3 _ _ _ - - C3+E3+G3+B3 _ | A2+C3+E3+G3 _ _ _ - - A2+C3+E3+G3 _ | B2+D#3+F#3+A3 _ _ _ - - B2+D#3+F#3+A3 _ | E3+G3+B3+D4 _ _ _ - - E3+G3+B3+D4 _ | C3+E3+G3+B3 _ _ _ - - C3+E3+G3+B3 _ | A2+C3+E3+G3 _ _ _ - - B2+D#3+F#3+A3 _ | E3+G3+B3 _ _ _ _ _ - -", vel:.6, strum:.015},
+      {p:"bass", s:"E2 _ B1 _ E2 _ G2 _ | C2 _ G1 _ C2 _ E2 _ | A1 _ E2 _ A1 _ C2 _ | B1 _ F#2 _ B1 _ D#2 _ | E2 _ B1 _ E2 _ G2 _ | C2 _ G1 _ C2 _ E2 _ | A1 _ E2 _ B1 _ F#2 _ | E2 _ _ _ - - - -"},
+      {p:"bell", s:"B4 _ _ _ D5 E5 _ _ | G5 _ _ _ - - E5 F#5 | E5 _ _ _ C5 _ A4 _ | B4 _ _ _ _ _ - - | B4 _ E5 _ G5 _ B5 _ | A5 _ _ _ G5 _ - - | E5 _ C5 _ D#5 _ F#5 _ | E5 _ _ _ _ _ - -", vel:.7}]}
+  ],
+  icons:{
+    bluecross:["............",".....bb.....",".....bb.....","..bbbBBbbb..","..bBBBBBBb..","..bbbBBbbb..",".....bb.....",".....bb.....",".....bb.....",".....bb.....","............","............"],
+    imp:["....kkkk....","....kwwk....","...kkwwkk...","..kbbbbbbk..",".kbbrrrrbbk.",".kbrrkkrrbk.",".kbbrrrrbbk.",".kbbbbbbbbk.","..kbbbbbbk..","...kkkkkk...","............","............"],
+    button:["............","...kkkkkk...","..kwwwwwwk..",".kwwkwwkwwk.",".kwwwwwwwwk.",".kwkwwwwkwk.",".kwwkkkkwwk.","..kwwwwwwk..","...kssssk...","..ksssssskk.","..kssssssk..","............"],
+    persuasion:["............","kkkkkkkkkkkk","kwwwwwwwwwwk","kwkkkwwwwwwk","kwwwwwwwwwwk","kwkkkkkkwwwk","kwwwwwwwwwwk","kwkkkkwwwwwk","kwwwwwwwwppk","kwwwwwwwwppk","kkkkkkkkkkkk","............"],
+    lostworld:["............","........kk..",".......kGGk.","......kGGGk.","..kk.kGGGk..",".kGGkGGGGk..",".kGGGGGGk...","..kGGGGGk...","...kGkkGk...","...kGk.kGk..","...kk...kk..","............"],
+    lastdm:["............","...kkkkkk...","..kyyyyyyk..",".kyykyykyyk.",".kyyyyyyyyk.","kyyyykkyyyyk","kyyyykkyyyyk",".kyyyyyyyyk.",".kyykyykyyk.","..kyyyyyyk..","...kkkkkk...","............"],
+    porto:["............","kkkkkkkkkkkk","kbbbbbbbbbbk","kbwBwBwBwBbk","kbBwBwBwBwbk","kbwBwBwBwBbk","kbBwBwBwBwbk","kbbbbbbbbbbk","kkkkkkkkkkkk","............","............","............"],
+    lastlight:["yy..........","..yy..kk....","....yykwk...","......kwwk..","......kwwk..","......kkkk..","......kwwk..","......kwwk..","......kwwk..",".....kwwwwk.","....kkkkkkkk","BBBBBBBBBBBB"],
+    lisbon:["............","...y........","..yyy.......","............","..rrr..rrr..",".rrrrrrrrrr.",".wwwwwwwwww.",".wbwwbwwbww.",".wwwwwwwwww.",".wbwwbwwbww.","ssssssssssss","............"],
+    stink:["............","..G...G..G..","...G.G..G...","..G...G.....","............","kkkkkkkkkkkk","nnnnnnnnnnnn","nnnnnnnnnnnn","BBBBBBBBBBBB","BnBBBnBBBBnB","BBBBBBBBBBBB","............"]
+  },
+  credits:[
+    "“The Blue Cross” — G. K. Chesterton, The Innocence of Father Brown, 1911 (first published 1910)",
+    "“The Bottle Imp” — Robert Louis Stevenson, 1891",
+    "“The Curious Case of Benjamin Button” — F. Scott Fitzgerald, Collier’s, 1922",
+    "Persuasion — Jane Austen, 1817",
+    "The Lost World — Arthur Conan Doyle, 1912"
+  ]
+};
+
+/* =========================================================
+   LAMPLIGHT READERS · LEVEL 4 (B2) — stories
+   Markup: [[shown text|key]]  (key omitted = shown text, lowercased)
+   key prefix c: = culture note (c:n- = name pronunciation), otherwise a glossary word
+   paras: [english, chinese, mood]
+   ========================================================= */
+const S = [
+/* ---------------- 1 ---------------- */
+{ id:"bluecross", thread:"", kind:"classic", title:"The Blue Cross", zt:"藍十字", voice:"m",
+  by:"G. K. Chesterton, 1910 · retold",
+  intro:"全歐洲最厲害的警探，追捕全歐洲最厲害的大盜。可是真正解開謎題的，是一個拿著破雨傘、提著一堆牛皮紙包裹、看起來傻呼呼的矮小神父。",
+  paras:[
+    ["Between the silver ribbon of morning and the green shining ribbon of sea, the boat touched [[Harwich|c:n-harwich]] and let loose a crowd of people like flies. Among them was a man who did not want to be noticed, and nobody noticed him. He wore a light gray suit and a white waistcoat, and he looked like a quiet tourist. He was, in fact, [[Aristide Valentin|c:n-valentin]], head of the Paris police and the most famous [[detective]] in the world.",
+     "在銀色的晨光和閃著綠光的海面之間，船靠上了哈威治港，一群人像蒼蠅一樣湧下船。人群中有一個男人不想被注意，也確實沒有人注意到他。他穿著淺灰色西裝和白色背心，看起來像個安靜的觀光客。事實上，他是巴黎警察局長，全世界最有名的偵探：亞里斯提德．華倫丁。","calm"],
+    ["He had come to England to catch the greatest criminal of the age. [[Flambeau|c:n-flambeau]] had robbed banks and had once run a milk company with no cows at all: every morning, he simply moved other people’s milk cans to his customers’ doors. Another time, he changed all the house numbers in a street in one night, just to [[lure]] a man into a trap. He was a genius of [[disguise]]. But there was one thing he could not hide. He was enormously tall. Valentin knew that if he saw a very tall man of any kind, he would arrest him at once.",
+     "他來英國，是為了抓這個時代最偉大的罪犯。弗蘭博搶過銀行，還開過一家一頭牛都沒有的牛奶公司：每天早上，他只是把別人家門口的牛奶罐，搬到他客戶的門口。還有一次，他在一夜之間把一整條街的門牌號碼全部換掉，只為了把一個人引進陷阱。他是喬裝的天才。可是有一樣東西他藏不住：他非常非常高。華倫丁知道，只要看到任何一個特別高的男人，他就會立刻逮捕他。","informative"],
+    ["Valentin was not a romantic man. He believed in reason, in cold logic and in good maps. But he also knew something that most policemen forget. The criminal is the artist; the detective is only the critic. A clever criminal never does the obvious thing. So a clever detective must sometimes do the unexpected thing, and follow it wherever it goes.",
+     "華倫丁不是一個浪漫的人。他相信理性，相信冷靜的邏輯，也相信好的地圖。可是他也知道一件大多數警察都會忘記的事：罪犯是藝術家，偵探只是評論家。聰明的罪犯從來不做理所當然的事。所以，聰明的偵探有時候也得做出人意料的事，然後跟著它走，不管它通往哪裡。","thoughtful"],
+    ["On the train to London, there was nobody tall. There were a few farmers, a small woman and a very short Roman Catholic priest with a round face and a large, shabby umbrella. He carried several brown paper parcels and kept dropping them. He told everyone on the train, with great [[innocence]], that he had to be careful, because one of his parcels held something made of silver “with blue stones.” Valentin felt sorry for him. Then he forgot about him.",
+     "往倫敦的火車上，沒有高個子。只有幾個農夫、一個嬌小的女人，還有一個非常矮的天主教神父，圓圓的臉，拿著一把又大又破的雨傘。他提著好幾個牛皮紙包裹，一直弄掉。他用一種非常天真的口氣，跟車上的每個人說他得小心一點，因為其中一個包裹裡有銀做的東西，「上面還有藍色的寶石」。華倫丁有點同情他，然後就把他忘了。","amused"],
+    ["In London, Valentin had no [[clue]] at all. So he did something strange. When he had nothing to follow, he followed nothing. He walked wherever chance took him, and he stopped wherever something looked wrong. His theory was simple: if you are in the dark, any small light is worth following. He walked until he came to a little restaurant on a corner, and he went in for a coffee.",
+     "到了倫敦，華倫丁一點線索都沒有。所以他做了一件奇怪的事。當他沒有東西可以追的時候，他就什麼都不追。他隨著機會亂走，只要看到不對勁的地方就停下來。他的理論很簡單：在黑暗中，任何一點小小的光都值得跟過去。他一直走，走到街角一間小餐廳，進去點了一杯咖啡。","thoughtful"],
+    ["He put some sugar into his coffee and tasted it. It was salt. He looked at the salt bowl. It was full of sugar. Valentin called the waiter. The waiter looked at the bowls, turned pale and said, “It must be those two priests. They came in early this morning. One of them paid, and then, before he left, he threw his soup at the wall.” The waiter pointed. There was a dark [[stain]] on the wallpaper. Valentin paid at once and asked which way the priests had gone.",
+     "他在咖啡裡加了點糖，嚐了一口。是鹽。他看了看鹽罐，裡面裝滿了糖。華倫丁把服務生叫來。服務生看了看罐子，臉色發白，說：「一定是那兩個神父。他們今天一大早來的。其中一個付了錢，離開前把湯潑到牆上。」服務生指了指，壁紙上有一塊深色的污漬。華倫丁馬上付了錢，問那兩個神父往哪個方向走了。","surprised"],
+    ["Two streets away, he found a fruit shop. The price labels had been [[swapped]]: a card on the oranges said BEST NUTS, and a card on the nuts said FINEST ORANGES. The angry shopkeeper said that two priests had passed by. The short one had knocked over a whole box of apples with his umbrella and then said sorry very nicely. “Which way?” asked Valentin. The man pointed toward the north.",
+     "隔了兩條街，他看到一家水果店。價格標籤被調換了：橘子上的牌子寫著「最好的堅果」，堅果上的牌子寫著「最好的橘子」。氣呼呼的老闆說，剛才有兩個神父經過。矮的那個用雨傘撞翻了一整箱蘋果，然後非常有禮貌地道了歉。「往哪邊走？」華倫丁問。老闆指了指北邊。","amused"],
+    ["Valentin found two policemen and took them with him. They did not understand. “Sir,” said one, “two priests playing tricks is not a crime.” “No,” said Valentin. “But it is a [[trail]].” In a sweet shop, the girl behind the counter said that a priest had left a brown paper parcel there. Later, he had sent a message asking her to post it to an address in Westminster. In another restaurant, a window had been broken. The waiter said that a short priest had paid for the window before he broke it.",
+     "華倫丁找了兩個警察一起去。他們搞不懂。「長官，」其中一個說，「兩個神父惡作劇，又不是犯罪。」「不是，」華倫丁說，「但這是一條可以追的線索。」在一家糖果店，櫃台的女孩說，有個神父把一個牛皮紙包裹忘在店裡。後來他傳話來，請她把包裹寄到西敏區的一個地址。在另一家餐廳，一扇窗戶被打破了。服務生說，有個矮小的神父在打破窗戶之前，就先付了賠償的錢。","curious"],
+    ["“He paid before he broke it?” said one of the policemen. “He must be mad.” Valentin said nothing. Someone was leaving them a [[deliberate]] trail of small, silly crimes, and he did not yet know why. They followed it all afternoon, from a bus to a street and from a street to the edge of [[Hampstead Heath|c:n-hampstead]], a great green hill on the edge of London. The sun was going down, and the sky turned the color of a peacock’s tail.",
+     "「打破之前就先付錢？」其中一個警察說，「他一定是瘋了。」華倫丁沒說話。有人刻意留下了一連串小小的、愚蠢的「罪行」給他們追，他還不知道為什麼。他們追了一整個下午，從公車追到街上，從街上追到漢普斯特德荒野的邊緣，那是倫敦邊上一座大大的綠色山丘。太陽正在下山，天空變成了孔雀尾巴的顏色。","thoughtful"],
+    ["By now the policemen were tired and cross. “Sir,” said the younger one, “we have followed salt, soup, apples and a window across half of London. What if this is just a silly little priest having a silly little day?” Valentin did not answer. He was looking at the long, dark hill ahead of them, where two black shapes were walking slowly against the last of the light. One was short. The other was very tall.",
+     "到了這時候，兩個警察已經又累又不耐煩。「長官，」年輕的那個說，「我們跟著鹽、湯、蘋果和一扇窗戶，跑了半個倫敦。萬一這只是一個傻傻的小神父，過了傻傻的一天呢？」華倫丁沒有回答。他望著前方那座又長又暗的山丘，兩個黑色的身影正在最後一點天光中慢慢走著。一個矮，一個非常高。","nervous"],
+    ["There, on a bench under a tree, sat two priests. One was the short man from the train. The other was very, very tall. Valentin and the policemen crept behind the trees, close enough to hear. The two priests were talking about the stars and about God. The tall one said, “Who can know if, out there, reason is reasonable?” The short one answered gently, “Reason is always reasonable, even in the last [[limbo]].”",
+     "在那裡，一棵樹下的長椅上，坐著兩個神父。一個是火車上那個矮小的男人。另一個非常非常高。華倫丁和警察躲在樹後面，悄悄靠近，近到聽得見他們說話。兩個神父正在談星星，談上帝。高的那個說：「誰知道在那遙遠的地方，理性還合不合理呢？」矮的那個溫和地回答：「理性永遠是合理的，就算在最遠的地方也一樣。」","calm"],
+    ["Then the tall priest’s voice changed. “Well,” he said, “just hand over that cross.” The short priest did not move. “Are you sure you want it?” he asked. “I know who you are,” said the tall man. “I’m Flambeau, and I want that blue cross. There’s nobody here to help you.” The little priest looked sad. “I’m afraid,” he said, “that the cross isn’t here.”",
+     "接著，高個子神父的聲音變了。「好了，」他說，「把那個十字架交出來。」矮個子神父一動也不動。「你確定你要它嗎？」他問。「我知道你是誰，」高個子說，「我是弗蘭博，我要那個藍十字。這裡沒有人能幫你。」小神父看起來有點難過。「恐怕，」他說，「十字架不在這裡。」","nervous"],
+    ["Flambeau tore open the parcel in his hand. Inside were only paper and a few sticks of lead. “I [[suspected]] you the moment we met,” said the little priest. “There was a little bulge under your sleeve, where thieves wear a [[bracelet]] with spikes. So I switched the parcels when you weren’t looking. The real cross is safe. I left it at the sweet shop, and they posted it for me. It is at Westminster by now.” Flambeau laughed, a little wildly. “You? A country priest? How could you know about bracelets and switched parcels?”",
+     "弗蘭博扯開他手上的包裹。裡面只有紙和幾根鉛條。「我們第一次見面，我就懷疑你了，」小神父說，「你的袖子底下鼓起一塊，那是小偷戴尖刺手環的地方。所以我趁你不注意，把包裹調換了。真正的十字架很安全。我把它留在糖果店，請店裡幫我寄出去，現在應該已經到西敏區了。」弗蘭博笑了，笑得有點瘋狂。「你？一個鄉下神父？你怎麼會懂手環和調包這種事？」","proud"],
+    ["“Because people come to me and tell me their sins,” said [[Father Brown|c:n-fatherbrown]] simply. “A man who listens to sins all his life learns a great deal about human evil. And I knew you weren’t a real priest. You attacked reason. That’s bad theology.” Then he smiled. “And didn’t you notice? I left a trail for the police all day: the salt, the soup, the apples, the window. They’re standing behind those trees right now.”",
+     "「因為大家會來找我，跟我說他們的罪，」布朗神父簡單地說，「一個一輩子都在聽人告解的人，對人性的黑暗知道得很多。而且我知道你不是真的神父。你攻擊理性，那是很糟糕的神學。」然後他笑了。「你沒發現嗎？我一整天都在幫警察留線索：鹽、湯、蘋果、窗戶。他們現在就站在那些樹後面。」","amused"],
+    ["Valentin stepped out of the shadows, and the two policemen took Flambeau by the arms. The greatest criminal in Europe did not fight. Like a gentleman who has lost a game, he turned to the greatest detective in Europe and made him a deep bow. Valentin took off his hat. “Do not bow to me, my friend,” he said to Flambeau. “Let us both bow to our [[master]].”",
+     "華倫丁從陰影中走出來，兩個警察抓住了弗蘭博的手臂。全歐洲最偉大的罪犯沒有反抗。他像一個輸了棋的紳士，轉向全歐洲最偉大的偵探，深深鞠了一個躬。華倫丁摘下帽子。「別對我鞠躬，我的朋友，」他對弗蘭博說，「讓我們兩個一起，向我們的老師鞠躬吧。」","tender"],
+    ["And for a moment the two of them stood there in the evening light, hats in their hands, before the little priest from Essex. He did not notice. He was blinking around him, looking for his umbrella, which he had dropped again. The cleverest mind in England, Valentin thought, belonged to a man who could not hold on to an umbrella. He decided he would never again judge a man by his hat.",
+     "於是有那麼一刻，兩個人站在黃昏的光線裡，手裡拿著帽子，面對那位從艾塞克斯來的小神父。他完全沒注意到。他正眨著眼睛四處張望，找他又弄掉的雨傘。華倫丁心想，全英國最聰明的頭腦，竟然屬於一個連雨傘都拿不好的人。他決定，從此以後，再也不以帽子取人了。","amused"]
+  ],
+  quiz:[
+    ["Why did Father Brown leave salt in the sugar bowl and break a window?", ["He wanted to make a trail for the police to follow.","He was angry with the restaurants.","Flambeau told him to do it."], 0, "他一路故意製造小麻煩，好讓警察跟著線索找到荒野上的他們。"],
+    ["How did Father Brown first suspect that the tall priest was a thief?", ["He was too tall.","He wore a thief’s spiked bracelet.","He spoke with a French accent."], 1, "布朗神父第一次見到他，就注意到他袖子底下鼓起來，那是小偷常戴的尖刺手環。"],
+    ["Where was the real blue cross at the end?", ["In Flambeau’s parcel.","Under the bench.","In a parcel posted to Westminster."], 2, "神父早就調了包，把真正的十字架寄到西敏區，弗蘭博拿到的只是紙和鉛條。"]
+  ]
+},
+
+/* ---------------- 2 ---------------- */
+{ id:"imp", thread:"", kind:"classic", title:"The Bottle Imp", zt:"瓶中妖", voice:"m",
+  by:"Robert Louis Stevenson, 1891 · retold",
+  intro:"一個小瓶子，裡面住著一個小妖怪，可以實現你任何願望。只有一個條件：你死的時候，它不能在你手上。而要擺脫它，你只能用比你買來時更便宜的價錢賣掉它。",
+  paras:[
+    ["There was a young man of [[Hawaii|c:n-hawaii]] named [[Keawe|c:n-keawe]]. He was poor, brave and as strong as a horse, and he could read and write like a schoolteacher. He was also a sailor, and one day his ship took him to [[San Francisco|c:n-sanfrancisco]]. He walked up a hill full of rich men’s houses, admiring them, until he stopped in front of one that was as beautiful as a toy. The windows were as bright as diamonds.",
+     "夏威夷有個年輕人，名叫奇維。他很窮，很勇敢，力氣大得像一匹馬，而且讀書寫字像個學校老師一樣好。他也是個水手。有一天，他的船來到了舊金山。他走上一座滿是有錢人房子的山丘，一邊走一邊欣賞，直到他停在一棟漂亮得像玩具的房子前面。那棟房子的窗戶亮得像鑽石。","calm"],
+    ["An old man was looking out of one window. His face was as sad as rain. Keawe and the old man looked at each other, and each of them envied the other. The old man invited him in and showed him the house from top to bottom. Then he took a small, round-bellied bottle from a cupboard. Something dark was moving inside it, like a shadow and a fire at the same time.",
+     "一個老人正從其中一扇窗往外看，臉色哀傷得像下雨天。奇維和老人互相看著，兩個人都羨慕對方。老人請他進屋，帶他從上到下參觀。然後，他從櫥櫃裡拿出一個圓肚子的小瓶子。瓶子裡有個暗暗的東西在動，像影子，又像一團火。","curious"],
+    ["“This bottle holds an [[imp]],” the old man said. “It will give you anything you want: love, money, a house like this one. But there is a catch. If you die while you own it, you will burn forever. And you cannot throw it away. You can only sell it, and only for less money than you paid. If you sell it for the same price or more, it comes back to you, like a homing pigeon.” He had paid ninety dollars. He would sell it for fifty.",
+     "「這個瓶子裡住著一個小妖怪，」老人說，「你想要什麼，它都會給你：愛情、金錢、像這樣的一棟房子。可是有一個條件。如果你死的時候它還在你手上，你就會永遠在地獄裡燃燒。而且你不能把它丟掉，你只能把它賣掉，而且賣的價錢一定要比你買的時候便宜。如果你用一樣的價錢或更貴的價錢賣，它就會像信鴿一樣，飛回你身邊。」他當初花了九十塊買的，現在願意五十塊賣掉。","nervous"],
+    ["Keawe laughed and did not believe him, so he paid fifty dollars to prove it was a trick. He wished for his fifty dollars back, and when he put his hand in his pocket, the money was there. Frightened, he left the bottle in the gutter. Before he reached the corner, it was back in his pocket. He sold it to a man for sixty dollars. That night, it was waiting in his sea chest. It was real.",
+     "奇維笑了，不相信他，就花了五十塊買下來，想證明那只是個把戲。他許願要把五十塊拿回來，手往口袋一伸，錢就在那裡。他嚇壞了，把瓶子丟在路邊的水溝裡。還沒走到街角，瓶子又回到了他的口袋。他用六十塊賣給一個男人。那天晚上，瓶子又在他的航海箱裡等著他。它是真的。","surprised"],
+    ["Keawe’s friend [[Lopaka|c:n-lopaka]] told him to make one wish and then sell it quickly. So Keawe wished for a beautiful house on his own island, with land and a garden. When the ship came home, the news was waiting for him. His uncle had died suddenly and left him land, and his uncle’s son had drowned at sea. Keawe wept. He had not wanted his wish to come true like that. But the land was his, and soon his house was built: three floors, wide balconies and windows like the house in San Francisco. People called it the Bright House.",
+     "奇維的朋友羅帕卡要他許一個願，然後趕快把瓶子賣掉。於是奇維許願，想在自己的島上有一棟漂亮的房子，有土地，有花園。船回到家，消息已經在等他了：他的叔叔突然過世，留了一塊地給他，叔叔的兒子也在海上淹死了。奇維哭了。他從沒想過，自己的願望會用這種方式實現。可是土地是他的了，房子很快就蓋好了：三層樓、寬敞的陽台，窗戶就像舊金山那棟房子一樣。大家都叫它「光明之屋」。","sad"],
+    ["Before Lopaka paid, he asked to see the imp itself, just once, so that he would know the bottle was real. Keawe was afraid, but he agreed. Lopaka looked into the bottle and turned as white as paper. Neither of them ever said what they saw. But Lopaka paid at once, and his hands were shaking as he counted the money.",
+     "羅帕卡付錢之前，要求親眼看一次那個小妖怪，好確定瓶子是真的。奇維很害怕，但還是答應了。羅帕卡往瓶子裡一看，臉白得像紙一樣。他們兩個從來沒說過自己看到了什麼。可是羅帕卡馬上就付了錢，數錢的時候，手還在發抖。","nervous"],
+    ["Lopaka bought the bottle for forty-nine dollars and sailed away. Keawe was happy and free. Then, one evening by the sea, he met a young woman called [[Kokua|c:n-kokua]]. She was laughing at the edge of the water, and he fell in love with her before she had finished. Soon he asked her to marry him, and she said yes.",
+     "羅帕卡用四十九塊買下瓶子，出海去了。奇維又快樂又自由。後來，某天傍晚在海邊，他遇到一個叫柯庫亞的年輕女子。她在水邊笑著，她還沒笑完，他就已經愛上了她。沒過多久，他向她求婚，她答應了。","tender"],
+    ["That same night, Keawe took a bath and saw a small patch on his skin. His heart turned to ice. It was [[leprosy|c:leprosy]]. In those days, there was no cure. People who had it were sent away forever to a lonely place on the island of [[Molokai|c:n-molokai]]. He could never marry Kokua now. There was only one hope: the bottle.",
+     "就在那天晚上，奇維洗澡時，在皮膚上看到一小塊斑。他的心一下子結成了冰。那是痲瘋病。在那個年代，這種病沒有藥醫，得病的人會被永遠送到摩洛凱島上一個孤單的地方。他再也不能娶柯庫亞了。只剩一個希望：那個瓶子。","worried"],
+    ["He searched for days. The bottle had passed from hand to hand, each time a little cheaper, across the islands. At last he found it in [[Honolulu|c:n-honolulu]], with a pale young man who had paid only two cents for it. The young man wanted to get rid of it, but who could he sell it to? There was no coin smaller than one cent. Whoever bought it now could never sell it again.",
+     "他找了好幾天。那個瓶子在島嶼之間一手傳過一手，每次都便宜一點。最後，他在檀香山找到了它，在一個臉色蒼白的年輕人手上，他只花了兩分錢就買下了它。年輕人很想擺脫它，可是能賣給誰呢？已經沒有比一分錢更小的硬幣了。現在買下它的人，就永遠賣不掉了。","worried"],
+    ["Keawe paid one cent. That night he wished his skin clean, and in the morning, it was. He married Kokua. But he could not smile, he could not sleep, and at night he walked the beach alone. Kokua followed him and made him tell her the truth. When he finished, she did not cry. She thought for a long time. Then she said, “There are other countries with other coins. In France, they have a coin called a [[centime|c:centime]], and five of them make one cent. We will go to [[Tahiti|c:n-tahiti]], where they use French money.”",
+     "奇維付了一分錢。那天晚上，他許願讓皮膚恢復乾淨，到了早上，果然好了。他娶了柯庫亞。可是他笑不出來，也睡不著，晚上總是一個人在海灘上走。柯庫亞跟在他後面，要他說出實話。他說完以後，她沒有哭。她想了很久，然後說：「別的國家有別的硬幣。法國有一種硬幣叫『生丁』，五個生丁才等於一分錢。我們去大溪地，那裡用的是法國的錢。」","hopeful"],
+    ["So they sailed to Tahiti and rented a house. But when they offered the bottle and explained it, nobody wanted to buy it, not even for a few centimes. Soon people crossed the street when they saw Keawe. Each night he sat on the balcony, staring at the sea, as if the bottle were already pulling him down.",
+     "於是他們坐船到大溪地，租了一間房子。可是每當他們拿出瓶子、把事情說清楚，就沒有人想買，就算只要幾個生丁也不要。沒多久，大家看到奇維就過馬路躲開。每天晚上，他坐在陽台上盯著大海，好像那個瓶子已經在把他往下拉。","sad"],
+    ["Kokua loved him more than she feared the fire. One night, while Keawe slept, she took the bottle and found an old man in the street. She gave him four centimes and asked him to buy the bottle from her husband for that money. Then she bought it back from the old man for three centimes. Now the bottle was hers. She went home and lay down beside her husband, and she did not sleep at all.",
+     "柯庫亞愛他，比她害怕地獄之火還要多。某天晚上，趁奇維睡著，她拿著瓶子到街上找了一個老人。她給老人四個生丁，請他用這筆錢向她丈夫買下瓶子。然後她再用三個生丁，從老人那裡把瓶子買回來。現在，瓶子是她的了。她回到家，躺在丈夫身邊，整夜沒有闔眼。","tender"],
+    ["In the morning, Keawe found the bottle gone and felt as light as a bird. Then he saw Kokua’s face, pale and afraid, and he understood everything. His heart broke for the second time. He would not let her do this for him. So he made a plan of his own. He found a rough old [[boatswain|c:boatswain]] drinking near the harbor and gave him two centimes. “Buy it from my wife for these,” he said. “Then sell it to me for one.”",
+     "早上，奇維發現瓶子不見了，覺得自己輕得像一隻鳥。然後他看到柯庫亞的臉，蒼白又害怕，他一下子全明白了。他的心第二次碎了。他不能讓她為他這麼做。所以他也想了一個計畫。他在港口邊找到一個正在喝酒的粗魯老水手長，給了他兩個生丁。「用這個向我太太買下瓶子，」他說，「然後用一個生丁賣給我。」","sad"],
+    ["The boatswain went and came back with the bottle. But when Keawe held out his one centime, the old sailor laughed and put the bottle in his pocket. “I’m going to hell anyway,” he said. “And this thing can get me all the brandy I want. Find your own bottle.” Keawe begged him. “I’m warning you,” Keawe said. “You don’t understand what you’re doing.” “I understand fine,” said the boatswain, and he walked off whistling into the dark.",
+     "水手長去了，帶著瓶子回來。可是當奇維拿出他的一個生丁，老水手笑了，把瓶子收進自己口袋。「反正我早就注定要下地獄了，」他說，「而且這東西可以讓我想喝多少白蘭地就喝多少。你自己去找你的瓶子吧。」奇維求他。「我警告你，」奇維說，「你不知道自己在做什麼。」「我清楚得很。」水手長說完，吹著口哨走進了黑夜。","nervous"],
+    ["Keawe ran home to Kokua. That night, for the first time since their wedding, the two of them sat on the balcony and laughed. Below them, the sea was dark and quiet, and the lamps of the harbor shone like little stars. The bottle was gone forever. Keawe looked at his wife and thought that no imp in the world could have given him anything better than what he already had.",
+     "奇維跑回家找柯庫亞。那天晚上，從結婚到現在第一次，兩個人坐在陽台上笑了。底下的海又暗又安靜，港口的燈火像小星星一樣閃爍。瓶子永遠消失了。奇維看著他的妻子，心想，世界上沒有任何一個妖怪，能給他比他已經擁有的更好的東西。","warm"]
+  ],
+  quiz:[
+    ["What is the rule for getting rid of the bottle?", ["You must throw it into the sea.","You must sell it for less than you paid.","You must give it away for free."], 1, "只能賣掉，而且價錢一定要比買來的時候便宜；丟掉或同價賣出，瓶子都會自己回來。"],
+    ["Why did Keawe need the bottle a second time?", ["He wanted a bigger house.","He found he had leprosy and wanted to be cured.","Lopaka asked him to buy it back."], 1, "他發現自己得了痲瘋病，只有瓶子能治好，才能娶柯庫亞。"],
+    ["Why did Kokua want to go to Tahiti?", ["They used French centimes there, which are smaller than a cent.","Her family lived there.","Nobody knew about the bottle there."], 0, "生丁比一分錢更小，瓶子才有機會繼續往下賣。"]
+  ]
+},
+
+/* ---------------- 3 ---------------- */
+{ id:"button", thread:"", kind:"classic", title:"The Curious Case of Benjamin Button", zt:"班傑明的奇幻旅程", voice:"m",
+  by:"F. Scott Fitzgerald, 1922 · retold",
+  intro:"1860 年，巴爾的摩一家醫院裡，一個嬰兒出生了。他留著白鬍子，看起來七十歲，而且，他會越活越年輕。",
+  paras:[
+    ["On a September morning in 1860, Mr. Roger Button hurried through the streets of [[Baltimore|c:n-baltimore]] toward the hospital. His wife had just had their first child. He was a respectable man who sold hardware, and he wanted the baby to be a boy, so that he could go to Yale and wear a good suit. When he arrived, the doctor would not look at him. The nurse dropped a tray. “Go and see for yourself,” she said in a strange voice.",
+     "1860 年九月的一個早上，羅傑．巴頓先生匆匆穿過巴爾的摩的街道趕往醫院。他太太剛生下他們的第一個孩子。他是個體面的人，做五金批發生意。他希望是個男孩，將來可以去讀耶魯，穿體面的西裝。他到醫院時，醫生不肯看他。護士把托盤掉在地上。「你自己去看吧。」她用一種很奇怪的聲音說。","nervous"],
+    ["In the nursery, wrapped in a white blanket that was much too small, sat an old man of about seventy. His hair was thin and white, and a long, dirty-gray beard hung down from his chin. His feet [[stuck out|stick out]] at the end of the hospital cot. He looked at Mr. Button with tired, faded eyes. “Are you my father?” he asked in a cracked voice. “Because if you are, I wish you’d get me out of here. This bed is terribly uncomfortable.”",
+     "在育嬰室裡，裹著一條小得可憐的白毯子，坐著一個大約七十歲的老人。他的頭髮稀疏花白，下巴垂著一大把髒髒的灰白鬍子。他的腳從醫院的嬰兒床尾伸了出來。他用疲倦、黯淡的眼睛看著巴頓先生。「你是我爸爸嗎？」他用沙啞的聲音問，「如果是的話，拜託帶我離開這裡。這張床實在太不舒服了。」","surprised"],
+    ["Mr. Button was [[horrified]]. What would people say? He hurried to a shop to buy clothes for his son. The shop assistant looked at him strangely when he asked for clothes for a newborn baby, size: old man. In the end, he bought a boy’s costume off a shop-window dummy and cut off most of the beard himself with a pair of hospital scissors. He named his son Benjamin. Then he did his best to pretend nothing was unusual.",
+     "巴頓先生嚇壞了。別人會怎麼說？他趕緊去店裡幫兒子買衣服。他說要買新生兒穿的衣服，尺寸是老人，店員用很奇怪的眼神看他。最後，他買下櫥窗假人身上那套男童的化裝舞會服裝，還親手用醫院的剪刀把鬍子剪掉一大截。他給兒子取名叫班傑明。然後，他盡全力假裝一切都很正常。","amused"],
+    ["He gave Benjamin a rattle and expected him to play with it. Benjamin shook it politely when someone was watching. Then he went back to reading his father’s encyclopedia, and at night he secretly smoked cigars with his grandfather. The two of them got along wonderfully. They were exactly the same age, after all, at least on the outside.",
+     "他給班傑明一個搖鈴，希望他會玩。班傑明在有人看的時候，會很有禮貌地搖一搖。然後他就回去讀他爸爸的百科全書，晚上還偷偷跟祖父一起抽雪茄。他們兩個處得好極了。畢竟，至少從外表看起來，他們的年紀一模一樣。","playful"],
+    ["When Benjamin was five, his father sent him to kindergarten. He sat at a tiny table with his dyed hair and his long legs, cutting paper with the other children. He was bored to tears. At the end of the first week, the teacher sent a polite note home. Benjamin, she wrote, was a lovely little boy, but he kept falling asleep during the songs.",
+     "班傑明五歲時，爸爸送他去上幼稚園。他頂著染過的頭髮、拖著長長的腿，坐在小小的桌子前，跟其他小朋友一起剪紙。他無聊到快哭了。第一個星期結束時，老師寄了一封很有禮貌的信回家。她寫說，班傑明是個可愛的小男孩，可是他唱歌時一直睡著。","amused"],
+    ["Then something strange became clear. Every year, Benjamin looked a little younger. His back straightened. His step grew lighter. At twelve, his hair had turned from white to iron gray. At eighteen, he stood as straight as a man of fifty and decided to [[enroll]] at Yale. When he arrived at the college, the registrar took one look at his gray hair and lost his temper. “This is a college for young men,” he shouted, “not a joke for old fools!” A crowd of students followed Benjamin to the station, laughing.",
+     "接著，一件奇怪的事越來越明顯：班傑明每年都看起來更年輕一點。他的背挺直了，腳步也變輕了。十二歲時，他的頭髮已經從白色變成鐵灰色。十八歲時，他站得像個五十歲的男人一樣挺，決定去耶魯註冊。他一到學校，教務主任看了一眼他的灰頭髮，就大發脾氣。「這裡是給年輕人讀的大學，」他大吼，「不是給老糊塗開玩笑的！」一群學生跟著班傑明一路笑到車站。","sad"],
+    ["So he joined his father’s hardware business instead. In 1880, at twenty, he went to a dance with his father, and there he met Hildegarde Moncrief, the daughter of a general. She had pale golden hair and a laugh like music. She thought he was his father’s brother, and she liked him at once. “Men your age are so much more interesting,” she told him. “Young men are so silly.” Benjamin fell in love with her on the spot.",
+     "於是他改去爸爸的五金公司上班。1880 年，二十歲的他跟爸爸去參加一場舞會，在那裡遇見了一位將軍的女兒，希爾德加德．蒙克里夫。她有一頭淺金色的頭髮，笑聲像音樂一樣。她以為他是他爸爸的弟弟，一下子就喜歡上他了。「你這個年紀的男人有趣多了，」她對他說，「年輕男人都好幼稚。」班傑明當場就愛上了她。","tender"],
+    ["They married, and the city talked about nothing else. People said that Hildegarde must have married a rich old man for his money. Others said that Benjamin was older than her father. Nobody believed the true story. But the business did well under Benjamin, and for some years, they were very happy. They had a son, Roscoe, who grew up into a serious, [[ambitious]] young man.",
+     "他們結婚了，整座城市都在談這件事。有人說，希爾德加德一定是為了錢才嫁給一個有錢的老頭。也有人說，班傑明比她爸爸年紀還大。沒有人相信真正的故事。不過在班傑明的經營下，生意做得很好，好幾年裡，他們都過得很幸福。他們生了一個兒子，叫羅斯科，長大後成了一個嚴肅又有野心的年輕人。","calm"],
+    ["But time ran in opposite directions for the two of them. Each year, Hildegarde grew a little older and quieter, and Benjamin grew a little younger and more restless. He began to go to dances alone. He took up golf and tennis. When war came in 1898, he joined the army, fought bravely and came home a lieutenant colonel with a medal, looking about thirty. His wife stayed at home with her knitting. They no longer had anything to say to each other.",
+     "可是對他們兩個人來說，時間是往相反方向走的。每一年，希爾德加德都老一點、安靜一點；班傑明卻年輕一點、靜不下來一點。他開始一個人去跳舞，開始打高爾夫和網球。1898 年戰爭爆發，他從軍，打仗很勇敢，回來時已經是中校，還得了勳章，看起來大約三十歲。他太太待在家裡打毛線。他們之間再也沒有話可說了。","wistful"],
+    ["By the time Benjamin was fifty, he looked twenty. He left the business to Roscoe and went to Harvard, where nobody laughed at him this time. In his first year, he was the star of the football team and beat Yale almost by himself, which gave him a quiet [[satisfaction]]. But by his last year, he was so small and thin that the bigger students pushed him around, and he could no longer play.",
+     "到了五十歲，班傑明看起來只有二十歲。他把生意交給羅斯科，自己去讀哈佛，這次沒有人笑他了。大一那年，他是美式足球隊的明星，幾乎一個人就打敗了耶魯，心裡有一種默默的滿足。可是到了大四，他變得又小又瘦，大塊頭的學生把他推來推去，他再也不能打球了。","proud"],
+    ["He went home to live with Roscoe, who was now a busy businessman with a wife and a little boy. Roscoe was embarrassed by his father. “You’re not a child,” he kept saying. “At least act your age. Behave yourself. And when visitors are here, don’t call me ‘Roscoe.’ Call me ‘Uncle.’” Benjamin tried. It was difficult. He looked fifteen, and he felt fifteen, and the world treated him like a boy.",
+     "他回家跟羅斯科住。羅斯科現在是個忙碌的生意人，有太太，還有一個小兒子。羅斯科覺得他爸爸很丟臉。「你又不是小孩，」他一直說，「至少表現得像你的年紀一點，規矩一點。還有，有客人在的時候，不要叫我『羅斯科』，要叫我『叔叔』。」班傑明試了，可是很難。他看起來十五歲，感覺也是十五歲，整個世界都把他當小男孩看待。","deadpan"],
+    ["When America joined the great war in Europe, a letter arrived making Benjamin a brigadier general. He had a new uniform made, put it on and went to an army camp to report for duty. The soldiers there laughed so hard that they had to hold on to the desk. A little boy in a uniform that was much too big for him! Someone called his son. Roscoe came to take him home, red in the face, and did not speak to him for a week.",
+     "美國加入歐洲大戰時，一封信寄來，任命班傑明為准將。他訂做了一套新軍服，穿上後到軍營去報到。那裡的士兵笑到得扶著桌子才站得住。一個穿著大好幾號軍服的小男孩！有人打電話給他兒子。羅斯科來帶他回家，臉漲得通紅，一整個星期都不跟他說話。","sad"],
+    ["After that, Benjamin went to kindergarten with Roscoe’s little son. At first, the two boys were the same size and played together happily. But soon Benjamin was smaller than his grandson. He liked the colored paper and the paste, and he liked it when the teacher said “Good boy.” He did not understand the big words the older children used, and he did not mind.",
+     "後來，班傑明跟羅斯科的小兒子一起去上幼稚園。一開始，兩個男孩一樣高，開開心心地一起玩。可是沒多久，班傑明就比他的孫子還矮了。他喜歡色紙和漿糊，喜歡老師說「好乖」。大孩子說的那些長長的字他聽不懂，他也不在意。","gentle"],
+    ["His memories began to [[fade]]. He did not remember the war, or Harvard, or the golden hair of Hildegarde. He did not remember being old. His world became small and warm: his nurse, Nana, his bath, his bottle of milk, the shapes of light on the ceiling. He was happy when Nana smiled at him, and he cried when she went away.",
+     "他的記憶開始慢慢淡去。他不記得戰爭，不記得哈佛，也不記得希爾德加德的金髮。他不記得自己曾經老過。他的世界變得又小又溫暖：他的保母娜娜、洗澡、他的奶瓶、天花板上光影的形狀。娜娜對他笑，他就開心；娜娜走開，他就哭。","tender"],
+    ["Then there were no more memories at all. There was only the soft white of his little bed, the warm milk, and Nana’s voice. And then, slowly, the light and the voice and the warm sweet smell of milk all faded together out of his mind, and there was only quiet, like the end of a long, long day.",
+     "後來，連一點記憶都沒有了。只剩下他小床上柔軟的白色、溫熱的牛奶，還有娜娜的聲音。然後，慢慢地，光線、聲音，還有牛奶溫暖甜甜的味道，全都一起從他的腦海裡淡去，只剩下一片寧靜，就像一個長長、長長的一天結束時那樣。","wistful"]
+  ],
+  quiz:[
+    ["What happened when Benjamin first tried to go to Yale at eighteen?", ["He became a football star.","The registrar thought he was an old man playing a joke.","He failed the exam."], 1, "他十八歲時看起來五十歲，教務主任以為他是來開玩笑的老糊塗。"],
+    ["Why did Benjamin and Hildegarde drift apart?", ["She grew older while he grew younger.","He lost all his money.","She moved to another city."], 0, "她一年比一年老，他一年比一年年輕，兩人越來越沒有話說。"],
+    ["What did Roscoe want Benjamin to call him when visitors were there?", ["Roscoe","Uncle","Mr. Button"], 1, "羅斯科覺得丟臉，要爸爸在客人面前叫他「叔叔」。"]
+  ]
+},
+
+/* ---------------- 4 ---------------- */
+{ id:"persuasion", thread:"love", kind:"classic", title:"Persuasion", zt:"勸服", voice:"f",
+  by:"Jane Austen, 1817 · retold and shortened",
+  intro:"八年前，十九歲的安被說服，放棄了她愛的那個身無分文的年輕軍官。八年後，他回來了，成了有錢的艦長。他好像已經忘了她。她卻一天也沒忘記他。",
+  paras:[
+    ["[[Anne Elliot|c:n-anne]] was twenty-seven, and everyone in her family had stopped noticing her. Her father, [[Sir Walter|c:n-sirwalter]], loved two things: mirrors and his own name in the book of English baronets. Her elder sister, Elizabeth, was beautiful and cold. Her younger sister, Mary, was married and always ill when it was convenient. Anne was kind, clever and quiet, and in that house, quiet meant invisible.",
+     "安．艾略特二十七歲，家裡已經沒有人會注意到她了。她爸爸華特爵士愛兩樣東西：鏡子，還有他自己的名字出現在英國準男爵名冊上。她姊姊伊莉莎白漂亮又冷淡。妹妹瑪麗已經嫁人，總是在剛好方便的時候生病。安善良、聰明、安靜，而在那個家裡，安靜就等於隱形。","wistful"],
+    ["Eight years earlier, she had been engaged to a young naval officer called [[Frederick Wentworth|c:n-wentworth]]. He had no money and no family name, only courage and a great deal of confidence. Lady Russell, Anne’s godmother and dearest friend, [[persuaded]] her that the match was foolish. He might die at sea. He might never be rich. Anne was nineteen and believed it was her duty to listen. She broke the engagement. He left, angry and hurt, and she had never stopped regretting it.",
+     "八年前，她跟一個名叫腓特烈．溫特沃斯的年輕海軍軍官訂過婚。他沒有錢，也沒有家世，只有勇氣和滿滿的自信。安的教母、也是她最親的朋友羅素夫人說服她，這門親事太不明智了：他可能會死在海上，可能永遠不會發財。十九歲的安相信聽話是她的責任，於是解除了婚約。他帶著憤怒和受傷離開，而她從此沒有一天不後悔。","sad"],
+    ["Now her father was in [[debt]]. To save money, he rented out the family home, Kellynch Hall, and moved to the fashionable city of [[Bath|c:n-bath]]. The new tenants were Admiral and Mrs. Croft. Mrs. Croft, Anne discovered, had a brother: Captain Frederick Wentworth. The war was over, and he was coming home a rich man, looking for a wife.",
+     "現在她爸爸欠了一身債。為了省錢，他把家族的宅邸凱林奇大廳租出去，搬到時髦的城市巴斯。新房客是克羅夫特上將夫婦。安發現，克羅夫特太太有一個弟弟：腓特烈．溫特沃斯上校。戰爭結束了，他發了財回國，正在找一位妻子。","nervous"],
+    ["They met again at Mary’s house in the country. It took less than a minute. He bowed. She curtsied. He said a few polite words to her sister, and then he left the room. “Captain Wentworth said you were so altered he should not have known you,” Mary reported later, without any kindness. Anne said nothing. But that night, the words sat on her heart like a stone.",
+     "他們在瑪麗鄉下的家重逢了，前後不到一分鐘。他鞠躬，她屈膝回禮。他對她妹妹說了幾句客套話，就離開了房間。「溫特沃斯上校說妳變了好多，他差點認不出妳。」瑪麗事後轉述，口氣一點也不客氣。安什麼也沒說。可是那天晚上，那句話像一顆石頭，壓在她的心上。","sad"],
+    ["Over the next weeks, the captain was everywhere: at dinners, at dances, on country walks. He was charming to everyone except Anne. He was especially charming to Mary’s young sisters-in-law, Louisa and Henrietta Musgrove, who were pretty, lively, nineteen and twenty. Everyone wondered which one he would marry. Anne played the piano so that the others could dance, and she watched.",
+     "接下來幾個星期，上校無所不在：晚宴上、舞會上、鄉間散步時。他對每個人都很有魅力，除了安。他對瑪麗那兩個年輕的小姑，路易莎和亨麗埃塔．默斯格羅夫，又特別有魅力，她們漂亮、活潑，一個十九歲、一個二十歲。大家都在猜他會娶哪一個。安坐在鋼琴前，彈琴讓大家跳舞，然後看著。","wistful"],
+    ["Yet small things happened. Once, Mary’s little boy climbed onto Anne’s back and would not let go. Before she could say a word, someone lifted the child away. It was Captain Wentworth. He did not speak to her, and he did not look at her. Another day, on a long walk, Anne was tired. Without a word, he arranged for her to ride home in his sister’s carriage. He was still cold. But some part of him, she realized, still cared what happened to her.",
+     "可是，還是有一些小事發生了。有一次，瑪麗的小兒子爬到安的背上，怎麼都不肯下來。她還來不及開口，就有人把孩子抱走了。是溫特沃斯上校。他沒跟她說話，也沒看她一眼。又有一天，大家走了很長的路，安累了。他一句話也沒說，就安排她坐他姊姊的馬車回家。他還是很冷淡。可是她發現，他心裡還有某個部分，依然在乎她過得好不好。","tender"],
+    ["Anne learned to survive those evenings. She talked to the older people, helped Mary with the children and tried not to listen when Louisa laughed at something Wentworth said. Once, she heard him tell Louisa that he admired a woman with a firm mind, who did not let herself be persuaded by others. Anne understood exactly who he was thinking of, and she felt the words go straight into her heart.",
+     "安學會了怎麼熬過那些晚上。她陪年長的人聊天，幫瑪麗照顧孩子，路易莎因為溫特沃斯說的話而笑的時候，她試著不去聽。有一次，她聽到他對路易莎說，他欣賞意志堅定的女人，不會輕易被別人說服。安完全明白他心裡想的是誰，那些話直直刺進了她的心。","sad"],
+    ["Then a group of them went to see the sea at [[Lyme|c:n-lyme]], where a long stone wall called the Cobb curved out into the waves. Louisa loved to be noticed. She made Captain Wentworth catch her as she jumped down the steep steps of the Cobb. Then she ran up and jumped again, laughing. “I am determined I will!” This time she jumped too soon. He missed her. She fell to the stones and lay as still as death.",
+     "後來，一群人去萊姆看海。那裡有一道叫「科布」的長長石堤，彎彎地伸進浪裡。路易莎很愛引人注意，她要溫特沃斯上校接住她，從科布陡峭的石階上跳下來。然後她又跑上去，笑著再跳一次：「我就是要跳！」這一次她跳得太早，他沒接住。她摔在石頭上，一動也不動，像死了一樣。","panicked"],
+    ["Everyone screamed. Henrietta fainted. Mary held on to her husband and cried. Captain Wentworth knelt on the stones with Louisa in his arms and looked around wildly, as if for help. It was Anne who stayed calm. She told one man to run for a [[surgeon]], another to bring smelling salts, and she held Louisa’s head. Later, when Louisa had been carried to a house nearby and the doctor said she would live, Anne heard Wentworth say quietly to someone, “There is no one so capable as Anne.”",
+     "每個人都在尖叫。亨麗埃塔昏倒了。瑪麗抓著她先生哭。溫特沃斯上校跪在石頭上，抱著路易莎，慌亂地四處張望，好像在找人幫忙。保持冷靜的，是安。她叫一個人跑去找外科醫生，叫另一個人去拿嗅鹽，自己扶著路易莎的頭。後來，路易莎被抬到附近的一間屋子裡，醫生說她會活下來。安聽到溫特沃斯對某人輕聲說：「沒有人比安更能幹了。」","panicked"],
+    ["Louisa got better slowly. During her long weeks in bed, a quiet young naval officer, Captain Benwick, read poetry to her, and before anyone knew it, they were engaged. The news reached Anne in Bath. Captain Wentworth was free. And soon, he was in Bath too.",
+     "路易莎慢慢康復。在她臥床的那幾個星期裡，一位安靜的年輕海軍軍官，本威克上校，唸詩給她聽，大家還來不及反應，他們就訂婚了。消息傳到巴斯的安那裡。溫特沃斯上校自由了。沒多久，他也來到了巴斯。","hopeful"],
+    ["But in Bath, Anne had another admirer. Her cousin, Mr. William Elliot, would one day inherit her father’s title. He was handsome, polite and very interested in Anne. Everyone said what a perfect match it would be, Lady Russell most of all. Anne did not trust him. He was too smooth, too pleasant to everyone. At a concert, Wentworth came to speak to her, saw Mr. Elliot at her side and left early with a dark face. Anne could have cried. He was [[jealous]]. That meant he still cared.",
+     "可是在巴斯，安有了另一個愛慕者。她的堂哥威廉．艾略特先生，將來會繼承她爸爸的爵位。他英俊、有禮貌，對安很感興趣。大家都說這是天作之合，羅素夫人說得最起勁。安不相信他。他太圓滑了，對每個人都太好了。在一場音樂會上，溫特沃斯過來找她說話，看到艾略特先生在她身邊，臉一沉就提早走了。安差點哭出來。他在吃醋。那表示，他還在乎。","hopeful"],
+    ["Soon after, Anne learned the truth about her cousin from an old school friend, Mrs. Smith, who was poor, ill and living in two small rooms in Bath. Years before, Mr. Elliot had led Mrs. Smith’s husband into debt and then refused to help her when he died. He was charming only when it was useful. Anne was not surprised. She had never trusted a man who never lost his temper and never laughed too loud.",
+     "沒多久，安從一位老同學史密斯太太那裡，知道了堂哥的真面目。史密斯太太又窮又病，住在巴斯兩間小小的房間裡。多年前，艾略特先生帶著她先生欠了一身債，等她先生過世，又拒絕幫助她。他只有在有利可圖的時候才迷人。安並不意外。她從來就不相信一個從不發脾氣、也從不放聲大笑的男人。","thoughtful"],
+    ["A few days later, Anne sat in a busy hotel room, talking with Wentworth’s friend, Captain Harville. Wentworth sat at a desk nearby, writing a letter. Harville and Anne began to argue gently about whether men or women love longer. “All the privilege I claim for my own sex,” Anne said, and her voice shook a little, “is that of loving longest, when existence or when hope is gone.” At the desk, the scratching of a pen stopped.",
+     "幾天後，安坐在一間熱鬧的旅館房間裡，跟溫特沃斯的朋友哈維爾上校聊天。溫特沃斯坐在附近的書桌前寫信。哈維爾和安開始溫和地爭論，到底是男人還是女人愛得比較長久。「我為我們女人所要求的唯一特權，」安說，聲音有一點發抖，「就是在生命或希望都已經消逝之後，還能愛得最久。」書桌那邊，沙沙的寫字聲停了。","tender"],
+    ["Wentworth stood, took his gloves and left with Harville. But a moment later he came back into the room, “for his gloves,” he said. He [[slipped]] a folded letter onto the table in front of Anne, looked at her once with burning eyes and was gone.",
+     "溫特沃斯站起來，拿了手套，跟哈維爾一起離開。可是過了一會兒，他又走回房間，說是「回來拿手套」。他把一封摺好的信悄悄放在安面前的桌上，用熾熱的眼神看了她一眼，然後就走了。","excited"],
+    ["She opened it with shaking hands. “I can listen no longer in silence,” he had written. “I must speak to you by such means as are within my reach. You pierce my soul. I am half agony, half hope. Tell me not that I am too late, that such precious feelings are gone for ever. I offer myself to you again with a heart even more your own than when you almost broke it, eight years and a half ago… I have loved none but you.”",
+     "她用顫抖的手打開信。「我再也無法沉默地聽下去了，」他寫道，「我只能用我還做得到的方式跟妳說話。妳刺穿了我的靈魂。我一半是痛苦，一半是希望。別告訴我已經太遲，別告訴我這麼珍貴的感情已經永遠消失。我再一次把自己交給妳，這顆心比八年半前、妳幾乎把它撕碎的時候，更加屬於妳……除了妳，我誰也沒愛過。」","tender"],
+    ["Half an hour later, they walked together up a quiet street in Bath, slowly, as if they had all the time in the world. At last they had. They talked about everything that had happened in eight years, every misunderstanding, every lonely evening. This time, nobody could persuade Anne of anything. She already knew exactly what she wanted.",
+     "半個小時後，他們一起走在巴斯一條安靜的街上，走得很慢，好像全世界的時間都是他們的。終於，真的是了。他們聊了八年來發生的每一件事，每一個誤會，每一個孤單的夜晚。這一次，沒有人能再說服安任何事了。她已經完全知道自己想要什麼。","warm"]
+  ],
+  quiz:[
+    ["Why did Anne break her engagement eight years earlier?", ["She stopped loving Wentworth.","Lady Russell persuaded her it was unwise.","Wentworth married someone else."], 1, "她的教母羅素夫人說服她，嫁給沒錢的年輕軍官太冒險了。"],
+    ["What did Wentworth say about Anne after Louisa’s fall?", ["That she was too quiet.","That there was no one so capable as Anne.","That she had changed too much."], 1, "安在意外中最冷靜能幹，他說：沒有人比安更能幹了。"],
+    ["Why did Wentworth write the letter?", ["He heard Anne say women love longest, even when hope is gone.","Harville told him to.","He was leaving Bath forever."], 0, "他在一旁聽到安說女人愛得最久，終於忍不住寫信表白。"]
+  ]
+},
+
+/* ---------------- 5 ---------------- */
+{ id:"lostworld", thread:"", kind:"classic", title:"The Lost World", zt:"失落的世界", voice:"m",
+  by:"Arthur Conan Doyle, 1912 · retold and shortened",
+  intro:"一個想當英雄的年輕記者，一個脾氣火爆的教授，還有南美洲叢林深處一座與世隔絕的高原。高原上，恐龍還活著。",
+  paras:[
+    ["It all began because of a girl. Her name was Gladys, and I, [[Edward Malone|c:n-malone]], a young reporter for the Daily Gazette, was in love with her. One evening I finally told her. She shook her head kindly. “I could only love a man who did great things,” she said. “A man who faced danger and was not afraid.” So I walked straight to my newspaper office and asked my editor for the most dangerous job he had.",
+     "一切都是因為一個女孩。她叫葛萊蒂絲，而我，愛德華．馬龍，《每日公報》的年輕記者，愛上了她。有一天晚上，我終於向她表白。她溫柔地搖搖頭。「我只會愛上做大事的男人，」她說，「一個面對危險也不害怕的男人。」所以我直接走回報社，向總編輯要他手上最危險的工作。","playful"],
+    ["My editor sent me to interview [[Professor Challenger|c:n-challenger]]. “He has broken the noses of the last three reporters who visited him,” he said cheerfully. “Good luck.” The professor was short, with enormous shoulders, a huge black beard and a voice like a bull. Within ten minutes, he had thrown me out of his front door into the street. Then, to my surprise, he invited me back in and showed me something: a sketchbook made by a dead American artist in the jungles of South America. One picture showed a creature like a huge [[lizard]], as tall as a house.",
+     "總編輯派我去訪問查林傑教授。「上一個、上上一個、上上上一個去找他的記者，鼻子都被他打斷了，」他開心地說，「祝你好運。」教授個子矮，肩膀卻寬得嚇人，留著一大把黑鬍子，聲音像一頭公牛。不到十分鐘，他就把我從前門丟到了街上。沒想到，他接著又請我進屋，給我看了一樣東西：一本素描本，是一個死在南美洲叢林裡的美國畫家畫的。其中一張圖畫著一種像巨大蜥蜴的生物，跟房子一樣高。","amused"],
+    ["Challenger claimed that somewhere in the Amazon there was a high [[plateau]], cut off from the world by cliffs, where creatures from millions of years ago still lived. At a public meeting in London, the audience laughed at him. One scientist, Professor Summerlee, a thin, sharp old man, called it nonsense. Challenger roared that he would prove it. A [[committee]] was formed on the spot: Summerlee would go to check the facts, Lord John Roxton, a famous hunter, would go for the adventure, and I would go for the newspaper. I thought of Gladys and raised my hand first.",
+     "查林傑宣稱，亞馬遜某個地方有一座高原，四周被懸崖圍住，與世隔絕，幾百萬年前的生物還活在上面。在倫敦的一場公開演講上，聽眾都在笑他。一位叫薩默李的教授，又瘦又尖酸的老人，說這全是胡說八道。查林傑大吼，說他會證明給大家看。現場馬上組成了一個委員會：薩默李去查證事實，有名的獵人洛克斯頓勳爵去冒險，而我代表報社去。我想到葛萊蒂絲，第一個舉起了手。","excited"],
+    ["We sailed to Brazil and traveled for weeks up the great river and its smaller branches, through forests so thick that the sun hardly touched the water. Challenger joined us there, as loud as ever. At last, one morning, we saw it: a long line of red cliffs rising out of the green jungle, hundreds of feet high, and on top, trees we had never seen before. Summerlee was silent for a full minute. Then he said, “Well. Let us see what is up there.”",
+     "我們坐船到巴西，沿著大河和它的小支流走了好幾個星期，穿過濃密到陽光幾乎照不到水面的森林。查林傑在那裡跟我們會合，還是一樣大嗓門。終於，某天早上，我們看到了：一長排紅色的懸崖從綠色叢林裡拔地而起，高好幾百英尺，懸崖頂上長著我們從來沒見過的樹。薩默李整整一分鐘沒說話。然後他說：「好吧，我們去看看上面有什麼。」","surprised"],
+    ["There was no way up the cliffs. But beside them stood a single tall rock like a tower, and on its top grew a tree. We climbed the rock, cut down the tree, and it fell across the gap like a bridge. One by one, we crossed on hands and knees, with nothing below us but air. We were on the plateau. Then we heard a crash behind us. One of our guides, Gomez, who had secretly hated Lord John for years, had pushed our tree bridge into the [[gorge]]. He shouted that Lord John had killed his brother, and laughed. Lord John’s rifle cracked once, and Gomez was gone. But so was our bridge. We were trapped.",
+     "懸崖根本爬不上去。可是懸崖旁邊有一根像塔一樣高的岩柱，柱頂長著一棵樹。我們爬上岩柱，把樹砍倒，樹就橫倒在缺口上，像一座橋。我們一個接一個，手腳並用地爬過去，底下什麼都沒有，只有空氣。我們上了高原。接著，背後傳來一聲巨響。我們的嚮導之一高梅茲，多年來一直暗中痛恨洛克斯頓勳爵，他把我們的樹橋推進了峽谷。他大喊洛克斯頓勳爵殺了他哥哥，接著大笑。洛克斯頓勳爵的步槍響了一聲，高梅茲不見了。可是我們的橋也沒了。我們被困住了。","panicked"],
+    ["For a long time nobody spoke. Then Challenger rubbed his hands together. “Gentlemen,” he said, “we have the chance to study a new world. Let us not waste it complaining.” Even Summerlee had to admit that he was right. We made a camp, built a fence of thorns around it and started to explore.",
+     "很長一段時間，沒有人說話。然後查林傑搓了搓手。「各位，」他說，「我們有機會研究一個全新的世界，別把時間浪費在抱怨上。」連薩默李都不得不承認他說得對。我們紮了營，在營地四周築了一圈荊棘籬笆，開始探險。","calm"],
+    ["On the second day, we crept through the bushes and saw them: five huge creatures, gray and scaly, as big as elephants, walking on their back legs. Their front legs were short, and they were pulling leaves from the trees with their mouths. Summerlee gave a little cry. “[[Iguanodons|c:iguanodon]],” whispered Challenger, his eyes full of tears. “Summerlee, look at them. Do you still say I am a liar?” For once, Summerlee said nothing at all.",
+     "第二天，我們悄悄穿過灌木叢，看見了牠們：五隻巨大的生物，灰色，身上長滿鱗片，跟大象一樣大，用後腿走路。牠們的前腿很短，正用嘴從樹上扯葉子吃。薩默李輕輕叫了一聲。「禽龍，」查林傑低聲說，眼裡含著淚水，「薩默李，你看牠們。你還說我是騙子嗎？」難得一次，薩默李什麼話都沒說。","surprised"],
+    ["Not every creature was so gentle. In a swamp full of bones, we found a nest of [[pterodactyls|c:pterodactyl]], flying [[reptiles]] with leathery wings as wide as a bus. They smelled terrible and screamed like old doors, and one of them tore Challenger’s hat off his head. At night, something enormous walked around our thorn fence, breathing heavily. In the morning we saw its footprints, deep in the mud, longer than my arm. We kept the fire burning every night after that.",
+     "不是每一種生物都這麼溫和。在一片堆滿骨頭的沼澤裡，我們發現了一窩翼手龍，一種飛行的爬蟲類，皮革般的翅膀張開來跟一輛公車一樣寬。牠們臭得要命，叫起來像生鏽的舊門，其中一隻還把查林傑的帽子從頭上扯走了。到了晚上，有個巨大的東西繞著我們的荊棘籬笆走，呼吸聲很重。早上，我們看到牠的腳印深深陷在泥裡，比我的手臂還長。從那以後，我們每天晚上都讓火燒著不熄。","nervous"],
+    ["One night, I could not sleep, so I walked alone to a lake in the middle of the plateau. In the moonlight, I saw strange creatures drinking at the edge of the water and a long neck rising out of the lake like a snake. On the way back, I heard heavy steps behind me. Something huge was following me, hopping like a giant bird, with a toad-like face and terrible teeth. I ran faster than I had ever run in my life, fell into a deep pit that hunters had dug, and lay there in the dark until morning, listening to it breathe above me.",
+     "有一天晚上，我睡不著，一個人走到高原中央的一座湖邊。月光下，我看到奇怪的生物在水邊喝水，還有一條長長的脖子像蛇一樣從湖裡伸出來。回來的路上，我聽到背後傳來沉重的腳步聲。有個巨大的東西在跟著我，像一隻巨鳥一樣跳著走，長著一張像蟾蜍的臉和可怕的牙齒。我跑得比這輩子任何時候都快，掉進一個獵人挖的深坑裡，在黑暗中躺到天亮，聽著牠在我頭頂上呼吸。","panicked"],
+    ["I will not describe all our adventures here. There were ape-men in the trees who captured Summerlee and Challenger, and a terrible night when I was chased through the forest. There was a tribe of people who lived in caves on the plateau and who became our friends after we helped them. In the end, it was they who showed us a secret tunnel through the rock and a way down the cliffs. After months away, we were going home.",
+     "我們所有的冒險，我就不在這裡一一描述了。樹上有猿人抓走了薩默李和查林傑，還有一個可怕的夜晚，我被追著跑過整座森林。高原上有一群住在山洞裡的人，在我們幫了他們以後，成了我們的朋友。最後，就是他們帶我們找到一條穿過岩石的秘密地道，還有一條下懸崖的路。離開好幾個月以後，我們終於要回家了。","hopeful"],
+    ["In London, the great hall was packed for our report. Thousands of people had come, and many of them had come to laugh. Summerlee spoke first, and they listened politely. Then a man stood up in the crowd. “Photographs can be faked,” he shouted. “Where is your proof?” Others joined in. Soon the whole hall was shouting. Challenger stood quietly on the stage beside a large wooden box.",
+     "回到倫敦，大禮堂擠滿了來聽我們報告的人。幾千人到場，其中很多人是來看笑話的。薩默李先上台，大家很有禮貌地聽著。然後，人群中有個男人站起來。「照片是可以造假的，」他大喊，「你們的證據在哪裡？」其他人也跟著喊。沒多久，整個禮堂都在吼叫。查林傑安靜地站在台上，身旁放著一個大木箱。","nervous"],
+    ["“You want proof?” he said. He bent down and opened the box. For a moment nothing happened. Then something climbed out and sat on the edge of the box: a creature with a long, cruel beak, red eyes and wings folded like a dirty umbrella. It was a young pterodactyl. A woman screamed. The creature spread its wings, jumped into the air and flew in circles above the heads of the crowd. People fell over chairs. Someone fainted. The smell filled the hall.",
+     "「你們要證據？」他說。他彎下腰，打開箱子。一開始什麼事都沒發生。然後，有個東西爬了出來，蹲在箱子邊上：一種長著又長又兇的嘴、紅色的眼睛、翅膀像一把髒雨傘一樣收著的生物。那是一隻年輕的翼手龍。一個女人尖叫起來。那隻生物張開翅膀，跳到空中，在群眾頭頂上一圈一圈地飛。有人被椅子絆倒，有人昏倒了。那股臭味充滿了整個禮堂。","excited"],
+    ["Then it found an open window high in the wall and was gone into the London night. It was seen once or twice on London rooftops, flying southwest, and then never again. But nobody in that hall ever laughed at Professor Challenger again, either. The newspapers printed the story the next morning, and my name was on the front page. I bought flowers and ran all the way to Gladys’s house.",
+     "然後，牠找到牆上高處一扇開著的窗戶，飛進倫敦的夜色裡，消失了。之後有人在倫敦的屋頂上看過牠一兩次，往西南方飛去，然後就再也沒出現了。不過，那天在禮堂裡的人，也再也沒有人敢笑查林傑教授了。隔天早上，報紙刊出了這個故事，我的名字登在頭版。我買了花，一路跑到葛萊蒂絲家。","triumphant"],
+    ["She opened the door with a small, nervous man beside her. “Edward!” she said. “This is my husband, Mr. Potts. He works in a lawyer’s office.” I looked at Mr. Potts. He was short, quiet and very ordinary. “But Gladys,” I said, “you said you could only love a hero.” “Oh, Edward,” she laughed. “I meant someone who was brave enough to marry me.” I walked away, and I did not feel sad for long. Lord John was planning another expedition, and he had asked me to come.",
+     "她打開門，身邊站著一個矮小、緊張兮兮的男人。「愛德華！」她說，「這是我先生，波茲先生。他在律師事務所上班。」我看著波茲先生。他又矮又安靜，非常普通。「可是葛萊蒂絲，」我說，「妳說過妳只會愛上英雄。」「喔，愛德華，」她笑著說，「我的意思是，有勇氣娶我的人呀。」我轉身離開，沒有難過太久。洛克斯頓勳爵正在計畫另一次探險，而且他邀我一起去。","amused"]
+  ],
+  quiz:[
+    ["Why did Malone ask for a dangerous job?", ["He needed more money.","He wanted to impress Gladys, who said she could only love a hero.","Challenger asked him to come."], 1, "葛萊蒂絲說她只會愛上做大事、不怕危險的男人，所以他想當英雄。"],
+    ["How did the explorers get trapped on the plateau?", ["A storm broke their boat.","Their guide Gomez pushed the tree bridge into the gorge.","They lost their map."], 1, "嚮導高梅茲痛恨洛克斯頓勳爵，把樹橋推下峽谷。"],
+    ["What was Challenger’s proof at the meeting in London?", ["A photograph of an iguanodon.","A living young pterodactyl in a box.","A huge footprint."], 1, "他打開木箱，放出一隻活生生的小翼手龍，在禮堂裡飛。"]
+  ]
+},
+
+/* ---------------- 6 ---------------- */
+{ id:"lastdm", thread:"dnd", age:65, kind:"orig", title:"The Last Dungeon Master", zt:"最後的地下城主", voice:"f",
+  by:"InkQuest original",
+  intro:"林老師教了三十五年國文，退休後的日子安靜得有點太安靜。直到有一天，她的孫子哭喪著臉回家：「我們的地下城主要去讀大學了。我們的遊戲結束了。」",
+  paras:[
+    ["Every Saturday afternoon for two years, the noise had come from Hao’s bedroom: dice rattling on the desk, four boys shouting at once, and then a terrible silence while someone waited to see if a dragon would eat him. Lin Mei-yu, sixty-five, retired, sat in the living room of their apartment in [[Tainan|c:n-tainan]] with a cup of tea and listened. She did not understand the game. But she understood the sound of children who were completely happy.",
+     "兩年來，每個星期六下午，噪音都從小豪的房間傳出來：骰子在書桌上嘩啦啦地滾，四個男孩同時大叫，接著是一陣可怕的沉默，有人在等著看自己會不會被龍吃掉。林美玉，六十五歲，已經退休，端著一杯茶坐在台南公寓的客廳裡聽著。她看不懂這個遊戲，可是她聽得懂，那是孩子們完全快樂時發出的聲音。","warm"],
+    ["Then, one Saturday in August, there was no noise at all. Her grandson came out of his room with his shoulders down. “Ah-Kai is going to university in Taichung,” he said. “He was our [[dungeon master|c:dm]]. Nobody else knows how to run the game. So that’s it. Game over.” He dropped onto the sofa as if the dragon had finally eaten him.",
+     "然後，八月的某個星期六，一點聲音都沒有。孫子垂著肩膀走出房間。「阿凱要去台中讀大學了，」他說，「他是我們的地下城主。沒有別人會帶這個遊戲。所以就這樣了，遊戲結束。」他倒在沙發上，好像那隻龍終於把他吃掉了。","sad"],
+    ["“What does a dungeon master do?” Mei-yu asked. Hao explained, a little impatiently. The dungeon master tells the story. She describes the world, plays every monster and every shopkeeper, makes the rules fair and decides what happens when the players try something crazy. “Like a teacher,” said Mei-yu. “Like a [[narrator]].” “Kind of,” said Hao. “But fun.” She decided not to take that personally.",
+     "「地下城主是做什麼的？」美玉問。小豪有點不耐煩地解釋：地下城主負責說故事。她描述整個世界，扮演每一隻怪物、每一個店老闆，讓規則公平，還要決定玩家做出瘋狂舉動時會發生什麼事。「就像老師嘛，」美玉說，「像說故事的人。」「有點像，」小豪說，「可是比較好玩。」她決定不要把這句話往心裡去。","amused"],
+    ["That night, after Hao went to bed, Mei-yu put on her reading glasses and opened the thick rulebook he had left on the table. It was in English, full of tables and numbers, and her English was rusty, so she kept a dictionary open beside it. There were spells, monsters, maps and a whole page about what happens when you fall from a great height. She had spent thirty-five years teaching teenagers to love old Chinese poems. She had read harder books than this. At two in the morning, she was still reading, with a pencil in her hand and a list of questions.",
+     "那天晚上，等小豪去睡了，美玉戴上老花眼鏡，翻開他留在桌上那本厚厚的規則書。書是英文的，滿滿的表格和數字，她的英文有點生疏了，所以旁邊一直攤著一本字典。書裡有法術、怪物、地圖，還有一整頁在講從高處摔下來會怎樣。她花了三十五年，教青少年愛上古典詩詞。比這更難的書，她都讀過。凌晨兩點，她還在讀，手裡拿著鉛筆，旁邊寫了一張問題清單。","curious"],
+    ["The next Saturday, she knocked on Hao’s door. Three boys looked up from their phones. “I’ll be your dungeon master,” she said. There was a long, [[polite]] silence. One of the boys, Wei, coughed. “Grandma Lin,” he said carefully, “it’s quite complicated.” “So is the Book of Songs,” said Mei-yu, and she sat down at the head of the desk. “Roll your dice.”",
+     "下一個星期六，她敲了敲小豪的房門。三個男孩從手機上抬起頭。「我來當你們的地下城主。」她說。一陣很長、很有禮貌的沉默。其中一個男孩，阿威，咳了一聲。「林奶奶，」他小心翼翼地說，「這個滿複雜的耶。」「《詩經》也很複雜啊。」美玉說，然後在書桌的主位坐下。「擲骰子吧。」","playful"],
+    ["The first game was a disaster. She forgot rules. She looked things up in the book for five minutes at a time. When the boys’ characters walked into a village, she described it so slowly and so beautifully that one of them fell asleep. Hao was [[mortified]]. After the boys left, Mei-yu sat alone at the desk for a long time, looking at her notes. Then she made a new list. At the top, she wrote: Less poetry. More goblins.",
+     "第一場遊戲是一場災難。她忘了規則，一查書就是五分鐘。男孩們的角色走進一座村莊時，她描述得又慢又美，結果有一個人睡著了。小豪丟臉死了。男孩們走後，美玉一個人在書桌前坐了很久，看著她的筆記。然後她寫了一張新的清單，最上面寫著：少一點詩，多一點哥布林。","amused"],
+    ["The second game was better. By the fourth, something had changed. Mei-yu stopped reading the rules and started reading the boys. She had spent her whole life watching teenagers in classrooms, and she knew exactly when they were bored, when they were afraid and when they were secretly proud of themselves. She gave the shy boy, Chun, a mystery that only he could solve. She gave Wei, who never stopped talking, an [[innkeeper]] who talked even more than he did. She gave every monster a reason, and every reason a voice.",
+     "第二場好一點了。到了第四場，有些事情變了。美玉不再讀規則，開始讀這些男孩。她一輩子都在教室裡觀察青少年，她完全知道他們什麼時候無聊、什麼時候害怕、什麼時候偷偷為自己驕傲。她給害羞的阿群一個只有他能解開的謎題。她給話多到停不下來的阿威，安排了一個比他更愛講話的旅店老闆。她讓每一隻怪物都有理由，每一個理由都有自己的聲音。","proud"],
+    ["Her goblins had names and complaints. Her dragon was old and lonely and collected teacups. When a boy’s character died in a trap, she did not make him sit out. She made him a ghost who could only speak in riddles, and he had more fun than anyone. The boys started arriving early. They stopped looking at their phones. One Saturday, Wei’s mother called to ask why her son kept saying “By the beard of my grandmother!” at dinner.",
+     "她的哥布林有名字，還會抱怨。她的龍又老又寂寞，喜歡收集茶杯。有個男孩的角色死在陷阱裡，她沒有讓他在旁邊乾坐著，而是讓他變成一個只能用謎語說話的鬼魂，結果他玩得比誰都開心。男孩們開始提早到，不再看手機。有一個星期六，阿威的媽媽打電話來問，為什麼她兒子吃晚飯時一直說「以我奶奶的鬍子發誓！」","playful"],
+    ["One Saturday, the dragon that collected teacups finally met the players. The boys had planned to fight it. Instead, Chun’s character, the shy one, asked the dragon why it was so lonely. The whole table went quiet. Mei-yu looked at Chun over her glasses, and then, in the dragon’s deep, tired voice, she told them a long, sad story about a dragon who had outlived all its friends. When she finished, Wei whispered, “Can we take it home?” They did. The dragon joined the party.",
+     "某個星期六，那隻收集茶杯的龍終於遇上了玩家。男孩們本來打算跟牠打一場。結果，害羞的阿群扮演的角色，開口問龍為什麼那麼寂寞。整張桌子都安靜了下來。美玉從老花眼鏡上方看了阿群一眼，然後用那隻龍低沉、疲憊的聲音，說了一個很長、很悲傷的故事：一隻龍活得比所有朋友都久。她說完以後，阿威小聲地說：「我們可以帶牠回家嗎？」他們真的帶了。那隻龍加入了隊伍。","tender"],
+    ["Word spread. A girl from Hao’s class asked if she could join. Then her younger brother. Then, one day, Mr. Huang from the fourth floor, a retired bus driver of seventy, stood shyly at the door. “I used to play this,” he said, “a long time ago, with my son, when he was your age.” By December, there were nine players, two tables and a waiting list. They moved from Hao’s bedroom to the community room on the ground floor, which the building manager agreed to open every Saturday afternoon.",
+     "消息傳開了。小豪班上一個女生問能不能加入。然後是她弟弟。然後，有一天，四樓的黃伯伯，一個七十歲的退休公車司機，很害羞地站在門口。「我以前玩過這個，」他說，「很久以前，我兒子跟你們一樣大的時候，我陪他玩過。」到了十二月，已經有九個玩家、兩張桌子，還有一張候補名單。他們從小豪的房間搬到一樓的社區活動室，管理員答應每個星期六下午都幫他們開門。","cheerful"],
+    ["Mei-yu ran both tables. She was busier than she had been in years. She had a notebook full of maps, a box of dice from a shop in Taipei and a voice for every kind of monster. Her daughter-in-law said she looked ten years younger. Mei-yu thought that was probably an exaggeration. Five years, maybe.",
+     "兩桌都由美玉帶。她比這幾年任何時候都忙。她有一本畫滿地圖的筆記本、一盒在台北買的骰子，還能為每一種怪物配上不同的聲音。她媳婦說她看起來年輕了十歲。美玉覺得這大概有點誇張。五歲吧，也許。","amused"],
+    ["One evening, after everyone had gone, Hao helped her stack the chairs. He was quiet for a long time. Then he said, “Grandma, why do you do this? You didn’t even like games.” Mei-yu thought about it. “When I was teaching,” she said, “I told stories, and young people listened. When I [[retired]], the stories stopped. I didn’t know how much I missed it until that rulebook. A good story needs a table, and people around it.” Hao nodded. “You’re our last dungeon master,” he said. “Nobody could replace you.”",
+     "某天晚上，大家都走了以後，小豪幫她把椅子疊起來。他安靜了很久，然後說：「阿嬤，妳為什麼要做這個？妳又不喜歡玩遊戲。」美玉想了想。「我教書的時候，」她說，「我說故事，年輕人聽。退休以後，故事就停了。在看到那本規則書以前，我都不知道自己有多想念這件事。一個好故事，需要一張桌子，還有一群圍在桌邊的人。」小豪點點頭。「妳是我們最後的地下城主，」他說，「沒有人可以取代妳。」","tender"],
+    ["“Nonsense,” said Mei-yu. “Somebody will have to. I’m sixty-five, not immortal.” She took a thick notebook from her bag and put it in his hands. Inside were all her maps and notes, the lonely dragon and the goblins with complaints. “Next Saturday is my birthday,” she said. “I want a present. I want to play.”",
+     "「胡說，」美玉說，「總得有人接手。我六十五歲，又不是長生不老。」她從包包裡拿出一本厚厚的筆記本，放到他手上。裡面是她所有的地圖和筆記，那隻寂寞的龍，還有那些愛抱怨的哥布林。「下星期六是我生日，」她說，「我想要一份禮物。我想當玩家。」","warm"],
+    ["Hao stared at the notebook. Then at her. Then he smiled, slowly, the way his grandfather used to smile. That week, he stayed up late every night, reading, writing and drawing maps. On Saturday, the community room was full. There was a cake with sixty-six candles, which the building manager said was a fire risk. And at the head of the table, nervous and proud, sat a fourteen-year-old dungeon master.",
+     "小豪盯著筆記本，再盯著她看。然後他慢慢地笑了，笑得就像他爺爺以前那樣。那個星期，他每天晚上都熬夜看書、寫筆記、畫地圖。星期六，社區活動室擠滿了人。有一個插著六十五根蠟燭的蛋糕，管理員說那有火災風險。在桌子的主位上，坐著一個又緊張又驕傲的十四歲地下城主。","proud"],
+    ["Mei-yu’s character was an old wizard who had just retired from teaching at a school of magic. She was slow, forgetful and very dangerous. In the first fight, she rolled a twenty, the best roll there is, and the whole room cheered so loudly that a neighbor came down to complain. She laughed until she cried. She had been the last dungeon master, she thought. Now she was the first player of something new. And honestly, she liked it even better.",
+     "美玉的角色是一個剛從魔法學校退休的老巫師，動作慢、記性差，而且非常危險。在第一場戰鬥裡，她擲出了二十點，那是最好的點數，整間活動室的人歡呼得太大聲，連鄰居都下樓來抗議。她笑到流眼淚。她心想，她曾經是他們最後的地下城主；現在，她是某個新故事的第一個玩家。而且說實話，她更喜歡這樣。","triumphant"]
+  ],
+  quiz:[
+    ["Why did the boys think their game was over?", ["Hao’s parents said no more games.","Their dungeon master was leaving for university.","They lost their dice."], 1, "原本的地下城主阿凱要去台中讀大學，沒有人會帶遊戲。"],
+    ["What did Mei-yu change after her first game went badly?", ["She bought new dice.","She used less poetry and more action, and learned to read her players.","She gave up."], 1, "她寫下「少一點詩，多一點哥布林」，並用教書時觀察學生的經驗來帶玩家。"],
+    ["What birthday present did Mei-yu ask for?", ["A new rulebook.","A cake with sixty-six candles.","To play as a player while Hao became dungeon master."], 2, "她把筆記交給小豪，生日時想換她當玩家，讓孫子當地下城主。"]
+  ]
+},
+
+/* ---------------- 7 ---------------- */
+{ id:"porto", thread:"love", kind:"orig", title:"The 7:42 to Porto", zt:"七點四十二分往波多", voice:"f",
+  by:"InkQuest original",
+  intro:"在里斯本做翻譯的怡婷，每個星期一都搭同一班火車去波多，坐同一個靠窗的位子。對面的位子上，總是坐著同一個男人，一路畫著窗外的風景，一句話也不說。",
+  paras:[
+    ["Every Monday morning, at 7:42, Yi-ting stepped onto the train to [[Porto|c:n-porto]] at Lisbon’s Oriente station with a coffee in one hand and a laptop bag in the other. Seat 42, carriage 3, by the window. She had chosen it in her first week because forty-two was the number of her grandmother’s house in Taichung. Three months later, she still chose it every time she booked. Some people collect stamps. Yi-ting collected small, private reasons for things.",
+     "每個星期一早上七點四十二分，怡婷都會在里斯本的東方車站踏上開往波多的火車，一手拿著咖啡，一手提著筆電包。三號車廂，四十二號，靠窗。她第一個星期就選了這個位子，因為四十二是她阿嬤在台中的門牌號碼。三個月後，她每次訂票還是選這個位子。有些人收集郵票，怡婷收集的是一些小小的、只有自己知道的理由。","calm"],
+    ["She was a translator. She turned Portuguese novels into Chinese for a publisher in Taipei, and every Monday she spent the day with an editor in Porto who helped her with the difficult words. The trip took almost three hours. She usually worked the whole way, with her headphones on and her dictionary open, while Portugal flew past the window like a film she had no time to watch.",
+     "她是翻譯。她幫台北一家出版社把葡萄牙小說翻成中文，每個星期一都要花一整天，在波多跟一位編輯討論那些難翻的字。這段車程將近三個小時。她通常整路都在工作，戴著耳機，字典攤開，葡萄牙就在窗外飛快掠過，像一部她沒時間看的電影。","calm"],
+    ["Seat 41, across the little table, belonged to a man with paint on his fingers. He was about thirty-five, with untidy dark hair and a gray sweater with a hole in one elbow. He never used a laptop. Instead, he opened a small [[sketchbook]] and drew what he saw through the window: a line of [[cork oaks|c:cork]], a white church on a hill, a heron standing in a rice field. When the train went too fast, he closed his eyes for a moment, as if he were remembering the view, and then drew it anyway.",
+     "小桌子對面的四十一號，坐著一個手指上沾著顏料的男人。他大約三十五歲，一頭亂亂的黑髮，灰色毛衣的手肘破了一個洞。他從不用筆電，而是打開一本小小的素描本，把窗外看到的東西畫下來：一排軟木橡樹、山丘上的白色教堂、站在稻田裡的一隻蒼鷺。火車開太快的時候，他會閉上眼睛一下，好像在回想剛才的景色，然後還是把它畫出來。","gentle"],
+    ["They never spoke. Lisbon people are polite, and so are people from Taichung. For twelve Mondays, they nodded “bom dia” when they sat down and nodded again in Porto when they stood up. Yi-ting knew the shape of his hands and the sound of his pencil better than she knew the faces of her neighbors. She did not know his name.",
+     "他們從來沒說過話。里斯本人很有禮貌，台中人也是。十二個星期一，他們坐下時點頭說一聲「早安」，到了波多站起來時再點一次頭。怡婷對他雙手的形狀和鉛筆的聲音，比對她鄰居的臉還熟悉。可是她不知道他叫什麼名字。","wistful"],
+    ["On the thirteenth Monday, the train stopped in a field outside Coimbra and did not move. Ten minutes passed, then thirty. A voice announced, first in Portuguese and then in English, that there was a problem with the line ahead and that the [[delay]] would be at least an hour. The carriage filled with sighs. Yi-ting took off her headphones. The man across from her put down his pencil. For the first time, there was nothing to do but look at each other.",
+     "第十三個星期一，火車停在科英布拉外的一片田野裡，就不動了。過了十分鐘，然後三十分鐘。廣播先用葡萄牙文、再用英文宣布，前方路段出了問題，至少會延誤一個小時。整節車廂都是嘆氣聲。怡婷拿下耳機。對面的男人放下鉛筆。第一次，他們除了看著對方，沒有別的事可以做。","curious"],
+    ["“Well,” he said in English, with an embarrassed smile. “At last, a view that stays still.” His name was Tomás. He restored old [[tiles]], the blue-and-white [[azulejos|c:azulejo]] that cover half the buildings in Portugal. For a year he had been working in Porto, at [[São Bento|c:n-saobento]] station, where about twenty thousand tiles on the walls tell the history of the country in pictures. Some of them were cracked, some were missing, and he was replacing them, one by one, painted by hand.",
+     "「嗯，」他用英文說，不好意思地笑了笑，「終於有一片不會跑掉的風景了。」他叫托馬斯，是修復老磁磚的師傅，修的是葡萄牙一半建築上都貼著的那種藍白色花磚「azulejo」。這一年來，他都在波多的聖本篤車站工作。那裡的牆上大約有兩萬片磁磚，用圖畫講述這個國家的歷史。有些裂了，有些不見了，他正一片一片地用手繪的新磁磚把它們補回去。","warm"],
+    ["“And you?” he asked. “You always look as if you are fighting with your computer.” She laughed and explained. She told him about the book she was translating, about a sentence she had been stuck on for a week. It was a sentence about the sea, and there was a Portuguese word in it, [[saudade|c:saudade]], that had no word in Chinese. “It means missing something,” she said, “but it’s more than that. It’s missing something that maybe never comes back, and loving the missing.” Tomás nodded slowly. “That’s the most Portuguese word there is.”",
+     "「那妳呢？」他問，「妳看起來總像在跟電腦吵架。」她笑了，跟他解釋。她說起她正在翻譯的書，說起一個她卡了一個星期的句子。那是一個關於大海的句子，裡面有一個葡萄牙字「saudade」，中文裡找不到對應的詞。「它的意思是想念，」她說，「可是不只這樣。它是想念某個也許再也不會回來的東西，而且連那份想念都一起愛著。」托馬斯慢慢點頭。「那是最葡萄牙的一個字了。」","thoughtful"],
+    ["The train did not move for two hours. They talked about everything: her grandmother’s house with the number forty-two, his grandmother’s kitchen in the Alentejo, the best custard tarts in Lisbon, which they disagreed about completely. He showed her his sketchbook. It was full of the view from seat 41. Then she noticed that on many pages, in the corner, there was a small figure by the window with headphones and a coffee cup. She looked up. He had turned bright red.",
+     "火車兩個小時都沒動。他們什麼都聊：她阿嬤那棟門牌四十二號的房子、他阿嬤在阿連特茹的廚房、里斯本最好吃的蛋塔是哪一家（他們的意見完全不同）。他給她看他的素描本，裡面畫滿了從四十一號看出去的風景。然後她發現，很多頁的角落，都有一個小小的人坐在窗邊，戴著耳機，拿著一杯咖啡。她抬起頭。他的臉已經紅透了。","tender"],
+    ["“I didn’t think you would ever look,” he said. “You were always working.” Yi-ting did not know what to say. So she said the honest thing. “I looked every week,” she said. “I just pretended not to.” Outside, the train finally began to move. Neither of them noticed.",
+     "「我以為妳永遠不會看，」他說，「妳總是在工作。」怡婷不知道該說什麼，所以她說了實話。「我每個星期都在看，」她說，「只是假裝沒有。」窗外，火車終於開始動了。他們兩個都沒有注意到。","tender"],
+    ["After that, Mondays changed. She still worked on the train, but only for the first hour. In the second hour, they talked. In the third, they watched the view together while he drew it, and she tried to find Chinese words for the colors. Some Mondays, after work, she went to São Bento and watched him on his ladder in the great hall, painting a missing piece of a battle scene, while tourists took photos of the walls and never noticed the man fixing them.",
+     "從那以後，星期一變了。她在火車上還是會工作，但只做第一個小時。第二個小時，他們聊天。第三個小時，他們一起看窗外的風景，他畫，她試著幫那些顏色找中文的詞。有些星期一下班後，她會到聖本篤車站，看他在大廳裡站在梯子上，補畫一幅戰爭場景裡缺掉的一塊，觀光客對著牆壁拍照，從來沒有人注意到那個正在修補它們的人。","warm"],
+    ["In March, he took her to the great hall of São Bento early one morning, before the tourists came. He showed her the tiles he had painted himself. They looked exactly like the old ones, except for one small thing. In a corner of a crowded market scene, if you knew where to look, there was a tiny woman by a window, with headphones and a cup of coffee. “Nobody will notice,” he said. “For a hundred years, maybe.” Yi-ting noticed. She thought about it for days.",
+     "三月的某個清晨，觀光客還沒來之前，他帶她到聖本篤車站的大廳，給她看他親手畫的磁磚。它們看起來跟舊的一模一樣，只有一個小地方不同：在一幅熱鬧的市集場景角落，如果你知道該看哪裡，會發現一個小小的女人坐在窗邊，戴著耳機，拿著一杯咖啡。「不會有人注意到的，」他說，「大概一百年都不會。」怡婷注意到了。她想了好幾天。","tender"],
+    ["Then, in May, an email came from Taipei. The publisher wanted her back in the office, starting in September. It was a good job, a better job, and her mother was getting older. Yi-ting read it on the train on Monday and closed her laptop without answering. Tomás looked at her face. “Saudade,” he said quietly. It was not a question.",
+     "然後，五月，台北來了一封 email。出版社希望她九月起回辦公室上班。那是一份好工作，更好的工作，而且她媽媽年紀也越來越大了。星期一，怡婷在火車上讀了那封信，沒有回覆就闔上了筆電。托馬斯看著她的臉。「Saudade。」他輕聲說。那不是一個問句。","sad"],
+    ["She did not decide that day, or that week. They did not talk about it. They talked about tiles and words and the heron in the rice field, which had started to appear every Monday as if it had booked a seat. In the end, she said yes to Taipei. And on her last Monday in August, Tomás did not take out his sketchbook. Instead, he put a small package wrapped in newspaper on the table between them.",
+     "她那天沒有決定，那個星期也沒有。他們沒有談這件事。他們聊磁磚、聊字詞、聊稻田裡那隻蒼鷺，牠開始每個星期一都出現，好像也訂了位子似的。最後，她答應了台北。到了八月她最後一個星期一，托馬斯沒有拿出素描本。他把一個用報紙包著的小包裹，放在他們之間的小桌上。","nervous"],
+    ["Inside was a single blue-and-white tile. He had painted it himself: a train window, a field, a white church on a hill and, in the corner, a heron. Underneath, in small, careful Chinese characters that he must have practiced for weeks, it said: 四十二號. Seat 42. “So you have the view in Taipei,” he said. “Tiles last for hundreds of years. Longer than saudade.”",
+     "裡面是一片藍白色的磁磚，他自己畫的：一扇火車的窗、一片田野、山丘上的白色教堂，角落裡還有一隻蒼鷺。底下用小小的、很用心的中文字寫著：四十二號。他一定練習了好幾個星期。「這樣妳在台北也看得到這片風景，」他說，「磁磚可以保存好幾百年，比 saudade 還久。」","tender"],
+    ["Yi-ting held the tile in both hands for a long time. Then she took a pen from her bag, opened his sketchbook to a clean page and wrote, in Portuguese, the first sentence she had ever written for herself and not for a book: “Come to Taipei in December. I’ll save you the window seat.” Tomás read it twice. Then he laughed, the way people laugh when something has been lifted off them. Outside, the heron opened its wings and followed the train for a little while, as if it wanted to see the end of the story too.",
+     "怡婷用雙手捧著那片磁磚，捧了很久。然後她從包包裡拿出一支筆，把他的素描本翻到空白的一頁，用葡萄牙文寫下了第一個不是為了書、而是為了自己寫的句子：「十二月來台北吧。我幫你留靠窗的位子。」托馬斯讀了兩遍。然後他笑了，像一個人肩上的重擔突然被拿走時那樣笑。窗外，那隻蒼鷺張開翅膀，跟著火車飛了一小段，好像牠也想看看這個故事的結局。","hopeful"]
+  ],
+  quiz:[
+    ["Why did Yi-ting always choose seat 42?", ["It was the cheapest seat.","It was the number of her grandmother’s house in Taichung.","Tomás asked her to sit there."], 1, "四十二是她阿嬤在台中的門牌號碼，是她自己的小小理由。"],
+    ["What made Yi-ting and Tomás finally talk?", ["He spilled her coffee.","The train stopped for two hours outside Coimbra.","They met at São Bento station."], 1, "火車在科英布拉外停了兩個小時，他們第一次除了看對方沒別的事可做。"],
+    ["What did Yi-ting write in Tomás’s sketchbook at the end?", ["Goodbye forever.","An invitation to visit her in Taipei.","A translation of saudade."], 1, "她已經決定回台北工作，用葡萄牙文邀請他十二月來台北，還說會幫他留靠窗的位子。"]
+  ]
+},
+
+/* ---------------- 8 ---------------- */
+{ id:"lastlight", thread:"static", kind:"orig", title:"The Static: Last Light", zt:"雜訊：最後的光", voice:"f",
+  by:"InkQuest original",
+  intro:"高雄三部曲完結篇。沒有月亮的晚上，四個朋友帶著海燕阿嬤的先生留下的灰色收音機，爬上旗津的燈塔。燈塔九點關門。他們只有一個半小時。",
+  paras:[
+    ["Nineteen days is a long time to wait for a moon to disappear. I counted every one of them in my notebook. Tammy spent them taking the gray radio apart on her bedroom floor and putting it back together. Bo spent them asking his grandma questions. Jerry spent them telling everyone at school that he was not scared, which is how we knew he was.",
+     "等月亮消失，十九天是很長的時間。我在筆記本裡一天一天地數。譚美把那十九天花在她房間的地板上，把灰色收音機拆開，再裝回去。阿柏把那十九天花在問他阿嬤問題上。傑瑞則把那十九天花在跟學校裡每個人說他不怕，我們就是這樣知道他其實很怕。","playful"],
+    ["On the twelfth day, Tammy called us at midnight. “It isn’t just a radio,” she said. “It’s a [[transceiver|c:transceiver]]. There’s a button on the side, under a piece of tape. It can send, not just receive. You can talk back.” Nobody said anything for a long time. Then Jerry said, very quietly, “Talk back to who?”",
+     "第十二天，譚美半夜打電話給我們。「它不只是收音機，」她說，「它是無線電收發機。側邊有一個按鈕，用膠帶貼住了。它不只能收，還能發。你可以回話。」很長一段時間，沒有人說話。然後傑瑞非常小聲地說：「回話給誰？」","nervous"],
+    ["Bo’s grandma had answers, but not the ones we expected. She had known Hai-yan’s husband for forty years. “Old Lin, the radio man,” she said in Taiwanese, and Bo translated. “On nights with no moon, he used to climb the hill to the [[lighthouse|c:lighthouse]] with a radio in his arms. He said the signals were clearer up there. My husband asked him once what he listened to. He just smiled and said, ‘Children.’ We all thought he meant the ships.”",
+     "阿柏的阿嬤有答案，可是跟我們想的不一樣。她認識海燕阿嬤的先生四十年了。「收音機林仔，」她用台語說，阿柏幫我們翻譯，「沒有月亮的晚上，他常常抱著一台收音機爬上燈塔那座山。他說上面的訊號比較清楚。我先生有一次問他在聽什麼，他只是笑一笑說：『囡仔。』我們都以為他講的是船。」","thoughtful"],
+    ["The new moon fell on a Friday. After school, at half past six, we took the ferry across the harbor. Bo was waiting at the Cijin pier with the radio in his backpack. The sky over Kaohsiung was turning from orange to purple, and the city lights were coming on one by one behind us. We walked past the temple and the seafood restaurants of the old street and started up the path to the lighthouse. It was steeper than it looked. Jerry complained the whole way, which helped.",
+     "新月落在一個星期五。放學後，六點半，我們搭渡輪過港。阿柏在旗津碼頭等我們，收音機放在他的背包裡。高雄上空的天色從橘色變成紫色，背後的城市燈火一盞一盞亮起來。我們走過廟口和老街上的海產店，開始爬往燈塔的步道。坡比看起來陡。傑瑞一路都在抱怨，這反而讓大家輕鬆了一點。","calm"],
+    ["We reached the top at half past seven. The lighthouse stood white against the dark sky, eight-sided, with a black roof and a round glass room on top where the great lamp turned. It was more than a hundred years old. Inside the courtyard, people were drinking coffee and taking photos of the harbor. A staff member smiled at us. “We close at nine,” she said. “Don’t miss the last view.” I wrote 9:00 in my notebook and underlined it twice.",
+     "我們七點半到了山頂。燈塔白白地立在黑色的天空下，八角形，黑色的屋頂，頂端是一個圓形的玻璃燈室，巨大的燈在裡面轉著。它已經超過一百歲了。庭院裡，有人在喝咖啡，有人在拍港口的照片。一位工作人員對我們笑了笑。「我們九點關門，」她說，「別錯過最後的風景。」我在筆記本上寫下 9:00，劃了兩條線。","curious"],
+    ["We sat on the low wall near the old [[sundial]], facing the sea. There was no moon at all, only the ships’ lights far out on the water and, every few seconds, the beam of the lighthouse sweeping over our heads like a slow white hand. Tammy put the radio on her knees and turned it on. The hiss came, the same long shhhhhh we had heard on the night of the static. Eight o’clock passed. Then eight-thirty. People began to leave. Nothing happened.",
+     "我們坐在古老日晷旁邊的矮牆上，面向大海。天上一點月亮都沒有，只有遠方海面上船隻的燈光，還有每隔幾秒，燈塔的光束就像一隻緩慢的白色大手，從我們頭頂掃過。譚美把收音機放在膝蓋上，打開。嘶嘶聲出現了，就是雜訊那晚那個長長的沙沙聲。八點過了，八點半也過了。人們開始離開。什麼事都沒發生。","nervous"],
+    ["At 8:41, as the beam passed over us, the hiss changed. A man’s voice came through, clear and close, as if he were sitting on the wall beside us. He spoke in Taiwanese. Bo grabbed my arm. “He says, ‘Is anyone there? This is Lin on Cijin Hill. The lighthouse is behind me. I keep hearing children on this frequency. Four of them. Are you there?’” Bo’s voice shook. “And he says the date. He says it’s 1986.”",
+     "八點四十一分，光束從我們頭上掃過的時候，嘶嘶聲變了。一個男人的聲音傳了出來，清楚又靠近，好像他就坐在我們旁邊的矮牆上。他說的是台語。阿柏抓住我的手臂。「他說：『有人在嗎？我是旗後山上的林仔，燈塔就在我後面。我一直在這個頻率上聽到囡仔的聲音，四個。你們在嗎？』」阿柏的聲音在發抖。「然後他說了日期。他說現在是 1986 年。」","surprised"],
+    ["This was not a recording. It was a conversation. Tammy looked at the tape on the side of the radio. Then she looked at us. I nodded. She peeled off the tape and pressed the button, and Bo leaned toward the radio and said, in his grandma’s Taiwanese, the bravest thing I have ever heard anyone say: “Yes, Uncle Lin. We’re here. We heard you.”",
+     "這不是錄音，這是一場對話。譚美看著收音機側邊的膠帶，然後看著我們。我點點頭。她撕下膠帶，按下按鈕，阿柏湊近收音機，用他阿嬤的台語，說了我聽過最勇敢的一句話：「有，林伯伯。我們在這裡。我們聽到你了。」","tender"],
+    ["The voice laughed, a surprised, happy laugh, and asked who we were. We told him everything, with Bo translating as fast as he could. We told him about the static at 3:33 and the Morse code under it. We told him about the blue door and the envelope, about a white bridge across the harbor that turned like the hand of a clock, a bridge that would not be built for another thirty-four years. The radio was quiet for a long time. Then he said, “So that is how I find you. I wondered.”",
+     "那個聲音笑了，又驚訝又開心地笑了，問我們是誰。我們把一切都告訴他，阿柏拚命地翻譯。我們跟他說了三點三十三分的雜訊，還有雜訊底下的摩斯密碼。我們跟他說了藍色的門和信封，說了一座白色的橋，橫跨港口，轉起來像時鐘的指針，那座橋再過三十四年才會蓋好。收音機安靜了很久。然後他說：「原來是這樣找到你們的。我一直在想。」","excited"],
+    ["Tammy understood first. She grabbed my notebook and wrote it all down for him in big letters, and Bo read it out to him slowly: the time, 3:33 in the morning; the message, BLUE DOOR. 3 PM. SAT. Then he described the drawing of the bridge with the moon and the stars. “He has to send it,” Tammy whispered. “Don’t you see? We heard it because he sent it. And he sends it because we told him. It’s a circle.” Jerry put his head in his hands. “My brain hurts,” he said. But he was smiling.",
+     "譚美最先想通。她搶過我的筆記本，用大大的字把所有東西寫下來，阿柏慢慢念給他聽：時間，凌晨三點三十三分；訊息，BLUE DOOR. 3 PM. SAT.。接著，他又描述了那張畫著月亮和星星的橋。「他得把它發出去，」譚美小聲說，「你們不懂嗎？我們聽到它，是因為他發了它；而他會發它，是因為我們告訴了他。這是一個圓。」傑瑞抱著頭。「我的腦袋好痛。」他說。可是他在笑。","excited"],
+    ["Then I asked the question I had been carrying for nineteen days. “Uncle Lin, why didn’t you just tell Hai-yan yourself? About the fish soup?” Bo translated. For a moment there was only static. Then the voice came back, softer. “Because I am a man who fixes radios,” he said. “I can make any machine speak. But I could never make myself say the things that mattered. So I asked four children to carry them for me. Is she well?” “She’s well,” said Bo. “She laughed and cried. She says you were a good listener.”",
+     "然後，我問了那個放在心裡十九天的問題。「林伯伯，你為什麼不自己跟海燕阿嬤說？魚湯的事？」阿柏翻譯了。有那麼一下子，只剩下雜訊。然後那個聲音回來了，更輕了。「因為我是修收音機的，」他說，「我可以讓任何機器說話，可是我從來沒辦法讓自己說出重要的話。所以我拜託四個囡仔幫我帶話。她好嗎？」「她很好，」阿柏說，「她又笑又哭。她說你很會聽。」","tender"],
+    ["Behind us, a voice called, “We’re closing now!” It was 8:58. The lighthouse beam swept over us once more, and the signal began to [[fade]]. Through the hiss, we heard him say one more thing, slowly, so that Bo could catch every word. Bo translated it with tears on his face: “Thank you for listening. Now go home, and listen to each other. Don’t wait forty years to say the good things.” Then there was only static, and then not even that.",
+     "後面有人喊：「我們要關門囉！」八點五十八分。燈塔的光束又從我們頭上掃過一次，訊號開始變弱。在嘶嘶聲中，我們聽到他又說了一句話，說得很慢，好讓阿柏每個字都聽得清楚。阿柏滿臉是淚地翻譯：「謝謝你們願意聽。現在回家吧，好好聽彼此說話。好聽的話，不要等四十年才說。」然後就只剩下雜訊，然後連雜訊都沒有了。","sad"],
+    ["We walked down the hill in the dark without talking. At the bottom, Jerry stopped. “Hey,” he said, and his voice was strange. “I just want to say… you guys are the best friends I’ve ever had. That’s all. I’m not waiting forty years.” Tammy hugged him so hard that his glasses fell off. Bo put his huge arms around all of us at once. I cried a little. I’m the dungeon master, so I’m allowed.",
+     "我們在黑暗中走下山，誰也沒說話。到了山腳，傑瑞停了下來。「欸，」他說，聲音怪怪的，「我只是想說……你們是我這輩子最好的朋友。就這樣。我才不要等四十年。」譚美用力抱住他，他的眼鏡都掉了。阿柏張開他粗壯的手臂，一次把我們全部抱住。我哭了一點點。我是地下城主，我可以哭。","warm"],
+    ["The next day, we took the ferry back to the blue door and told Hai-yan everything. She listened without saying a word. When we finished, she went into the kitchen. Twenty minutes later, she came out with four bowls of fish soup. “He used to come home from that hill on nights with no moon,” she said, “smiling like a boy, and he never told me why.” She sat down with us. “Eat. It’s perfect. I have it on good authority.”",
+     "隔天，我們搭渡輪回到那扇藍色的門，把一切都告訴海燕阿嬤。她聽著，一句話也沒說。我們講完以後，她走進廚房。二十分鐘後，她端出四碗魚湯。「沒有月亮的晚上，他常從那座山上回家，」她說，「笑得像個小男孩，可是從來不跟我說為什麼。」她跟我們一起坐下來。「吃吧。很好喝的。這可是有人掛保證的。」","warm"],
+    ["That night, I opened my notebook to a new page and wrote at the top: THE STATIC. THE END. Then I crossed out THE END. On Wednesday, after school, four friends sat down in Room 404 for a new campaign. Tammy’s new character was a wizard who could talk to anything through a crystal radio. Jerry’s bard finally learned to sing in tune. And Bo, the barbarian, said “thank you” to every monster before he fought it, because, he said, you never know who’s listening.",
+     "那天晚上，我在筆記本上翻開新的一頁，最上面寫著：雜訊。完。然後我把「完」劃掉了。星期三放學後，四個朋友在 404 教室坐下來，開始一場新的冒險。譚美的新角色是一個能用水晶收音機跟任何東西說話的巫師。傑瑞的吟遊詩人終於學會唱歌不走音了。而阿柏，那個野蠻人，每次跟怪物打架前都會先說一聲「謝謝」，因為他說，你永遠不知道誰在聽。","hopeful"]
+  ],
+  quiz:[
+    ["What did Tammy discover about the gray radio?", ["It was broken.","It could send messages as well as receive them.","It was made in 1986."], 1, "它是無線電收發機，側邊用膠帶貼住的按鈕可以讓人回話。"],
+    ["Why did the four friends hear the static at 3:33 in the first place?", ["Old Lin sent it because the friends told him to on the lighthouse night.","A ship was sending signals.","Tammy sent it as a joke."], 0, "是一個圓：他們在燈塔上告訴 1986 年的林伯伯時間和訊息，他才把雜訊發出去。"],
+    ["What was Old Lin’s last message to the four friends?", ["Fix more radios.","Listen to each other, and don’t wait forty years to say the good things.","Never come back to the lighthouse."], 1, "他要他們回家好好聽彼此說話，好聽的話不要等四十年才說。"]
+  ]
+},
+
+/* ---------------- 9 ---------------- */
+{ id:"lisbon", thread:"", kind:"guide", title:"Lisbon on Foot", zt:"用雙腳走里斯本", voice:"m",
+  by:"InkQuest travel guide",
+  intro:"里斯本蓋在七座山丘上，路是石頭鋪的，又陡又滑。最好的看法，就是穿一雙好鞋，慢慢走。這份指南帶你走老城的巷弄、看得到整座城的觀景台，還有一家從 1837 年賣到現在的蛋塔店。",
+  paras:[
+    ["Lisbon is a city built on seven hills, and you will feel every one of them in your legs. Taxis are cheap and the famous yellow trams are charming, but the best way to understand Lisbon is to walk it, slowly, with a lot of stops for coffee. So before anything else, a word about shoes. Lisbon’s sidewalks are covered in [[calçada|c:calcada]], small white and black stones laid by hand in patterns of waves, stars and ships. They are beautiful, and they are as slippery as ice when it rains. Leave the fashionable shoes at home.",
+     "里斯本是一座蓋在七座山丘上的城市，你的腿會感受到每一座。計程車很便宜，有名的黃色電車也很迷人，可是要真正懂里斯本，最好的方法是用走的，慢慢走，常常停下來喝杯咖啡。所以，在一切開始之前，先說鞋子。里斯本的人行道鋪著「calçada」，一顆顆小小的黑白石頭，用手工排成波浪、星星和船的圖案。它們很美，可是一下雨就滑得像冰。好看但不好走的鞋子，就留在家裡吧。","informative"],
+    ["Start where the city starts: in [[Alfama|c:n-alfama]], the oldest neighborhood in Lisbon. On November 1, 1755, a terrible [[earthquake]], followed by a tsunami and fires, destroyed much of the city. Alfama, built on solid rock, survived better than most. That is why it still looks the way it did centuries ago, a maze of narrow streets, steep stairs and tiny squares, with laundry hanging between the windows and old women watching the world from their doorsteps.",
+     "從這座城市的起點開始：阿爾法瑪，里斯本最古老的街區。1755 年 11 月 1 日，一場可怕的大地震，接著是海嘯和大火，摧毀了這座城市的大部分。阿爾法瑪蓋在堅硬的岩盤上，撐得比大多數地方好。所以它到現在看起來還是幾百年前的樣子：窄窄的街道、陡陡的階梯、小小的廣場組成的迷宮，窗戶之間晾著衣服，老太太坐在門口看著來來往往的世界。","informative"],
+    ["Don’t try to follow a map in Alfama. You will get lost, and that is the point. Every wrong turn leads to a staircase, a cat on a wall or a view of the river between two houses. If you visit in June, especially around the twelfth and thirteenth, the whole neighborhood turns into a street party for the city’s favorite saint, Saint Anthony, with music, paper decorations and the smell of grilled sardines everywhere.",
+     "在阿爾法瑪不要試著照地圖走。你一定會迷路，而迷路正是重點。每一個轉錯的彎，都會通到一段階梯、一隻趴在牆上的貓，或是兩棟房子之間露出的一片河景。如果你六月來，特別是十二、十三日前後，整個街區會變成一場慶祝城市最愛的聖人聖安東尼的街頭派對，到處都是音樂、紙做的裝飾，還有烤沙丁魚的香味。","cheerful"],
+    ["Lisbon’s hills give it something special: [[viewpoints|viewpoint]], which the Portuguese call [[miradouros|c:miradouro]]. Near the top of Alfama, the Miradouro de Santa Luzia has blue-and-white tiles, flowers climbing over the walls and red roofs falling all the way down to the river. Climb higher, to the Miradouro da Senhora do Monte, and you will see almost the whole city at once: the castle, the river, the long red bridge and, if you are lucky, a golden sunset over all of it. Bring water. The climb is worth it, but it is still a climb.",
+     "里斯本的山丘給了它一樣特別的東西：觀景台，葡萄牙人叫它「miradouro」。在阿爾法瑪接近山頂的地方，聖露西亞觀景台有藍白色的磁磚、爬滿牆的花，還有一路往下延伸到河邊的紅色屋頂。再往上爬，到山聖母觀景台，你幾乎可以一次看到整座城市：城堡、河、長長的紅色大橋，運氣好的話，還有灑在這一切上面的金色夕陽。記得帶水。爬上去很值得，但還是要爬。","warm"],
+    ["That long red bridge, by the way, looks a lot like the Golden Gate Bridge in San Francisco, and many visitors think it was built by the same people. It was not, though an American company did build it. It opened in 1966 and is now called the 25 de Abril Bridge, after the day in 1974 when a peaceful revolution ended almost fifty years of [[dictatorship]] in Portugal. People put red carnations into the soldiers’ guns, and the day became known as the Carnation Revolution.",
+     "順帶一提，那座長長的紅色大橋，看起來很像舊金山的金門大橋，很多遊客以為是同一批人蓋的。其實不是，雖然蓋它的確實是一家美國公司。它在 1966 年通車，現在叫做「四二五大橋」，名字來自 1974 年的那一天：一場和平的革命，結束了葡萄牙將近五十年的獨裁統治。人們把紅色康乃馨插進士兵的槍管裡，那一天後來被稱為「康乃馨革命」。","informative"],
+    ["Down by the river, the Baixa, or downtown, looks completely different. After the earthquake, the Marquis of Pombal rebuilt it with straight streets in a neat grid, one of the first cities in Europe planned to survive the next earthquake. Walk under the great arch of Rua Augusta into Praça do Comércio, a huge yellow square that opens onto the river. Ships once unloaded gold and spices here. Today, people sit on the steps by the water and watch the light change.",
+     "往下走到河邊，下城區看起來完全不一樣。地震以後，彭巴爾侯爵用整整齊齊的棋盤式直街重建了這裡，這是歐洲最早為了「撐過下一次地震」而規劃的城市之一。穿過奧古斯塔街的大拱門，走進商業廣場，一個面對河的巨大黃色廣場。以前，船隻在這裡卸下黃金和香料。現在，人們坐在水邊的階梯上，看著光線變化。","informative"],
+    ["Between the Baixa and the hill above it stands the strangest thing in Lisbon: the Elevador de Santa Justa, an iron tower with a lift inside, built in 1902 to carry people up the hill. It looks like something from an old science-fiction novel. The queue can be very long. Here’s a secret: you can walk up the streets behind it in ten minutes and reach the viewing platform at the top for much less money.",
+     "在下城區和上方山丘之間，立著里斯本最奇特的東西：聖胡斯塔升降機，一座裡面裝著電梯的鐵塔，1902 年建成，用來把人載上山丘。它看起來像從老科幻小說裡走出來的東西。排隊的人可能非常多。告訴你一個秘密：從它後面的街道往上走，十分鐘就到了，還能用便宜很多的價錢登上頂端的觀景平台。","playful"],
+    ["About the trams. Tram 28 is the most famous ride in Lisbon, an old yellow wooden tram that rattles up and down the hills through Alfama and Graça. It is wonderful, and it is also packed with tourists from morning to night, and a favorite place for [[pickpockets]]. If you want to ride it, go early in the morning and keep your bag in front of you. Or do what the locals do and walk the same route. You will see more, and the tram will still pass you on the hill, ringing its bell.",
+     "關於電車。28 號電車是里斯本最有名的一條線，一台老式的黃色木頭電車，喀啦喀啦地在阿爾法瑪和格拉薩的山坡上爬上爬下。它很棒，可是也從早到晚擠滿了觀光客，是扒手最愛的地方。如果你想搭，一大早去，把包包背在前面。或者，像當地人一樣，沿著同一條路線用走的。你會看到更多，而且電車還是會在山坡上從你旁邊經過，叮叮噹噹地按著鈴。","informative"],
+    ["Now, food. Take a tram or a train west along the river to [[Belém|c:n-belem]]. There, since 1837, a bakery called Pastéis de Belém has been selling custard tarts made from a secret recipe that came from the monks of the monastery next door. The pastry is crisp, the custard is warm, and you eat them with cinnamon and sugar on top. There is always a queue outside. Go inside instead and find a table in one of the back rooms. It is usually faster, and it feels like a secret.",
+     "接下來，吃的。搭電車或火車沿著河往西，到貝倫。在那裡，從 1837 年開始，一家叫「貝倫蛋塔」的店就一直在賣蛋塔，祕方來自隔壁修道院的修士。塔皮酥脆，內餡溫熱，上面撒上肉桂粉和糖粉一起吃。店外永遠在排隊。不如直接走進店裡，在後面的房間找張桌子。通常比較快，而且感覺像發現了一個秘密。","cheerful"],
+    ["While you are in Belém, visit the monastery itself, the Jerónimos Monastery, with its white stone carved like lace, and the Belém Tower, a small fortress standing in the river. Together they are a UNESCO World Heritage Site. Both were built in the age when Portuguese sailors set out to explore the world, and both are decorated with stone ropes, shells and strange sea creatures, as if the builders could not stop thinking about the ocean.",
+     "既然到了貝倫，也去看看那座修道院本身：熱羅尼莫斯修道院，白色的石頭雕得像蕾絲一樣；還有貝倫塔，一座立在河裡的小小堡壘。它們一起被列為聯合國教科文組織世界遺產。兩座建築都建於葡萄牙水手出海探索世界的年代，上面都裝飾著石雕的繩索、貝殼和奇怪的海洋生物，好像建造它們的人怎麼樣都停不下來想著大海。","informative"],
+    ["Everywhere you go, look at the walls. Lisbon is covered in [[azulejos|c:azulejo]], painted ceramic tiles, on churches, train stations, shops and ordinary houses. Some are blue and white, some are green or yellow, some show whole stories in pictures. If you love them, the National Tile Museum has hundreds of years of them. But please do not take one home from a building, even if it is loose. Too many have already disappeared that way.",
+     "不管走到哪裡，都看看牆壁。里斯本到處都貼著「azulejo」，彩繪的瓷磚，教堂、火車站、商店、普通的民宅上都有。有些是藍白色的，有些是綠色或黃色的，有些用圖畫講完一整個故事。如果你喜歡，國家磁磚博物館裡收藏了好幾百年的磁磚。可是，請不要從建築物上拿一片回家，就算它已經鬆了也不要。已經有太多磁磚就是這樣不見的。","firm"],
+    ["When the sun goes down, find a small restaurant in Alfama or the Bairro Alto and listen to [[fado|c:fado]], Lisbon’s own music. A singer stands in front of two guitarists and sings about the sea, lost love and saudade, a kind of sad, sweet longing. In 2011, UNESCO added fado to its list of the world’s Intangible Cultural Heritage. You do not need to understand Portuguese. You will understand anyway. Just remember: during the songs, the room goes completely silent. No talking, no clinking glasses, no phones.",
+     "太陽下山以後，在阿爾法瑪或上城區找一家小餐廳，聽一聽法朵，里斯本自己的音樂。一位歌手站在兩位吉他手前面，唱著大海、失去的愛情，還有 saudade，一種既哀傷又甜美的思念。2011 年，聯合國教科文組織把法朵列入人類無形文化遺產。你不需要懂葡萄牙文，你還是會聽懂的。只要記得：唱歌的時候，整個房間會完全安靜。不說話，不碰杯，不滑手機。","tender"],
+    ["One last thing. Lisbon has become very popular, and in some old neighborhoods, many homes have been turned into holiday flats. Prices have risen, and some families who lived there for generations have had to leave. You can help a little. Eat in small local places, buy from local shops, say “bom dia” and “obrigado” or “obrigada,” and be quiet in the streets at night. People live there.",
+     "最後一件事。里斯本變得非常熱門，在一些老街區，很多住家被改成了度假公寓。房價漲了，有些在那裡住了好幾代的家庭不得不搬走。你可以幫上一點忙：在當地的小店吃飯、跟在地的店家買東西、說一聲「早安」（bom dia）和「謝謝」（男生說 obrigado，女生說 obrigada），晚上在街上保持安靜。那裡有人住。","thoughtful"],
+    ["Lisbon does not reward hurry. It rewards people who stop on a staircase to catch their breath and notice the view, who sit for an hour over one coffee, who get lost in Alfama on purpose. Walk until your legs hurt, eat one more custard tart than you planned, and save your last evening for a miradouro at sunset. You will understand why so many travelers leave Lisbon with saudade of their own.",
+     "里斯本不獎勵趕路的人。它獎勵的，是那些停在階梯上喘口氣、順便發現風景的人，是那些一杯咖啡坐一個小時的人，是那些故意在阿爾法瑪迷路的人。走到腿痠，多吃一個本來沒打算吃的蛋塔，把最後一個晚上留給夕陽下的觀景台。你就會明白，為什麼有那麼多旅人離開里斯本時，心裡也帶著屬於自己的 saudade。","warm"]
+  ],
+  quiz:[
+    ["Why does Alfama still look the way it did centuries ago?", ["It was rebuilt after 1755.","Built on solid rock, it survived the 1755 earthquake better than most areas.","Cars are not allowed there."], 1, "阿爾法瑪蓋在堅硬的岩盤上，1755 年大地震時撐得比其他地方好。"],
+    ["What advice does the guide give about Tram 28?", ["Ride it at night only.","Go early, watch your bag, or walk the same route instead.","Don’t ride it; it’s closed."], 1, "28 號電車很擠又有扒手，建議一早去、包包放前面，或乾脆沿路線走路。"],
+    ["What should you do while a fado singer is singing?", ["Clap along.","Stay completely silent.","Take videos."], 1, "唱法朵的時候整個房間會安靜下來，不說話、不碰杯、不滑手機。"]
+  ]
+},
+
+/* ---------------- 10 ---------------- */
+{ id:"stink", thread:"", kind:"history", title:"The Great Stink of 1858", zt:"1858 倫敦大惡臭", voice:"m",
+  by:"InkQuest history",
+  intro:"1858 年夏天，倫敦熱到連泰晤士河都在發臭。臭到國會議員受不了，終於批准了一項巨大的工程，從此改變了城市的樣貌，也救了成千上萬條人命。",
+  paras:[
+    ["In the summer of 1858, London was the largest and richest city in the world. It had more than two and a half million people, railways, factories, gas lamps and the grand new Houses of Parliament standing proudly beside the River [[Thames|c:n-thames]]. It also had a problem that nobody could ignore any longer. The river stank.",
+     "1858 年夏天，倫敦是全世界最大、最富有的城市。它有超過兩百五十萬人口，有鐵路、工廠、煤氣路燈，還有一棟嶄新、宏偉的國會大廈，驕傲地立在泰晤士河畔。它也有一個再也沒辦法視而不見的問題：河在發臭。","informative"],
+    ["For centuries, Londoners had dropped almost everything into the Thames: kitchen waste, factory [[chemicals]], dead animals and the contents of their toilets. In the 1840s, flushing toilets became popular, and new laws made people connect their homes to the city’s drains. That sounded like progress. But the drains had only one destination: the river. The same river from which many Londoners still got their drinking water.",
+     "幾百年來，倫敦人幾乎什麼都往泰晤士河裡丟：廚餘、工廠的化學物質、動物屍體，還有廁所裡的東西。1840 年代，沖水馬桶開始流行，新法律要求大家把房子接上城市的排水溝。這聽起來是進步。可是排水溝只有一個終點：河。而許多倫敦人，還是從這條河裡取喝的水。","informative"],
+    ["People had been warning about it for years. In 1855, the famous scientist [[Michael Faraday|c:n-faraday]] took a boat out on the river and dropped pieces of white card into the water to see how deep he could see them. They disappeared almost as soon as they touched the surface. He wrote an angry letter to The Times. The river, he said, had become a brown, [[foul]] liquid. Nobody did very much.",
+     "多年來一直有人在警告。1855 年，有名的科學家麥可．法拉第搭船到河上，把一張張白色卡片丟進水裡，想看看能看到多深。卡片幾乎一碰到水面就看不見了。他寫了一封憤怒的信給《泰晤士報》，說這條河已經變成一種褐色、惡臭的液體。可是沒有人採取什麼行動。","informative"],
+    ["Then came the summer of 1858. It was one of the hottest summers anyone could remember, with temperatures above thirty degrees for weeks. The sun cooked the river. The smell rose from the water and spread over the whole city: through the streets, into the shops, into the bedrooms. Newspapers called it “The Great Stink.” People said you could not cross a bridge without feeling sick.",
+     "接著，1858 年的夏天來了。那是大家記憶中最熱的夏天之一，氣溫連續好幾個星期超過三十度。太陽把河水煮熟了。臭味從水面升起，擴散到整座城市：飄過街道，飄進商店，飄進臥室。報紙稱它為「大惡臭」。人們說，走過任何一座橋都會想吐。","nervous"],
+    ["The worst place of all was the Houses of Parliament, which stood right on the riverbank. The members of Parliament tried to work with the windows closed in the heat. Workers hung long curtains soaked in a strong chemical, chloride of lime, to fight the smell. It did not help. Some members ran from the library holding handkerchiefs over their noses. There was serious talk of moving Parliament out of London altogether.",
+     "最慘的地方是國會大廈，它就蓋在河岸邊。國會議員在大熱天裡關著窗戶，試著工作。工人掛上一條條浸過一種強烈化學藥劑「漂白粉」的長窗簾，想擋住臭味。沒有用。有些議員拿手帕摀著鼻子，從圖書室逃出來。大家甚至認真討論過，要不要乾脆把國會搬出倫敦。","amused"],
+    ["Most people believed that the smell itself was dangerous. This was called the [[miasma theory|c:miasma]]: the idea that diseases like [[cholera]] spread through bad air. Cholera was a terrible disease that could kill a healthy person in a day, and it had killed tens of thousands of Londoners in the past twenty-five years. If bad air caused cholera, people reasoned, then the Great Stink might kill them all.",
+     "大多數人相信，臭味本身就很危險。這叫做「瘴氣說」：認為霍亂這類疾病是透過髒空氣傳播的。霍亂是一種可怕的疾病，可以在一天之內奪走一個健康的人的性命，過去二十五年裡，它已經害死了好幾萬個倫敦人。大家心想，如果是髒空氣造成霍亂，那大惡臭說不定會把他們全部害死。","worried"],
+    ["One doctor disagreed. Four years earlier, during a cholera [[outbreak]] in the Soho district, Dr. [[John Snow|c:n-snow]] had made a map. On it, he marked every house where someone had died. The deaths gathered around one public water pump on Broad Street. Snow persuaded the local officials to remove the pump’s handle, and the outbreak soon ended. Cholera, he argued, spread through dirty water, not dirty air. Few people believed him at the time. But he was right.",
+     "有一位醫生不同意。四年前，蘇活區爆發霍亂時，約翰．斯諾醫生畫了一張地圖。他在地圖上標出每一間有人死亡的房子。死亡案例全部聚集在寬街上的一座公共水泵周圍。斯諾說服地方官員把水泵的把手拆掉，疫情很快就結束了。他主張，霍亂是透過髒水傳播的，不是髒空氣。當時沒什麼人相信他。可是他是對的。","thoughtful"],
+    ["In the end, it did not matter who was right about the cause. The smell had done what years of letters and warnings could not: it had reached the noses of the most powerful men in Britain. That summer, Parliament rushed through a new law to pay for a modern sewer system. It took just eighteen days. The job went to the chief engineer of London’s new Metropolitan Board of Works, a small, serious man with a great mustache: [[Joseph Bazalgette|c:n-bazalgette]].",
+     "最後，誰對病因說得對，已經不重要了。臭味做到了多年來的信件和警告都做不到的事：它鑽進了全英國最有權力的人的鼻子。那年夏天，國會火速通過一條新法律，撥款興建現代化的下水道系統，只花了十八天。這份工作交給了倫敦新成立的都會工程委員會總工程師，一個個子小小、表情嚴肅、留著一大把鬍子的人：約瑟夫．巴澤爾傑特。","informative"],
+    ["Bazalgette’s plan was simple in idea and enormous in size. Instead of letting the drains run into the river in the middle of London, he would build huge new tunnels running alongside the Thames to catch the sewage and carry it far to the east, away from the city. It took about 132 kilometers of these great main sewers, connected to over 1,700 kilometers of smaller street sewers, and around 318 million bricks. Pumping stations, decorated like palaces, lifted the waste so that it could keep flowing.",
+     "巴澤爾傑特的計畫，概念很簡單，規模卻很巨大。他不再讓排水溝在倫敦市中心直接流進河裡，而是沿著泰晤士河兩岸，蓋好幾條巨大的新隧道，把污水攔截下來，送到遠遠的東邊，離開城市。這需要大約 132 公里的大型主下水道，連接超過 1,700 公里較小的街道下水道，還有大約三億一千八百萬塊磚。裝飾得像宮殿一樣的抽水站，把污水抽高，讓它能繼續流動。","informative"],
+    ["Bazalgette also made one decision that still matters today. When he calculated how big the pipes needed to be, he doubled the size. “We are only going to do this once,” he is reported to have said, “and there is always the unforeseen.” London’s population grew far beyond what anyone in 1858 imagined. Bazalgette’s oversized tunnels coped with it for well over a century.",
+     "巴澤爾傑特還做了一個到今天都還很重要的決定。他算出管子需要多大以後，把尺寸加倍。據說他說過：「這種事我們只會做一次，而且總會有預料不到的狀況。」倫敦的人口成長，遠遠超出 1858 年任何人的想像。巴澤爾傑特這些「過大」的隧道，撐了一百多年都還應付得來。","proud"],
+    ["The work was dirty, dangerous and slow. Thousands of men dug through London’s mud by hand, often in the dark, while the city carried on above them. Bazalgette checked everything himself. He insisted on a new, stronger kind of cement and had every batch tested before it was used. Many engineers thought he was too careful. His sewers are still working today, which suggests that he was exactly as careful as he needed to be.",
+     "這項工程又髒、又危險、又慢。成千上萬的工人用雙手挖過倫敦的爛泥，常常是在黑暗中，而城市就在他們頭頂上照常運轉。巴澤爾傑特每件事都親自檢查。他堅持使用一種新的、更堅固的水泥，每一批在使用前都要先測試。很多工程師覺得他太小心了。他的下水道到今天都還在運作，這說明他的小心，一點也不多餘。","proud"],
+    ["Building the sewers changed the shape of the city itself. To hide the new tunnels along the river, Bazalgette built wide stone walls called [[embankments|embankment]] and filled the land behind them. On top, there were new roads, gardens and walkways. Under one of them, the Victoria Embankment, he even made room for an underground railway. Today, millions of tourists walk along the Thames on Bazalgette’s embankments without knowing what lies under their feet.",
+     "興建下水道，也改變了這座城市本身的樣貌。為了把河邊的新隧道藏起來，巴澤爾傑特蓋了寬闊的石牆，叫做堤岸，再把後面的地填平。上面鋪了新的道路、花園和步道。在其中一道維多利亞堤岸底下，他甚至預留了地鐵的空間。今天，幾百萬觀光客沿著泰晤士河，走在巴澤爾傑特的堤岸上，卻不知道自己腳下有什麼。","informative"],
+    ["The main system opened in stages in the 1860s and was completed in 1875. The results were dramatic. In 1866, cholera struck London one more time, but mostly in an area of the East End that was not yet connected. After that, London never had a major cholera outbreak again. The new sewers, built to fight a smell, had defeated a killer. Slowly, people accepted that John Snow had been right about the water all along.",
+     "主要系統在 1860 年代分階段啟用，1875 年全部完工。效果非常驚人。1866 年，霍亂最後一次侵襲倫敦，但主要發生在東區一個還沒接上新系統的地方。在那之後，倫敦再也沒有爆發過大規模的霍亂。這些為了對付臭味而蓋的下水道，打敗了一個殺手。慢慢地，大家終於接受，斯諾醫生對水的看法從頭到尾都是對的。","proud"],
+    ["Of course, the story did not end there. The sewage now flowed into the Thames further east, and it took many more years before London learned to clean it properly first. And in the twenty-first century, even Bazalgette’s great tunnels were full. When heavy rain fell, they overflowed into the river again. So London built a new “super sewer,” the Thames Tideway Tunnel, twenty-five kilometers long and deep under the river. It was completed in 2025, almost exactly 150 years after Bazalgette finished his.",
+     "當然，故事並沒有在那裡結束。污水改成流進更東邊的泰晤士河，倫敦又花了很多年，才學會先把它處理乾淨。到了二十一世紀，連巴澤爾傑特的大隧道也滿了。大雨一來，污水又會滿出來流進河裡。所以倫敦蓋了一條新的「超級下水道」，泰晤士潮汐隧道，長二十五公里，深埋在河底下。它在 2025 年完工，幾乎剛好是巴澤爾傑特完成他的系統的一百五十年後。","informative"],
+    ["Today, on the Victoria Embankment, there is a small memorial to Joseph Bazalgette. Most people walk past it without looking. The words on it are in Latin and mean “He put the river in chains.” It is not the most beautiful monument in London. But few people in history have saved more lives, and he did it with bricks, a great deal of patience and a terrible smell that finally made the powerful pay attention.",
+     "今天，在維多利亞堤岸上，有一座小小的巴澤爾傑特紀念碑。大部分人走過去都不會多看一眼。上面的字是拉丁文，意思是「他為河流套上了鎖鏈」。它不是倫敦最美的紀念碑。可是，歷史上很少有人救過比他更多的人命，而他靠的是磚塊、無比的耐心，還有一股終於讓有權有勢的人不得不注意的可怕臭味。","warm"]
+  ],
+  quiz:[
+    ["Why did Parliament finally act in 1858?", ["Faraday’s letter convinced them.","The smell from the river reached them in the Houses of Parliament.","The Queen ordered it."], 1, "國會大廈就在河邊，臭味讓議員們受不了，十八天內就通過了法律。"],
+    ["What did Dr. John Snow show with his map?", ["That cholera spread through bad air.","That cholera deaths gathered around one water pump.","Where to build the sewers."], 1, "他標出死亡案例，發現都集中在寬街的一座水泵周圍，證明霍亂透過髒水傳播。"],
+    ["Why did Bazalgette double the size of his sewer pipes?", ["Bricks were cheap.","He expected the unexpected and wanted to do the job only once.","Parliament asked him to."], 1, "他說這種事只會做一次，而且總有預料不到的狀況，所以把管徑加倍，撐了一百多年。"]
+  ]
+}
+
+];
+
+/* ---------------- glossary ---------------- */
+const VOCAB = {
+"detective":{w:"detective",pos:"n.",kk:"[dɪˋtɛktɪv]",lv:"B1",zh:"偵探、刑警",d:"調查犯罪、找出真相的人。detective story = 偵探小說。"},
+"lure":{w:"lure",pos:"v.",kk:"[lʊr]",lv:"C1",zh:"引誘、誘騙",d:"用好處或假象把人引到某個地方，常常是陷阱。"},
+"disguise":{w:"disguise",pos:"n.",kk:"[dɪsˋgaɪz]",lv:"B2",zh:"喬裝、偽裝",d:"改變外表讓別人認不出來。in disguise = 喬裝打扮。"},
+"innocence":{w:"innocence",pos:"n.",kk:"[ˋɪnəsṇs]",lv:"C1",zh:"天真；清白",d:"像小孩一樣單純、沒有心機；也指沒有犯罪。形容詞是 innocent。"},
+"clue":{w:"clue",pos:"n.",kk:"[klu]",lv:"B1",zh:"線索",d:"幫助解開謎題的東西。I have no clue. = 我完全不知道。"},
+"stain":{w:"stain",pos:"n.",kk:"[sten]",lv:"B2",zh:"污漬",d:"很難洗掉的髒痕跡。"},
+"swapped":{w:"swap",pos:"v.",kk:"[swɑp]",lv:"B2",zh:"交換、調換",d:"把兩樣東西互換位置。過去式 swapped。"},
+"trail":{w:"trail",pos:"n.",kk:"[trel]",lv:"B2",zh:"足跡、一連串的線索",d:"某人或某物留下的痕跡，可以跟著走。也是山裡的「小徑」。"},
+"deliberate":{w:"deliberate",pos:"adj.",kk:"[dɪˋlɪbərɪt]",lv:"B2",zh:"故意的、刻意的",d:"不是意外，而是有計畫地做的。副詞 deliberately。"},
+"limbo":{w:"limbo",pos:"n.",kk:"[ˋlɪmbo]",lv:"C2",zh:"靈薄獄；最遠的邊界",d:"天主教傳統中，地獄邊緣的地方（拉丁文 limbus 是「邊界」的意思）。故事裡布朗神父用它比喻「宇宙最遙遠的邊界」。"},
+"suspected":{w:"suspect",pos:"v.",kk:"[səˋspɛkt]",lv:"B2",zh:"懷疑",d:"覺得某人可能做了壞事。當名詞 [ˋsʌspɛkt] 是「嫌疑犯」，重音在前。"},
+"bracelet":{w:"bracelet",pos:"n.",kk:"[ˋbreslɪt]",lv:"B1",zh:"手環、手鐲",d:"戴在手腕上的飾品。"},
+"master":{w:"master",pos:"n.",kk:"[ˋmæstɚ]",lv:"B1",zh:"大師、老師；主人",d:"在某方面最厲害、值得學習的人。故事裡華倫丁用它稱呼布朗神父。"},
+"imp":{w:"imp",pos:"n.",kk:"[ɪmp]",lv:"C2",zh:"小妖怪、小惡魔",d:"童話裡愛惡作劇的小魔鬼。"},
+"stick out":{w:"stick out",pos:"phr. v.",kk:"[stɪk aʊt]",lv:"B2",zh:"伸出來、突出",d:"從某個東西的邊緣露出來。過去式 stuck out。"},
+"horrified":{w:"horrified",pos:"adj.",kk:"[ˋhɔrə͵faɪd]",lv:"B2",zh:"嚇壞的、驚恐的",d:"看到可怕或令人震驚的事時的感覺。"},
+"enroll":{w:"enroll",pos:"v.",kk:"[ɪnˋrol]",lv:"B2",zh:"註冊、入學",d:"正式報名進入學校或課程。英式拼法 enrol。"},
+"ambitious":{w:"ambitious",pos:"adj.",kk:"[æmˋbɪʃəs]",lv:"B2",zh:"有野心的、有抱負的",d:"很想成功、想往上爬。名詞是 ambition。"},
+"satisfaction":{w:"satisfaction",pos:"n.",kk:"[͵sætɪsˋfækʃən]",lv:"B2",zh:"滿足",d:"得到想要的東西時的感覺。"},
+"fade":{w:"fade",pos:"v.",kk:"[fed]",lv:"B2",zh:"漸漸消失、褪色",d:"慢慢變淡、變弱，直到不見。fade away = 消失。"},
+"persuaded":{w:"persuade",pos:"v.",kk:"[pɚˋswed]",lv:"B2",zh:"說服",d:"persuade someone to do / that… = 說服某人。這本小說的書名 Persuasion 就是它的名詞。"},
+"debt":{w:"debt",pos:"n.",kk:"[dɛt]",lv:"B2",zh:"債務",d:"欠別人的錢。b 不發音。in debt = 負債。"},
+"surgeon":{w:"surgeon",pos:"n.",kk:"[ˋsɝdʒən]",lv:"B2",zh:"外科醫生",d:"動手術的醫生。"},
+"jealous":{w:"jealous",pos:"adj.",kk:"[ˋdʒɛləs]",lv:"B1",zh:"嫉妒的、吃醋的",d:"看到喜歡的人跟別人親近時不高興的感覺。"},
+"slipped":{w:"slip",pos:"v.",kk:"[slɪp]",lv:"B2",zh:"悄悄放、塞",d:"不引人注意地很快放進某處。也有「滑倒」的意思。"},
+"lizard":{w:"lizard",pos:"n.",kk:"[ˋlɪzɚd]",lv:"B1",zh:"蜥蜴",d:"有四條腿和長尾巴的爬蟲類。"},
+"plateau":{w:"plateau",pos:"n.",kk:"[plæˋto]",lv:"C1",zh:"高原",d:"很高、頂端平坦的大片土地。"},
+"committee":{w:"committee",pos:"n.",kk:"[kəˋmɪtɪ]",lv:"B2",zh:"委員會",d:"一群被選出來處理某件事的人。拼法注意兩個 m、兩個 t、兩個 e。"},
+"gorge":{w:"gorge",pos:"n.",kk:"[gɔrdʒ]",lv:"C1",zh:"峽谷",d:"兩邊是陡峭岩壁的深谷。"},
+"reptiles":{w:"reptile",pos:"n.",kk:"[ˋrɛptḷ]",lv:"B2",zh:"爬蟲類",d:"蛇、蜥蜴、鱷魚、恐龍這類冷血動物。"},
+"narrator":{w:"narrator",pos:"n.",kk:"[næˋretɚ]",lv:"B2",zh:"敘述者、說故事的人",d:"講故事的那個人。"},
+"polite":{w:"polite",pos:"adj.",kk:"[pəˋlaɪt]",lv:"A2",zh:"有禮貌的",d:"a polite silence = 出於禮貌而保持的沉默，其實是不知道怎麼回答。"},
+"mortified":{w:"mortified",pos:"adj.",kk:"[ˋmɔrtə͵faɪd]",lv:"C1",zh:"羞愧至極、丟臉死了",d:"比 embarrassed 更強烈，丟臉到想鑽進地洞。"},
+"innkeeper":{w:"innkeeper",pos:"n.",kk:"[ˋɪn͵kipɚ]",lv:"C1",zh:"旅店老闆",d:"inn 是舊式的小旅店。奇幻冒險故事裡常見的角色。"},
+"retired":{w:"retire",pos:"v.",kk:"[rɪˋtaɪr]",lv:"B1",zh:"退休",d:"不再工作。形容詞 retired = 已退休的。"},
+"sketchbook":{w:"sketchbook",pos:"n.",kk:"[ˋskɛtʃ͵bʊk]",lv:"B2",zh:"素描本",d:"用來畫草圖的本子。sketch = 素描、草圖。"},
+"delay":{w:"delay",pos:"n.",kk:"[dɪˋle]",lv:"B1",zh:"延誤、誤點",d:"比預定時間晚。The train is delayed. = 火車誤點了。"},
+"tiles":{w:"tile",pos:"n.",kk:"[taɪl]",lv:"B1",zh:"磁磚、瓦片",d:"貼在牆上、地上或屋頂上的一片片材料。"},
+"sundial":{w:"sundial",pos:"n.",kk:"[ˋsʌn͵daɪəl]",lv:"C1",zh:"日晷",d:"用太陽的影子看時間的工具。"},
+"earthquake":{w:"earthquake",pos:"n.",kk:"[ˋɝθ͵kwek]",lv:"B1",zh:"地震",d:"台灣人很熟悉的字。aftershock = 餘震。"},
+"viewpoint":{w:"viewpoint",pos:"n.",kk:"[ˋvju͵pɔɪnt]",lv:"B2",zh:"觀景點；觀點",d:"可以看到美景的地方；也有「看法、角度」的意思。"},
+"dictatorship":{w:"dictatorship",pos:"n.",kk:"[dɪkˋtetɚ͵ʃɪp]",lv:"C1",zh:"獨裁統治",d:"一個人或一小群人掌握全部權力、不經選舉的統治。dictator = 獨裁者。"},
+"pickpockets":{w:"pickpocket",pos:"n.",kk:"[ˋpɪk͵pɑkɪt]",lv:"B2",zh:"扒手",d:"在人多的地方偷別人口袋或包包裡東西的小偷。"},
+"chemicals":{w:"chemical",pos:"n.",kk:"[ˋkɛmɪkḷ]",lv:"B1",zh:"化學物質",d:"ch 念 [k]。chemistry = 化學。"},
+"foul":{w:"foul",pos:"adj.",kk:"[faʊl]",lv:"C1",zh:"惡臭的、骯髒的",d:"非常髒、非常臭、令人作嘔的。運動裡的 foul 是「犯規」。"},
+"cholera":{w:"cholera",pos:"n.",kk:"[ˋkɑlərə]",lv:"C1",zh:"霍亂",d:"一種透過受污染的水傳播的傳染病。ch 念 [k]。"},
+"outbreak":{w:"outbreak",pos:"n.",kk:"[ˋaʊt͵brek]",lv:"B2",zh:"（疾病、戰爭）爆發",d:"疾病或暴力突然開始，而且擴散。"},
+"embankment":{w:"embankment",pos:"n.",kk:"[ɪmˋbæŋkmənt]",lv:"C1",zh:"堤岸",d:"沿著河岸築起的堤防或石牆。倫敦泰晤士河畔有好幾條著名的 Embankment。"}
+};
+
+/* ---------------- culture & names ---------------- */
+const CULT = {
+"c:n-harwich":{name:1,h:"Harwich",kk:"[ˋhærɪdʒ]",say:"HARR-ij",zh:"哈威治",d:"英格蘭東岸的港口，有船往返荷蘭。w 不發音，結尾念 -ij。英國地名常常跟拼法不一樣！"},
+"c:n-valentin":{name:1,h:"Aristide Valentin",kk:"[͵ærɪsˋtid ͵vælɑ̃ˋtæ̃]",say:"a-ree-STEED va-lahn-TAN",zh:"亞里斯提德．華倫丁",d:"法文名字，Valentin 結尾是鼻音，不念英文的 Valentine。"},
+"c:n-flambeau":{name:1,h:"Flambeau",kk:"[flæmˋbo]",say:"flahm-BOH",zh:"弗蘭博",d:"法文，意思是「火炬」。故事裡全歐洲最有名的大盜。"},
+"c:n-hampstead":{name:1,h:"Hampstead Heath",kk:"[ˋhæmpstɪd ˋhiθ]",say:"HAMP-stid HEETH",zh:"漢普斯特德荒野",d:"倫敦北邊一大片起伏的草地和樹林，可以遠眺市中心。heath 是長著矮草和灌木的荒地。"},
+"c:n-fatherbrown":{name:1,h:"Father Brown",kk:"[ˋfɑðɚ ˋbraʊn]",say:"FAH-thur BROWN",zh:"布朗神父",d:"卻斯特頓筆下的天主教神父偵探，外表平凡、看起來傻傻的，其實非常了解人性。Father 是對神父的稱呼。"},
+"c:n-hawaii":{name:1,h:"Hawaii",kk:"[həˋwaɪ]",say:"huh-WHY",zh:"夏威夷",d:"太平洋上的群島。故事發生在十九世紀，當時夏威夷還是一個獨立的王國。"},
+"c:n-keawe":{name:1,h:"Keawe",kk:"[keˋɑve]",say:"kay-AH-vay",zh:"奇維",d:"夏威夷名字。夏威夷語的 w 有時念起來像 v。"},
+"c:n-sanfrancisco":{name:1,h:"San Francisco",kk:"[͵sæn frənˋsɪsko]",say:"san fran-SIS-koh",zh:"舊金山",d:"美國西岸的港口城市，十九世紀因為淘金熱而興起。"},
+"c:n-lopaka":{name:1,h:"Lopaka",kk:"[loˋpɑkə]",say:"loh-PAH-kuh",zh:"羅帕卡",d:"夏威夷名字，是英文名字 Robert 的夏威夷語說法。"},
+"c:n-kokua":{name:1,h:"Kokua",kk:"[koˋkuə]",say:"koh-KOO-uh",zh:"柯庫亞",d:"夏威夷語，意思是「幫助」。很適合這個角色。"},
+"c:leprosy":{h:"leprosy",kk:"[ˋlɛprəsɪ]",zh:"痲瘋病（漢生病）",d:"一種會傷害皮膚和神經的細菌感染疾病。十九世紀沒有藥可以醫，夏威夷王國把病人強制送到摩洛凱島隔離。今天已經可以完全治癒，台灣也改稱「漢生病」，避免歧視。"},
+"c:n-molokai":{name:1,h:"Molokai",kk:"[͵moloˋkaɪ]",say:"moh-loh-KYE",zh:"摩洛凱島",d:"夏威夷的一座島。十九世紀，痲瘋病人被強制隔離在島上北邊的半島。"},
+"c:n-honolulu":{name:1,h:"Honolulu",kk:"[͵hɑnəˋlulu]",say:"hon-uh-LOO-loo",zh:"檀香山",d:"夏威夷最大的城市，現在是夏威夷州的首府。"},
+"c:centime":{h:"centime",kk:"[ˋsɑntim]",zh:"生丁",d:"法國以前的小硬幣，一百生丁等於一法郎。故事裡大溪地用法國的錢，五生丁大約等於美國的一分錢。"},
+"c:n-tahiti":{name:1,h:"Tahiti",kk:"[təˋhitɪ]",say:"tuh-HEE-tee",zh:"大溪地",d:"南太平洋的島嶼，當時是法國的殖民地，所以用法國的錢。"},
+"c:boatswain":{h:"boatswain",kk:"[ˋbosṇ]",zh:"水手長",d:"船上管理水手和甲板工作的人。拼法很長，念起來卻只有 BOH-sun 兩個音節，也常寫成 bosun。"},
+"c:n-baltimore":{name:1,h:"Baltimore",kk:"[ˋbɔltə͵mor]",say:"BAWL-tih-mor",zh:"巴爾的摩",d:"美國東岸馬里蘭州的港口城市，也是作者費茲傑羅晚年住過的地方。"},
+"c:n-anne":{name:1,h:"Anne Elliot",kk:"[æn ˋɛlɪət]",say:"AN EL-ee-ut",zh:"安．艾略特",d:"珍．奧斯汀筆下最安靜、最成熟的女主角。"},
+"c:n-sirwalter":{name:1,h:"Sir Walter",kk:"[sɝ ˋwɔltɚ]",say:"sur WAWL-tur",zh:"華特爵士",d:"Sir 加名字（不是姓）是對爵士或準男爵的稱呼。準男爵（baronet）是可以世襲的頭銜，但不算貴族。"},
+"c:n-wentworth":{name:1,h:"Wentworth",kk:"[ˋwɛntwɝθ]",say:"WENT-wurth",zh:"溫特沃斯",d:"英國姓氏。結尾的 -worth 念得很輕，[wɝθ]。"},
+"c:n-bath":{name:1,h:"Bath",kk:"[bɑθ]",say:"BAHTH",zh:"巴斯",d:"英格蘭西南部的城市，有古羅馬浴場，十八、十九世紀是有錢人社交的時髦地方。英國人念 [bɑθ]，美國人常念 [bæθ]。"},
+"c:n-lyme":{name:1,h:"Lyme",kk:"[laɪm]",say:"LIME",zh:"萊姆",d:"全名 Lyme Regis，英格蘭南岸的小鎮，有一道叫 the Cobb 的古老石堤。"},
+"c:n-malone":{name:1,h:"Edward Malone",kk:"[məˋlon]",say:"muh-LOHN",zh:"愛德華．馬龍",d:"愛爾蘭裔的年輕記者，故事的敘述者。"},
+"c:n-challenger":{name:1,h:"Professor Challenger",kk:"[ˋtʃælɪndʒɚ]",say:"CHAL-in-jur",zh:"查林傑教授",d:"柯南．道爾筆下脾氣火爆的科學家。challenger 本身的意思就是「挑戰者」。"},
+"c:iguanodon":{h:"iguanodon",kk:"[ɪˋgwɑnə͵dɑn]",zh:"禽龍",d:"一種草食恐龍，可以用後腿站立，是最早被科學家命名的恐龍之一。"},
+"c:pterodactyl":{h:"pterodactyl",kk:"[͵tɛrəˋdæktɪl]",zh:"翼手龍",d:"會飛的古代爬蟲類（嚴格來說不是恐龍）。開頭的 p 不發音。"},
+"c:n-tainan":{name:1,h:"Tainan",kk:"[ˋtaɪˋnɑn]",say:"TIE-NAHN",zh:"台南",d:"台灣最古老的城市之一。"},
+"c:dm":{h:"dungeon master (DM)",zh:"地下城主",d:"龍與地下城裡負責說故事、扮演所有怪物和路人、裁判規則的人。玩家扮演英雄，DM 扮演整個世界。"},
+"c:n-porto":{name:1,h:"Porto",kk:"[ˋportu]",say:"POR-too",zh:"波多",d:"葡萄牙第二大城，波特酒（port wine）的故鄉。葡萄牙文結尾的 o 念起來像 oo。"},
+"c:cork":{h:"cork oak",kk:"[ˋkɔrk ͵ok]",zh:"軟木橡樹",d:"樹皮可以做成軟木塞的橡樹。葡萄牙是全世界最大的軟木產地，剝樹皮不用砍樹，每九年左右可以剝一次。"},
+"c:azulejo":{h:"azulejo",kk:"[͵æzuˋleʒo]",zh:"葡萄牙彩繪磁磚",d:"葡萄牙到處可見的彩繪瓷磚，最有名的是藍白色的，貼在教堂、車站、民宅的牆上，有些拼成一整幅圖畫。"},
+"c:n-saobento":{name:1,h:"São Bento",kk:"[saʊ ˋbɛntu]",say:"sow BEN-too",zh:"聖本篤車站",d:"波多市中心的火車站，大廳牆上大約有兩萬片藍白磁磚，畫著葡萄牙的歷史場景，建於二十世紀初。"},
+"c:saudade":{h:"saudade",kk:"[saʊˋdɑdə]",zh:"（葡萄牙文）思念、鄉愁",d:"葡萄牙人最愛說「翻譯不出來」的字：對不在身邊、甚至可能再也回不來的人事物，那種又苦又甜的思念。"},
+"c:transceiver":{h:"transceiver",kk:"[trænsˋsivɚ]",zh:"無線電收發機",d:"transmitter（發射機）加 receiver（接收機）。普通收音機只能聽，收發機可以收也可以發，業餘無線電玩家（ham radio）就是用它跟遠方的人通話。"},
+"c:lighthouse":{h:"Kaohsiung Lighthouse",zh:"高雄燈塔（旗後燈塔）",d:"位在旗津旗後山上。最早建於 1883 年，現在的白色八角形燈塔是 1918 年重建的，燈至今仍在運作。2022 年 9 月起開放夜間參觀，到晚上九點，週一公休。實際開放時間請以官方公告為準。"},
+"c:calcada":{h:"calçada portuguesa",kk:"[kɑlˋsɑdə]",zh:"葡萄牙碎石路",d:"用手工把白色石灰岩和黑色玄武岩小石塊排成圖案的人行道，是葡萄牙的招牌街景。下雨時很滑。"},
+"c:n-alfama":{name:1,h:"Alfama",kk:"[ælˋfɑmə]",say:"al-FAH-muh",zh:"阿爾法瑪",d:"里斯本最古老的街區，名字來自阿拉伯文。"},
+"c:miradouro":{h:"miradouro",kk:"[͵mirəˋdoru]",zh:"觀景台",d:"葡萄牙文的「觀景台」。里斯本建在山丘上，有很多免費的 miradouro 可以看整座城市。"},
+"c:n-belem":{name:1,h:"Belém",kk:"[bɛˋlɛm]",say:"beh-LEM",zh:"貝倫",d:"里斯本西邊的河岸區，葡萄牙文的「伯利恆」。這裡有熱羅尼莫斯修道院、貝倫塔，還有那家有名的蛋塔店。"},
+"c:fado":{h:"fado",kk:"[ˋfɑdu]",zh:"法朵",d:"里斯本的傳統歌曲，通常由一位歌手和兩把吉他（其中一把是葡萄牙吉他）演出，主題常是大海、命運和思念。2011 年列入聯合國教科文組織人類無形文化遺產。"},
+"c:n-thames":{name:1,h:"Thames",kk:"[tɛmz]",say:"TEMZ",zh:"泰晤士河",d:"流過倫敦的河。th 念 [t]，a 念 [ɛ]，結尾念 z：TEMZ。"},
+"c:n-faraday":{name:1,h:"Michael Faraday",kk:"[ˋfærə͵de]",say:"FAIR-uh-day",zh:"麥可．法拉第",d:"英國科學家，發現電磁感應，奠定了發電機和電動機的原理。"},
+"c:miasma":{h:"miasma theory",kk:"[maɪˋæzmə]",zh:"瘴氣說",d:"十九世紀以前很普遍的看法：疾病是從臭的、髒的空氣傳來的。後來細菌理論證明，很多疾病其實是透過水、食物或病菌傳播。"},
+"c:n-snow":{name:1,h:"John Snow",kk:"[dʒɑn ˋsno]",say:"JON SNOH",zh:"約翰．斯諾",d:"英國醫生，1854 年用地圖找出霍亂和寬街水泵的關係，被視為現代流行病學之父之一。"},
+"c:n-bazalgette":{name:1,h:"Joseph Bazalgette",kk:"[ˋbæzəl͵dʒɛt]",say:"BAZ-ul-jet",zh:"約瑟夫．巴澤爾傑特",d:"英國土木工程師，設計了倫敦的現代下水道系統。法國裔姓氏，英國人念 BAZ-ul-jet。"}
+};
+
+/* =========================================================
+   LAMPLIGHT READERS — reader engine
+   needs: LEVEL (level.js), S / VOCAB / CULT (data.js)
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(LEVEL.prefix+k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(LEVEL.prefix+k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(LEVEL.prefix+k); }catch(e){} }
+};
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const pad = n => String(n).padStart(2,"0");
+const RX = /\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]/g;
+const plain = s => String(s).replace(RX,"$1");
+const keyOf = (disp, key) => key || disp.toLowerCase();
+function mk(s){
+  return esc(s).replace(RX,(m,disp,key)=>{
+    key = keyOf(disp, key);
+    return `<span class="g ${key.startsWith("c:") ? "cu" : "vo"}" role="button" tabindex="0" data-k="${esc(key)}">${disp}</span>`;
+  });
+}
+const CEFR = {A1:1,A2:2,B1:3,B2:4,C1:5,C2:6};
+const THREAD = {dnd:"🎲 龍與地下城", women:"✨ 自信女性", love:"💕 輕鬆愛情", static:"📡 高雄三部曲"};
+const KIND = {orig:"原創故事", classic:"經典改寫", guide:"旅遊指南", history:"歷史知識"};
+const KIND_EN = {orig:"ORIGINAL", classic:"CLASSIC", guide:"GUIDE", history:"HISTORY"};
+
+/* word counts and which story each note first appears in */
+S.forEach((s,i)=>{
+  s.i = i;
+  s.words = s.paras.reduce((n,p)=>n + (plain(p[0]).match(/[A-Za-z0-9’'-]+/g) || []).length, 0);
+  s.mins = Math.max(1, Math.round(s.words / 110));
+  s.keys = [];
+  s.paras.forEach(p=>{ for(const m of p[0].matchAll(RX)){ const k = keyOf(m[1], m[2]); if(!s.keys.includes(k)) s.keys.push(k);
+    const e = k.startsWith("c:") ? CULT[k] : VOCAB[k]; if(e && e.s === undefined) e.s = i; } });
+});
+
+/* ---------------- icons ---------------- */
+const SVGI = {
+  spk:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>',
+  play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>',
+  stop:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12v12H6z"/></svg>',
+  pause:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>',
+  restart:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>',
+  star:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.8l2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9z"/></svg>',
+  starO:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.8l2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9zm0 4.5-1.5 3.2-3.5.5 2.5 2.4-.6 3.5 3.1-1.7 3.1 1.7-.6-3.5 2.5-2.4-3.5-.5z"/></svg>',
+  zh:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v2H4zm7 3h2v3h6v7h-2v-5h-4v7h-2v-7H7v5H5v-7h6z"/></svg>'
+};
+const PAL = {k:"#2B2536",w:"#FFFFFF",y:"#F4C542",o:"#E08A3C",r:"#D9674E",p:"#F2A1A8",g:"#4E9A5B",G:"#7BC57F",b:"#8FCBE3",B:"#5F71A6",s:"#B9B0A3",n:"#8A5A3C",l:"#6FB7C9"};
+function pix(id){
+  const rows = LEVEL.icons[id]; if(!rows) return "";
+  let r = "";
+  rows.forEach((row,y)=>{ let x = 0;
+    while(x < row.length){ const c = row[x]; if(c === "."){ x++; continue; }
+      let w = 1; while(row[x+w] === c) w++;
+      r += `<rect x="${x}" y="${y}" width="${w}" height="1" fill="${PAL[c]}"/>`; x += w; } });
+  return `<svg viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
+}
+
+/* ---------------- cover scene (320×180, Bayer-dithered) ---------------- */
+const Scene = (()=>{
+  const cv = $("#cv"), x = cv.getContext("2d"), W = 320, H = 180;
+  const B4 = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+  const hex = h => [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+  const img = x.createImageData(W,H), d = img.data;
+  const put = (px,py,c)=>{ if(px<0||py<0||px>=W||py>=H) return; const i=(py*W+px)*4; d[i]=c[0]; d[i+1]=c[1]; d[i+2]=c[2]; d[i+3]=255; };
+  const rect = (x0,y0,w,h,c)=>{ c=hex(c); for(let yy=y0;yy<y0+h;yy++) for(let xx=x0;xx<x0+w;xx++) put(xx,yy,c); };
+  const vgrad = (x0,y0,w,h,cols)=>{ const cs=cols.map(hex), n=cs.length-1;
+    for(let yy=0;yy<h;yy++){ const t=yy/(h-1)*n, k=Math.min(n-1,Math.floor(t)), f=t-k;
+      for(let xx=0;xx<w;xx++){ const b=(B4[yy&3][xx&3]+.5)/16; put(x0+xx,y0+yy, f>b?cs[k+1]:cs[k]); } } };
+  const glow = (cx,cy,r,col,str)=>{ const c=hex(col);
+    for(let yy=cy-r;yy<=cy+r;yy++) for(let xx=cx-r;xx<=cx+r;xx++){
+      if(xx<0||yy<0||xx>=W||yy>=H) continue;
+      const dd=Math.hypot(xx-cx,(yy-cy)*1.1)/r; if(dd>1) continue;
+      const t=(1-dd)*(1-dd)*str, b=(B4[yy&3][xx&3]+.5)/16;
+      const i=(yy*W+xx)*4, a = t>b ? .55 : t>b*.5 ? .25 : 0;
+      if(a){ d[i]+= (c[0]-d[i])*a; d[i+1]+=(c[1]-d[i+1])*a; d[i+2]+=(c[2]-d[i+2])*a; } } };
+  vgrad(0,0,W,120,["#2A2336","#352B40","#3F3246"]);
+  for(let xx=0;xx<W;xx+=16) rect(xx,0,1,120,"#2E2639");
+  rect(18,14,132,92,"#1B1726");
+  /* each level can set its own window: night sky with moon and rain (default), or a dusk sky with a setting sun */
+  const SC = Object.assign({sky:["#15183A","#232A5A","#3B3872","#5A4A83"], moon:true, stars:true, rain:true, birds:false}, LEVEL.scene || {});
+  vgrad(22,18,124,84,SC.sky);
+  if(SC.stars) [[30,24],[52,30],[70,21],[96,28],[118,23],[134,34],[42,40],[88,44]].forEach(p=>put(p[0],p[1],hex("#E8E3FF")));
+  if(SC.moon){ for(let yy=-9;yy<=9;yy++) for(let xx=-9;xx<=9;xx++){ if(xx*xx+yy*yy<=81) put(120+xx,36+yy,hex((xx+yy)>6?"#D9CFAE":"#F4EBCB")); }
+    rect(116,32,3,2,"#E2D7B6"); rect(123,39,2,2,"#E2D7B6"); }
+  if(SC.sun){ for(let yy=-14;yy<=14;yy++) for(let xx=-14;xx<=14;xx++){ if(xx*xx+yy*yy<=196) put(58+xx,76+yy,hex(yy>4?"#F59A62":yy>-3?"#FDB46E":"#FFD08A")); }
+    for(let yy=56;yy<100;yy+=5) rect(22,yy,124,1,yy>80?"#E58A6A":"#D9798A"); }
+  const sk=[[22,78,14,24],[36,70,12,32],[48,82,16,20],[64,66,10,36],[74,76,18,26],[92,72,12,30],[104,80,16,22],[120,68,12,34],[132,78,14,24]];
+  sk.forEach(b=>rect(b[0],b[1],b[2],b[3],"#241F3C"));
+  for(let i=0;i<46;i++){ const b=sk[i%sk.length]; const wx=b[0]+2+((i*5)%(b[2]-3)), wy=b[1]+3+((i*7)%(b[3]-6)); if(i%3) put(wx,wy,hex(i%4?"#F2C46B":"#FFE3A3")); }
+  rect(18,14,132,4,"#5A4232"); rect(18,102,132,5,"#6B4E3A"); rect(18,14,4,92,"#5A4232"); rect(146,14,4,92,"#5A4232"); rect(82,18,4,84,"#5A4232"); rect(22,58,124,3,"#5A4232");
+  rect(14,106,140,4,"#7A5A43");
+  for(let yy=10;yy<112;yy++){ const w=8+Math.round(Math.sin(yy/9)*2); rect(6,yy,w,1,yy%6<3?"#8C4F5E":"#7B4453"); rect(154-w+8,yy,w,1,yy%6<3?"#8C4F5E":"#7B4453"); }
+  rect(4,8,160,3,"#4A3528");
+  vgrad(0,120,W,60,["#6E4B35","#5C3E2C","#4A3223"]);
+  rect(0,120,W,2,"#8A6147");
+  for(let xx=0;xx<W;xx+=40) rect(xx,128,24,1,"#5F4130");
+  [["#5F7FA8",196,108,52,6],["#B96F7D",200,102,46,6],["#6F9277",194,96,50,6],["#C0823A",202,90,40,6]].forEach(b=>{rect(b[1],b[2],b[3],b[4],b[0]); rect(b[1],b[2],b[3],1,"#FFFFFF"); rect(b[1]+2,b[2]+2,b[3]-4,1,"#F4E7CF");});
+  rect(150,134,70,4,"#3E2A1E");
+  for(let i=0;i<32;i++){ const lift=Math.round(Math.sin(i/31*Math.PI)*3); rect(152+i,128-lift,1,8+lift,"#F4ECDA"); rect(186+i,128-lift,1,8+lift,"#EFE5D0"); }
+  rect(184,126,2,10,"#CBBFA6");
+  for(let l=0;l<4;l++){ rect(156,129+l*2,24,1,"#C9BDA4"); rect(190,129+l*2,24,1,"#C9BDA4"); }
+  rect(110,124,20,14,"#E9E1D2"); rect(110,124,20,2,"#FFFFFF"); rect(112,125,16,2,"#9A6A3F"); rect(130,127,4,2,"#E9E1D2"); rect(133,127,2,7,"#E9E1D2"); rect(130,132,4,2,"#E9E1D2"); rect(106,138,28,2,"#CFC6B6");
+  rect(262,136,30,4,"#2E2A30"); rect(274,88,4,48,"#3A3540"); rect(272,86,8,3,"#3A3540");
+  for(let yy=0;yy<22;yy++){ const w=18+yy; rect(276-w/2|0,64+yy,w,1,yy<2?"#F7D59A":yy%4?"#E8B561":"#DDA955"); }
+  rect(262,86,28,2,"#C98E43");
+  rect(34,128,18,12,"#B1634A"); rect(33,127,20,2,"#C9745A");
+  [[40,112,3,16],[44,108,3,20],[36,116,3,12],[48,114,3,14]].forEach(s=>rect(s[0],s[1],s[2],s[3],"#4E8A5B"));
+  [[34,114,6,3],[46,106,6,3],[38,108,5,3],[49,112,6,3],[30,120,6,3]].forEach(s=>rect(s[0],s[1],s[2],s[3],"#6FAE78"));
+  /* the level number, lettered on the spine of the top book */
+  const baseImg = new Uint8ClampedArray(d);
+  const drops = Array.from({length:44},()=>({x:22+Math.random()*124, y:18+Math.random()*84, v:1.6+Math.random()*1.4}));
+  const steam = Array.from({length:10},(_,i)=>({t:i/10}));
+  const birds = [{x:40,y:34,v:.35,p:0},{x:56,y:40,v:.3,p:2},{x:100,y:28,v:.4,p:4}], bird = hex("#3A2440");
+  const rain = hex("#9DB2E6"), rain2 = hex("#6F7FB8"), st1 = hex("#F4EFE6"), st2 = hex("#C9BFB6");
+  let frame = 0, last = 0, on = false;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function paint(){
+    d.set(baseImg);
+    const fl = 1 + (Math.sin(frame*.7)+Math.sin(frame*1.9))*.03;
+    glow(276,96,90,"#F6C57A",.72*fl); glow(276,112,40,"#FFE2A8",.8*fl);
+    if(SC.moon) glow(120,36,26,"#CFC8FF",.35);
+    if(SC.sun) glow(58,72,44,"#FFC38A",.42);
+    if(SC.birds) birds.forEach(b=>{ b.x+=b.v; if(b.x>146) b.x=22; const bx=b.x|0, flap=(frame+b.p)%6<3;
+      put(bx,b.y+(flap?0:1),bird); put(bx+1,b.y+1,bird); put(bx+2,b.y+(flap?0:1),bird); });
+    if(SC.rain) drops.forEach(p=>{ p.y+=p.v; if(p.y>100){ p.y=18; p.x=22+Math.random()*124; } put(p.x|0,p.y|0,rain); put(p.x|0,(p.y|0)-1,rain2); });
+    steam.forEach((s,i)=>{ s.t=(s.t+.02)%1; const sy=122-s.t*22, sx=118+Math.round(Math.sin(s.t*6+i)*3)+(i%3)*2;
+      if(s.t<.85){ const c=s.t<.4?st1:st2; put(sx,sy|0,c); if(i%2) put(sx+1,sy|0,c); } });
+    x.putImageData(img,0,0);
+  }
+  function loop(ts){ if(!on) return; if(ts-last >= 83){ last = ts; frame++; paint(); } requestAnimationFrame(loop); }
+  return {
+    start(){ if(on) return; on = true; paint(); if(!reduce) requestAnimationFrame(loop); },
+    stop(){ on = false; }
+  };
+})();
+
+/* ---------------- FM music ---------------- */
+const Music = (()=>{
+  let ctx=null, bus, out, timer=null, cur=-1, step=0, nextT=0, keeper=null, ducked=false;
+  let vol = store.get("vol", 42) / 100;
+  const midi = n=>{ const m=/^([A-G])(#?)(\d)$/.exec(n); return 12*(+m[3]+1)+{C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+(m[2]?1:0); };
+  const hz = m=>440*Math.pow(2,(m-69)/12);
+  const P = {
+    ep:   {mods:[{r:1,i:1.6,d:.9},{r:14,i:.5,d:.07}], a:.004, dec:2.2, sus:0, g:.16, lp:3200},
+    bell: {mods:[{r:3.5,i:2.6,d:1.6}], a:.002, dec:2.6, sus:0, g:.10, lp:6000},
+    bass: {mods:[{r:1,i:2.2,d:.22}], a:.005, dec:.9, sus:.35, g:.24, lp:900},
+    pad:  {mods:[{r:2,i:.7,d:9}], a:.9, dec:4, sus:.8, g:.07, lp:2400, det:6},
+    mar:  {mods:[{r:4,i:2.4,d:.09}], a:.002, dec:.55, sus:0, g:.13, lp:4200}
+  };
+  function parse(str){ const t=str.split(/\s+/).filter(z=>z&&z!=="|"), ev={}; let last=null;
+    t.forEach((k,i)=>{ if(k==="-"){last=null;return;} if(k==="_"){ if(last) last.len++; return; } last={ms:k.split("+").map(midi),len:1}; ev[i]=last; });
+    return {n:t.length, ev}; }
+  const TR = LEVEL.tracks; TR.forEach(t=>t.parts.forEach(p=>p.q=parse(p.s)));
+  function silentWav(){
+    const n = 4000, buf = new ArrayBuffer(44+n), v = new DataView(buf), w = (o,s)=>{ for(let i=0;i<s.length;i++) v.setUint8(o+i,s.charCodeAt(i)); };
+    w(0,"RIFF"); v.setUint32(4,36+n,true); w(8,"WAVE"); w(12,"fmt "); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+    v.setUint32(24,8000,true); v.setUint32(28,8000,true); v.setUint16(32,1,true); v.setUint16(34,8,true); w(36,"data"); v.setUint32(40,n,true);
+    for(let i=0;i<n;i++) v.setUint8(44+i,128);
+    let s = ""; new Uint8Array(buf).forEach(b=> s += String.fromCharCode(b));
+    return "data:audio/wav;base64," + btoa(s);
+  }
+  /* iOS: play through the silent switch, and keep the session alive */
+  function unlockIOS(){
+    try{ if(navigator.audioSession) navigator.audioSession.type = "playback"; }catch(e){}
+    try{ if(!keeper){ keeper = new Audio(silentWav()); keeper.loop = true; keeper.setAttribute("playsinline",""); keeper.volume = 0.01; }
+      const pr = keeper.play(); if(pr && pr.catch) pr.catch(()=>{}); }catch(e){}
+  }
+  function impulse(sec){ const n=ctx.sampleRate*sec, b=ctx.createBuffer(2,n,ctx.sampleRate);
+    for(let c=0;c<2;c++){ const ch=b.getChannelData(c); for(let i=0;i<n;i++) ch[i]=(Math.random()*2-1)*Math.pow(1-i/n,3.2); } return b; }
+  function init(){
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false;
+    ctx=new AC(); out=ctx.createGain(); bus=ctx.createGain();
+    const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-18; comp.ratio.value=3;
+    const rev=ctx.createConvolver(); rev.buffer=impulse(3); const rg=ctx.createGain(); rg.gain.value=.32;
+    const dly=ctx.createDelay(1); dly.delayTime.value=.42; const fb=ctx.createGain(); fb.gain.value=.28;
+    const dlp=ctx.createBiquadFilter(); dlp.type="lowpass"; dlp.frequency.value=1800; const dg=ctx.createGain(); dg.gain.value=.18;
+    bus.connect(comp); bus.connect(rev); rev.connect(rg); rg.connect(comp);
+    bus.connect(dly); dly.connect(dlp); dlp.connect(fb); fb.connect(dly); dlp.connect(dg); dg.connect(comp);
+    comp.connect(out); out.connect(ctx.destination); out.gain.value=0; return true;
+  }
+  function applyVol(){ if(out) out.gain.setTargetAtTime(cur < 0 ? 0 : vol*(ducked?.3:1), ctx.currentTime, .08); }
+  function voice(t, m, dur, p, vel){
+    const f=hz(m), amp=ctx.createGain(), lp=ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=p.lp;
+    const carriers=[f]; if(p.det) carriers.push(f*Math.pow(2,p.det/1200));
+    const stopAt=t+dur+p.dec+.2;
+    carriers.forEach(cf=>{
+      const c=ctx.createOscillator(); c.frequency.value=cf;
+      p.mods.forEach(md=>{ const o=ctx.createOscillator(), g=ctx.createGain(); o.frequency.value=cf*md.r;
+        const idx=cf*md.i; g.gain.setValueAtTime(idx,t); g.gain.setTargetAtTime(idx*.15,t+.005,md.d/3);
+        o.connect(g); g.connect(c.frequency); o.start(t); o.stop(stopAt); });
+      c.connect(lp); c.start(t); c.stop(stopAt);
+    });
+    const pk=p.g*(vel||1)/carriers.length;
+    amp.gain.setValueAtTime(0,t); amp.gain.linearRampToValueAtTime(pk,t+p.a);
+    amp.gain.setTargetAtTime(pk*p.sus,t+p.a,p.dec/3);
+    amp.gain.setTargetAtTime(0,t+Math.max(p.a,dur),p.sus?.5:.25);
+    lp.connect(amp); amp.connect(bus);
+  }
+  function tick(){
+    const T=TR[cur], sd=60/T.bpm/2;
+    while(nextT < ctx.currentTime+.25){
+      const sw = step%2 ? sd*T.swing : 0;
+      T.parts.forEach(pt=>{ const e=pt.q.ev[step%pt.q.n]; if(!e) return;
+        e.ms.forEach((m,k)=>voice(nextT+sw+(pt.strum||0)*k, m, e.len*sd*.96, P[pt.p], pt.vel)); });
+      nextT += sd; step++;
+    }
+  }
+  function play(i){
+    if(!ctx && !init()){ toast("這個瀏覽器無法播放音樂"); return; }
+    unlockIOS();
+    const r = ctx.resume(); if(r && r.catch) r.catch(()=>{});
+    setTimeout(()=>{ if(cur >= 0 && ctx.state !== "running") toast("瀏覽器擋住了音樂：請再點一下 ♪，並確認手機沒有開靜音"); }, 700);
+    clearInterval(timer); cur=i; step=0; nextT=ctx.currentTime+.1; applyVol();
+    tick(); timer=setInterval(tick,40); store.set("trk", i); ui();
+  }
+  function stop(){ clearInterval(timer); timer=null; cur=-1; if(ctx) applyVol(); if(keeper) keeper.pause(); ui(); }
+  function wake(){ if(ctx && cur >= 0 && ctx.state !== "running"){ unlockIOS(); ctx.resume(); } }
+  function ui(){
+    $("#musicBtn").classList.toggle("on", cur >= 0);
+    $$(".trk").forEach(b=>{ const on = +b.dataset.t === cur; b.classList.toggle("on", on); b.querySelector(".pl").textContent = on ? "❚❚" : "▶"; });
+    const cm = $("#coverMusic"); if(cm){ cm.classList.toggle("on", cur >= 0); cm.setAttribute("aria-pressed", cur >= 0); }
+  }
+  document.addEventListener("visibilitychange", ()=>{
+    if(!ctx || cur < 0) return;
+    if(document.hidden){ clearInterval(timer); ctx.suspend(); }
+    else ctx.resume().then(()=>{ nextT = ctx.currentTime + .05; clearInterval(timer); timer = setInterval(tick,40); });
+  });
+  return { TR, play, stop, wake, ui,
+    get cur(){ return cur; }, get state(){ return ctx ? ctx.state : "none"; },
+    setVol(v){ vol=v; store.set("vol", Math.round(v*100)); if(ctx) applyVol(); }, get vol(){ return vol; },
+    duck(on){ ducked=on; if(ctx) applyVol(); } };
+})();
+
+/* ---------------- speech ----------------
+   1. a recorded clip listed in <audio>/manifest.json   (s01-03.mp3 = story 1, paragraph 3)
+   2. the browser's voice, sentence by sentence, shaped by each paragraph's mood */
+const MOOD = {
+  cheerful:[1.05,1.12], excited:[1.12,1.2], panicked:[1.16,1.16], bright:[1.03,1.08], friendly:[1.0,1.05],
+  warm:[0.95,1.0], gentle:[0.9,0.98], tender:[0.86,0.95], nostalgic:[0.87,0.95], wistful:[0.86,0.92], sad:[0.84,0.9],
+  hopeful:[0.93,1.05], playful:[1.05,1.1], teasing:[1.0,1.08], amused:[1.0,1.08], deadpan:[0.92,0.9],
+  curious:[1.0,1.1], surprised:[1.08,1.2], calm:[0.95,1.0], proud:[1.0,1.06], triumphant:[1.06,1.15],
+  thoughtful:[0.9,0.97], nervous:[1.04,1.05], tired:[0.88,0.94], informative:[0.97,1.0], worried:[1.02,1.03], shy:[0.95,1.05], annoyed:[1.06,0.95]
+};
+const SYN = window.speechSynthesis || null;
+let qid = 0, Q = null;
+let rate = store.get("rate", .85);
+let voiceURI = store.get("voiceURI", "");
+const VOICES = {all:[], f:[], m:[], main:null};
+const FEM = /Samantha|Ava|Allison|Susan|Zira|Aria|Jenny|Michelle|Emma|Joanna|Salli|Kendra|Kimberly|Ivy|Karen|Moira|Tessa|Victoria|Serena|Kate|Fiona|Veena|Libby|Sonia|Natasha|Nicky|Sara|Female|Google US English/i;
+const MAL = /Alex|Daniel|Tom|Aaron|Arthur|Rishi|David|Mark|Guy|Ryan|Eric|Christopher|Matthew|Joey|Justin|Brian|Oliver|Gordon|Lee|Evan|Nathan|Male/i;
+const NOVELTY = /Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Deranged|Good News|Hysterical|Jester|Junior|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Ralph|Fred|Kathy|Princess|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley/i;
+function vq(v){ const s = (v.voiceURI || "") + " " + v.name;
+  if(/premium|高品質|優質/i.test(s)) return 2; if(/enhanced|增強|加強|Natural|Neural|Online/i.test(s)) return 1; return 0; }
+const QLABEL = ["一般音質","增強音質","高品質"];
+function pickVoice(){
+  if(!SYN) return;
+  const us = v => /^en[-_]US/i.test(v.lang) ? 0 : 1, hq = v => 2 - vq(v);
+  const vs = SYN.getVoices().filter(v=>/^en/i.test(v.lang) && !NOVELTY.test(v.name)).sort((a,b)=>us(a)-us(b) || hq(a)-hq(b));
+  VOICES.all = vs; VOICES.f = vs.filter(v=>FEM.test(v.name)); VOICES.m = vs.filter(v=>!FEM.test(v.name) && MAL.test(v.name));
+  VOICES.main = vs.find(v=>v.voiceURI === voiceURI)
+    || vs.find(v=>us(v)===0 && /Samantha|Google US English|Aria|Jenny|Ava|Allison/i.test(v.name)) || VOICES.f[0] || vs[0] || null;
+  fillVoiceSel();
+}
+/* a story told by a man uses a male voice, unless the reader picked a voice by hand */
+function narrator(s){
+  if(voiceURI || !s || s.voice !== "m") return VOICES.main;
+  return VOICES.m.find(v=>v.lang === (VOICES.main && VOICES.main.lang)) || VOICES.m[0] || VOICES.main;
+}
+if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
+const sayAs = t => Object.entries(LEVEL.sayAs || {}).reduce((x,[w,r])=>x.split(w).join(r), t);  /* voice-only respellings */
+const speakable = t => sayAs(plain(t)).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/…/g,"...").replace(/—/g,", ").replace(/\$(\d+)/g,"$1 dollars");
+function sentences(t){
+  const s = speakable(t).replace(/\b([ap])\.m\./g,"$1_m_").replace(/\b(Mr|Mrs|Ms|Dr|St)\./g,"$1_");
+  return (s.match(/[^.!?]+(?:[.!?]+["']?|$)/g) || [s]).map(x=>x.replace(/([ap])_m_/g,"$1.m.").replace(/\b(Mr|Mrs|Ms|Dr|St)_/g,"$1.").trim()).filter(Boolean);
+}
+function prosody(sent, mood){
+  const m = MOOD[mood] || [1,1];
+  let r = rate * m[0], p = m[1];
+  if(/!["']?$/.test(sent)){ r *= 1.06; p += .08; } else if(/\?["']?$/.test(sent)) p += .07; else if(/\.\.\.["']?$/.test(sent)) r *= .92;
+  return {rate:Math.max(.5, Math.min(1.5, r)), pitch:Math.max(.8, Math.min(1.25, p))};
+}
+function pushTTS(q, it){
+  const ss = sentences(it.text), v = narrator(S[cur]);
+  ss.forEach((s,n)=>{ const pr = prosody(s, it.mood), last = n === ss.length-1;
+    const gap = last ? 450 : /\.\.\.["']?$/.test(s) ? 450 : /\?["']?$/.test(s) ? 320 : 260;
+    q.push({text:s, el:it.el, gap, voice:v, rate:pr.rate, pitch:pr.pitch}); });
+}
+const CLIPS = new Set();
+const player = new Audio(); player.preload = "auto";
+try{ fetch(LEVEL.audio + "manifest.json", {cache:"no-cache"}).then(r=>r.ok ? r.json() : null).then(j=>{
+  if(j) (Array.isArray(j) ? j : (j.files || [])).forEach(f=>CLIPS.add(String(f).replace(/\.mp3$/i,""))); }).catch(()=>{}); }catch(e){}
+function clearSpeaking(){ $$(".speaking").forEach(e=>e.classList.remove("speaking")); }
+function stopSpeech(){ qid++; if(SYN) SYN.cancel(); try{ player.pause(); }catch(e){} clearSpeaking(); Q = null; Music.duck(false); playBtns(); }
+function pauseSpeech(){ if(!Q || Q.paused) return; qid++; Q.paused = true; Q.k = Math.max(0, Q.k-1); if(SYN) SYN.cancel(); try{ player.pause(); }catch(e){} Music.duck(false); playBtns(); }
+function resumeSpeech(){ if(Q && Q.paused){ Q.paused = false; runQueue(); } }
+function sayQueue(items, mode){
+  const hasClip = items.some(it=>it.clip && CLIPS.has(it.clip));
+  if(!SYN && !hasClip){ toast("這個瀏覽器不支援朗讀功能"); return; }
+  stopSpeech();
+  const q = [];
+  items.forEach(it=>{ if(it.clip && CLIPS.has(it.clip)) q.push({audio:it.clip, el:it.el, gap:450, it}); else pushTTS(q, it); });
+  Q = {q, k:0, mode, paused:false}; runQueue();
+}
+function runQueue(){
+  const my = ++qid, S_ = Q, q = S_.q;
+  playBtns(); Music.duck(true);
+  const next = ()=>{
+    if(my !== qid) return;
+    if(S_.k >= q.length){ clearSpeaking(); Q = null; Music.duck(false); playBtns(); return; }
+    const x = q[S_.k++];
+    if(x.el && !x.el.classList.contains("speaking")){ clearSpeaking(); x.el.classList.add("speaking"); if(q.length > 1) x.el.scrollIntoView({block:"center", behavior:"smooth"}); }
+    if(x.audio){
+      let failed = false;
+      const fail = ()=>{ if(failed || my !== qid) return; failed = true; const sub = []; pushTTS(sub, x.it); q.splice(S_.k, 0, ...sub); next(); };
+      player.onended = ()=>{ if(my === qid) setTimeout(next, x.gap); }; player.onerror = fail;
+      player.src = `${LEVEL.audio}${x.audio}.mp3`; player.playbackRate = rate < .8 ? .85 : 1;
+      const pr = player.play(); if(pr && pr.catch) pr.catch(fail); return;
+    }
+    if(!SYN){ next(); return; }
+    const u = new SpeechSynthesisUtterance(x.text);
+    if(x.voice){ u.voice = x.voice; u.lang = x.voice.lang; } else u.lang = "en-US";
+    u.rate = x.rate; u.pitch = x.pitch;
+    u.onend = ()=>{ if(my === qid) setTimeout(next, x.gap); };
+    u.onerror = ()=>{ if(my === qid) setTimeout(next, 50); };
+    SYN.speak(u);
+  };
+  setTimeout(next, 60);
+}
+function sayWord(t){ if(!SYN) return; stopSpeech(); const u = new SpeechSynthesisUtterance(sayAs(t)); const v = VOICES.main;
+  if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "en-US"; u.rate = Math.min(1, rate); SYN.speak(u); }
+let speechUnlocked = false;
+function unlockSpeech(){ if(speechUnlocked || !SYN) return; speechUnlocked = true;
+  try{ const u = new SpeechSynthesisUtterance(" "); u.volume = 0; u.lang = "en-US"; SYN.speak(u); }catch(e){} }
+["touchend","click","keydown"].forEach(t=>document.addEventListener(t, unlockSpeech, true));
+function fillVoiceSel(){
+  const s = $("#voiceSel"); if(!s) return;
+  if(!VOICES.all.length){ s.innerHTML = `<option>（這個瀏覽器沒有英文語音）</option>`; s.disabled = true; return; }
+  s.disabled = false;
+  s.innerHTML = `<option value="">自動（依故事選男聲或女聲）</option>` + VOICES.all.map((v,i)=>`<option value="${i}"${voiceURI && v === VOICES.main ? " selected" : ""}>${esc(v.name)} · ${esc(v.lang)} · ${QLABEL[vq(v)]}</option>`).join("");
+  const m = VOICES.main; if(m) $("#voiceNow").innerHTML = `目前主要聲音：<b>${esc(m.name)}（${QLABEL[vq(m)]}）</b>`;
+}
+function playBtns(){
+  const b = $("#playAll");
+  if(b){ const mine = Q && Q.mode === "all";
+    b.innerHTML = !mine ? SVGI.play + "<span>Listen 朗讀全文</span>" : Q.paused ? SVGI.play + "<span>Resume 繼續</span>" : SVGI.pause + "<span>Pause 暫停</span>";
+    b.classList.toggle("on", !!mine && !Q.paused); const r = $("#playRe"); if(r) r.hidden = !mine; }
+  $$(".pspk").forEach(p=>{ const live = !!Q && Q.mode === "p" + p.dataset.p;
+    if(p.classList.contains("live") !== live){ p.classList.toggle("live", live); p.innerHTML = live ? SVGI.stop : SVGI.spk; p.setAttribute("aria-label", live ? "停止" : "聽這一段"); } });
+}
+
+/* ---------------- state ---------------- */
+let cur = -1;                                   /* -1 = contents page */
+let read = store.get("read", {});               /* id -> date string */
+let quiz = store.get("quiz", {});               /* id -> [answers] */
+let stars = store.get("stars", []);
+let showZh = !!store.get("zhdef", false);
+let fresh = "";                                 /* story stamped this visit, animated on the card */
+const today = ()=>{ const d = new Date(); return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`; };
+const readCount = ()=>S.filter(s=>read[s.id]).length;
+const wordsRead = ()=>S.reduce((n,s)=>n + (read[s.id] ? s.words : 0), 0);
+
+/* ---------------- views ---------------- */
+function tagHTML(s){
+  return `<span class="tag t">${KIND[s.kind]}</span>` + (s.thread ? `<span class="tag">${THREAD[s.thread]}${s.age ? " · " + s.age : ""}</span>` : "");
+}
+function libHTML(){
+  const n = readCount(), perfect = S.filter(s=>{ const a = quiz[s.id]; return a && a.length === s.quiz.length && a.every((x,k)=>x === s.quiz[k][2]); }).length;
+  return `<section class="lib" aria-label="借書證">
+    <div class="libh"><b>Library Card</b><span>借書證・讀完一篇就蓋一個章</span></div>
+    <div class="stamps">${S.map((s,i)=>`<button class="st${read[s.id] ? " on" : ""}${fresh === s.id ? " new" : ""}" data-go="${i}" data-sid="${s.id}" aria-label="${esc(s.title)}${read[s.id] ? "（已讀）" : ""}">${read[s.id] ? pix(s.id) : pad(i+1)}</button>`).join("")}</div>
+    <div class="libs"><span><b>${n}</b>/ ${S.length} 篇讀完</span><span><b>${wordsRead().toLocaleString()}</b>個英文字</span><span><b>${perfect}</b>篇小測驗全對</span></div>
+  </section>`;
+}
+function renderHome(){
+  stopSpeech(); cur = -1; store.set("pos", -1);
+  $("#main").innerHTML = libHTML() + `<h2 class="hh">Stories 故事</h2><div class="cards">` + S.map((s,i)=>`
+    <button class="card" data-go="${i}">
+      <span class="ico">${pix(s.id)}</span>
+      <span><span class="cn">${pad(i+1)}. ${esc(s.title)}</span><span class="cz2">${esc(s.zt)}</span><span class="tags">${tagHTML(s)}</span></span>
+      <span class="cr">${read[s.id] ? '<span class="ok">✓</span>' : ""}${s.words} words<br>${s.mins} min</span>
+    </button>`).join("") + `</div>`;
+  buildToc(); window.scrollTo(0,0);
+}
+/* each story has its own song (LEVEL.storyTracks): opening a story switches to it, but only if music is already on */
+let musicStory = -1;
+function storyTrack(i){ const t = (LEVEL.storyTracks||[])[i]; return (i >= 0 && t != null && t < LEVEL.tracks.length) ? t : (store.get("trk", 0) || 0); }
+function musicFor(i){ if(i === musicStory) return; musicStory = i; const t = storyTrack(i); if(Music.cur >= 0 && Music.cur !== t) Music.play(t); }
+function renderStory(i, para){
+  stopSpeech(); closePop(); cur = i; store.set("pos", i); musicFor(i);
+  const s = S[i], prev = S[i-1], next = S[i+1], a = quiz[s.id] || [];
+  $("#main").innerHTML = `<article class="story">
+    <p class="sk">STORY ${pad(i+1)} · ${KIND_EN[s.kind]}</p>
+    <h1>${esc(s.title)}</h1>
+    <p class="szt">${esc(s.zt)}</p>
+    <div class="meta">${tagHTML(s)}<span class="tag">${s.words} words · 約 ${s.mins} 分鐘</span></div>
+    <div class="intro">${esc(s.intro)}<span class="by">${esc(s.by)}</span></div>
+    <div class="tools">
+      <button class="pb" id="playAll"></button>
+      <button class="pb" id="playRe" hidden>${SVGI.restart}<span>從頭</span></button>
+      <button class="pb${showZh ? " sel" : ""}" id="zhBtn" aria-pressed="${showZh}">${showZh ? "隱藏中文" : "顯示中文"}</button>
+    </div>
+    ${s.paras.map((p,k)=>`<div class="pp" id="p${k}"><button class="pspk" data-p="${k}" aria-label="聽這一段">${SVGI.spk}</button><p class="en"><span class="t">${mk(p[0])}</span></p><p class="zh">${esc(p[1])}</p></div>`).join("")}
+    <p class="end">~ THE END ~</p>
+    <section class="box" id="quiz">
+      <p class="bh">Did you get it?</p><p class="bz">小測驗・三題，可以跳過</p>
+      ${s.quiz.map((q,k)=>`<div class="q" data-q="${k}"><p class="qt">${k+1}. ${esc(q[0])}</p><div class="qo">${q[1].map((o,j)=>`<button data-o="${j}">${esc(o)}</button>`).join("")}</div><p class="qx" hidden></p></div>`).join("")}
+    </section>
+    <section class="box done" id="done"></section>
+    <nav class="nav">
+      ${prev ? `<button data-go="${i-1}"><small>← 上一篇</small><span>${esc(prev.title)}</span></button>` : `<button data-home><small>←</small><span>Contents 目錄</span></button>`}
+      ${next ? `<button data-go="${i+1}"><small>下一篇 →</small><span>${esc(next.title)}</span></button>` : `<button data-home><small>→</small><span>Contents 目錄</span></button>`}
+    </nav>
+  </article>`;
+  a.forEach((x,k)=>{ if(x !== undefined && x !== null) answer(k, x, true); });
+  doneBox(); playBtns(); buildToc();
+  if(para !== undefined){ const el = $("#p"+para); if(el){ el.scrollIntoView({block:"center"}); el.querySelector(".en").classList.add("flash"); } }
+  else window.scrollTo(0,0);
+}
+function doneBox(){
+  const s = S[cur], d = read[s.id];
+  $("#done").innerHTML = d
+    ? `<button class="bigst" disabled>✓ READ · ${esc(d)}</button><small>已經蓋在借書證上了。想再讀一次，隨時歡迎。</small>`
+    : `<button class="bigst" id="stampBtn">I finished! 我讀完了</button><small>按下去，就會在借書證上蓋一個章。</small>`;
+}
+function answer(k, j, quiet){
+  const s = S[cur], q = s.quiz[k], box = $(`.q[data-q="${k}"]`); if(!box) return;
+  const ok = j === q[2];
+  box.querySelectorAll(".qo button").forEach((b,n)=>{ b.classList.toggle("right", ok && n === j); b.classList.toggle("wrong", !ok && n === j); });
+  const x = box.querySelector(".qx"); x.hidden = false;
+  x.innerHTML = ok ? `<b>答對了！</b>${esc(q[3])}` : `<b>再想想看。</b>回到故事裡找找線索，再選一次。`;
+  if(!quiet){ const a = quiz[s.id] || []; a[k] = j; quiz[s.id] = a; store.set("quiz", quiz); }
+}
+function stamp(){
+  const s = S[cur]; if(read[s.id]) return;
+  read[s.id] = today(); store.set("read", read); fresh = s.id; doneBox();
+  const n = readCount();
+  toast(n === S.length ? `十篇全部讀完了！你讀了 ${wordsRead().toLocaleString()} 個英文字 🎉` : `蓋章！借書證上已經有 ${n} 個章了`);
+  buildToc();
+}
+
+/* ---------------- popover ---------------- */
+const pop = $("#pop");
+function popHTML(k){
+  if(k.startsWith("c:")){ const c = CULT[k]; if(!c) return "";
+    const pk = c.kk ? `<span class="pk">${esc(c.kk)}</span>` : "";
+    return `<div class="ph"><span class="pw">${esc(c.h)}</span>${pk}<span class="lvb">${c.name ? "名字發音" : "文化小知識"}</span><span class="px2"><button class="ib" data-say="${esc(c.h)}" aria-label="聽發音">${SVGI.spk}</button><button class="ib" data-close aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg></button></span></div>
+      <p class="pz">${esc(c.zh)}</p>${c.say ? `<p class="pd">念起來像 <b>${esc(c.say)}</b></p>` : ""}<p class="pd">${esc(c.d)}</p>`; }
+  const v = VOCAB[k]; if(!v) return "";
+  const hi = (CEFR[v.lv] || 1) > LEVEL.rank, st = stars.includes(k);
+  return `<div class="ph"><span class="pw">${esc(v.w)}</span><span class="pk">${esc(v.kk)}</span><span class="lvb${hi ? " hi" : ""}">${esc(v.lv)}${hi ? " · 超出本級" : ""}</span>
+      <span class="px2"><button class="ib" data-say="${esc(v.w)}" aria-label="聽發音">${SVGI.spk}</button><button class="ib star${st ? " on" : ""}" data-star="${esc(k)}" aria-label="${st ? "取消收藏" : "收藏"}">${st ? SVGI.star : SVGI.starO}</button><button class="ib" data-close aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg></button></span></div>
+    <p class="pz"><span class="lvb">${esc(v.pos)}</span> ${esc(v.zh)}</p><p class="pd">${esc(v.d)}</p>${v.s !== undefined ? `<p class="pn">出自第 ${v.s+1} 篇〈${esc(S[v.s].title)}〉</p>` : ""}`;
+}
+function openPop(k){ const h = popHTML(k); if(!h) return; $("#popIn").innerHTML = h; pop.classList.add("on"); pop.setAttribute("aria-hidden","false"); pop.dataset.k = k; }
+function closePop(){ pop.classList.remove("on"); pop.setAttribute("aria-hidden","true"); }
+
+/* ---------------- drawer ---------------- */
+function openDrawer(p){ $("#drawer").classList.add("on"); $("#scrim").classList.add("on"); switchPane(p || "toc"); }
+function closeDrawer(){ $("#drawer").classList.remove("on"); $("#scrim").classList.remove("on"); }
+function switchPane(p){
+  $$("#tabs button").forEach(b=>b.classList.toggle("on", b.dataset.p === p));
+  $$(".pane").forEach(x=>x.hidden = x.id !== "p-"+p);
+  if(p === "words") buildWords(); if(p === "about") buildAbout(); if(p === "find") setTimeout(()=>$("#q").focus(), 250);
+}
+function buildToc(){
+  $("#toc").innerHTML = `<a data-home class="${cur < 0 ? "cur" : ""}"><span></span><span><span class="n">Contents & Library Card</span><span class="z">目錄與借書證</span></span><span></span></a>` +
+    S.map((s,i)=>`<a data-go="${i}" class="${i === cur ? "cur" : ""}">${pix(s.id)}<span><span class="n">${pad(i+1)}. ${esc(s.title)}</span><span class="z">${esc(s.zt)}</span></span><span class="ok">${read[s.id] ? "✓" : ""}</span></a>`).join("");
+}
+function snip(t, q){ const i = t.toLowerCase().indexOf(q.toLowerCase()); if(i < 0) return esc(t.slice(0,80));
+  const a = Math.max(0, i-40), b = Math.min(t.length, i+q.length+50);
+  return (a ? "…" : "") + esc(t.slice(a,i)) + "<mark>" + esc(t.slice(i,i+q.length)) + "</mark>" + esc(t.slice(i+q.length,b)) + (b < t.length ? "…" : ""); }
+function search(){
+  const q = $("#q").value.trim(), res = $("#res");
+  if(q.length < 2 && !/[一-鿿]/.test(q)){ res.innerHTML = `<p class="hint">可以搜尋故事內容、中文翻譯和詞彙。</p>`; return; }
+  const out = [], ql = q.toLowerCase();
+  Object.keys(VOCAB).forEach(k=>{ const v = VOCAB[k]; if(v.w.toLowerCase().includes(ql) || v.zh.includes(q)) out.push(`<a data-pop="${esc(k)}"><small>WORD 詞彙</small><b>${esc(v.w)}</b>　${esc(v.zh)}</a>`); });
+  Object.keys(CULT).forEach(k=>{ const c = CULT[k]; if(c.h.toLowerCase().includes(ql) || c.zh.includes(q)) out.push(`<a data-pop="${esc(k)}"><small>CULTURE 文化</small><b>${esc(c.h)}</b>　${esc(c.zh)}</a>`); });
+  S.forEach((s,i)=>s.paras.forEach((p,k)=>{ const en = plain(p[0]);
+    if(en.toLowerCase().includes(ql)) out.push(`<a data-go="${i}" data-para="${k}"><small>STORY ${pad(i+1)} · ${esc(s.title)}</small>${snip(en,q)}</a>`);
+    else if(p[1].includes(q)) out.push(`<a data-go="${i}" data-para="${k}"><small>STORY ${pad(i+1)} · ${esc(s.zt)}</small>${snip(p[1],q)}</a>`); }));
+  res.innerHTML = out.length ? `<p class="hint">找到 ${out.length} 筆</p>` + out.slice(0,60).join("") : `<p class="hint">找不到「${esc(q)}」。</p>`;
+}
+let wmode = "all";
+function buildWords(){
+  $$("#wseg button").forEach(b=>b.classList.toggle("on", b.dataset.w === wmode));
+  const row = k=>{ const v = VOCAB[k], c = CULT[k]; if(!v && !c) return "";
+    return `<a data-pop="${esc(k)}"><b>${esc(v ? v.w : c.h)}</b><span>${esc(v ? v.zh : c.zh)}</span>${stars.includes(k) ? "<i>★</i>" : ""}</a>`; };
+  if(wmode === "star"){
+    $("#wl").innerHTML = stars.length ? stars.map(row).join("") : `<p class="hint">還沒有收藏。讀故事時點一下有虛線的字，再按 ☆ 就能收藏。</p>`; return; }
+  $("#wl").innerHTML = S.map((s,i)=>`<h4>${pad(i+1)}. ${esc(s.title)}</h4>` + s.keys.filter(k=>(VOCAB[k] || CULT[k]) && (VOCAB[k] || CULT[k]).s === i).map(row).join("")).join("");
+}
+function buildAbout(){
+  $("#p-about").innerHTML = `<p class="big">InkQuest</p><p class="mot">Every quest begins with a story.</p>
+    <p><b>Lamplight Readers 燈下小書</b><br>${esc(LEVEL.zh)}（${LEVEL.cefr}）・${S.length} 篇故事<br>版本 ${esc(LEVEL.version)}</p>
+    <p>《窗邊英文》的姊妹讀本，給想自己多讀一點的人。每篇都可以朗讀、點字看解釋；讀完蓋個章，看看自己讀了多少英文。</p>
+    <p>目前進度：讀完 ${readCount()} 篇，共 ${wordsRead().toLocaleString()} 個英文字。</p>
+    <p><b>經典故事來源</b>（皆為公有領域作品，由 InkQuest 改寫為 ${LEVEL.cefr} 程度）</p>
+    <ul>${LEVEL.credits.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>
+    ${(LEVEL.notes || []).map(n=>`<p style="font-size:13px">${esc(n)}</p>`).join("")}
+    <p>字型：Jersey 15、Literata（SIL Open Font License）。音樂為瀏覽器即時 FM 合成。</p>
+    <p>Created with Claude.</p>
+    <p>© 2026 Wen-Hung Fang. All rights reserved.</p>`;
+}
+
+/* ---------------- settings ---------------- */
+let fs = store.get("fs", 19);
+function applyFs(){ document.documentElement.style.setProperty("--fs", fs+"px"); $$("#sizes button").forEach(b=>b.classList.toggle("on", +b.dataset.v === fs)); }
+function applyRate(){ $$("#rates button").forEach(b=>b.classList.toggle("on", +b.dataset.v === rate)); }
+function applyZhDef(){ const d = !!store.get("zhdef", false); $$("#zhset button").forEach(b=>b.classList.toggle("on", !!+b.dataset.v === d)); }
+function applyTheme(){ const t = store.get("theme", "auto"); if(t === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t);
+  $$("#themes button").forEach(b=>b.classList.toggle("on", b.dataset.v === t)); }
+function setZh(on){ showZh = on; document.body.classList.toggle("showzh", on); const b = $("#zhBtn"); if(b){ b.textContent = on ? "隱藏中文" : "顯示中文"; b.classList.toggle("sel", on); b.setAttribute("aria-pressed", on); } }
+
+/* ---------------- toast ---------------- */
+const toastQ = []; let toastBusy = false;
+function toast(m){ if(toastQ[toastQ.length-1] !== m) toastQ.push(m); if(!toastBusy) toastNext(); }
+function toastNext(){ const m = toastQ.shift(); if(m === undefined){ toastBusy = false; return; } toastBusy = true;
+  const t = $("#toast"); t.textContent = m; t.classList.add("on"); setTimeout(()=>{ t.classList.remove("on"); setTimeout(toastNext, 300); }, 2600); }
+
+/* ---------------- events ---------------- */
+document.addEventListener("click", e=>{
+  const t = e.target;
+  const g = t.closest(".g"); if(g){ openPop(g.dataset.k); return; }
+  const go = t.closest("[data-go]");
+  if(go){ const para = go.dataset.para; closeDrawer(); renderStory(+go.dataset.go, para === undefined ? undefined : +para); return; }
+  if(t.closest("[data-home]")){ closeDrawer(); renderHome(); return; }
+  const pp = t.closest("[data-pop]"); if(pp){ openPop(pp.dataset.pop); return; }
+  const sp = t.closest(".pspk");
+  if(sp){ const k = +sp.dataset.p; if(Q && Q.mode === "p"+k){ stopSpeech(); return; }
+    const s = S[cur]; sayQueue([{text:s.paras[k][0], mood:s.paras[k][2], el:$("#p"+k), clip:`s${pad(cur+1)}-${pad(k+1)}`}], "p"+k); return; }
+  if(t.closest("#playAll")){
+    if(Q && Q.mode === "all"){ Q.paused ? resumeSpeech() : pauseSpeech(); return; }
+    const s = S[cur]; sayQueue(s.paras.map((p,k)=>({text:p[0], mood:p[2], el:$("#p"+k), clip:`s${pad(cur+1)}-${pad(k+1)}`})), "all"); return; }
+  if(t.closest("#playRe")){ const s = S[cur]; sayQueue(s.paras.map((p,k)=>({text:p[0], mood:p[2], el:$("#p"+k), clip:`s${pad(cur+1)}-${pad(k+1)}`})), "all"); return; }
+  if(t.closest("#zhBtn")){ setZh(!showZh); return; }
+  const qo = t.closest(".qo button"); if(qo){ answer(+qo.closest(".q").dataset.q, +qo.dataset.o); return; }
+  if(t.closest("#stampBtn")){ stamp(); return; }
+  const say = t.closest("[data-say]"); if(say){ sayWord(say.dataset.say); return; }
+  const star = t.closest("[data-star]");
+  if(star){ const k = star.dataset.star, i = stars.indexOf(k); if(i < 0) stars.push(k); else stars.splice(i,1); store.set("stars", stars);
+    openPop(k); toast(i < 0 ? "收藏到詞彙的「我的收藏」" : "取消收藏"); if(!$("#p-words").hidden) buildWords(); return; }
+  if(t.closest("[data-close]")){ closePop(); return; }
+  if(pop.classList.contains("on") && !t.closest("#pop")) closePop();
+  if(!$("#mp").hidden && !t.closest("#mp") && !t.closest("#musicBtn")) $("#mp").hidden = true;
+});
+document.addEventListener("keydown", e=>{
+  if((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("g")){ e.preventDefault(); openPop(e.target.dataset.k); }
+  if(e.key === "Escape"){ closePop(); closeDrawer(); $("#mp").hidden = true; }
+});
+$("#menuBtn").onclick = ()=>openDrawer("toc");
+$("#setBtn").onclick = ()=>openDrawer("set");
+$("#dClose").onclick = closeDrawer;
+$("#scrim").onclick = closeDrawer;
+$("#brand").onclick = ()=>renderHome();
+$("#tabs").onclick = e=>{ const b = e.target.closest("button"); if(b) switchPane(b.dataset.p); };
+$("#q").addEventListener("input", search);
+$("#wseg").onclick = e=>{ const b = e.target.closest("button"); if(b){ wmode = b.dataset.w; buildWords(); } };
+$("#sizes").onclick = e=>{ const b = e.target.closest("button"); if(b){ fs = +b.dataset.v; store.set("fs", fs); applyFs(); } };
+$("#rates").onclick = e=>{ const b = e.target.closest("button"); if(b){ rate = +b.dataset.v; store.set("rate", rate); applyRate(); } };
+$("#zhset").onclick = e=>{ const b = e.target.closest("button"); if(b){ store.set("zhdef", !!+b.dataset.v); applyZhDef(); setZh(!!+b.dataset.v); } };
+$("#themes").onclick = e=>{ const b = e.target.closest("button"); if(b){ store.set("theme", b.dataset.v); applyTheme(); } };
+$("#voiceSel").onchange = e=>{
+  const v = e.target.value === "" ? null : VOICES.all[+e.target.value];
+  voiceURI = v ? v.voiceURI : ""; store.set("voiceURI", voiceURI); pickVoice();
+  if(v && SYN){ SYN.cancel(); const u = new SpeechSynthesisUtterance("Hello! Shall we read a story?"); u.voice = v; u.lang = v.lang; u.rate = rate; SYN.speak(u); }
+};
+let resetArm = 0;
+$("#resetBtn").onclick = ()=>{
+  if(Date.now() - resetArm > 4000){ resetArm = Date.now(); $("#resetBtn").textContent = "確定要清除嗎？再按一次"; setTimeout(()=>{ $("#resetBtn").textContent = "清除閱讀紀錄"; }, 4000); return; }
+  read = {}; quiz = {}; stars = []; ["read","quiz","stars","pos"].forEach(store.del); resetArm = 0;
+  $("#resetBtn").textContent = "清除閱讀紀錄"; toast("閱讀紀錄已清除"); closeDrawer(); renderHome();
+};
+/* music panel */
+$("#tracks").innerHTML = Music.TR.map((t,i)=>`<button class="trk" data-t="${i}"><span class="pl">▶</span><span><span class="tn">${esc(t.n)}</span><span class="tz">${esc(t.z)}</span></span></button>`).join("");
+$("#tracks").onclick = e=>{ const b = e.target.closest(".trk"); if(!b) return; const i = +b.dataset.t; if(Music.cur === i) Music.stop(); else Music.play(i); };
+$("#musicBtn").onclick = ()=>{ $("#mp").hidden = !$("#mp").hidden; };
+$("#mStop").onclick = ()=>Music.stop();
+$("#vol").value = Math.round(Music.vol*100);
+$("#vol").addEventListener("input", e=>Music.setVol(e.target.value/100));
+
+/* ---------------- cover ---------------- */
+function leaveCover(){ document.body.classList.remove("cover"); Scene.stop(); }
+/* cover: START = music on + open the book where the reader left off; MUSIC = toggle music, stay on the cover */
+$("#goBtn").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(storyTrack(cur)); leaveCover(); };
+$("#coverMusic").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(storyTrack(cur)); else Music.stop(); };
+["touchend","click"].forEach(t=>document.addEventListener(t, ()=>Music.wake(), true));
+
+/* ---------------- boot ---------------- */
+function boot(){
+  $("#cvK").textContent = LEVEL.kicker; $("#cvZ").textContent = LEVEL.zh; $("#brandLv").textContent = `L${LEVEL.n} · ${LEVEL.cefr}`;
+  applyFs(); applyRate(); applyZhDef(); applyTheme(); setZh(showZh); Music.ui();
+  const p = store.get("pos", -1);
+  if(p >= 0 && p < S.length) renderStory(p); else renderHome();
+  document.body.classList.add("cover"); Scene.start();
+}
+boot();
+
+</script>
+</body>
+</html>
