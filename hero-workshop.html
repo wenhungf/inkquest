@@ -51,6 +51,18 @@ body:not(.titled) #title{display:none;}
 #title .go:active{transform:translateY(4px);box-shadow:0 1px 0 #9a6a14;}
 #title .tap{font-family:var(--f-px);color:#8f7fb0;font-size:15px;letter-spacing:.12em;animation:blink 1.4s steps(2) infinite;}
 #title .cc{font-size:11px;color:#6d5f86;text-align:center;max-width:560px;}
+/* title screen on short screens (laptops): never cut off the Open button; scroll if it still doesn't fit */
+#title{overflow-y:auto;justify-content:flex-start;overscroll-behavior:contain;}
+#title > :first-child{margin-top:auto;} #title > :last-child{margin-bottom:auto;}
+#title > *{flex:none;}
+@media (max-height:1000px){
+  #title{gap:6px;padding:10px 16px;}
+  #title .stage{width:min(96vw,calc(44vh * 16 / 9),960px);}
+  #title h1{font-size:clamp(30px,6.4vh,56px) !important;margin-top:2px;}
+  #title .kick{font-size:14px;}
+  #title .go{font-size:22px;padding:6px 26px 8px;}
+}
+@media (max-height:560px){ #title .stage{width:min(96vw,calc(34vh * 16 / 9),960px);} #title .kick{font-size:12px;letter-spacing:.1em;} }
 @keyframes blink{50%{opacity:.35}}
 
 /* ---------- toolbar ---------- */

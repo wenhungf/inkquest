@@ -51,6 +51,18 @@ body:not(.titled) #title{display:none;}
 #title .go:active{transform:translateY(4px);box-shadow:0 1px 0 #9a6a14;}
 #title .tap{font-family:var(--f-px);color:#8f7fb0;font-size:15px;letter-spacing:.12em;animation:blink 1.4s steps(2) infinite;}
 #title .cc{font-size:11px;color:#6d5f86;text-align:center;max-width:560px;}
+/* title screen on short screens (laptops): never cut off the Open button; scroll if it still doesn't fit */
+#title{overflow-y:auto;justify-content:flex-start;overscroll-behavior:contain;}
+#title > :first-child{margin-top:auto;} #title > :last-child{margin-bottom:auto;}
+#title > *{flex:none;}
+@media (max-height:1000px){
+  #title{gap:6px;padding:10px 16px;}
+  #title .stage{width:min(96vw,calc(44vh * 16 / 9),960px);}
+  #title h1{font-size:clamp(30px,6.4vh,56px) !important;margin-top:2px;}
+  #title .kick{font-size:14px;}
+  #title .go{font-size:22px;padding:6px 26px 8px;}
+}
+@media (max-height:560px){ #title .stage{width:min(96vw,calc(34vh * 16 / 9),960px);} #title .kick{font-size:12px;letter-spacing:.1em;} }
 @keyframes blink{50%{opacity:.35}}
 
 /* ---------- toolbar ---------- */
@@ -1633,6 +1645,62 @@ const KScene = (()=>{
   for(let i=0;i<24;i++){ const fx=92+i*4, fy=106+Math.round(Math.sin(i/3)*2); rect(fx,fy,3,3,["#d9463a","#f4c542","#4f86d0","#7cc58a"][i%4]); }
   for(let xx=92;xx<188;xx++) put(xx,105+Math.round(Math.sin((xx-92)/12)*2),hex("#4a3a3a"));
 
+
+  /* ---- Penny, a young copper dragon, flying back and forth over the town ---- */
+  const PW = 60, PH = 40;
+  function SLayer(){ const a = new Uint8Array(PW*PH);
+    const L = {a, set(px,py,c){ px=Math.round(px); py=Math.round(py); if(px<0||py<0||px>=PW||py>=PH) return; a[py*PW+px]=c; },
+      get(px,py){ if(px<0||py<0||px>=PW||py>=PH) return 0; return a[py*PW+px]; },
+      ell(cx,cy,rx,ry,c){ for(let yy=Math.floor(cy-ry);yy<=cy+ry;yy++) for(let xx=Math.floor(cx-rx);xx<=cx+rx;xx++){ if(((xx-cx)/rx)**2+((yy-cy)/ry)**2<=1) L.set(xx,yy,c); } },
+      cap(x0,y0,x1,y1,r0,r1,c){ const n=Math.ceil(Math.hypot(x1-x0,y1-y0)*2)+1; for(let i=0;i<=n;i++){ const t=i/n; L.ell(x0+(x1-x0)*t, y0+(y1-y0)*t, r0+(r1-r0)*t+.01, r0+(r1-r0)*t+.01, c); } },
+      chain(pts,rs,c){ for(let i=0;i<pts.length-1;i++) L.cap(pts[i][0],pts[i][1],pts[i+1][0],pts[i+1][1],rs[i],rs[i+1],c); },
+      poly(pts,c){ let y0=1e9,y1=-1e9; pts.forEach(p=>{y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1]);});
+        for(let yy=Math.floor(y0);yy<=y1;yy++){ const xs=[]; for(let i=0;i<pts.length;i++){ const p=pts[i], q=pts[(i+1)%pts.length];
+          if((p[1]<=yy+.5&&q[1]>yy+.5)||(q[1]<=yy+.5&&p[1]>yy+.5)) xs.push(p[0]+(yy+.5-p[1])/(q[1]-p[1])*(q[0]-p[0])); }
+          xs.sort((m,n)=>m-n); for(let k=0;k<xs.length;k+=2) for(let xx=Math.round(xs[k]);xx<Math.round(xs[k+1]);xx++) L.set(xx,yy,c); } },
+      line(x0,y0,x1,y1,c){ const n=Math.ceil(Math.max(Math.abs(x1-x0),Math.abs(y1-y0)))||1; for(let i=0;i<=n;i++) L.set(x0+(x1-x0)*i/n, y0+(y1-y0)*i/n, c); } };
+    return L; }
+  /* wing shapes: [membrane polygon, finger bones from the wrist], for up / level / down */
+  const WINGS = [
+    {m:[[25,19],[35,18],[42,3],[33,1],[24,4],[17,9]], wr:[42,3], f:[[33,1],[24,4],[17,9]]},
+    {m:[[26,17],[35,16],[45,6],[35,2],[23,3],[12,8]], wr:[45,6], f:[[35,2],[23,3],[12,8]]},
+    {m:[[26,20],[35,20],[41,34],[33,35],[25,32],[19,27]], wr:[41,34], f:[[33,35],[25,32],[19,27]]}];
+  function pennyFrame(wi, flip){
+    const L = SLayer(), Wg = WINGS[wi], bob = wi === 2 ? -1 : wi === 0 ? 1 : 0;
+    /* back wing, a little higher and darker */
+    L.poly(Wg.m.map(p=>[p[0]-3,p[1]-2]),6);
+    L.chain([[30,17+bob],[18,23+bob],[8,21+bob],[2,16+bob]],[4,3,2,1.2],1);           /* tail */
+    L.poly([[2,16+bob],[-1,12+bob],[0,18+bob],[5,18+bob]],1);                           /* tail tip */
+    L.ell(28,21+bob,11,6,1); L.ell(30,24+bob,8,2.5,4);                                 /* body, belly */
+    L.ell(23,26+bob,3,2,2); L.ell(34,26+bob,3,2,2);                                    /* legs, tucked up */
+    L.chain([[36,18+bob],[42,14+bob],[45,13+bob]],[4.5,3.4,3],1);                       /* neck */
+    L.ell(48,12+bob,5,3.6,1); L.poly([[49,9+bob],[57,11+bob],[57,14+bob],[49,15.5+bob]],1); /* head, snout */
+    L.cap(46,9+bob,40,4+bob,1.4,.6,5); L.cap(48,9+bob,44,3+bob,1.2,.5,5);                 /* horns */
+    [[27,15],[32,15],[38,13]].forEach(q=>L.poly([[q[0]-2,q[1]+2+bob],[q[0],q[1]-2+bob],[q[0]+2,q[1]+2+bob]],5)); /* back frills */
+    L.poly(Wg.m.map(p=>[p[0],p[1]+bob]),3);                                            /* front wing */
+    L.line(35,18+bob,Wg.wr[0],Wg.wr[1]+bob,1); Wg.f.forEach(q=>L.line(Wg.wr[0],Wg.wr[1]+bob,q[0],q[1]+bob,1));
+    const pal = {1:"#c8743a",2:"#9a5530",3:"#5fb39a",4:"#f2cf8e",5:"#efe3c8",6:"#3b8a76"}, sh = {1:"#8a4a26",3:"#3b8a76",6:"#2a6658"}, hi = {1:"#f0a464",3:"#8fd4bc"};
+    const c = document.createElement("canvas"); c.width = PW; c.height = PH; const g = c.getContext("2d"), im = g.createImageData(PW,PH), q = im.data;
+    const P = (px,py,col)=>{ if(px<0||py<0||px>=PW||py>=PH) return; const i=(py*PW+px)*4, h=hex(col); q[i]=h[0]; q[i+1]=h[1]; q[i+2]=h[2]; q[i+3]=255; };
+    for(let yy=0;yy<PH;yy++) for(let xx=0;xx<PW;xx++){ const v = L.a[yy*PW+xx];
+      if(!v){ if(L.get(xx-1,yy)||L.get(xx+1,yy)||L.get(xx,yy-1)||L.get(xx,yy+1)) P(xx,yy,"#241a2a"); continue; }
+      let col = pal[v]; if(sh[v] && !L.get(xx,yy+1)) col = sh[v]; if(hi[v] && !L.get(xx,yy-1)) col = hi[v]; P(xx,yy,col); }
+    P(50,11+bob,"#241a2a"); P(51,11+bob,"#fff6c8"); P(56,13+bob,"#241a2a");             /* eye and nostril */
+    for(let k=0;k<3;k++) P(51+k*2,15+bob+(k===1?1:0),"#8a4a26");                      /* a grin */
+    g.putImageData(im,0,0);
+    if(!flip) return c;
+    const m = document.createElement("canvas"); m.width = PW; m.height = PH; const mg = m.getContext("2d"); mg.translate(PW,0); mg.scale(-1,1); mg.drawImage(c,0,0); return m; }
+  const PEN = [0,1].map(f=>[0,1,2].map(w=>pennyFrame(w, !!f)));
+  const FLAP = [0,1,2,1];
+  /* one pass is 440 px of sky; she turns round out of sight and comes back at a new height */
+  const penny = {x:120, dir:1, y:30, pass:0};
+  function drawPenny(){
+    const fr = PEN[penny.dir > 0 ? 0 : 1][reduce ? 1 : FLAP[Math.floor(frame/2)%4]];
+    const py = Math.round(penny.y + Math.sin(frame/7)*3);
+    x.imageSmoothingEnabled = false; x.drawImage(fr, Math.round(penny.x) - PW/2, py - PH/2); }
+  function movePenny(){ penny.x += penny.dir * 2.2;
+    if(penny.x > W + 60 || penny.x < -60){ penny.dir *= -1; penny.pass++; penny.y = [26,38,20,32][penny.pass % 4]; } }
+
   const base = new Uint8ClampedArray(d);
   const notes = Array.from({length:6},(_,i)=>({t:i/6, x:0}));
   const smoke = Array.from({length:8},(_,i)=>({t:i/8}));
@@ -1645,11 +1713,14 @@ const KScene = (()=>{
     smoke.forEach((s,i)=>{ s.t=(s.t+.015)%1; const sx=119+Math.round(Math.sin(s.t*6+i)*2), sy=110-s.t*30; if(s.t<.8) put(sx,sy,hex(s.t<.4?"#f4f0ea":"#cfc6c0")); });
     for(let k=0;k<6;k++){ const yy=130+((frame*2+k*9)%50); put(292+Math.round(Math.sin(yy/9)*4)+(k%3)*3-3,yy,hex("#d8ecff")); }
     x.putImageData(img,0,0);
+    if(on && !reduce) movePenny(); drawPenny();
   }
   function loop(ts){ if(!on) return; if(ts-last>=80){ last=ts; frame++; paint(); } requestAnimationFrame(loop); }
   paint();
   const mini = $("#mini"); if(mini){ const m = mini.getContext("2d"); m.imageSmoothingEnabled = false; m.drawImage(cv, 40, 50, 240, 100, 0, 0, 120, 50); }
-  return {start(){ if(on) return; on = true; if(!reduce) requestAnimationFrame(loop); }, stop(){ on = false; }};
+  /* pose(x, y, dir, wing): place Penny for a still picture (the print cover and chapter art) */
+  return {start(){ if(on) return; on = true; if(!reduce) requestAnimationFrame(loop); }, stop(){ on = false; },
+    pose(px, py, dir, wing){ Object.assign(penny, {x:px, y:py, dir:dir || 1}); frame = wing == null ? 0 : [0,2,4][wing]; paint(); }};
 })();
 
 /* =========================================================
