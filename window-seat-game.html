@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Window Seat: The Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+html{-webkit-text-size-adjust:100%;}
+[hidden]{display:none!important;}
+</style>
+<style>
+:root{
+  --bg:#F3EFE6; --surface:#FFFCF5; --ink:#24262E; --muted:#636774; --rule:#DDD6C7;
+  --accent:#2F6F8F; --accent-ink:#FFFFFF; --tint:#DCEAF0; --warm:#E07A5F; --gold:#E9B44C;
+  --good:#3E8E5E; --bad:#C0533A; --stress:#D9644A;
+  --pop-bg:#24262E; --pop-ink:#F1EEE6; --pop-muted:#B0B3BD; --pop-accent:#F2C35B;
+  --shadow:rgba(36,38,46,.18);
+  --f-body:'Atkinson Hyperlegible',"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-disp:'Fraunces',Georgia,"PingFang TC","Noto Serif TC",serif;
+  --f-px:'Pixelify Sans',ui-monospace,"PingFang TC",monospace;
+  --c-class:#5B8DB8; --c-work:#D9904A; --c-social:#D46A8C; --c-explore:#3E9C7A; --c-rest:#8C7BB5; --c-lock:#9A958A;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#15171C; --surface:#1E2128; --ink:#ECEAE4; --muted:#A3A6B0; --rule:#30343D;
+  --accent:#7CB8D6; --accent-ink:#10161A; --tint:#203038; --pop-bg:#ECEAE4; --pop-ink:#1B1D22; --pop-muted:#585C66; --pop-accent:#2F6F8F;
+  --shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --bg:#15171C; --surface:#1E2128; --ink:#ECEAE4; --muted:#A3A6B0; --rule:#30343D;
+  --accent:#7CB8D6; --accent-ink:#10161A; --tint:#203038; --pop-bg:#ECEAE4; --pop-ink:#1B1D22; --pop-muted:#585C66; --pop-accent:#2F6F8F;
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.5;}
+body{min-height:100vh;-webkit-tap-highlight-color:transparent;overflow-x:hidden;}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
+canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block;}
+#app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;padding:0 16px 96px;}
+.scr{display:none;} .scr.on{display:block;}
+.px{font-family:var(--f-px);}
+.muted{color:var(--muted);}
+.btn{white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:10px 18px;border-radius:12px;
+  background:var(--accent);color:var(--accent-ink);font-weight:700;box-shadow:0 2px 0 rgba(0,0,0,.15);}
+.btn.alt{background:var(--surface);color:var(--ink);border:2px solid var(--rule);box-shadow:none;}
+.btn svg{width:18px;height:18px;fill:currentColor;flex:none;}
+.btn.small{min-height:36px;padding:6px 12px;font-size:15px;border-radius:10px;}
+.btn:disabled{opacity:.45;cursor:default;}
+.btn.on{background:var(--ink);color:var(--bg);}
+.row{display:flex;gap:10px;align-items:center;}
+.wrap{flex-wrap:wrap;}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:16px;padding:14px;box-shadow:0 2px 8px var(--shadow);}
+h1,h2,h3{font-family:var(--f-disp);line-height:1.15;}
+h2{font-size:22px;margin:4px 0 10px;}
+h3{font-size:18px;margin:2px 0 6px;}
+
+/* title */
+#title{text-align:center;padding-top:24px;}
+#title canvas{width:100%;max-width:448px;margin:0 auto;border-radius:18px;box-shadow:0 6px 18px var(--shadow);}
+#title .kick{font-family:var(--f-px);letter-spacing:.12em;color:var(--accent);font-size:14px;margin-top:18px;}
+#title h1{font-size:40px;margin:4px 0 2px;}
+#title .zh{font-size:18px;color:var(--muted);margin-bottom:6px;}
+#title .blurb{font-size:15px;color:var(--muted);margin:6px auto 16px;max-width:340px;}
+#title .btns{display:flex;flex-direction:column;gap:10px;align-items:center;}
+#title .btns > .btn{min-width:220px;}
+#title .btns .row .btn{min-width:0;}
+#title .foot{margin-top:18px;font-size:13px;color:var(--muted);}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 0 8px;border-bottom:1px solid var(--rule);margin:0 -16px 12px;padding-left:16px;padding-right:16px;}
+.top .r1{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.top .date{font-family:var(--f-px);font-size:16px;}
+.top .money{font-family:var(--f-px);font-size:16px;font-weight:600;}
+.top .money.neg{color:var(--bad);}
+.bar{height:10px;border-radius:6px;background:var(--rule);overflow:hidden;flex:1;}
+.bar i{display:block;height:100%;background:var(--good);border-radius:6px;transition:width .4s;}
+.bar.stress i{background:var(--stress);}
+.top .r2{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13px;}
+.ib{width:40px;height:40px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;}
+.ib svg{width:22px;height:22px;fill:currentColor;}
+.ib.on{background:var(--ink);color:var(--bg);}
+
+/* home */
+.hero{display:flex;gap:12px;align-items:center;}
+.hero canvas{width:96px;height:96px;border-radius:14px;background:var(--tint);flex:none;}
+.hero .who{font-family:var(--f-disp);font-size:20px;}
+.hero .sub{font-size:14px;color:var(--muted);}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:12px;}
+.stat{font-size:14px;}
+.stat .n{display:flex;justify-content:space-between;}
+.stat .bar{height:8px;margin-top:2px;}
+.stat .bar i{background:var(--accent);}
+.thread{margin-top:12px;display:flex;flex-direction:column;gap:8px;}
+.msg{background:var(--surface);border:1px solid var(--rule);border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:16px;}
+.msg .from{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:2px;display:flex;justify-content:space-between;align-items:center;}
+.msg .zht{font-size:14px;color:var(--muted);margin-top:4px;}
+.zhb{font-size:12px;border:1px solid var(--rule);border-radius:8px;padding:0 6px;color:var(--muted);}
+.menu{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.menu .btn{width:100%;}
+
+/* planner */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:6px;}
+.cal .wd{text-align:center;font-size:12px;color:var(--muted);font-family:var(--f-px);}
+.slot{position:relative;aspect-ratio:1/1.25;border-radius:10px;border:2px dashed var(--rule);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:3px 1px;overflow:hidden;}
+.slot .d{font-family:var(--f-px);font-size:12px;color:var(--muted);line-height:1;}
+.slot canvas{width:28px;height:28px;margin-top:3px;}
+.slot .a{font-size:10.5px;line-height:1.15;text-align:center;margin-top:2px;word-break:break-word;}
+.slot.set{border-style:solid;}
+.slot.sel{outline:3px solid var(--gold);outline-offset:1px;}
+.slot.lock{background:repeating-linear-gradient(45deg,var(--surface),var(--surface) 6px,var(--rule) 6px,var(--rule) 8px);border-style:solid;cursor:default;}
+.slot.past{opacity:.35;}
+.slot.m-class{border-color:var(--c-class);} .slot.m-work{border-color:var(--c-work);} .slot.m-social{border-color:var(--c-social);} .slot.m-explore{border-color:var(--c-explore);} .slot.m-rest{border-color:var(--c-rest);}
+.slot.today{box-shadow:0 0 0 2px var(--accent) inset;}
+.preview{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0;}
+.preview .pv{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:8px;text-align:center;}
+.preview .pv b{display:block;font-family:var(--f-px);font-size:17px;}
+.preview .pv span{font-size:12px;color:var(--muted);}
+.warn{color:var(--bad);font-size:14px;margin:6px 0;}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+
+/* sheet */
+#sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;transform:translateY(110%);transition:transform .25s, visibility .25s;visibility:hidden;}
+#sheet.on{transform:none;visibility:visible;}
+body.sheet-on #plan{padding-bottom:58vh;}
+#sheet .in{max-width:480px;margin:0 auto;background:var(--surface);border-radius:18px 18px 0 0;box-shadow:0 -6px 24px var(--shadow);padding:12px 14px calc(16px + env(safe-area-inset-bottom,0px));max-height:56vh;display:flex;flex-direction:column;}
+#sheet .hd{flex:none;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.tabs{flex:none;display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;}
+.tab{flex:none;padding:6px 12px;border-radius:999px;border:2px solid var(--rule);font-size:15px;}
+.tab.on{color:#fff;border-color:transparent;}
+.tab.on.m-class{background:var(--c-class);} .tab.on.m-work{background:var(--c-work);} .tab.on.m-social{background:var(--c-social);} .tab.on.m-explore{background:var(--c-explore);} .tab.on.m-rest{background:var(--c-rest);}
+.acts{overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 0;}
+.act{display:flex;gap:10px;align-items:center;text-align:left;padding:10px;border-radius:12px;border:1px solid var(--rule);background:var(--bg);width:100%;}
+.act canvas{width:36px;height:36px;flex:none;}
+.act .t{font-weight:700;}
+.act .s{font-size:13px;color:var(--muted);}
+.act .fx{font-size:13px;}
+.act[disabled]{opacity:.45;}
+.act .why{font-size:13px;color:var(--bad);}
+.tag{white-space:nowrap;display:inline-block;font-size:12px;border-radius:6px;padding:0 6px;margin-left:4px;background:var(--tint);color:var(--ink);font-weight:400;}
+
+/* play */
+.feed{display:flex;flex-direction:column;gap:8px;}
+.day{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:10px;animation:pop .25s ease-out;}
+@keyframes pop{from{transform:translateY(8px);opacity:0;}to{transform:none;opacity:1;}}
+.day canvas{width:56px;height:56px;border-radius:10px;flex:none;}
+.day .dh{font-family:var(--f-px);font-size:13px;color:var(--muted);}
+.day .ln{font-size:16px;}
+.day .ticks{font-size:13px;margin-top:2px;display:flex;flex-wrap:wrap;gap:4px 8px;}
+.up{color:var(--good);} .dn{color:var(--bad);}
+.playbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--bg);border-top:1px solid var(--rule);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));}
+.playbar .in{max-width:448px;margin:0 auto;display:flex;gap:8px;justify-content:space-between;align-items:center;}
+
+/* modal */
+#modal{position:fixed;inset:0;z-index:60;background:rgba(20,20,26,.5);display:none;align-items:flex-end;justify-content:center;padding:16px;}
+#modal.on{display:flex;}
+#modal .box{width:100%;max-width:448px;max-height:86vh;overflow-y:auto;background:var(--surface);border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.3);margin-bottom:env(safe-area-inset-bottom,0px);}
+#modal .choices{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+#modal .choices .btn{width:100%;text-align:left;justify-content:flex-start;}
+.diary{font-family:var(--f-disp);font-size:18px;line-height:1.55;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:16px;background-image:repeating-linear-gradient(transparent,transparent 27px,var(--rule) 27px,var(--rule) 28px);}
+
+/* glossary words */
+.g{border-bottom:2px dotted var(--accent);cursor:pointer;}
+.g.seen{border-bottom-style:solid;}
+#pop{position:fixed;z-index:70;left:16px;right:16px;max-width:420px;margin:0 auto;background:var(--pop-bg);color:var(--pop-ink);border-radius:14px;padding:12px 14px;box-shadow:0 8px 24px rgba(0,0,0,.35);display:none;}
+#pop.on{display:block;}
+#pop .w{font-weight:700;font-size:18px;}
+#pop .k{color:var(--pop-muted);font-size:14px;margin-left:6px;}
+#pop .z{color:var(--pop-accent);font-size:16px;margin-top:2px;}
+#pop .d{font-size:14px;color:var(--pop-muted);margin-top:4px;}
+#pop .x{position:absolute;top:6px;right:6px;}
+
+/* trip */
+.board{background:#101418;color:#F5D36A;border-radius:12px;padding:10px;font-family:var(--f-px);font-size:14px;border:4px solid #2C3138;}
+.board .bh{display:grid;grid-template-columns:50px 1fr 80px 34px;gap:4px;color:#8FB7D0;font-size:12px;border-bottom:1px solid #2C3138;padding-bottom:4px;margin-bottom:4px;}
+.board .br{display:grid;grid-template-columns:50px 1fr 80px 34px;gap:4px;padding:6px 2px;border-radius:6px;width:100%;text-align:left;color:#F5D36A;}
+.board .br:active,.board .br.sel{background:#22303A;}
+.board .br small{display:block;color:#C9CFD6;font-size:11px;}
+.clock{font-family:var(--f-px);font-size:20px;}
+.win{width:100%;border-radius:16px;border:6px solid #3A3F47;background:#9CC7E0;}
+.map{width:100%;border-radius:14px;border:1px solid var(--rule);touch-action:manipulation;}
+.hud{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0;}
+.hud .pv{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:6px;text-align:center;font-size:13px;}
+.hud .pv b{display:block;font-family:var(--f-px);font-size:16px;}
+.nodes{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
+.node{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid var(--rule);background:var(--surface);text-align:left;width:100%;}
+.node .nm{font-weight:700;}
+.node .cost{font-size:13px;color:var(--muted);white-space:nowrap;}
+.node.done{opacity:.55;}
+.clues{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.clue{border:2px solid var(--rule);border-radius:12px;padding:6px;background:var(--surface);}
+.clue canvas{width:100%;aspect-ratio:1;border-radius:8px;}
+.clue .cn{font-size:12px;text-align:center;margin-top:2px;}
+.clue.ok{border-color:var(--good);} .clue.no{border-color:var(--bad);}
+.album{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.post{border-radius:12px;overflow:hidden;border:1px solid var(--rule);background:var(--surface);}
+.post canvas{width:100%;aspect-ratio:3/2;}
+.post .pt{font-size:13px;padding:6px 8px;}
+.nb{display:flex;flex-direction:column;gap:6px;}
+.nb .it{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:10px;background:var(--surface);border:1px solid var(--rule);}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:14px;z-index:80;opacity:0;transition:opacity .3s;pointer-events:none;max-width:88vw;text-align:center;}
+#toast.on{opacity:1;}
+.set .rowi{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--rule);gap:8px;}
+textarea{width:100%;min-height:80px;font:13px ui-monospace,monospace;border-radius:10px;border:1px solid var(--rule);padding:8px;background:var(--bg);color:var(--ink);}
+.hearts{display:flex;flex-direction:column;gap:8px;}
+.fr{display:flex;gap:10px;align-items:center;}
+.fr canvas{width:48px;height:48px;border-radius:10px;background:var(--tint);}
+.fr .h{color:var(--warm);letter-spacing:2px;}
+.sum{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:15px;margin:8px 0;}
+.back{margin-bottom:6px;}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <section id="title" class="scr on"></section>
+  <section id="home" class="scr"></section>
+  <section id="plan" class="scr"></section>
+  <section id="play" class="scr"></section>
+  <section id="trip" class="scr"></section>
+  <section id="info" class="scr"></section>
+</div>
+<div id="sheet"><div class="in"></div></div>
+<div id="modal"><div class="box"></div></div>
+<div id="pop"></div>
+<div id="toast"></div>
+<script>
+/* ==== engine/i18n.js ==== */
+/* UI strings: Chinese first, English on the toggle. Story text stays in English. */
+const UI = {
+  start:{zh:"開始新遊戲", en:"New game"}, cont:{zh:"繼續", en:"Continue"}, music:{zh:"音樂", en:"Music"},
+  langBtn:{zh:"English", en:"中文"}, kicker:{zh:"INKQUEST · 遊戲版 · 第一階段", en:"INKQUEST · THE GAME · STAGE 1"},
+  titleZh:{zh:"靠窗的位子：遊戲版", en:"靠窗的位子：遊戲版"},
+  blurb:{zh:"幫 Mia 規劃台北的每一天：上課、打工、和朋友出去，或是搭火車去冒險。這是試玩版：2025 年 7 月到 8 月。", en:"Plan Mia's days in Taipei: classes, work, friends, or a train trip south. This slice covers July and August 2025."},
+  confirmNew:{zh:"要開始新遊戲嗎？目前的進度會被覆蓋。", en:"Start a new game? Your current save will be replaced."}, yes:{zh:"確定", en:"Yes"}, cancel:{zh:"取消", en:"Cancel"},
+  confirmEnd:{zh:"要結束今天的島上行程嗎？還沒去的地方就去不了了。", en:"End your day on the island? You can't visit the other places today."},
+  noMusic:{zh:"這個瀏覽器無法播放音樂", en:"This browser can't play music"},
+  stress:{zh:"壓力", en:"Stress"}, money:{zh:"存款", en:"Money"},
+  en:{zh:"英文", en:"English"}, co:{zh:"自信", en:"Confidence"}, fi:{zh:"體力", en:"Fitness"},
+  cr:{zh:"手藝", en:"Craft"}, sty:{zh:"風格", en:"Style"}, kh:{zh:"生活力", en:"Know-how"},
+  plan2:{zh:"規劃接下來兩週", en:"Plan the next two weeks"}, friends:{zh:"朋友", en:"Friends"},
+  notebook:{zh:"單字本", en:"Notebook"}, album:{zh:"相簿", en:"Album"}, settings:{zh:"設定", en:"Settings"},
+  messages:{zh:"訊息", en:"Messages"}, block:{zh:"第 {n} 個兩週", en:"Block {n}"},
+  week1:{zh:"第一週", en:"Week 1"}, week2:{zh:"第二週", en:"Week 2"},
+  m_class:{zh:"上課", en:"Class"}, m_work:{zh:"打工", en:"Work"}, m_social:{zh:"朋友", en:"Social"},
+  m_explore:{zh:"出遊", en:"Explore"}, m_rest:{zh:"休息", en:"Rest"},
+  pickDay:{zh:"點一天來安排活動", en:"Tap a day to plan it"},
+  fillRest:{zh:"空白的日子都排這個", en:"Fill empty days"}, copyLast:{zh:"沿用上次", en:"Copy last plan"}, clear:{zh:"清除", en:"Clear"},
+  go:{zh:"開始這兩週", en:"Start these two weeks"}, back:{zh:"返回", en:"Back"},
+  cost:{zh:"花費", en:"Spend"}, income:{zh:"收入", en:"Earn"}, estStress:{zh:"預估壓力", en:"Est. stress"},
+  empty:{zh:"空白", en:"Free"}, free:{zh:"自由日", en:"Free day"},
+  needs:{zh:"需要", en:"Needs"}, onlyOn:{zh:"只在", en:"Only on"}, closed:{zh:"公休", en:"closed"},
+  twoDays:{zh:"需要連續兩天", en:"Needs two days in a row"}, notYet:{zh:"還沒解鎖", en:"Not unlocked yet"},
+  removeDay:{zh:"清除這天", en:"Clear this day"}, close:{zh:"關閉", en:"Close"},
+  negWarn:{zh:"小心：照這個計畫，存款會變成負的。", en:"Careful: this plan takes your money below zero."},
+  stressWarn:{zh:"小心：壓力太高（超過 80）可能會生病。", en:"Careful: stress over 80 can make Mia sick."},
+  skip:{zh:"快轉", en:"Skip"}, speed:{zh:"速度", en:"Speed"}, next:{zh:"繼續", en:"Next"}, ok:{zh:"好", en:"OK"},
+  summary:{zh:"兩週總結", en:"Two-week summary"}, diary:{zh:"Mia 的日記", en:"Mia's diary"},
+  paid:{zh:"入帳", en:"Paid"}, spent:{zh:"支出", en:"Spent"}, rentPaid:{zh:"房租和帳單", en:"Rent and bills"},
+  pendingPay:{zh:"待入帳薪水", en:"Pay on the way"},
+  showZh:{zh:"中", en:"中"}, tapWord:{zh:"點虛線的字可以看中文。", en:"Tap a dotted word for Chinese."},
+  langSet:{zh:"選單語言", en:"Menu language"}, musicSet:{zh:"音樂", en:"Music"}, themeSet:{zh:"外觀", en:"Theme"},
+  saveCode:{zh:"存檔代碼", en:"Save code"}, saveHelp:{zh:"複製這段代碼，就能在別的裝置繼續玩。", en:"Copy this code to continue on another device."},
+  load:{zh:"讀取代碼", en:"Load code"}, loaded:{zh:"讀取成功！", en:"Loaded!"}, badCode:{zh:"代碼不正確", en:"That code doesn't work"},
+  copy:{zh:"複製", en:"Copy"}, copied:{zh:"已複製", en:"Copied"}, newGame:{zh:"重新開始", en:"Restart"},
+  auto:{zh:"自動", en:"Auto"}, light:{zh:"淺色", en:"Light"}, dark:{zh:"深色", en:"Dark"},
+  on:{zh:"開", en:"On"}, off:{zh:"關", en:"Off"},
+  notebookEmpty:{zh:"還沒有單字。故事裡點虛線的字，就會收進這裡。", en:"No words yet. Tap dotted words in the story to collect them."},
+  albumEmpty:{zh:"還沒有明信片。出去冒險就能收集！", en:"No postcards yet. Go exploring to collect them!"},
+  hearts:{zh:"好感度", en:"Hearts"}, rank:{zh:"等級", en:"Rank"},
+  r0:{zh:"初級", en:"Beginner"}, r1:{zh:"中級", en:"Regular"}, r2:{zh:"高級", en:"Advanced"},
+  sick:{zh:"生病了", en:"Sick"}, typhoon:{zh:"颱風假", en:"Typhoon day"}, locked:{zh:"已固定", en:"Fixed"},
+  trip:{zh:"冒險", en:"Adventure"}, endSlice:{zh:"試玩版結束", en:"End of the slice"},
+  portfolio:{zh:"作品集", en:"Portfolio"}, time:{zh:"時間", en:"Time"}, energy:{zh:"體力值", en:"Energy"},
+  leave:{zh:"結束今天", en:"End the day"}, go2:{zh:"出發", en:"Go"},
+  perDay:{zh:"每天", en:"a day"}, payday:{zh:"發薪日", en:"payday"}, cash:{zh:"當天付現", en:"paid the same day"},
+  livingCost:{zh:"生活費（吃飯、交通）", en:"Living costs (food, transport)"}
+};
+
+/* ==== content/book1/tracks.js ==== */
+/* songs: the four Book 1 songs from the textbook, plus the train song */
+const TRACKS = [
+    {n:"Morning Walk", z:"晨間散步・輕快", bpm:112, hat:true, lw:"p25", lg:0.18, bg:0.281,
+     lead:"E5 _ G5 _ C6 _ G5 E5 | D5 _ G5 _ B5 _ A5 G5 | C5 _ E5 _ A5 _ G5 E5 | F5 _ A5 _ G5 F5 E5 D5 | E5 _ G5 _ C6 _ D6 E6 | D6 _ B5 _ G5 _ A5 B5 | A5 _ F5 A5 G5 _ D5 F5 | E5 _ D5 _ C5 _ - -",
+     bass:"C3 - G3 - C3 - G3 - | G2 - D3 - G2 - D3 - | A2 - E3 - A2 - E3 - | F2 - C3 - F2 - C3 - | C3 - G3 - C3 - G3 - | G2 - D3 - G2 - D3 - | F2 - C3 - G2 - D3 - | C3 - G3 - C3 - - -"},
+    {n:"Rainy Window", z:"雨天窗邊・抒情", bpm:84, hat:false, lw:"square", lg:0.126, bg:0.247,
+     lead:"A4 _ C5 _ E5 _ _ _ | F5 _ E5 _ C5 _ _ _ | E5 _ G5 _ C5 _ D5 _ | B4 _ _ _ D5 _ _ _ | A4 _ C5 _ E5 _ A5 _ | G5 _ F5 _ E5 _ C5 _ | D5 _ B4 _ D5 _ G5 _ | E5 _ _ _ A4 _ _ _",
+     bass:"A2 E3 A3 E3 A2 E3 A3 E3 | F2 C3 F3 C3 F2 C3 F3 C3 | C3 G3 C4 G3 C3 G3 C4 G3 | G2 D3 G3 D3 G2 D3 G3 D3 | A2 E3 A3 E3 A2 E3 A3 E3 | F2 C3 F3 C3 F2 C3 F3 C3 | G2 D3 G3 D3 G2 D3 G3 D3 | A2 E3 A3 E3 A2 E3 A3 E3"},
+    {n:"Night Market", z:"夜市小跑步・活潑", bpm:128, hat:true, lw:"p25", lg:0.18, bg:0.297,
+     lead:"C5 F5 A5 F5 C6 _ A5 _ | D5 F5 A#5 _ A5 G5 F5 _ | E5 G5 C6 _ A#5 A5 G5 _ | A5 _ F5 _ C5 _ - - | D5 F5 A5 D6 _ C6 A5 _ | A#5 _ A5 G5 F5 _ D5 _ | C5 E5 G5 A#5 A5 G5 E5 _ | F5 _ A5 _ F5 _ - -",
+     bass:"F2 F3 C3 F3 F2 F3 C3 F3 | A#1 A#2 F2 A#2 A#1 A#2 F2 A#2 | C2 C3 G2 C3 C2 C3 G2 C3 | F2 F3 C3 F3 F2 F3 C3 F3 | D2 D3 A2 D3 D2 D3 A2 D3 | A#1 A#2 F2 A#2 A#1 A#2 F2 A#2 | C2 C3 G2 C3 C2 C3 G2 C3 | F2 F3 C3 F3 F2 - - -"},
+    {n:"Tea Break", z:"午後茶點・悠閒", bpm:100, hat:true, lw:"p25", lg:0.162, bg:0.264,
+     lead:"B4 _ D5 G5 _ _ F#5 G5 | E5 _ G5 B5 _ _ A5 G5 | E5 _ C5 E5 G5 _ E5 _ | F#5 _ A5 _ D5 _ _ _ | B4 D5 G5 _ B5 _ A5 G5 | G5 _ E5 _ B4 _ E5 G5 | E5 _ G5 _ F#5 _ A5 _ | G5 _ _ _ - - - -",
+     bass:"G2 - D3 - G2 - D3 - | E2 - B2 - E2 - B2 - | C3 - G2 - C3 - G2 - | D3 - A2 - D3 - A2 - | G2 - D3 - G2 - D3 - | E2 - B2 - E2 - B2 - | C3 - G2 - D3 - A2 - | G2 - D3 - G2 - - -"},
+  {n:"Southbound", z:"南下列車・輕快", bpm:120, hat:true, lw:"p25", lg:0.17, bg:0.28,
+   lead:"G5 _ B5 _ D6 _ B5 G5 | A5 _ C6 _ E6 _ D6 C6 | B5 _ G5 _ D5 _ G5 B5 | A5 _ _ _ F#5 _ D5 _ | G5 _ B5 _ D6 _ G6 _ | F#6 _ E6 D6 C6 _ A5 _ | B5 _ D6 _ C6 _ A5 F#5 | G5 _ _ _ - - - -",
+   bass:"G2 - D3 - G2 - D3 - | A2 - E3 - A2 - E3 - | G2 - D3 - B2 - D3 - | D2 - A2 - D2 - F#2 - | G2 - D3 - G2 - D3 - | C3 - G2 - C3 - G2 - | G2 - D3 - D2 - A2 - | G2 - D3 - G2 - - -"}
+];
+
+/* ==== content/book1/gloss.js ==== */
+/* ---------------- glosses for [[marked]] words: Chinese first, then a short note ---------------- */
+const GLOSS = {
+  "order":{w:"order", kk:"[ˋɔrdɚ]", zh:"點（餐）", d:"order food = 點餐"},
+  "notebook":{w:"notebook", kk:"[ˋnotˏbʊk]", zh:"筆記本"},
+  "silly":{w:"silly", kk:"[ˋsɪlɪ]", zh:"傻傻的、好笑的"},
+  "breathe":{w:"breathe", kk:"[brið]", zh:"呼吸"},
+  "dumpling":{w:"dumpling", kk:"[ˋdʌmplɪŋ]", zh:"水餃、餃子"},
+  "dish":{w:"dish", kk:"[dɪʃ]", zh:"菜、料理", d:"也有「盤子」的意思。複數是 dishes。"},
+  "delicious":{w:"delicious", kk:"[dɪˋlɪʃəs]", zh:"好吃的、美味的"},
+  "blurry":{w:"blurry", kk:"[ˋblɝɪ]", zh:"模糊的"},
+  "tutor":{w:"tutor", kk:"[ˋtutɚ]", zh:"家教老師"},
+  "patient":{w:"patient", kk:"[ˋpeʃənt]", zh:"有耐心的", d:"也有「病人」的意思。"},
+  "library":{w:"library", kk:"[ˋlaɪˏbrɛrɪ]", zh:"圖書館"},
+  "shy":{w:"shy", kk:"[ʃaɪ]", zh:"害羞的"},
+  "handbag":{w:"handbag", kk:"[ˋhændˏbæg]", zh:"手提包"},
+  "customer":{w:"customer", kk:"[ˋkʌstəmɚ]", zh:"客人、顧客"},
+  "receipt":{w:"receipt", kk:"[rɪˋsit]", zh:"收據、發票", d:"p 不發音。"},
+  "manager":{w:"manager", kk:"[ˋmænɪdʒɚ]", zh:"經理、主管"},
+  "latte":{w:"latte", kk:"[ˋlɑte]", zh:"拿鐵"},
+  "regular":{w:"regular", kk:"[ˋrɛgjəlɚ]", zh:"常客", d:"也可以當形容詞：「平常的、規律的」。"},
+  "oops":{w:"oops", kk:"[ups]", zh:"哎呀（不小心出錯時說）"},
+  "portfolio":{w:"portfolio", kk:"[portˋfolɪˏo]", zh:"作品集"},
+  "mutual-benefit":{w:"mutual-benefit", kk:"[ˋmjutʃʊəl ˋbɛnəfɪt]", zh:"互惠的", d:"互惠外拍：攝影師和模特兒互不收費，各自拿照片累積作品。"},
+  "pose":{w:"pose", kk:"[poz]", zh:"姿勢、擺姿勢"},
+  "blink":{w:"blink", kk:"[blɪŋk]", zh:"眨眼"},
+  "stinky tofu":{w:"stinky tofu", kk:"[ˋstɪŋkɪ ˋtofu]", zh:"臭豆腐"},
+  "ktv":{w:"KTV", zh:"KTV、唱歌包廂", d:"英美比較常說 karaoke [ˏkɑrəˋokɪ]。KTV 是台灣和亞洲的說法。"},
+  "youbike":{w:"YouBike", zh:"YouBike 微笑單車", d:"台灣的公共自行車。YouBike 2.0 在台北、新北前 30 分鐘 NT$5，之後每 30 分鐘 NT$10；台中、高雄前 30 分鐘免費。電輔車 2.0E 前兩小時每 30 分鐘 NT$20。"},
+  "weekend":{w:"weekend", kk:"[ˋwikˋɛnd]", zh:"週末"},
+  "working holiday":{w:"working holiday", kk:"[ˋwɝkɪŋ ˋhɑləˏde]", zh:"打工度假", d:"年輕人到國外一邊旅行、一邊工作，通常是一到兩年。"},
+  "seafood":{w:"seafood", kk:"[ˋsiˏfud]", zh:"海鮮"},
+  "model":{w:"model", kk:"[ˋmɑdḷ]", zh:"當模特兒；模特兒"},
+  "typhoon":{w:"typhoon", kk:"[taɪˋfun]", zh:"颱風"},
+  "father's day":{w:"Father's Day", zh:"父親節", d:"台灣的父親節是 8 月 8 日，因為「八八」聽起來像「爸爸」。美國和英國是 6 月的第三個星期日。"},
+  "usual":{w:"the usual", kk:"[ˋjuʒʊəl]", zh:"老樣子（常點的那個）"},
+  "seat":{w:"seat", kk:"[sit]", zh:"座位"},
+  "aisle":{w:"aisle", kk:"[aɪl]", zh:"走道", d:"s 不發音。window seat 靠窗，aisle seat 靠走道。"},
+  "bento":{w:"bento", kk:"[ˋbɛnto]", zh:"便當", d:"來自日文。英文也可以說 lunch box。"},
+  "grill":{w:"grill", kk:"[grɪl]", zh:"烤", d:"grilled squid = 烤魷魚"},
+  "squid":{w:"squid", kk:"[skwɪd]", zh:"魷魚"},
+  "goddess":{w:"goddess", kk:"[ˋgɑdɪs]", zh:"女神"},
+  "lifeguard":{w:"lifeguard", kk:"[ˋlaɪfˏgɑrd]", zh:"救生員"},
+  "electric":{w:"electric", kk:"[ɪˋlɛktrɪk]", zh:"電動的", d:"electric bike = 電動腳踏車"},
+  "harbor":{w:"harbor", kk:"[ˋhɑrbɚ]", zh:"港口", d:"英式拼法是 harbour。"},
+  "ferry":{w:"ferry", kk:"[ˋfɛrɪ]", zh:"渡輪"},
+  "hostel":{w:"hostel", kk:"[ˋhɑstḷ]", zh:"青年旅館"},
+  "pier-2":{w:"Pier-2", zh:"駁二藝術特區", d:"高雄港邊的老倉庫改成的藝術區。"},
+  "warehouse":{w:"warehouse", kk:"[ˋwɛrˏhaʊs]", zh:"倉庫"},
+  "metal":{w:"metal", kk:"[ˋmɛtḷ]", zh:"金屬"},
+  "painting":{w:"painting", kk:"[ˋpentɪŋ]", zh:"畫"},
+  "jie":{w:"Jie", zh:"姊", d:"華人常叫姊姊「姊」，不直接叫名字。英文通常直接叫名字。"}
+};
+
+/* words the English voice says the local way */
+const SAY_AS = {"Kaohsiung":"Gow-shong", "Cijin":"Chee-jin", "Jie":"Jyeh", "Tze-Chiang":"Tsuh-chyahng", "Chu-Kuang":"Joo-gwahng", "Hualien":"Hwah-lyen", "Tianhou":"Tyen-ho", "Cihou":"Tsuh-ho", "Mazu":"Mah-tsoo", "Chiayi":"Jya-ee"};
+
+/* ==== content/book1/stage.js ==== */
+/* =========================================================
+   STAGE 1 · HOME (Book 1, A1) — vertical slice: July 7 – August 31, 2025
+   Canon (Window Seat Book 1): Mia, 27, sells bags on the third floor of a
+   Taipei department store. In the game she lives at home with her family
+   (decided 2026-10-12), so she pays no rent in Taiwan. Her brother Leo,
+   Mom and Dad (family dinner on Sundays, no phones at the table), Ben from
+   men's wear, Auntie Chen's breakfast shop on the corner, Mochi the cat from
+   next door, and her best friend Ting, who is abroad.
+   ========================================================= */
+const STAGE = {
+  id:1, book:"Window Seat (Book 1)", start:"2025-07-07", end:"2025-08-31", blocks:4,
+  money:20000, stress:20,
+  stats:{en:8, co:15, fi:20, cr:15, sty:22, kh:15},
+  living:200,                                   /* lunch and transport each day; she eats at home */
+  gain:.3,                                     /* stat growth per day: the full game spans 52 blocks */
+  recover:.5,                                   /* stress a night's sleep takes away */
+  bills:[],                                     /* she lives at home: no rent in Taiwan */
+  music:{home:0, plan:3, play:0, trip:4, rain:1, night:2}
+};
+
+/* the people Mia can spend time with (hearts 0–100, one heart per 20) */
+const CAST = {
+  family:{zh:"家人", en:"Family", spr:"mom", d:{zh:"媽媽、爸爸和弟弟 Leo。星期天一起吃晚餐。", en:"Mom, Dad and her brother Leo. Dinner together on Sundays."}},
+  leo:{zh:"Leo（弟弟）", en:"Leo (brother)", spr:"leo", d:{zh:"愛吃又愛冒險的弟弟。夜市任務的搭檔。", en:"Her little brother. Partner for night market missions."}},
+  ben:{zh:"Ben（同事）", en:"Ben (coworker)", spr:"ben", d:{zh:"百貨公司男裝部的同事，很會講笑話。", en:"Works in men's wear. Always has a funny story."}},
+  ting:{zh:"婷（好朋友）", en:"Ting (best friend)", spr:"ting", d:{zh:"最好的朋友，正在加拿大溫哥華打工度假。", en:"Her best friend, on a working holiday in Vancouver."}},
+  chen:{zh:"陳阿姨", en:"Auntie Chen", spr:"chen", d:{zh:"街角早餐店的老闆娘，叫每個人「帥哥」「美女」。", en:"Runs the breakfast shop on the corner. Calls everyone “handsome” or “pretty.”"}}
+};
+
+/* ---------------- activities ----------------
+   days: allowed weekdays (0 = Monday); cost per day; pay per day and when it arrives;
+   g: stat gains on a good day; st: stress change; odds: the stat behind success. */
+const ACTS = {
+  /* classes */
+  english:{menu:"class", s:{zh:"英文課", en:"English"}, zh:"英文會話班", en:"English class", spr:"book", days:[1,3], cost:450, st:4, g:{en:2.2, co:0.6}, odds:"en", cls:true,
+    ok:["We practice [[ordering|order]] food in English. I can do it!", "The teacher asks, “Where are you from?” I answer with a big smile.", "We learn ten new words. I write them in my [[notebook]]."],
+    slip:["I forget my homework. I feel [[silly]]."]},
+  yoga:{menu:"class", s:{zh:"瑜伽", en:"Yoga"}, zh:"瑜伽課", en:"Yoga class", spr:"mat", days:[0,2], cost:400, st:-3, g:{fi:1.8, sty:0.6}, odds:"fi", cls:true,
+    ok:["My legs shake, but I hold the tree pose for one minute.", "I can touch my toes today!"], slip:["I am too tired. I lie on my mat and [[breathe]]."]},
+  cooking:{menu:"class", s:{zh:"烹飪", en:"Cooking"}, zh:"烹飪課", en:"Cooking class", spr:"pot", days:[5], cost:900, st:-2, g:{cr:2.6}, odds:"cr", cls:true,
+    ok:["We make [[dumplings|dumpling]]. Mine are ugly but [[delicious]].", "Today we cook three-cup chicken. The kitchen smells wonderful."], slip:["I burn the rice. The whole room smells funny."]},
+  styling:{menu:"class", s:{zh:"造型", en:"Styling"}, zh:"造型攝影課", en:"Styling and photo class", spr:"camera", days:[6], cost:750, st:3, g:{sty:2.6, co:0.4}, odds:"sty", cls:true,
+    ok:["We learn about colors. Blue is my color!", "I take photos of a classmate, and she takes photos of me."], slip:["My photos are all [[blurry]]."]},
+  tutor:{menu:"class", s:{zh:"家教", en:"Tutor"}, zh:"英文家教", en:"English tutor", spr:"laptop", days:null, cost:1000, st:5, g:{en:3.2}, odds:"en", cls:true,
+    ok:["My [[tutor]] is [[patient]]. We talk for one hour, only in English."], slip:["My tutor asks many questions. My head is full."]},
+  study:{menu:"class", s:{zh:"自習", en:"Study"}, zh:"圖書館自習", en:"Self-study at the library", spr:"lib", days:null, cost:0, st:2, g:{en:1.0, kh:0.8}, odds:"en", cls:true,
+    ok:["I study at the [[library]]. It is quiet and cool.", "I read a short English story. I understand most of it!"], slip:["I fall asleep on my book."]},
+  exchange:{menu:"class", s:{zh:"語交", en:"Exchange"}, zh:"語言交換", en:"Language exchange", spr:"chat", days:[2], cost:150, st:-2, g:{en:1.2, co:1.4}, odds:"co", cls:true,
+    ok:["Tonight I talk with people from five countries!", "A student from Germany teaches me English. I teach her Chinese."], slip:["I am [[shy]] tonight. I only say “Hi.”"]},
+
+  /* work */
+  dept:{menu:"work", s:{zh:"百貨", en:"Store"}, zh:"百貨公司櫃位", en:"Department store", spr:"bag", days:null, cost:0, pay:1600, wkBonus:300, payday:5, st:5, g:{sty:0.8, co:0.8}, odds:"sty", need:{sty:20},
+    sub:{zh:"三樓包包櫃・時薪 NT$200，週末多抽成", en:"Bags, 3rd floor · NT$200/hr, weekend commission"},
+    ok:["I sell three [[handbags|handbag]] today. My feet hurt, but I am happy.", "A [[customer]] wants a red bag. I find the perfect one.", "Ben brings me a coffee. “Busy day?” he asks. “Very!”"],
+    slip:["I give a customer the wrong [[receipt]]. My [[manager]] is not happy."]},
+  cafe:{menu:"work", s:{zh:"咖啡館", en:"Café"}, zh:"咖啡館打工", en:"Café shift", spr:"cup", days:[0,2,3,4,5,6], cost:0, pay:1140, payday:10, st:4, g:{cr:1.2, co:0.6}, odds:"cr",
+    sub:{zh:"巷口咖啡館・時薪 NT$190・週二公休", en:"Corner café · NT$190/hr · closed Tuesdays"},
+    ok:["I make twenty [[lattes|latte]]. Some are beautiful!", "A [[regular]] says, “Your coffee is the best!”"], slip:["I drop a cup. [[Oops]]!"]},
+  /* modeling (checked with Wen-Hung, 2026-10-12): new models shoot on a mutual-benefit basis (互惠),
+     no fee either way, sharing travel costs; experienced models earn about NT$2,500–6,000 for a 3-hour session */
+  shoot:{menu:"work", s:{zh:"互惠外拍", en:"Shoot"}, zh:"互惠外拍", en:"Mutual-benefit photo shoot", spr:"model", days:[5,6], cost:100, pay:0, cash:true, st:6, g:{sty:2.0, co:1.2}, odds:"sty", need:{sty:15}, flag:"shoot", port:1,
+    sub:{zh:"週末・不收費，互相累積作品・分攤交通 NT$100・作品集 +1", en:"Weekend · no fee either way · share travel NT$100 · portfolio +1"},
+    ok:["The photographer says, “Look at the light. Good!” I learn a new [[pose]].", "We shoot by the river. The photos look like a magazine!"], slip:["I [[blink]] in every photo. We try again and again."]},
+
+  shootPaid:{menu:"work", s:{zh:"付費外拍", en:"Paid shoot"}, zh:"付費外拍", en:"Paid photo shoot", spr:"camera", days:[5,6], cost:0, pay:2800, cash:true, st:7, g:{sty:2.2, co:1.4}, odds:"sty", need:{sty:25}, flag:"paidShoot", port:1,
+    sub:{zh:"週末三小時・NT$2,800・當天付清", en:"3 hours on a weekend · NT$2,800 · paid the same day"},
+    ok:["Three hours of photos for a café's new menu. My smile is tired, but my wallet is happy.", "The client loves the photos. “Can we work together again?”"], slip:["The sun is too strong. We wait for clouds, and it takes four hours."]},
+
+  /* social */
+  boba:{menu:"social", s:{zh:"手搖", en:"Boba"}, zh:"和 Ben 喝手搖", en:"Bubble tea with Ben", spr:"boba", days:null, cost:90, st:-7, h:{ben:8}, g:{},
+    ok:["Ben and I drink bubble tea after work. He tells funny stories about customers."]},
+  nightmkt:{menu:"social", s:{zh:"夜市", en:"Market"}, zh:"和 Leo 逛夜市", en:"Night market with Leo", spr:"lantern", days:null, cost:300, st:-10, h:{leo:8}, g:{kh:0.4},
+    ok:["Leo and I eat [[stinky tofu]] and grilled corn. Night market mission complete!", "Leo wins a toy at a game stall. He is very proud."]},
+  ktv:{menu:"social", s:{zh:"KTV", en:"KTV"}, zh:"同事 KTV", en:"KTV with coworkers", spr:"mic", days:[4,5], cost:650, st:-16, h:{ben:6}, g:{co:1.0},
+    ok:["We sing for three hours at [[KTV]]. My voice is gone!"]},
+  family:{menu:"social", s:{zh:"家聚", en:"Family"}, zh:"家庭晚餐", en:"Family dinner", spr:"bowl", days:[6], cost:0, st:-9, h:{family:8}, g:{cr:0.4},
+    ok:["Dad cooks fish. Mom asks, “Are you eating well?”", "No phones at the table. We talk and laugh all night."]},
+  callting:{menu:"social", s:{zh:"視訊", en:"Call"}, zh:"和婷視訊", en:"Video call with Ting", spr:"phone", days:null, cost:0, st:-5, h:{ting:8}, g:{en:0.4},
+    ok:["Ting calls from Canada. It is morning there and night here.", "Ting shows me the mountains in Vancouver. So beautiful!"]},
+
+  /* rest */
+  rest:{menu:"rest", s:{zh:"休息", en:"Rest"}, zh:"在家休息", en:"Rest at home", spr:"bed", days:null, cost:0, st:-14, g:{},
+    ok:["I sleep late and read a book. A slow day is a good day."]},
+  ride:{menu:"rest", s:{zh:"單車", en:"Bike"}, zh:"河濱騎單車", en:"Riverside bike ride", spr:"bike", days:null, cost:25, st:-8, g:{fi:0.8},
+    ok:["I ride a [[YouBike]] by the river for an hour and a half. The evening wind feels good."]},
+
+  /* explore: a two-day adventure */
+  khh:{menu:"explore", s:{zh:"高雄", en:"Trip"}, zh:"高雄兩天一夜", en:"Kaohsiung weekend", spr:"train", days:null, cost:0, est:3000, span:2, trip:"khh", st:0, g:{},
+    sub:{zh:"火車南下・旗津冒險・NT$2,300–4,100（看住哪裡）", en:"Train south · Cijin adventure · NT$2,300–4,100, by where you stay"}}
+};
+/* the activity that fills an empty day, and the special days */
+const SPECIAL = {
+  free:{s:{zh:"自由", en:"Free"}, zh:"自由日", en:"Free day", spr:"sun", st:-6, g:{}, ok:["A free day. I clean my room and water my plants."]},
+  sick:{s:{zh:"生病", en:"Sick"}, zh:"生病", en:"Sick", spr:"sick", st:-8, g:{}, ok:["I am sick in bed. Mom brings me soup."]},
+  typhoon:{s:{zh:"颱風假", en:"Typhoon"}, zh:"颱風假", en:"Typhoon day", spr:"rain", st:-10, g:{}, ok:["Typhoon day! No work, no class. The rain is loud on my window."]},
+  khh2:{s:{zh:"高雄②", en:"Trip ②"}, zh:"高雄（第二天）", en:"Kaohsiung, day 2", spr:"train", st:0, g:{}}
+};
+const MENUS = ["class","work","social","explore","rest"];
+const RANKS = [0, 6, 14];          /* sessions needed for Beginner, Regular, Advanced */
+const RANK_MUL = [1, 1.3, 1.6];
+
+/* ==== content/book1/events.js ==== */
+/* ---------------- events: messages at the start of a block, and surprises on the way ----------------
+   at:"start" runs when a block opens; at:"day" is checked before each day plays.
+   msgs: [from, English, 中文]. A choice pauses the game until the player answers. */
+const EVENTS = [
+  {id:"intro", at:"start", when:S=>S.blk === 0,
+    msgs:[["family","Mia! Don't be late for dinner on Sunday. Dad is cooking fish.","Mia！星期天晚餐別遲到喔，爸爸要煮魚。"],
+          ["ben","Big summer sale this month. They need people on [[weekends|weekend]]!","這個月夏季特賣，週末很缺人喔！"],
+          ["ting","Hi from Vancouver! I am here on a [[working holiday]]. Call me sometime!","從溫哥華跟妳打招呼！我在這裡打工度假。有空打給我！"]]},
+  {id:"khhHint", at:"start", when:S=>S.blk === 1,
+    msgs:[["leo","You need a trip, [[Jie|jie]]. Take the train to Kaohsiung! Cijin has the best [[seafood]].","姊，妳需要出去走走。坐火車去高雄啦！旗津的海鮮最好吃。"],
+          ["ben","[[KTV]] on Friday or Saturday? The whole team is going!","星期五或星期六去唱 KTV？大家都會去！"]]},
+  {id:"shootOffer", at:"start", once:false, when:S=>S.blk >= 1 && S.st.sty >= 15 && !S.flags.shoot,
+    msgs:[["photo","Hi Mia! I am a photographer. I saw your photo on your friend's page. Do you want to [[model]] for a photo shoot? It is a [[mutual-benefit]] shoot: no one pays. You get photos for your [[portfolio]], and I get photos for mine.","Mia 妳好！我是攝影師，在妳朋友的頁面看到妳的照片。想不想一起外拍？這是互惠拍攝，雙方都不收費：妳拿照片做作品集，我也拿照片放我的作品集。"]],
+    choice:{q:["What do you do?","妳要怎麼做？"], opts:[
+      {en:"Check his page and ask Ben to come with me", zh:"先看他的作品頁，再請 Ben 陪我去", fx:S=>{ S.flags.shoot = true; S.st.kh += 1;
+        return ["ben","Good idea. His page looks good, and many people know him. I can come on Saturday.","好主意。他的頁面看起來沒問題，很多人認識他。星期六我可以陪妳去。"]; }},
+      {en:"Say yes right away", zh:"馬上答應", fx:S=>{ S.flags.shoot = true;
+        return ["ben","Wait! Always check the photographer first. Meet in a public place, and bring a friend. I will come with you.","等等！一定要先查一下攝影師，約在公開的地方，而且要帶朋友去。我陪妳去。"]; }},
+      {en:"Not now", zh:"先不要", fx:S=>{ S.flags.shootLater = S.blk;
+        return ["photo","No problem. Message me any time.","沒問題，隨時傳訊息給我。"]; }}]}},
+  {id:"paidOffer", at:"start", when:S=>S.portfolio >= 2 && S.st.sty >= 25 && !S.flags.paidShoot,
+    msgs:[["photo","Your [[portfolio]] looks great now! A café needs photos for its new menu. Three hours, NT$2,800. Are you free on a weekend?","妳的作品集現在很棒！有一間咖啡館要拍新菜單的照片，三個小時，NT$2,800。週末有空嗎？"]],
+    fx:S=>{ S.flags.paidShoot = true; }},
+  {id:"typhoon", at:"start", when:S=>S.blk === 2,
+    msgs:[["news","[[Typhoon]] warning! A strong typhoon is coming on Wednesday. The city says: no work and no school that day.","颱風警報！強颱星期三來襲，台北市宣布停班停課。"]],
+    fx:S=>{ S.locks[D.add(S.date, 2)] = "typhoon"; }},
+  {id:"fathers", at:"start", when:S=>S.blk === 2,
+    msgs:[["leo","Friday is [[Father's Day]]! 8/8, “ba ba,” like “Dad.” What do we give him?","星期五是父親節！八八，「爸爸」。我們要送他什麼？"]],
+    choice:{q:["What do you do for Dad?","妳要為爸爸做什麼？"], opts:[
+      {en:"Buy him a nice shirt (NT$800)", zh:"買一件好看的襯衫（NT$800）", fx:S=>{ S.money -= 800; S.hearts.family += 10; S.flags.dadGift = "shirt";
+        return ["family","Dad wears the shirt every day now. Every day!","爸爸現在每天都穿那件襯衫，每天喔！"]; }},
+      {en:"Cook dinner for him", zh:"煮一頓晚餐給他吃", fx:S=>{ const good = S.st.cr >= 22; S.hearts.family += good ? 12 : 8; S.st.cr += .8; S.flags.dadGift = "dinner";
+        return good ? ["family","Your fish is better than Dad's! Don't tell him.","妳煮的魚比爸爸煮的還好吃！別跟他說。"]
+                    : ["family","The rice is a little hard. Dad eats it all anyway.","飯有點硬，不過爸爸還是全部吃光了。"]; }},
+      {en:"Make a card with Leo", zh:"和 Leo 一起做卡片", fx:S=>{ S.hearts.family += 6; S.hearts.leo += 4; S.flags.dadGift = "card";
+        return ["leo","Dad put our card on the fridge. He reads it every morning.","爸爸把我們的卡片貼在冰箱上，每天早上都會看。"]; }}]}},
+  {id:"tingWH", at:"start", when:S=>S.blk === 3,
+    msgs:[["ting","Guess what? I got a job at a café in Vancouver! You should try a [[working holiday]] too. Maybe London?","跟妳說！我在溫哥華的咖啡館找到工作了！妳也該試試打工度假，也許去倫敦？"]],
+    fx:S=>{ S.flags.whIdea = true; }},
+  {id:"lowMoney", at:"start", when:S=>S.money < 3000 && !S.flags.momLoan,
+    msgs:[["family","Mia, is your money OK? Eat dinner at home more. Here is some money for this month.","Mia，錢還夠用嗎？多在家吃晚餐。這個月的錢先拿去用。"]],
+    fx:S=>{ S.money += 5000; S.flags.momLoan = true; S.stress += 5; }},
+
+  /* small surprises during the two weeks */
+  {id:"mochi", at:"day", once:false, when:(S,c)=>rand() < .06,
+    msgs:[["mochi","In the evening, Mochi comes to my window. She wants fish. I have none.","傍晚，麻糬來到我的窗邊。她想要魚，可是我沒有。"]], fx:S=>{ S.stress -= 3; }},
+  {id:"chen", at:"day", once:false, when:(S,c)=>rand() < .06 && !c.lock,
+    msgs:[["chen","Auntie Chen says, “Good morning, pretty girl! The [[usual]]?” My day starts well.","陳阿姨說：「美女早安！老樣子？」今天有個好的開始。"]], fx:S=>{ S.stress -= 2; S.hearts.chen += 4; }}
+];
+
+/* who sends a message: name and sprite */
+const FROM = {
+  family:{zh:"媽媽", en:"Mom", spr:"mom"}, leo:{zh:"Leo", en:"Leo", spr:"leo"}, ben:{zh:"Ben", en:"Ben", spr:"ben"},
+  ting:{zh:"婷", en:"Ting", spr:"ting"}, chen:{zh:"陳阿姨", en:"Auntie Chen", spr:"chen"}, photo:{zh:"攝影師", en:"Photographer", spr:"camera"},
+  news:{zh:"新聞", en:"News", spr:"rain"}, mochi:{zh:"麻糬", en:"Mochi", spr:"cat"}, mia:{zh:"Mia", en:"Mia", spr:"mia"},
+  teacher:{zh:"老師", en:"Teacher", spr:"book"}, bank:{zh:"銀行", en:"Bank", spr:"coin"}
+};
+
+/* a teacher's line when Mia moves up a rank in a class */
+const RANKUP = {
+  english:["You can talk about your day now. Great job, Mia!","妳現在已經可以聊自己的一天了，很棒！"],
+  yoga:["Your back is strong now, and your breathing is calm. Good work!","妳的背現在很有力，呼吸也很穩了。做得好！"],
+  cooking:["Your dumplings look like dumplings now!","妳的水餃現在看起來像水餃了！"],
+  styling:["You have a good eye for color.","妳對顏色很有眼光。"],
+  tutor:["You speak more and stop less. I am proud of you.","妳說得更多、停得更少了。我以妳為榮。"],
+  study:["I can read a whole page without my phone dictionary!","我可以不查手機字典讀完一整頁了！"],
+  exchange:["Everyone wants to talk with you now, Mia!","現在大家都想跟妳聊天了，Mia！"]
+};
+
+/* ==== content/book1/trip-khh.js ==== */
+/* ---------------- Kaohsiung weekend: the Stage 1 adventure ----------------
+   Facts checked 2026-10-12: TRA Tze-Chiang Taipei–Kaohsiung NT$843, about 4–5 hours (Seat61);
+   Gushan–Cijin ferry, a few minutes, about NT$40, 05:00–02:00 (2026 guide; older sources say NT$30);
+   Cijin Tianhou Temple founded 1673, Kaohsiung's first Mazu temple (Wikipedia);
+   Cihou Fort, Qing-era, guarded the harbor entrance; Kaohsiung (Cihou) Lighthouse: 1883, rebuilt 1918,
+   open to 21:00, closed Mondays; Cijin Beach has black sand; Rainbow Church is an art frame in the
+   seaside park; YouBike: 2.0 free for the first 30 min in Kaohsiung then NT$10/30 min; 2.0E NT$20/30 min for the first 2 hours (Wen-Hung, 2026-10-12). Train numbers on the board are made up. Chu-Kuang Taipei–Kaohsiung NT$650.
+   Sunset in Kaohsiung (calculated): about 18:48 in early July, 18:40 on Aug 1, 18:31 mid-August, 18:17 on Aug 31. */
+const TRIPS = {
+khh:{
+  zh:"高雄兩天一夜", en:"Kaohsiung weekend", music:4,
+  board:{
+    now:"07:40", task:["Find the fast train to Kaohsiung. Tap it, then go to the platform.","找到往高雄的快車。點一下，然後去月台。"],
+    rows:[
+      {t:"07:48", type:"Local", no:"1131", to:"Keelung", via:"Songshan · Nangang", plat:"2B", ok:0, why:["Keelung is north. You want to go south!","基隆在北邊，妳要往南！"]},
+      {t:"07:55", type:"Tze-Chiang", no:"271", to:"Hualien", via:"Yilan", plat:"3B", ok:0, why:["Hualien is on the east coast. Wrong way!","花蓮在東海岸，方向錯了！"]},
+      {t:"08:00", type:"Tze-Chiang", no:"105", to:"Kaohsiung", via:"Taichung · Tainan", plat:"3A", ok:2, arr:"12:05"},
+      {t:"08:12", type:"Chu-Kuang", no:"511", to:"Pingtung", via:"Taichung · Kaohsiung", plat:"4A", ok:1, arr:"13:20", why:["This train stops in Kaohsiung too, but it is slower.","這班車也會停高雄，只是比較慢。"]},
+      {t:"08:20", type:"Local", no:"2219", to:"Taoyuan", via:"Banqiao", plat:"4B", ok:0, why:["Taoyuan is close. This train does not go to Kaohsiung.","桃園很近，這班車不到高雄。"]}
+    ],
+    late:{t:"09:00", type:"Tze-Chiang", no:"119", arr:"13:05"}
+  },
+  ride:[
+    {at:"Taichung", ann:"We are now arriving at Taichung. The doors will open on the left.", zh:"列車即將抵達台中，左側車門開啟。",
+     scene:["A man stands next to me. He shows me his ticket. “Excuse me, I think this is my [[seat]].”","一個男人站到我旁邊，拿車票給我看：「不好意思，這好像是我的位子。」"],
+     opts:[{en:"Check my ticket", zh:"看看我的車票", stat:"kh", ok:["Car 6, seat 14. He is in car 5! We laugh. He walks to the next car.","第六車十四號。他是第五車！我們都笑了，他走去下一節車廂。"], fail:["I can't find my ticket. I stand up and look in my bag. Oh, it is in my pocket.","我找不到車票，站起來翻包包。喔，在口袋裡。"], g:{kh:1}},
+           {en:"Say sorry and move", zh:"說抱歉然後換位子", stat:null, ok:["I move. Later I check my ticket. It WAS my seat! Oh well.","我換了位子。後來看車票，那其實是我的位子！算了。"], g:{co:.3}}]},
+    {at:"Chiayi", ann:"Next station, Chiayi.", zh:"下一站，嘉義。",
+     scene:["A food cart comes down the [[aisle]]. It smells like pork and rice. Railway [[bento]], NT$100.","餐車沿著走道推過來，飄著排骨和白飯的香味。台鐵便當，一個 NT$100。"],
+     opts:[{en:"Buy a bento", zh:"買一個便當", cost:100, ok:["The pork is sweet and the egg is perfect. Train food is the best food.","排骨甜甜的，滷蛋剛剛好。火車上的便當最好吃。"], st:-4},
+           {en:"Wait for Kaohsiung seafood", zh:"留著肚子吃高雄海鮮", ok:["My stomach makes a loud noise. The woman next to me smiles.","我的肚子咕嚕咕嚕叫，隔壁的阿姨笑了。"], energy:-5}]},
+    {at:"Tainan", ann:"Next station, Tainan.", zh:"下一站，台南。",
+     scene:["A tourist across the aisle looks worried. “Excuse me. Is this train going to Kaohsiung?”","走道對面的觀光客看起來很緊張：「不好意思，這班車有到高雄嗎？」"],
+     opts:[{en:"“Yes! I am going there too.”", zh:"「有！我也要去。」", stat:"en", ok:["She smiles. “Thank you!” We talk about [[seafood]] all the way to Kaohsiung.","她笑了：「謝謝！」我們一路聊海鮮聊到高雄。"], fail:["I say, “Yes… Kaohsiung… yes.” She understands. Good enough!","我說：「Yes……Kaohsiung……yes。」她聽懂了。夠好了！"], g:{en:1, co:1}},
+           {en:"Nod and smile", zh:"點頭微笑", ok:["She nods back. She looks less worried.","她也點點頭，看起來沒那麼緊張了。"], g:{co:.2}}]}
+  ],
+  /* Cijin island. x,y on a 300×360 map; links: [node, minutes on foot, energy]. Hills cost more. */
+  map:{
+    start:"pier", arriveMin:60, ferry:40, sunsets:[["07-25","18:45"],["08-05","18:40"],["08-20","18:30"],["12-31","18:20"]], close:"21:00", energyBase:50,
+    nodes:{
+      pier:{x:150, y:58, zh:"旗津渡輪站", en:"Cijin Ferry Pier", spr:"boat"},
+      oldst:{x:132, y:108, zh:"旗津老街", en:"Cijin Old Street", spr:"squid"},
+      temple:{x:168, y:96, zh:"旗津天后宮", en:"Tianhou Temple", spr:"temple"},
+      bikes:{x:110, y:140, zh:"租腳踏車", en:"Bike rental", spr:"bike"},
+      fort:{x:206, y:40, zh:"旗後砲台", en:"Cihou Fort", spr:"fort", hill:true},
+      light:{x:236, y:72, zh:"高雄燈塔", en:"Kaohsiung Lighthouse", spr:"lighthouse", hill:true},
+      beach:{x:74, y:200, zh:"旗津海水浴場", en:"Cijin Beach", spr:"wave"},
+      rainbow:{x:60, y:268, zh:"彩虹教堂", en:"Rainbow Church", spr:"rainbow"}
+    },
+    links:[["pier","oldst",8,3],["pier","temple",6,2],["oldst","temple",5,2],["oldst","bikes",8,3],["oldst","beach",15,5],
+           ["pier","fort",25,14],["fort","light",15,10],["temple","light",30,16],["bikes","beach",10,3],["beach","rainbow",20,6],["bikes","rainbow",28,8]],
+    visits:{
+      oldst:{min:45, scene:["The street smells of the sea and [[grilled|grill]] [[squid]]. A tourist points at a squid and asks me, “What is this?”","整條街都是海的味道和烤魷魚香。一個觀光客指著魷魚問我：「這是什麼？」"],
+        opts:[{en:"“It is squid! It is [[delicious]]. Try it!”", zh:"「這是魷魚！很好吃，試試看！」", stat:"en", ok:["He buys two and gives me one. “For my teacher!” he says.","他買了兩串，送我一串。他說：「給我的老師！」"], fail:["I try, but I forget the word. I make an octopus face. He laughs and buys one.","我想說，可是忘了那個字，只好做出章魚的表情。他笑著買了一串。"], g:{en:1.2, co:1}, energy:8},
+              {en:"Buy a seafood lunch", zh:"買海鮮午餐", cost:250, ok:["Shrimp, clams and fried fish. I eat everything.","鮮蝦、蛤蜊、炸魚，我全部吃光光。"], energy:15, st:-4}]},
+      temple:{min:30, scene:["Tianhou Temple is very old. People built it in 1673, for Mazu, the [[goddess]] of the sea. A visitor asks, “Who is Mazu?”","天后宮非常古老，1673 年就蓋好了，供奉海上的女神媽祖。一位遊客問：「媽祖是誰？」"],
+        opts:[{en:"“She protects people on the sea, like fishermen.”", zh:"「她保護在海上的人，像是漁夫。」", stat:"en", ok:["“Like a [[lifeguard|lifeguard]] for the whole sea!” he says. Yes, exactly.","「像是整片海的救生員！」他說。對，就是這樣。"], fail:["“Mazu… sea… help.” He nods slowly. I think he understands.","「媽祖……海……幫忙。」他慢慢點頭，應該懂了吧。"], g:{en:1, kh:.6}, card:"temple"},
+              {en:"Look quietly at the old stones", zh:"安靜地看著那些老石頭", ok:["The stone steps are very old. Many people walked here before me.","石階非常古老。在我之前，已經有好多人走過這裡。"], g:{kh:.6}, st:-3, card:"temple"}]},
+      bikes:{min:10, scene:["There is a [[YouBike]] station here. A regular YouBike is free for the first 30 minutes in Kaohsiung. An [[electric|electric]] one costs NT$20 for every 30 minutes.","這裡有 YouBike 站。高雄的一般 YouBike 前 30 分鐘免費；電輔車每 30 分鐘 NT$20。"],
+        opts:[{en:"Take an electric YouBike for two hours (NT$80)", zh:"騎電輔 YouBike 兩小時（NT$80）", cost:80, ok:["I ride along the sea. With a little help from the motor, flat roads are easy!","我沿著海邊騎，有馬達幫一點忙，平路好輕鬆！"], bike:"e"},
+              {en:"Take a regular YouBike for two hours (NT$30)", zh:"騎一般 YouBike 兩小時（NT$30）", cost:30, ok:["I ride along the sea. My legs work, but it is faster than walking.","我沿著海邊騎。腳要出力，不過比走路快。"], bike:"p", g:{fi:.4}},
+              {en:"No, I like to walk", zh:"不用，我喜歡走路", ok:["My legs are strong. Let's go!","我的腿很有力，出發！"]}]},
+      fort:{min:35, scene:["Cihou Fort sits on the hill. Soldiers watched the [[harbor]] from here a long time ago. The stairs are steep.","旗後砲台在山丘上，很久以前士兵從這裡守著港口。樓梯很陡。"],
+        opts:[{en:"Climb to the top", zh:"爬到最上面", stat:"fi", ok:["At the top, I see ships come into the harbor. Big ones!","在最上面，我看到船開進港口，好大的船！"], fail:["I stop three times on the stairs. But I make it.","我在樓梯上停了三次，但還是爬上去了。"], g:{fi:1.2}, card:"fort", energy:-6}]},
+      light:{min:30, big:true},
+      beach:{min:40, scene:["Cijin Beach has black sand. The sun is hot, and the waves are loud.","旗津海水浴場的沙是黑色的。太陽很大，浪聲很響。"],
+        opts:[{en:"Take a photo for Mom", zh:"拍一張照片給媽媽", stat:"sty", ok:["Black sand, blue sea, white waves. Mom says, “Beautiful! Wear a hat!”","黑沙、藍海、白浪。媽媽說：「好漂亮！記得戴帽子！」"], fail:["My thumb is in the photo. Mom loves it anyway.","照片裡有我的大拇指。媽媽還是很喜歡。"], g:{sty:.8}, card:"beach"},
+              {en:"Sit in the shade and rest", zh:"在樹蔭下休息", ok:["Under a palm tree, I close my eyes for ten minutes.","在椰子樹下，我閉上眼睛休息十分鐘。"], energy:12, st:-5}]},
+      rainbow:{min:30, scene:["The Rainbow Church is a big frame with rainbow colors, next to the sea. There is a line for photos.","彩虹教堂是海邊一個彩虹色的大框架，拍照要排隊。"],
+        opts:[{en:"Wait in line for a photo", zh:"排隊拍照", stat:"sty", min:20, ok:["A girl takes my photo. I stand in the middle of the rainbow. Perfect!","一個女生幫我拍照，我站在彩虹正中間。完美！"], fail:["The wind blows my hair into my face. It is a funny photo.","風把頭髮吹到我臉上，照片很好笑。"], g:{sty:1, co:.5}, card:"rainbow"},
+              {en:"Take a photo from the side", zh:"從旁邊拍就好", ok:["Fewer people here. A quiet photo of the rainbow and the sea.","這裡人比較少。一張安靜的彩虹和大海。"], card:"rainbow"}]}
+    },
+    big:{ /* the lighthouse at sunset */
+      early:["The lighthouse is white and has eight sides. The sun is still high. Sunset is at {t}.","燈塔是白色的八角形。太陽還很高，日落時間是 {t}。"],
+      climb:["The last part of the hill is very steep. My legs are heavy.","山坡最後一段非常陡，我的腿好重。"],
+      win:["The sun goes down into the sea. The sky turns orange, then pink. Ships turn on their lights. I forget to take a photo. Then I take ten.","太陽沉進海裡，天空變成橘色，然後是粉紅色。船一艘艘亮起燈。我忘了拍照，接著一口氣拍了十張。"],
+      late:["The sun is already down. But the city lights are on, and the lighthouse light turns above me. It is beautiful too.","太陽已經下山了。可是城市的燈都亮了，燈塔的光在我頭上轉。這樣也很美。"],
+      tired:["My legs say no. I sit on a step halfway up and watch the sky from there. Next time, I will save my energy.","我的腿說不行了。我坐在半路的台階上，從那裡看天空。下次要留一點體力。"],
+      need:20
+    },
+    /* where to sleep: pay for a bed, or stay free with a friend */
+    stay:{q:["Where do I sleep tonight?","今晚要住哪裡？"], opts:[
+      {id:"hostel", zh:"青年旅館的床位（NT$650）", en:"A bed in a hostel (NT$650)", cost:650},
+      {id:"hotel", zh:"商務旅館的單人房（NT$1,800）", en:"A room in a business hotel (NT$1,800)", cost:1800},
+      {id:"friend", zh:"住 Ben 表姊家（免費）", en:"Stay with Ben's cousin (free)", cost:0, hearts:{ben:30},
+       why:["Ben and I are not close enough yet.","和 Ben 還不夠熟。"]}]},
+    hotel:{scene:["The hotel room is small and quiet. A hot shower, a soft bed, and the city lights in the window.","旅館房間不大，很安靜。熱水澡、軟軟的床，窗外是城市的燈光。"],
+      opts:[{en:"Sleep early", zh:"早點睡", ok:["I sleep for nine hours. Perfect.","我睡了九個小時，完美。"], st:-10}]},
+    friend:{scene:["Ben's cousin Hsin-yi lives near the Love River. She makes me a bowl of noodles. “Tomorrow, go to Pier-2,” she says.","Ben 的表姊心怡住在愛河附近，她煮了一碗麵給我吃。她說：「明天去駁二吧。」"],
+      opts:[{en:"Talk with her until late", zh:"和她聊到很晚", ok:["We talk about work, family and travel. Kaohsiung feels like home now.","我們聊工作、家人和旅行。高雄現在感覺像家一樣。"], g:{co:.6, kh:.6}, h:{ben:6}},
+            {en:"Thank her and sleep", zh:"謝謝她，然後去睡", ok:["Her sofa is very soft. I sleep well.","她家的沙發好軟，我睡得很好。"], st:-6, h:{ben:3}}]},
+    night:{scene:["At the [[hostel]], a traveler from Japan asks me, “Where can I eat tonight?”","在青年旅館，一個日本旅客問我：「今晚可以去哪裡吃東西？」"],
+      opts:[{en:"Tell her about the night market", zh:"跟她介紹夜市", stat:"en", ok:["I draw a map for her. She gives me a little Japanese candy. Friends!","我幫她畫了一張地圖，她送我一顆日本糖果。交到朋友了！"], fail:["I say “night market” three times and point. She finds it!","我說了三次「night market」，再用手指方向。她找到了！"], g:{en:1, co:1}},
+            {en:"Go to sleep early", zh:"早點睡", ok:["I fall asleep before my head is on the pillow.","頭還沒碰到枕頭我就睡著了。"], st:-6}]}
+  },
+  /* day 2: a walk in Pier-2 Art Center with clues */
+  walk:{
+    intro:["The next morning, I walk around [[Pier-2]] Art Center. Old [[warehouses|warehouse]] by the harbor are now full of art. I have three clues for photos.","隔天早上，我在駁二藝術特區散步。港邊的老倉庫現在都是藝術。我有三個拍照線索。"],
+    clues:[
+      {q:["Find something very big and made of [[metal]].","找一個很大、用金屬做的東西。"], a:"statue"},
+      {q:["Find something that trains used a long time ago.","找一個火車很久以前會用到的東西。"], a:"tracks"},
+      {q:["Find a [[painting]] on a wall.","找一幅畫在牆上的畫。"], a:"mural"}
+    ],
+    pics:[
+      {id:"statue", zh:"巨大的金屬雕塑", en:"giant metal sculpture", spr:"robot"},
+      {id:"ice", zh:"冰淇淋車", en:"ice cream cart", spr:"icecream"},
+      {id:"tracks", zh:"舊鐵軌", en:"old railway tracks", spr:"tracks"},
+      {id:"bike", zh:"腳踏車", en:"bicycle", spr:"bike"},
+      {id:"mural", zh:"牆上的壁畫", en:"wall mural", spr:"mural"},
+      {id:"door", zh:"倉庫的大門", en:"warehouse door", spr:"door"}
+    ],
+    done:["Three photos, three clues. The sun is hot, so I buy a lemon drink and take the light rail to the station.","三張照片、三個線索。太陽好大，我買了一杯檸檬飲料，搭輕軌去車站。"],
+    home:["On the train home, I sit by the window again. The fields turn gold, then dark. I sleep until Taipei.","回程的火車上，我又坐在窗邊。田野變成金色，然後暗下來。我一路睡到台北。"]
+  },
+  costs:{ticket:843, ticketSlow:650, mrt:35, food:0},
+  cards:{
+    window:{zh:"窗外的南台灣", en:"The window seat, going south"},
+    fort:{zh:"旗後砲台", en:"Cihou Fort"}, temple:{zh:"天后宮的老石階", en:"Old steps at Tianhou Temple"},
+    beach:{zh:"黑沙海灘", en:"Black sand beach"}, rainbow:{zh:"彩虹教堂", en:"Rainbow Church"},
+    sunset:{zh:"燈塔的夕陽", en:"Sunset at the lighthouse"}, nightlight:{zh:"燈塔的夜景", en:"The lighthouse at night"},
+    pier2:{zh:"駁二散步", en:"A walk at Pier-2"}
+  }
+}};
+
+/* ==== art/sprites.js ==== */
+/* pixel sprites: one letter per pixel, palette in core.js (PAL). 12×12 unless noted. */
+const SPR = {
+  /* people (16×16 for Mia, 12×12 for others) */
+  mia:["....hhhhhhh.....","...hhhhhhhhh....","..hhhhhhhhhhh...","..hhsssssssshh..","..hhsssssssshh..","..hhskssssksh...","..hhsssssssshh..","..hhrsssssrshh..","..hh.sskkss.hh..","...h..ssss..h...","......ssss......","....bbbbbbbb....","...bbbbwwbbbbb..","..bbbbbwwbbbbbb.","..bbbbbbbbbbbbb.","..bbbbbbbbbbbbb."],
+  mom:["...NNNNNN...","..NNNNNNNN..","..NssssssN..","..NskssksN..","..NssssssN..","...srsssr...","....skks....","....ssss....","...pppppp...","..pppwwppp..","..pppppppp..","..pppppppp.."],
+  leo:["...kkkkkk...","..kkkkkkkk..","..kssssssk..","..skssssks..","..ssssssss..","...ssksss...","....ssss....","....ssss....","...GGGGGG...","..GGGyyGGG..","..GGGGGGGG..","..GGGGGGGG.."],
+  ben:["...NNNNN....","..NNNNNNN...","..NsssssN...","..skssksss..","..ssssssss..","..sskkkss...","...ssssss...","....ssss....","...uuwwuu...","..uuuwwuuu..","..uuuuuuuu..","..uuuuuuuu.."],
+  ting:["..hhhhhhhh..",".hhhhhhhhhh.",".hhsssssshh.",".hskssssksh.",".hhsssssshh.",".hhrsssssrh.",".hh.skks.hh.",".h..ssss..h.","...xxxxxx...","..xxxxxxxx..","..xxxxxxxx..","..xxxxxxxx.."],
+  chen:["...eeeeee...","..eeeeeeee..","..essssssse.","..skssssks..","..ssssssss..","...srssrs...","....skks....","....ssss....","..wwwwwwww..","..wwrrrrww..","..wwwwwwww..","..wwwwwwww.."],
+  cat:["............","..w......w..","..ww....ww..",".wwwwwwwwww.",".wkwwwwwwkw.",".wwwwppwwww.",".wwwwwwwwww.","..wwwwwwww..","..wwwwwwwww.","..wwwwwwwwww","..ww.ww.ww..","............"],
+  /* activities */
+  book:["............",".kkkkkkkkkk.",".kbbbbkbbbbk.".slice(0,12),".kbwwbkbwwbk",".kbbbbkbbbbk",".kbwwbkbwwbk",".kbbbbkbbbbk",".kbwwbkbwwbk",".kbbbbkbbbbk",".kkkkkkkkkkk","............","............"],
+  mat:["............","............","............","....kk......","...kssk.....","....kk..kk..","...kkkkkks..","..kk.kk.....","..k...kk....","pppppppppppp","pppppppppppp","............"],
+  pot:["............","...e..e.e...","....e.e..e..","............","..kkkkkkkk..",".kEEEEEEEEk.","kkEEEEEEEEkk",".kEEEEEEEEk.",".kEEEEEEEEk.","..kEEEEEEk..","...kkkkkk...","............"],
+  camera:["............","....kkk.....","kkkkkkkkkkkk","kEEEEEEEEEEk","kEEkkkkEEwEk","kEkbbbbkEEEk","kEkbllbkEEEk","kEkbbbbkEEEk","kEEkkkkEEEEk","kEEEEEEEEEEk","kkkkkkkkkkkk","............"],
+  laptop:["............","..kkkkkkkk..","..kllllllk..","..kllllllk..","..kllllllk..","..kllllllk..","..kkkkkkkk..",".keeeeeeeek.","keeeeeeeeeek","kkkkkkkkkkkk","............","............"],
+  lib:["............","kkkkkkkkkkkk","krbgyrbgyrbk","krbgyrbgyrbk","krbgyrbgyrbk","kkkkkkkkkkkk","kgyrbgyrbgyk","kgyrbgyrbgyk","kgyrbgyrbgyk","kkkkkkkkkkkk","............","............"],
+  chat:["............",".kkkkkk.....","kwwwwwwk....","kwkkwkwk....","kwwwwwwk....",".kkkwkk.....","...kk.kkkkkk","....kbbbbbbk","....kbkkbkbk","....kbbbbbbk","....kkkkbkk.","........kk.."],
+  bag:["............","....kkkk....","...k....k...","...k....k...",".kkkkkkkkkk.",".kxxxxxxxxk.",".kxxxyyxxxk.",".kxxxxxxxxk.",".kxxxxxxxxk.",".kxxxxxxxxk.",".kkkkkkkkkk.","............"],
+  cup:["............","...e.e.e....","....e.e.....","............",".kkkkkkkk...",".kwwwwwwkkk.",".kwnnnnwk.k.",".kwnnnnwk.k.",".kwwwwwwkkk.","..kwwwwk....","kkkkkkkkkk..","............"],
+  model:["..hhhh......",".hhhhhh.....",".hssssh.....",".hskskh.....","..ssss......","...ss...k...",".pppppp.kk..","pp.pppp..k..","p..pppp.....","...p..p.....","...p..p.....","..kk..kk...."],
+  boba:["......k.....","......k.....","...kkkkkk...","..kwwwwwwk..","..kcccccck..","..kcccccck..","..kcccccck..","..kckckcck..","..kckkcckk..","...kckkck...","...kkkkkk...","............"],
+  lantern:[".....kk.....","....kkkk....","...rrrrrr...","..rryyyyrr..",".rrrrrrrrrr.",".rryyyyyyrr.",".rrrrrrrrrr.","..rryyyyrr..","...rrrrrr...","....kkkk....",".....yy.....",".....y......"],
+  mic:["............","....kkkk....","...kEEEEk...","...kEeEEk...","...kEEEEk...","....kkkk....",".....kk.....",".....kk.....",".....kk.....","....kkkk....","...kkkkkk...","............"],
+  bowl:["...e..e.....","....e..e....","............",".wwwwwwwwww.","kkkkkkkkkkkk","kwwwwwwwwwwk",".kwwrwwrwwk.",".kwwwwwwwwk.","..kwwwwwwk..","...kkkkkk...","....kkkk....","............"],
+  phone:["...kkkkkk...","...kllllk...","...kllllk...","...klsslk...","...klsslk...","...kllllk...","...kllllk...","...kllllk...","...kllllk...","...kkkkkk...","...kkwkkk...","............"],
+  bed:["............","............","k...........","k...........","kww.........","kwwppppppppk","kpppppppppk.".padEnd(12,"."),"kkkkkkkkkkkk","k..........k","k..........k","............","............"],
+  bike:["............","............","......kk....","..k..k......","...kkkkk....","..k.k..kk...",".kkk.k.kkk..","k..kk.k...k.","k...k.k...k.","k...k.k...k.",".kkk...kkk..","............"],
+  train:["............",".kkkkkkkkkk.","kyyyyyyyyyyk","kllkllkllkyk","kllkllkllkyk","kyyyyyyyyyyk","kuuuuuuuuuuk","kyyyyyyyyyyk","kkkkkkkkkkkk",".kk.kk..kk..","eeeeeeeeeeee","............"],
+  sun:["............",".....y......",".y...y...y..","..y.....y...","....yyy.....","yy.yyyyy.yy.","...yyyyy....","....yyy.....","..y.....y...",".y...y...y..",".....y......","............"],
+  sick:["............","..kkkkkkkk..",".kssssssssk.",".ksksssksk..".padEnd(12,"."),".kssssssssk.",".ksrrssrrsk.",".kssskkssk..".padEnd(12,"."),"..kssssssk..","..lllllllll.",".llllllllll.",".llllllllll.","............"],
+  rain:["............","...eeee.....","..eeeeeee...",".eeeeeeeeee.",".eeeeeeeeee.","..eeeeeeee..","............","..l..l..l...",".l..l..l..l.","..l..l..l...",".l..l..l....","............"],
+  coin:["............","....kkkk....","...kyyyyk...","..kyyttyyk..","..kytyytyk..","..kytyytyk..","..kytyytyk..","..kyyttyyk..","...kyyyyk...","....kkkk....","............","............"],
+  /* trip */
+  boat:["............",".....k......",".....kww....",".....kwww...",".....kwwww..",".....k......","kkkkkkkkkkk.",".kwwwbwwwk..","..kkkkkkk...","bbbbbbbbbbbb","b.bb.bb.bb.b","............"],
+  squid:["............","....kkkk....","...kwwwwk...","..kwwwwwwk..","..kwkwwkwk..","..kwwwwwwk..","..kwwwwwwk..","..kkkkkkkk..","..k.k.k.k...",".k.k.k.k.k..","..k...k.....","............"],
+  temple:["............","kk........kk",".krrrrrrrrk.","rrrrrrrrrrrr",".kyyyyyyyyk.",".krrkyykrrk.",".krrkyykrrk.",".krrkyykrrk.",".krrkkkkrrk.","eeeeeeeeeeee","eeeeeeeeeeee","............"],
+  fort:["............","............","..k...k...k.","..kkkkkkkkk.","..keeeeeeek.","..keeeeeeek.","kkkkkk.kkkkk".slice(0,12),"keeekkkkeeek","keeeekkeeeek","keeeekkeeeek","gggggggggggg","GGGGGGGGGGGG"],
+  lighthouse:["....yyyy....","...kwwwwk...","...kllllk...","...kkkkkk...","....kwwk....","....kwwk....","...kwwwwk...","...kwwwwk...","...kwwwwk...","..kwwwwwwk..","gggggggggggg","GGGGGGGGGGGG"],
+  wave:["............","............","..bbb.......",".bwwbb..bbb.","bb..bbbbwwbb","b....bbb..bb","............","bbbbbbbbbbbb","kkkkkkkkkkkk","kEkEkEkEkEkE","EkEkEkEkEkEk","............"],
+  rainbow:["............","...rrrrrr...","..roooooor..",".royyyyyyor.","royggggggyor","roygb..bgyor","roygb..bgyor","roygb..bgyor","roygb..bgyor","roygb..bgyor","bbbbbbbbbbbb","............"],
+  robot:["....kkkk....","...keeeek...","...kekkek...","...keeeek...","....kkkk....","..kkeeeekk..",".keeeeeeeek.",".kekeeeekek.",".kekeeeekek.","...keeeek...","...ke..ek...","..kkk..kkk.."],
+  icecream:["....pppp....","...pppppp...","...pwpppp...","....pppp....","....ytty....","....ytty....",".....yy.....","kkkkkkkkkkkk","kxxxxxxxxxxk","kwwwwwwwwwwk","kxxxxxxxxxxk",".k.k....k.k."],
+  tracks:["n.n..n..n.n.".slice(0,12),"eeeeeeeeeeee","n..n..n..n..","n..n..n..n..","eeeeeeeeeeee","n..n..n..n..","...gg.......","..gGgg......","n..n..n..n..","eeeeeeeeeeee","n..n..n..n..","............"],
+  mural:["kkkkkkkkkkkk","kbbbbbbbbbbk","kbbyybbbbbbk","kbbyybbbbbbk","kbbbbbbbgbbk","kbbbbbbgggbk","kbbbbbgggggk","kbgbbgggggk.".padEnd(12,"k"),"kgggggggggggk".slice(0,12),"kkkkkkkkkkkk","eeeeeeeeeeee","eeeeeeeeeeee"],
+  door:["kkkkkkkkkkkk","knnnnnnnnnnk","knkkkkkkkknk","knkNNNNNNknk","knkNNNNNNknk","knkkkkkkkknk","knkNNNNNNknk","knkNNNNNNknk","knkkkkkkkknk","knnnnnnnnnnk","eeeeeeeeeeee","............"],
+  lock:["............","....kkkk....","...k....k...","...k....k...","..kkkkkkkk..","..kyyyyyyk..","..kyyykyyk..","..kyyykyyk..","..kyyyyyyk..","..kkkkkkkk..","............","............"]
+};
+
+/* ==== engine/core.js ==== */
+/* =========================================================
+   WINDOW SEAT: THE GAME — core helpers (shared by every stage)
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const PREFIX = "wsg-";
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(PREFIX+k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(PREFIX+k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(PREFIX+k); }catch(e){} }
+};
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const pad = n => String(n).padStart(2,"0");
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const fmt = n => (n < 0 ? "−" : "") + "NT$" + Math.abs(Math.round(n)).toLocaleString("en-US");
+let RNG = Math.random;  /* swapped for a seeded one by the balance simulator */
+const rand = () => RNG();
+const pick = a => a[Math.floor(rand()*a.length)];
+
+/* ---------------- language ----------------
+   Menus start in Chinese; a toggle switches them to English. Story text is always English. */
+let LANG = store.get("lang", "zh");
+const T = k => { const e = UI[k]; return e ? (e[LANG] != null ? e[LANG] : e.zh) : k; };
+const N = o => o ? (LANG === "en" ? (o.en || o.zh) : (o.zh || o.en)) : "";
+
+/* ---------------- story markup: [[shown|key]] opens a gloss ---------------- */
+const RX = /\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]/g;
+const plain = s => String(s).replace(RX, "$1");
+function mk(s){
+  return esc(s).replace(RX, (m, disp, key)=>{
+    key = key || disp.toLowerCase();
+    const seen = (typeof S !== "undefined" && S && S.notes && S.notes.includes(key)) ? " seen" : "";
+    return `<span class="g${seen}" role="button" tabindex="0" data-k="${esc(key)}">${disp}</span>`;
+  });
+}
+function toast(t){ const el = $("#toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(()=>el.classList.remove("on"), 2200); }
+
+/* ---------------- dates ---------------- */
+const D = {
+  parse(s){ const [y,m,d] = s.split("-").map(Number); return new Date(Date.UTC(y, m-1, d)); },
+  iso(dt){ return dt.toISOString().slice(0,10); },
+  add(s, n){ const dt = D.parse(s); dt.setUTCDate(dt.getUTCDate()+n); return D.iso(dt); },
+  wd(s){ return (D.parse(s).getUTCDay() + 6) % 7; },          /* 0 = Monday */
+  day(s){ return D.parse(s).getUTCDate(); },
+  mon(s){ return D.parse(s).getUTCMonth(); },
+  short(s){ const dt = D.parse(s); return LANG === "en" ? `${MON_EN[dt.getUTCMonth()]} ${dt.getUTCDate()}` : `${dt.getUTCMonth()+1}/${dt.getUTCDate()}`; },
+  long(s){ const dt = D.parse(s); return LANG === "en" ? `${WD_EN[D.wd(s)]}, ${MON_EN[dt.getUTCMonth()]} ${dt.getUTCDate()}` : `${dt.getUTCMonth()+1} 月 ${dt.getUTCDate()} 日（${WD_ZH[D.wd(s)]}）`; },
+  storyDate(s){ const dt = D.parse(s); return `${WD_EN[D.wd(s)]}, ${MON_FULL[dt.getUTCMonth()]} ${dt.getUTCDate()}`; }
+};
+const WD_EN = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const WD_ZH = ["一","二","三","四","五","六","日"];
+const MON_EN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MON_FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+/* ---------------- pixel art ----------------
+   Sprites are strings of palette letters, drawn onto small canvases. */
+const PAL = {k:"#2B2536",w:"#FFFFFF",y:"#F4C542",o:"#E58E3A",r:"#D9534F",p:"#E79AB2",g:"#7BBF6A",G:"#3E8E5E",
+  b:"#6FA8DC",B:"#2F5D8A",s:"#F2C9A5",S:"#D9A27F",n:"#8A5A3C",N:"#5B3A26",l:"#9ED9E8",h:"#2E2433",
+  e:"#B7B2A8",E:"#77736B",c:"#F6E7C8",m:"#B784C7",t:"#E8D07A",u:"#4A6FA5",v:"#C9E3A6",x:"#E07A5F"};
+function drawSprite(cv, rows, scale){
+  const h = rows.length, w = rows[0].length; scale = scale || 1;
+  cv.width = w*scale; cv.height = h*scale;
+  const c = cv.getContext("2d"); c.clearRect(0,0,cv.width,cv.height);
+  rows.forEach((r,y)=>{ for(let x=0;x<r.length;x++){ const ch = r[x]; if(ch === "." || !PAL[ch]) continue; c.fillStyle = PAL[ch]; c.fillRect(x*scale,y*scale,scale,scale); } });
+  return cv;
+}
+function spriteHTML(id, cls){ return `<canvas class="${cls||""}" data-spr="${esc(id)}"></canvas>`; }
+function paintSprites(root){
+  (root || document).querySelectorAll("canvas[data-spr]").forEach(cv=>{ const g = SPR[cv.dataset.spr]; if(g) drawSprite(cv, g); });
+}
+
+/* ---------------- 8-bit music (the Window Seat books' chiptune player) ---------------- */
+const Music = (()=>{
+  const TR = TRACKS;
+  function midi(n){ const m = /^([A-G])(#?)(\d)$/.exec(n); return 12*(+m[3]+1) + {C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]] + (m[2]?1:0); }
+  function parse(str){
+    const t = str.split(/\s+/).filter(x=>x && x!=="|"); const ev = {}; let last = null;
+    t.forEach((k,i)=>{ if(k==="-"){ last=null; return; } if(k==="_"){ if(last) last.len++; return; } last = {m:midi(k), len:1}; ev[i] = last; });
+    return {n:t.length, ev};
+  }
+  TR.forEach(t=>{ t.L = parse(t.lead); t.B = parse(t.bass); });
+  let ctx=null, out=null, lp=null, timer=null, cur=-1, step=0, nextT=0, noise=null, p25=null, keeper=null;
+  let vol = store.get("vol", 55) / 100;
+  function silentWav(){
+    const n = 4000, buf = new ArrayBuffer(44+n), v = new DataView(buf), w = (o,s)=>{ for(let i=0;i<s.length;i++) v.setUint8(o+i,s.charCodeAt(i)); };
+    w(0,"RIFF"); v.setUint32(4,36+n,true); w(8,"WAVE"); w(12,"fmt "); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+    v.setUint32(24,8000,true); v.setUint32(28,8000,true); v.setUint16(32,1,true); v.setUint16(34,8,true); w(36,"data"); v.setUint32(40,n,true);
+    for(let i=0;i<n;i++) v.setUint8(44+i,128);
+    let s = ""; new Uint8Array(buf).forEach(b=> s += String.fromCharCode(b));
+    return "data:audio/wav;base64," + btoa(s);
+  }
+  function unlockIOS(){
+    try{ if(navigator.audioSession) navigator.audioSession.type = "playback"; }catch(e){}
+    try{ if(!keeper){ keeper = new Audio(silentWav()); keeper.loop = true; keeper.setAttribute("playsinline",""); keeper.volume = 0.01; }
+      const pr = keeper.play(); if(pr && pr.catch) pr.catch(()=>{}); }catch(e){}
+  }
+  function init(){
+    const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return false;
+    ctx = new AC(); out = ctx.createGain(); lp = ctx.createBiquadFilter();
+    lp.type = "lowpass"; lp.frequency.value = 3200; lp.connect(out); out.connect(ctx.destination);
+    const M = 40, re = new Float32Array(M), im = new Float32Array(M);
+    for(let n=1;n<M;n++) re[n] = (2/(n*Math.PI)) * Math.sin(n*Math.PI*.25);
+    p25 = ctx.createPeriodicWave(re, im);
+    noise = ctx.createBuffer(1, ctx.sampleRate*.05, ctx.sampleRate);
+    const d = noise.getChannelData(0); for(let i=0;i<d.length;i++) d[i] = Math.random()*2-1;
+    out.gain.value = vol*1.65; return true;
+  }
+  function note(t, m, dur, type, peak){
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    if(type==="p25") o.setPeriodicWave(p25); else o.type = type;
+    o.frequency.value = 440*Math.pow(2,(m-69)/12);
+    g.gain.setValueAtTime(.0001,t); g.gain.linearRampToValueAtTime(peak,t+.01);
+    g.gain.setTargetAtTime(peak*.55,t+.02,.12); g.gain.setTargetAtTime(.0001,t+Math.max(.04,dur-.03),.025);
+    o.connect(g); g.connect(lp); o.start(t); o.stop(t+dur+.25);
+  }
+  function hat(t){
+    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    s.buffer = noise; f.type = "highpass"; f.frequency.value = 7000;
+    g.gain.setValueAtTime(.035,t); g.gain.exponentialRampToValueAtTime(.001,t+.04);
+    s.connect(f); f.connect(g); g.connect(out); s.start(t); s.stop(t+.05);
+  }
+  function tick(){
+    const Tk = TR[cur], sd = 60/Tk.bpm/2;
+    while(nextT < ctx.currentTime + .15){
+      const a = Tk.L.ev[step % Tk.L.n], b = Tk.B.ev[step % Tk.B.n];
+      if(a) note(nextT, a.m, a.len*sd*.95, Tk.lw, Tk.lg);
+      if(b) note(nextT, b.m, b.len*sd*.9, "triangle", Tk.bg);
+      if(Tk.hat && step % 2 === 1) hat(nextT);
+      nextT += sd; step++;
+    }
+  }
+  function play(i){
+    if(!ctx && !init()){ toast(T("noMusic")); return; }
+    unlockIOS(); const r = ctx.resume(); if(r && r.catch) r.catch(()=>{});
+    clearInterval(timer); cur = i; step = 0; nextT = ctx.currentTime + .08;
+    tick(); timer = setInterval(tick, 25); store.set("music", true); ui();
+  }
+  function stop(){ clearInterval(timer); timer = null; cur = -1; if(keeper) keeper.pause(); store.set("music", false); ui(); }
+  function want(i){ if(cur >= 0 && cur !== i) play(i); }  /* switch song only if music is on */
+  function ui(){ $$("[data-music]").forEach(b=>{ b.classList.toggle("on", cur >= 0); b.setAttribute("aria-pressed", cur >= 0); }); }
+  document.addEventListener("visibilitychange", ()=>{
+    if(!ctx || cur < 0) return;
+    if(document.hidden){ clearInterval(timer); ctx.suspend(); }
+    else { ctx.resume().then(()=>{ nextT = ctx.currentTime + .05; timer = setInterval(tick,25); }); }
+  });
+  return { play, stop, want, ui, get cur(){ return cur; } };
+})();
+
+/* ---------------- speech: English voice for messages and announcements ---------------- */
+const SYN = window.speechSynthesis || null;
+let VOICE = null;
+function pickVoice(){
+  if(!SYN) return;
+  const vs = SYN.getVoices().filter(v=>/^en[-_]US/i.test(v.lang) || /^en/i.test(v.lang));
+  VOICE = vs.find(v=>/Samantha|Google US English|Aria|Jenny|Ava|Allison/i.test(v.name)) || vs[0] || null;
+}
+if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
+const sayAs = t => Object.entries(SAY_AS).reduce((x,[w,r])=>x.split(w).join(r), t);
+function say(t){
+  if(!SYN) return; SYN.cancel();
+  const u = new SpeechSynthesisUtterance(sayAs(plain(t)).replace(/[“”]/g,'"').replace(/[’‘]/g,"'"));
+  if(VOICE){ u.voice = VOICE; u.lang = VOICE.lang; } else u.lang = "en-US";
+  u.rate = .9; SYN.speak(u);
+}
+const ICON = {
+  spk:'<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg>',
+  music:'<svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>',
+  gear:'<svg viewBox="0 0 24 24"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.6 7.6 0 0 0-1.7-1L15 3h-4l-.4 2.9a7.6 7.6 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.6 7.6 0 0 0 1.7 1L11 21h4l.4-2.9a7.6 7.6 0 0 0 1.7-1l2.5 1 2-3.5L19.4 13zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>',
+  x:'<svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg>',
+  back:'<svg viewBox="0 0 24 24"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg>'
+};
+
+/* ---------------- gloss popover ---------------- */
+function openGloss(k, anchor){
+  const g = GLOSS[k]; if(!g) return;
+  if(typeof S !== "undefined" && S && !S.notes.includes(k)){ S.notes.push(k); save(); }
+  const p = $("#pop");
+  p.innerHTML = `<button class="ib x" data-close aria-label="close">${ICON.x}</button>
+    <div><span class="w">${esc(g.w || k)}</span>${g.kk ? `<span class="k">${esc(g.kk)}</span>` : ""}
+    <button class="ib" data-say="${esc(g.w || k)}" aria-label="speak">${ICON.spk}</button></div>
+    <div class="z">${esc(g.zh)}</div>${g.d ? `<div class="d">${esc(g.d)}</div>` : ""}`;
+  const r = anchor.getBoundingClientRect();
+  p.style.top = (r.bottom + 8 + 150 > innerHeight ? Math.max(8, r.top - 158) : r.bottom + 8) + "px";
+  p.classList.add("on");
+  anchor.classList.add("seen");
+}
+document.addEventListener("click", e=>{
+  const g = e.target.closest(".g"); if(g){ e.stopPropagation(); openGloss(g.dataset.k, g); return; }
+  const sp = e.target.closest("[data-say]"); if(sp){ say(sp.dataset.say); return; }
+  if(e.target.closest("[data-close]") || !e.target.closest("#pop")) $("#pop").classList.remove("on");
+}, true);
+
+/* ==== engine/sim.js ==== */
+/* =========================================================
+   simulation: state, calendar, day resolution (no DOM here,
+   so the balance simulator can run it in Node)
+   ========================================================= */
+let S = null;
+const STATS = ["en","co","fi","cr","sty","kh"];
+
+function newGame(){
+  return {v:1, stage:STAGE.id, date:STAGE.start, blk:0, phase:"home", day:0,
+    money:STAGE.money, stress:STAGE.stress, st:Object.assign({}, STAGE.stats),
+    hearts:{family:20, leo:20, ben:10, ting:30, chen:10}, flags:{}, locks:{}, seen:{},
+    plan:new Array(14).fill(null), lastPlan:null, sessions:{}, payQ:[], sickLeft:0,
+    workRun:0, lastCls:null, clsRun:0, portfolio:0,
+    notes:[], album:[], diary:[], mlog:{}, thread:[], feed:[], snap:null, done:false, trips:0};
+}
+function save(){ if(S) store.set("save", S); }
+function load(){ const s = store.get("save", null); return s && s.v === 1 ? s : null; }
+
+const blockDate = (S, i) => D.add(S.date, i);
+const monthKey = d => d.slice(0,7);
+function lockOf(S, i){ return S.locks[blockDate(S, i)] || null; }
+function actOf(id){ return ACTS[id] || SPECIAL[id] || null; }
+
+/* can activity `id` go on day i of this block? */
+function canPlace(S, id, i){
+  const a = ACTS[id], date = blockDate(S, i), wd = D.wd(date);
+  if(lockOf(S, i)) return {ok:false, why:"locked"};
+  if(a.days && !a.days.includes(wd)) return {ok:false, why:"days"};
+  if(a.need) for(const k in a.need) if(S.st[k] < a.need[k]) return {ok:false, why:"need", k, v:a.need[k]};
+  if(a.flag && !S.flags[a.flag]) return {ok:false, why:"flag"};
+  if(a.span === 2){ if(i >= 13 || lockOf(S, i+1)) return {ok:false, why:"span"}; }
+  return {ok:true};
+}
+function setPlan(S, i, id){
+  const old = S.plan[i];
+  if(old === "khh") S.plan[i+1] = null;               /* removing a trip frees its second day */
+  if(old === "khh2"){ S.plan[i-1] = null; }
+  if(id && ACTS[id] && ACTS[id].span === 2){ if(S.plan[i+1] === "khh") S.plan[i+2] = null; S.plan[i+1] = "khh2"; }
+  S.plan[i] = id;
+}
+
+/* the money and stress a plan would mean, before it plays */
+function preview(S){
+  let cost = 0, income = 0, stress = S.stress;
+  for(let i=0;i<14;i++){
+    const date = blockDate(S, i), lk = lockOf(S, i), id = lk || S.plan[i] || "free", a = actOf(id);
+    cost += STAGE.living;
+    STAGE.bills.forEach(b=>{ if(D.day(date) === b.day) cost += b.amt; });
+    if(!a) continue;
+    cost += a.cost || 0; if(a.est) cost += a.est;
+    if(a.pay) income += a.pay + (a.wkBonus && D.wd(date) >= 5 ? a.wkBonus : 0);
+    stress = clamp(stress + (a.st || 0) - (id === "khh" || id === "khh2" ? 0 : STAGE.recover), 0, 100);
+    if(id === "khh") stress = clamp(stress - 15, 0, 100);
+  }
+  const cash = S.payQ.filter(p=>p.date <= blockDate(S, 13)).reduce((t,p)=>t+p.amt, 0);
+  return {cost, income, stress, end:S.money - cost + cash};
+}
+
+/* when a job's pay arrives: a set day of the next month, or the same day */
+function payDate(date, a){
+  if(a.cash) return date;
+  const dt = D.parse(date); dt.setUTCDate(1); dt.setUTCMonth(dt.getUTCMonth()+1); dt.setUTCDate(a.payday);
+  return D.iso(dt);
+}
+const chance = (v, need) => clamp(.62 + (v - (need || 10))/60, .55, .96);
+const rankOf = n => n >= RANKS[2] ? 2 : n >= RANKS[1] ? 1 : 0;
+
+/* ---------------- a block opens: messages, choices, locks ---------------- */
+function openBlock(S){
+  S.thread = []; S.pending = [];
+  S.snap = {money:S.money, stress:S.stress, st:Object.assign({}, S.st), hearts:Object.assign({}, S.hearts), notes:S.notes.length, album:S.album.length};
+  EVENTS.filter(e=>e.at === "start").forEach(e=>{
+    if(e.once !== false && S.seen[e.id]) return;
+    if(e.id === "shootOffer" && S.flags.shootLater === S.blk) return;
+    if(!e.when(S)) return;
+    S.seen[e.id] = true;
+    e.msgs.forEach(m=>S.thread.push(m));
+    if(e.fx) e.fx(S);
+    if(e.choice) S.pending.push(e.id);
+  });
+  S.phase = "home"; S.day = 0; save();
+}
+function answer(S, evId, k){
+  const e = EVENTS.find(x=>x.id === evId), o = e.choice.opts[k];
+  const reply = o.fx(S); if(reply) S.thread.push(reply);
+  S.pending = S.pending.filter(x=>x !== evId); clampAll(S); save();
+  return reply;
+}
+function clampAll(S){
+  STATS.forEach(k=> S.st[k] = clamp(S.st[k], 0, 100));
+  Object.keys(S.hearts).forEach(k=> S.hearts[k] = clamp(S.hearts[k], 0, 100));
+  S.stress = clamp(S.stress, 0, 100);
+}
+
+/* ---------------- one day plays ---------------- */
+function runDay(S, i){
+  const date = blockDate(S, i), wd = D.wd(date), mk_ = monthKey(date);
+  const before = {money:S.money, stress:S.stress, st:Object.assign({}, S.st), hearts:Object.assign({}, S.hearts)};
+  const out = {i, date, msgs:[], pay:[], ok:true};
+  const ml = S.mlog[mk_] = S.mlog[mk_] || {acts:{}, earned:0, days:0};
+  ml.days++;
+
+  /* money in: paydays */
+  S.payQ.filter(p=>p.date <= date).forEach(p=>{ S.money += p.amt; out.pay.push(p);
+    out.msgs.push(["bank", `Payday! +NT$${p.amt.toLocaleString("en-US")} from the ${p.src === "dept" ? "department store" : "café"}.`, `發薪日！${p.src === "dept" ? "百貨公司" : "咖啡館"}的薪水 NT$${p.amt.toLocaleString("en-US")} 入帳了。`]); });
+  S.payQ = S.payQ.filter(p=>p.date > date);
+  /* money out: rent, bills, food */
+  STAGE.bills.forEach(b=>{ if(D.day(date) === b.day){ S.money -= b.amt; out.msgs.push(["bank", `Rent and bills: −NT$${b.amt.toLocaleString("en-US")}.`, `房租和水電：−NT$${b.amt.toLocaleString("en-US")}。`]); } });
+  S.money -= STAGE.living;
+
+  /* what happens today */
+  let id = lockOf(S, i);
+  if(!id && S.plan[i] === "khh2") id = "khh2";
+  if(!id && S.sickLeft > 0){ id = "sick"; }
+  if(!id && S.stress > 80 && rand() < .3){ S.sickLeft = 3; id = "sick";
+    out.msgs.push(["family","Mia, you are working too hard. Stay in bed. I am bringing soup.","Mia，妳太累了，躺著休息。我帶湯過去。"]); }
+  if(id === "sick") S.sickLeft--;
+  if(id && S.plan[i] === "khh" && S.plan[i+1] === "khh2") S.plan[i+1] = null;   /* a lost first day cancels the trip */
+  if(!id) id = S.plan[i] || "free";
+  out.id = id;
+  const a = actOf(id);
+
+  if(id === "khh"){ out.trip = "khh"; ml.acts[id] = (ml.acts[id]||0)+1; return finishDay(S, out, before); }
+  if(id === "khh2"){ out.line = "Pier-2 Art Center, then the long train ride home."; ml.acts.khh2 = (ml.acts.khh2||0)+1; S.workRun = 0; return finishDay(S, out, before); }
+
+  /* classes, work, friends, rest */
+  S.money -= a.cost || 0;
+  const oddsV = a.odds ? S.st[a.odds] : 50, need = a.need ? Object.values(a.need)[0] : 10;
+  let p = a.odds ? chance(oddsV, need) : 1;
+  if(a.cls) p = Math.min(.97, p + .04 * rankOf(S.sessions[id] || 0));
+  const good = rand() < p; out.ok = good;
+  let mul = good ? 1 : .5;
+  if(a.cls){
+    const n0 = S.sessions[id] || 0, r0 = rankOf(n0);
+    S.sessions[id] = n0 + 1; mul *= RANK_MUL[r0];
+    if(S.lastCls === id) S.clsRun++; else { S.lastCls = id; S.clsRun = 1; }
+    if(S.clsRun >= 3) mul *= 1.2;
+    const r1 = rankOf(n0 + 1);
+    if(r1 > r0 && RANKUP[id]) out.msgs.push([id === "study" ? "mia" : "teacher", RANKUP[id][0], RANKUP[id][1]]), out.rankUp = r1;
+  } else { S.lastCls = null; S.clsRun = 0; }
+  if(S.stress > 60) mul *= .8;
+  for(const k in (a.g || {})) S.st[k] += a.g[k] * mul * STAGE.gain;
+  S.stress += (a.st || 0) + (good ? 0 : 3) - STAGE.recover;
+  for(const k in (a.h || {})) S.hearts[k] += a.h[k];
+
+  if(a.menu === "work"){
+    S.workRun++;
+    if(S.workRun >= 7){ S.stress += 4; if(S.workRun === 7) out.msgs.push(["mia","Seven work days in a row. I am so tired.","連續上班七天了，好累。"]); }
+    let amt = a.pay + (a.wkBonus && wd >= 5 ? a.wkBonus : 0);
+    if(!good) amt = Math.round(amt * .8);
+    if(a.cash){ S.money += amt; out.cash = amt; }
+    else { S.payQ.push({date:payDate(date, a), amt, src:id}); out.later = {amt, date:payDate(date, a)}; }
+    ml.earned += amt;
+    if(a.port && good) S.portfolio += a.port;
+  } else if(id !== "free") S.workRun = 0;
+  if(id === "free" || id === "rest" || id === "sick" || id === "typhoon") S.workRun = 0;
+  ml.acts[id] = (ml.acts[id]||0)+1;
+  out.line = good ? pick(a.ok) : pick(a.slip || a.ok);
+
+  /* small surprises */
+  for(const e of EVENTS.filter(e=>e.at === "day")){
+    if(e.once !== false && S.seen[e.id]) continue;
+    if(!e.when(S, {date, id, lock:!!lockOf(S,i)})) continue;
+    S.seen[e.id] = true; e.msgs.forEach(m=>out.msgs.push(m)); if(e.fx) e.fx(S); break;
+  }
+  return finishDay(S, out, before);
+}
+function finishDay(S, out, before){
+  clampAll(S);
+  out.d = {money:S.money - before.money, stress:S.stress - before.stress, st:{}, hearts:{}};
+  STATS.forEach(k=>{ const v = S.st[k] - before.st[k]; if(Math.abs(v) >= .05) out.d.st[k] = v; });
+  Object.keys(S.hearts).forEach(k=>{ const v = S.hearts[k] - before.hearts[k]; if(v) out.d.hearts[k] = v; });
+  S.day = out.i + 1; S.feed.push(out);
+  return out;
+}
+
+/* a finished adventure pays out */
+function applyTrip(S, res){
+  S.money -= res.spent;
+  for(const k in res.g) S.st[k] += res.g[k];
+  S.stress += res.stress;
+  res.cards.forEach(c=>{ if(!S.album.includes(c)) S.album.push(c); });
+  for(const k in (res.h || {})) S.hearts[k] += res.h[k];
+  (res.notes || []).forEach(k=>{ if(!S.notes.includes(k)) S.notes.push(k); });
+  S.trips++; clampAll(S);
+  const last = S.feed[S.feed.length-1];
+  if(last && last.trip){ last.line = res.line; last.tripRes = res; last.d = {money:-res.spent, stress:res.stress, st:Object.assign({}, res.g), hearts:Object.assign({}, res.h || {})}; }
+}
+
+/* ---------------- a block closes ---------------- */
+function closeBlock(S){
+  const sn = S.snap, sum = {money:S.money - sn.money, stress:S.stress - sn.stress, st:{}, hearts:{}, notes:S.notes.length - sn.notes, album:S.album.length - sn.album};
+  STATS.forEach(k=>{ const v = S.st[k] - sn.st[k]; if(Math.abs(v) >= .05) sum.st[k] = v; });
+  Object.keys(S.hearts).forEach(k=>{ const v = S.hearts[k] - sn.hearts[k]; if(v) sum.hearts[k] = v; });
+  /* did a month end inside this block? */
+  sum.diary = null;
+  for(let i=0;i<14;i++){ const d = blockDate(S, i), nx = D.add(d, 1); if(monthKey(d) !== monthKey(nx)){ sum.diary = diaryFor(S, monthKey(d)); S.diary.push(sum.diary); } }
+  S.lastPlan = S.plan.slice();
+  S.plan = new Array(14).fill(null); S.feed = [];
+  S.blk++; S.date = D.add(S.date, 14);
+  if(S.blk >= STAGE.blocks) S.done = true;
+  S.phase = S.done ? "end" : "home";
+  save();
+  return sum;
+}
+
+/* Mia's diary page at the end of each month, written at Book 1's level */
+const NUMW = ["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen","twenty"];
+const nw = n => NUMW[n] || String(n);
+function diaryFor(S, mkey){
+  const ml = S.mlog[mkey] || {acts:{}, earned:0}, A = ml.acts, m = MON_FULL[+mkey.slice(5)-1];
+  const n = ids => ids.reduce((t,k)=>t+(A[k]||0), 0);
+  const lines = [`${m} is over. Here is my month.`];
+  const work = n(["dept","cafe","shoot","shootPaid"]), cls = n(["english","yoga","cooking","styling","tutor","study","exchange"]);
+  const fun = n(["boba","nightmkt","ktv","family","callting"]), rest = n(["rest","ride","free","sick","typhoon"]);
+  if(work) lines.push(`I worked ${nw(work)} ${work === 1 ? "day" : "days"}. ${work > 18 ? "That is a lot. My feet are tired!" : "My wallet is happy."}`);
+  else lines.push("I did not work this month. My wallet is sad!");
+  if(n(["english","tutor","study","exchange"])) lines.push("I studied English. Every day I know a few more words.");
+  if(A.cooking) lines.push("In cooking class, I learned to make new [[dishes|dish]].");
+  const sh = (A.shoot||0) + (A.shootPaid||0);
+  if(sh) lines.push(`I did ${nw(sh)} photo ${sh === 1 ? "shoot" : "shoots"}. I am learning to [[pose]].`);
+  if(A.khh) lines.push("The best day: my trip to Kaohsiung. I want to travel more.");
+  if(fun) lines.push(`I saw my friends and family ${nw(fun)} ${fun === 1 ? "time" : "times"}.`);
+  else lines.push("I did not see my friends much. I miss them.");
+  if(A.sick) lines.push("I got sick. Next month, I will rest more.");
+  else if(S.stress > 60) lines.push("I feel tired. I need a slow day soon.");
+  else lines.push("I feel good. Life in Taipei is busy, but it is mine.");
+  if(S.flags.whIdea && mkey === "2025-08") lines.push("Ting's message is still in my head. A [[working holiday]]… in London?");
+  return {month:mkey, lines};
+}
+
+/* ==== engine/ui.js ==== */
+/* =========================================================
+   screens: title, home, planner, play, summary, info pages
+   ========================================================= */
+const screens = ["title","home","plan","play","trip","info"];
+function show(id){ screens.forEach(s=>$("#"+s).classList.toggle("on", s === id)); window.scrollTo(0,0); }
+const statName = k => T(k);
+const fmtD = v => (v > 0 ? "+" : "−") + Math.abs(v).toFixed(Math.abs(v) < 10 && v % 1 ? 1 : 0);
+let selDay = -1, menuTab = "class", playTimer = null, playSpeed = store.get("speed", 1);
+
+/* ---------------- shared bits ---------------- */
+function topBar(){
+  const end = blockDate(S, 13);
+  return `<div class="top"><div class="r1">
+      <span class="date">${D.short(S.date)} – ${D.short(end)}</span>
+      <span class="money${S.money < 0 ? " neg" : ""}">${fmt(S.money)}</span>
+      <span class="row" style="gap:4px"><button class="ib" data-music aria-label="${T("music")}">${ICON.music}</button><button class="ib" data-go="settings" aria-label="${T("settings")}">${ICON.gear}</button></span>
+    </div>
+    <div class="r2"><span>${T("stress")}</span><div class="bar stress"><i style="width:${S.stress}%"></i></div><span class="px">${Math.round(S.stress)}</span></div></div>`;
+}
+function msgHTML(m){
+  const f = FROM[m[0]] || FROM.mia;
+  return `<div class="msg"><div class="from"><span>${esc(N(f))}</span><span class="row" style="gap:4px"><button class="zhb" data-zh>${T("showZh")}</button><button class="ib" style="width:30px;height:30px" data-say="${esc(plain(m[1]))}" aria-label="speak">${ICON.spk}</button></span></div>
+    <div>${mk(m[1])}</div><div class="zht" hidden>${esc(m[2])}</div></div>`;
+}
+function ticksHTML(d, extra){
+  const out = [];
+  if(d.money) out.push(`<span class="${d.money > 0 ? "up" : "dn"}">${d.money > 0 ? "+" : ""}${fmt(d.money)}</span>`);
+  STATS.forEach(k=>{ if(d.st && d.st[k]) out.push(`<span class="${d.st[k] > 0 ? "up" : "dn"}">${statName(k)} ${fmtD(d.st[k])}</span>`); });
+  if(d.stress) out.push(`<span class="${d.stress < 0 ? "up" : "dn"}">${T("stress")} ${fmtD(d.stress)}</span>`);
+  Object.keys(d.hearts || {}).forEach(k=>{ out.push(`<span class="up">♥ ${esc(N(CAST[k]))} ${fmtD(d.hearts[k])}</span>`); });
+  if(extra) out.push(extra);
+  return out.join("");
+}
+function modal(html, onReady){
+  const m = $("#modal"); m.querySelector(".box").innerHTML = html; m.classList.add("on");
+  paintSprites(m); if(onReady) onReady(m.querySelector(".box"));
+}
+function closeModal(){ $("#modal").classList.remove("on"); }
+function askConfirm(msg, yes){
+  modal(`<p style="font-size:17px">${esc(msg)}</p><div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn alt" id="cNo">${T("cancel")}</button><button class="btn" id="cYes">${T("yes")}</button></div>`, box=>{
+    box.querySelector("#cNo").onclick = closeModal; box.querySelector("#cYes").onclick = ()=>{ closeModal(); yes(); };
+  });
+}
+document.addEventListener("click", e=>{
+  const z = e.target.closest("[data-zh]"); if(z){ const t = z.closest(".msg,.scene").querySelector(".zht"); if(t) t.hidden = !t.hidden; return; }
+  const mu = e.target.closest("[data-music]"); if(mu){ if(Music.cur >= 0) Music.stop(); else Music.play(musicFor()); return; }
+  const go = e.target.closest("[data-go]"); if(go){ info(go.dataset.go); return; }
+});
+function musicFor(){
+  const scr = screens.find(s=>$("#"+s).classList.contains("on"));
+  if(scr === "trip") return STAGE.music.trip;
+  if(scr === "plan") return STAGE.music.plan;
+  return STAGE.music.home;
+}
+
+/* ---------------- title ---------------- */
+function renderTitle(){
+  const has = !!load();
+  $("#title").innerHTML = `<canvas id="cover" width="224" height="140"></canvas>
+    <p class="kick">${T("kicker")}</p><h1>Window Seat</h1><p class="zh">${T("titleZh")}</p>
+    <p class="blurb">${T("blurb")}</p>
+    <div class="btns">${has ? `<button class="btn" id="tCont">${T("cont")}</button>` : ""}
+      <button class="btn${has ? " alt" : ""}" id="tNew">${T("start")}</button>
+      <div class="row"><button class="btn alt small" data-music>♪ ${T("music")}</button><button class="btn alt small" id="tLang">${T("langBtn")}</button></div></div>
+    <p class="foot">© 2026 Wen-Hung Fang. All rights reserved.</p>`;
+  drawCover($("#cover")); Music.ui();
+  if(has) $("#tCont").onclick = ()=>{ S = load(); enter(); };
+  $("#tNew").onclick = ()=>{ const go = ()=>{ S = newGame(); openBlock(S); enter(); }; if(has) askConfirm(T("confirmNew"), go); else go(); };
+  $("#tLang").onclick = ()=>{ setLang(LANG === "zh" ? "en" : "zh"); renderTitle(); };
+}
+function setLang(l){ LANG = l; store.set("lang", l); document.documentElement.lang = l === "zh" ? "zh-Hant" : "en"; }
+function drawCover(cv){  /* a train window: Taipei at morning */
+  const c = cv.getContext("2d"), W = 224, H = 140;
+  const g = c.createLinearGradient(0,0,0,H); g.addColorStop(0,"#F6C9A8"); g.addColorStop(.55,"#F9E2B8"); g.addColorStop(1,"#BFD9C8");
+  c.fillStyle = g; c.fillRect(0,0,W,H);
+  c.fillStyle = "#F4C542"; c.beginPath(); c.arc(170,52,16,0,7); c.fill();
+  c.fillStyle = "#8FB3A8"; for(let x=0;x<W;x+=6){ const h = 18 + 10*Math.sin(x*.07) + 6*Math.sin(x*.21); c.fillRect(x, 92-h, 6, h); }
+  c.fillStyle = "#6E8F86"; [[20,30],[44,46],[60,24],[96,60],[104,40],[132,34],[150,52],[188,28],[200,44]].forEach(([x,h])=>c.fillRect(x, 96-h, 14, h));
+  c.fillStyle = "#4E6B64"; c.fillRect(102, 26, 6, 70); c.fillRect(99, 40, 12, 4); c.fillRect(100, 54, 10, 4); c.fillRect(100, 68, 10, 4);  /* a tower */
+  c.fillStyle = "#7BBF6A"; c.fillRect(0,96,W,44);
+  c.fillStyle = "#5FA05A"; for(let x=0;x<W;x+=10) c.fillRect(x, 102 + (x%20 ? 4 : 0), 6, 2);
+  c.fillStyle = "#3A3F47"; c.fillRect(0,0,W,8); c.fillRect(0,H-10,W,10); c.fillRect(0,0,8,H); c.fillRect(W-8,0,8,H); c.fillRect(110,0,4,H);
+  c.fillStyle = "rgba(255,255,255,.25)"; c.fillRect(16,14,30,4); c.fillRect(124,14,22,4);
+}
+function enter(){
+  Music.want(STAGE.music.home);
+  if(S.done) return endScreen();
+  if(S.phase === "play") return resumePlay();   /* a half-played block carries on where it stopped */
+  renderHome();
+}
+
+/* ---------------- home ---------------- */
+function renderHome(){
+  show("home");
+  const stats = STATS.map(k=>`<div class="stat"><div class="n"><span>${statName(k)}</span><span class="px">${Math.floor(S.st[k])}</span></div><div class="bar"><i style="width:${S.st[k]}%"></i></div></div>`).join("");
+  const pend = S.payQ.reduce((t,p)=>t+p.amt, 0);
+  $("#home").innerHTML = topBar() + `
+    <div class="hero">${spriteHTML("mia")}<div><div class="who">Mia</div>
+      <div class="sub">${LANG === "en" ? `Block ${S.blk+1} of ${STAGE.blocks} · Taipei` : `第 ${S.blk+1} / ${STAGE.blocks} 個兩週・台北`}</div>
+      ${pend ? `<div class="sub">${T("pendingPay")}：${fmt(pend)}</div>` : ""}${S.portfolio ? `<div class="sub">${T("portfolio")}：${S.portfolio}</div>` : ""}</div></div>
+    <div class="stats">${stats}</div>
+    ${S.thread.length ? `<h3 style="margin-top:14px">${T("messages")}</h3><p class="muted" style="font-size:13px">${T("tapWord")}</p><div class="thread">${S.thread.map(msgHTML).join("")}</div>` : ""}
+    <div class="menu"><button class="btn" id="hPlan" style="grid-column:1/-1">${T("plan2")}</button>
+      <button class="btn alt" data-go="friends">${T("friends")}</button><button class="btn alt" data-go="notebook">${T("notebook")}</button>
+      <button class="btn alt" data-go="album">${T("album")}</button><button class="btn alt" data-go="settings">${T("settings")}</button></div>`;
+  paintSprites($("#home")); Music.ui();
+  $("#hPlan").onclick = ()=>renderPlan();
+  if(S.pending && S.pending.length) setTimeout(()=>askChoice(S.pending[0]), 300);
+}
+function askChoice(evId){
+  const e = EVENTS.find(x=>x.id === evId); if(!e) return;
+  const m = e.msgs[e.msgs.length-1];
+  modal(`<div class="msg">${mk(m[1])}<div class="zht">${esc(m[2])}</div></div>
+    <h3 style="margin-top:12px">${LANG === "en" ? esc(e.choice.q[0]) : esc(e.choice.q[1])}</h3>
+    <div class="choices">${e.choice.opts.map((o,k)=>`<button class="btn alt" data-opt="${k}">${esc(N(o))}</button>`).join("")}</div>`, box=>{
+    box.querySelectorAll("[data-opt]").forEach(b=> b.onclick = ()=>{ answer(S, evId, +b.dataset.opt); closeModal(); renderHome(); });
+  });
+}
+
+/* ---------------- planner ---------------- */
+function renderPlan(){
+  show("plan"); Music.want(STAGE.music.plan);
+  const pv = preview(S);
+  const cells = i => {
+    const date = blockDate(S, i), lk = lockOf(S, i), id = lk || S.plan[i], a = id ? actOf(id) : null;
+    const cls = ["slot"]; if(id) cls.push("set"); if(lk) cls.push("lock"); if(a && a.menu) cls.push("m-"+a.menu); if(id === "khh2") cls.push("m-explore"); if(i === selDay) cls.push("sel");
+    return `<button class="${cls.join(" ")}" data-i="${i}" ${lk ? "disabled" : ""}><span class="d">${D.day(date)}</span>${a ? spriteHTML(a.spr) : ""}<span class="a">${a ? esc(N(a.s || a)) : `<span class="muted">${T("empty")}</span>`}</span></button>`;
+  };
+  const wk = w => `<div class="cal">${(LANG === "en" ? WD_EN : WD_ZH).map(x=>`<span class="wd">${x}</span>`).join("")}${[0,1,2,3,4,5,6].map(j=>cells(w*7+j)).join("")}</div>`;
+  $("#plan").innerHTML = topBar() + `
+    <button class="btn alt small back" id="pBack">${ICON.back} ${T("back")}</button>
+    <h2>${T("plan2")}</h2><p class="muted" style="font-size:14px">${T("pickDay")}</p>
+    <h3 class="px" style="font-size:14px;margin-top:8px">${T("week1")} · ${D.short(S.date)}</h3>${wk(0)}
+    <h3 class="px" style="font-size:14px;margin-top:10px">${T("week2")} · ${D.short(blockDate(S,7))}</h3>${wk(1)}
+    <div class="tools"><button class="btn alt small" id="pCopy" ${S.lastPlan ? "" : "disabled"}>${T("copyLast")}</button><button class="btn alt small" id="pClear">${T("clear")}</button></div>
+    <div class="preview"><div class="pv"><b>${fmt(pv.cost)}</b><span>${T("cost")}</span></div><div class="pv"><b>${fmt(pv.income)}</b><span>${T("income")}</span></div><div class="pv"><b>${Math.round(pv.stress)}</b><span>${T("estStress")}</span></div></div>
+    <p class="muted" style="font-size:12px;margin-top:-6px">${T("livingCost")}：NT$${STAGE.living} ${T("perDay")}</p>
+    ${pv.end < 0 ? `<p class="warn">${T("negWarn")}</p>` : ""}${pv.stress > 80 ? `<p class="warn">${T("stressWarn")}</p>` : ""}
+    <button class="btn" id="pGo" style="width:100%;margin-top:6px">${T("go")}</button>`;
+  paintSprites($("#plan")); Music.ui();
+  $$("#plan .slot").forEach(b=> b.onclick = ()=>{ const i = +b.dataset.i; if(S.plan[i] === "khh2") selDay = i-1; else selDay = i; openSheet(); renderPlan(); });
+  $("#pBack").onclick = ()=>{ selDay = -1; closeSheet(); renderHome(); };
+  $("#pClear").onclick = ()=>{ S.plan = new Array(14).fill(null); save(); renderPlan(); };
+  $("#pCopy").onclick = ()=>{ copyLast(); save(); renderPlan(); };
+  $("#pGo").onclick = ()=>{ closeSheet(); selDay = -1; startPlay(); };
+}
+function copyLast(){
+  S.plan = new Array(14).fill(null);
+  for(let i=0;i<14;i++){ const id = S.lastPlan[i]; if(!id || id === "khh2" || !ACTS[id]) continue; if(canPlace(S, id, i).ok && !S.plan[i]) setPlan(S, i, id); }
+}
+function whyText(r, a){
+  if(r.why === "days") return `${T("onlyOn")} ${a.days.map(d=>LANG === "en" ? WD_EN[d] : "週"+WD_ZH[d]).join(LANG === "en" ? ", " : "、")}` + (a === ACTS.cafe ? `（${LANG === "en" ? "Tue " + T("closed") : "週二" + T("closed")}）` : "");
+  if(r.why === "need") return `${T("needs")} ${statName(r.k)} ${r.v}`;
+  if(r.why === "flag") return T("notYet");
+  if(r.why === "span") return T("twoDays");
+  return T("locked");
+}
+function openSheet(){
+  const a0 = S.plan[selDay] && actOf(S.plan[selDay]); if(a0 && a0.menu) menuTab = a0.menu;
+  const date = blockDate(S, selDay);
+  const list = Object.entries(ACTS).filter(([id,a])=>a.menu === menuTab).sort((x,y)=>(canPlace(S,y[0],selDay).ok?1:0)-(canPlace(S,x[0],selDay).ok?1:0));
+  const fx = a => {
+    const parts = [];
+    if(a.cost) parts.push(`−NT$${a.cost}`); if(a.est) parts.push(`≈ −NT$${a.est.toLocaleString("en-US")}`);
+    if(a.pay) parts.push(`+NT$${a.pay}${a.wkBonus ? "+" : ""}`);
+    Object.keys(a.g || {}).forEach(k=>parts.push(`${statName(k)}+`));
+    Object.keys(a.h || {}).forEach(k=>parts.push(`♥${N(CAST[k]).split("（")[0].split(" (")[0]}`));
+    if(a.st) parts.push(`${T("stress")}${a.st > 0 ? "+" : "−"}${Math.abs(a.st)}`);
+    return parts.join(" · ");
+  };
+  const sh = $("#sheet .in");
+  sh.innerHTML = `<div class="hd"><b>${D.long(date)}</b><button class="ib" id="shX" aria-label="${T("close")}">${ICON.x}</button></div>
+    <div class="tabs">${MENUS.map(m=>`<button class="tab m-${m}${m === menuTab ? " on" : ""}" data-m="${m}">${T("m_"+m)}</button>`).join("")}</div>
+    <div class="acts">${list.map(([id,a])=>{ const r = canPlace(S, id, selDay);
+      return `<button class="act" data-a="${id}" ${r.ok ? "" : "disabled"}>${spriteHTML(a.spr)}<div><div class="t">${esc(N(a))}${S.plan[selDay] === id ? `<span class="tag">✓</span>` : ""}${a.cls && S.sessions[id] ? `<span class="tag">${T("r"+rankOf(S.sessions[id]))}</span>` : ""}</div>
+        ${a.sub ? `<div class="s">${esc(N(a.sub))}</div>` : ""}<div class="fx">${esc(fx(a))}</div>${r.ok ? "" : `<div class="why">${esc(whyText(r, a))}</div>`}</div></button>`; }).join("")}
+      ${S.plan[selDay] ? `<button class="btn alt small" id="shDel">${T("removeDay")}</button>` : ""}
+      ${S.plan[selDay] && ACTS[S.plan[selDay]] && ACTS[S.plan[selDay]].span !== 2 ? `<button class="btn alt small" id="shFill">${T("fillRest")}</button>` : ""}</div>`;
+  paintSprites(sh);
+  $("#sheet").classList.add("on"); document.body.classList.add("sheet-on");
+  const sl = document.querySelector(`#plan .slot[data-i="${selDay}"]`); if(sl) setTimeout(()=>sl.scrollIntoView({block:"center", behavior:"smooth"}), 50);
+  $("#shX").onclick = ()=>{ closeSheet(); selDay = -1; renderPlan(); };
+  sh.querySelectorAll(".tab").forEach(t=> t.onclick = ()=>{ menuTab = t.dataset.m; openSheet(); });
+  sh.querySelectorAll(".act").forEach(b=> b.onclick = ()=>{
+    setPlan(S, selDay, b.dataset.a); save();
+    let n = selDay + (ACTS[b.dataset.a].span || 1);
+    while(n < 14 && (S.plan[n] || lockOf(S, n))) n++;
+    selDay = n < 14 ? n : -1;
+    if(selDay < 0) closeSheet(); else openSheet();
+    renderPlan();
+  });
+  const del = $("#shDel"); if(del) del.onclick = ()=>{ setPlan(S, selDay, null); save(); openSheet(); renderPlan(); };
+  const fill = $("#shFill"); if(fill) fill.onclick = ()=>{ const id = S.plan[selDay];
+    for(let i=0;i<14;i++) if(!S.plan[i] && canPlace(S, id, i).ok) setPlan(S, i, id);
+    save(); closeSheet(); selDay = -1; renderPlan(); };
+}
+function closeSheet(){ $("#sheet").classList.remove("on"); document.body.classList.remove("sheet-on"); }
+
+/* ---------------- play the two weeks ---------------- */
+function startPlay(){
+  S.phase = "play"; S.day = 0; S.feed = []; save();
+  playShell(); nextDay();
+}
+function playShell(){
+  show("play"); Music.want(STAGE.music.play);
+  $("#play").innerHTML = topBar() + `<h2>${LANG === "en" ? "Two weeks in Taipei" : "台北的兩週"}</h2><div class="feed" id="feed"></div>
+    <div class="playbar"><div class="in"><button class="btn alt small" id="spd">${T("speed")} ×${playSpeed}</button><button class="btn small" id="skip">${T("skip")} ⏩</button></div></div>`;
+  Music.ui();
+  $("#spd").onclick = ()=>{ playSpeed = playSpeed === 1 ? 2 : playSpeed === 2 ? 4 : 1; store.set("speed", playSpeed); $("#spd").textContent = `${T("speed")} ×${playSpeed}`; };
+  $("#skip").onclick = ()=>{ playSpeed = 99; };
+}
+function resumePlay(){
+  clearTimeout(playTimer); playShell();
+  S.feed.forEach(o=>addDayCard(o));
+  const last = S.feed[S.feed.length-1];
+  if(last && last.trip && !last.tripRes){ S.feed.pop(); S.day = last.i;   /* a trip cut short starts again */
+    const out = runDay(S, S.day); save(); addDayCard(out); return goTrip(out); }
+  playTimer = setTimeout(nextDay, 500);
+}
+function goTrip(out){
+  return setTimeout(()=>runTrip(out.trip, res=>{ applyTrip(S, res); save();
+      show("play"); Music.want(STAGE.music.play); refreshTripCard(S.feed[S.feed.length-1]); updateTop();
+      playTimer = setTimeout(nextDay, 600); }), 500);
+}
+function nextDay(){
+  clearTimeout(playTimer);
+  if(S.day >= 14) return endBlock();
+  const out = runDay(S, S.day); save();
+  addDayCard(out);
+  if(out.trip) return goTrip(out);
+  const pause = out.msgs.length ? 1400 : 700;
+  playTimer = setTimeout(nextDay, playSpeed >= 99 ? 30 : pause / playSpeed);
+}
+function dayScene(id){
+  const a = actOf(id) || SPECIAL.free;
+  const bg = {class:"#DCE7F2", work:"#F6E3CC", social:"#F6DCE5", explore:"#D7EEE4", rest:"#E7E1F3"}[a.menu] || (id === "sick" ? "#F2E0DC" : id === "typhoon" ? "#D5DCE6" : "#EFEDE6");
+  return {spr:a.spr, bg};
+}
+function addDayCard(out){
+  const sc = dayScene(out.id), a = actOf(out.id);
+  const extra = out.later ? `<span class="muted">${T("pendingPay")} ${fmt(out.later.amt)} → ${D.short(out.later.date)}</span>` : out.cash ? `<span class="up">+${fmt(out.cash)}</span>` : "";
+  const el = document.createElement("div"); el.className = "day"; el.dataset.i = out.i;
+  el.innerHTML = `<canvas width="56" height="56" style="background:${sc.bg}" data-spr="${sc.spr}"></canvas><div style="flex:1">
+    <div class="dh">${D.long(out.date)} · ${esc(N(a))}${out.ok === false ? " · 😅" : ""}</div>
+    <div class="ln">${out.trip ? `<i class="muted">${LANG === "en" ? "Off to the station…" : "出發去車站……"}</i>` : mk(out.line || "")}</div>
+    <div class="ticks">${ticksHTML(Object.assign({}, out.d, {money:out.cash ? out.d.money - out.cash : out.d.money}), extra)}</div></div>`;
+  $("#feed").appendChild(el);
+  paintSprites(el);
+  out.msgs.forEach(m=>{ const w = document.createElement("div"); w.innerHTML = msgHTML(m); $("#feed").appendChild(w.firstChild); });
+  el.scrollIntoView({block:"end", behavior:"smooth"});
+  updateTop();
+}
+function refreshTripCard(out){
+  const el = $(`#feed .day[data-i="${out.i}"]`); if(!el) return;
+  el.querySelector(".ln").innerHTML = mk(out.line || ""); el.querySelector(".ticks").innerHTML = ticksHTML(out.d);
+}
+function updateTop(){ const t = $("#play .top"); if(t){ t.outerHTML = topBar(); Music.ui(); } }
+function endBlock(){
+  const sum = closeBlock(S);
+  if(playSpeed >= 99) playSpeed = store.get("speed", 1);
+  const hearts = Object.keys(sum.hearts).map(k=>`<span>♥ ${esc(N(CAST[k]))} ${fmtD(sum.hearts[k])}</span>`).join("");
+  modal(`<h2>${T("summary")}</h2>
+    <div class="sum"><span>${T("money")}</span><b class="${sum.money >= 0 ? "up" : "dn"}">${sum.money >= 0 ? "+" : ""}${fmt(sum.money)}</b>
+      <span>${T("stress")}</span><b>${Math.round(S.stress)} (${fmtD(sum.stress || 0)})</b>
+      ${STATS.map(k=>sum.st[k] ? `<span>${statName(k)}</span><b class="up">${fmtD(sum.st[k])}</b>` : "").join("")}</div>
+    ${hearts ? `<div class="ticks" style="display:flex;flex-wrap:wrap;gap:6px;font-size:14px">${hearts}</div>` : ""}
+    <button class="btn" id="sNext" style="width:100%;margin-top:14px">${T("next")}</button>`, box=>{
+    box.querySelector("#sNext").onclick = ()=>{ if(sum.diary) showDiary(sum.diary, after); else after(); };
+  });
+  function after(){ closeModal(); if(S.done) return endScreen(); openBlock(S); renderHome(); Music.want(STAGE.music.home); }
+}
+function showDiary(dy, then){
+  modal(`<h2>${T("diary")}</h2><div class="diary">${dy.lines.map(l=>`<p>${mk(l)}</p>`).join("")}</div>
+    <div class="row" style="margin-top:12px;justify-content:space-between"><button class="btn alt small" data-say="${esc(dy.lines.map(plain).join(" "))}">${ICON.spk}</button><button class="btn" id="dNext">${T("next")}</button></div>`, box=>{
+    box.querySelector("#dNext").onclick = then;
+  });
+}
+
+/* ---------------- end of the slice ---------------- */
+function endScreen(){
+  show("info");
+  const top2 = STATS.slice().sort((a,b)=>S.st[b]-S.st[a]).slice(0,2);
+  $("#info").innerHTML = `<div style="padding-top:20px"><h2>${T("endSlice")}</h2>
+    <div class="hero">${spriteHTML("mia")}<div><div class="who">Mia</div><div class="sub">${fmt(S.money)} · ${T("stress")} ${Math.round(S.stress)}</div>
+    ${S.payQ.length ? `<div class="sub">${T("pendingPay")}：${fmt(S.payQ.reduce((t,p)=>t+p.amt,0))}</div>` : ""}<div class="sub">${statName(top2[0])} ${Math.floor(S.st[top2[0]])} · ${statName(top2[1])} ${Math.floor(S.st[top2[1]])}</div></div></div>
+    <div class="diary" style="margin-top:12px">${LANG === "en"
+      ? "<p>That's July and August. In the full game, Stage 1 runs to the Mid-Autumn Festival on October 6, 2025, and closes with the Mid-Autumn Night Market Stall. Then Mia's working-holiday dream begins.</p>"
+      : "<p>七月和八月結束了。完整版的第一階段會一直玩到 2025 年 10 月 6 日中秋節，以中秋夜市擺攤收尾。接著，Mia 的打工度假夢就要開始了。</p>"}</div>
+    <div class="menu"><button class="btn alt" data-go="album">${T("album")}</button><button class="btn alt" data-go="notebook">${T("notebook")}</button>
+    <button class="btn" id="eNew" style="grid-column:1/-1">${T("newGame")}</button></div></div>`;
+  paintSprites($("#info"));
+  $("#eNew").onclick = ()=>askConfirm(T("confirmNew"), ()=>{ S = newGame(); openBlock(S); enter(); });
+}
+
+/* ---------------- info pages ---------------- */
+let infoBack = null;
+function info(page){
+  if(!S && page !== "settings") return;
+  const from = screens.find(s=>$("#"+s).classList.contains("on"));
+  if(from !== "info") infoBack = from;
+  show("info"); closeSheet();
+  let h = `<div style="padding-top:12px"><button class="btn alt small back" id="iBack">${ICON.back} ${T("back")}</button>`;
+  if(page === "friends"){
+    h += `<h2>${T("friends")}</h2><div class="hearts">${Object.keys(CAST).map(k=>{ const n = Math.floor(S.hearts[k]/20), part = S.hearts[k] % 20;
+      return `<div class="card fr">${spriteHTML(CAST[k].spr)}<div><b>${esc(N(CAST[k]))}</b><div class="h">${"♥".repeat(n)}${"♡".repeat(5-n)}</div><div class="muted" style="font-size:13px">${esc(N(CAST[k].d))}</div></div></div>`; }).join("")}</div>`;
+  } else if(page === "notebook"){
+    h += `<h2>${T("notebook")}</h2>` + (S.notes.length ? `<div class="nb">${S.notes.map(k=>GLOSS[k] ? `<div class="it"><span><b>${esc(GLOSS[k].w || k)}</b> <span class="muted">${esc(GLOSS[k].kk || "")}</span></span><span>${esc(GLOSS[k].zh)}</span></div>` : "").join("")}</div>` : `<p class="muted">${T("notebookEmpty")}</p>`);
+  } else if(page === "album"){
+    const cards = TRIPS.khh.cards;
+    h += `<h2>${T("album")}</h2>` + (S.album.length ? `<div class="album">${S.album.map(c=>`<div class="post"><canvas width="150" height="100" data-card="${c}"></canvas><div class="pt">${esc(N(cards[c] || {zh:c, en:c}))}</div></div>`).join("")}</div>` : `<p class="muted">${T("albumEmpty")}</p>`);
+  } else if(page === "settings"){
+    const th = store.get("theme", "auto");
+    h += `<h2>${T("settings")}</h2><div class="set">
+      <div class="rowi"><span>${T("langSet")}</span><span class="row"><button class="btn small ${LANG === "zh" ? "on" : "alt"}" data-l="zh">中文</button><button class="btn small ${LANG === "en" ? "on" : "alt"}" data-l="en">English</button></span></div>
+      <div class="rowi"><span>${T("musicSet")}</span><button class="btn small alt" data-music>♪ ${T("music")}</button></div>
+      <div class="rowi"><span>${T("themeSet")}</span><span class="row">${["auto","light","dark"].map(t=>`<button class="btn small ${th === t ? "on" : "alt"}" data-th="${t}">${T(t)}</button>`).join("")}</span></div>
+      ${S ? `<div style="padding:10px 0"><b>${T("saveCode")}</b><p class="muted" style="font-size:13px">${T("saveHelp")}</p><textarea id="code" readonly>${esc(exportCode())}</textarea>
+        <div class="row" style="margin-top:6px"><button class="btn small alt" id="cCopy">${T("copy")}</button></div></div>` : ""}
+      <div style="padding:10px 0"><b>${T("load")}</b><textarea id="codeIn" placeholder="…"></textarea><div class="row" style="margin-top:6px"><button class="btn small alt" id="cLoad">${T("load")}</button></div></div></div>`;
+  }
+  $("#info").innerHTML = h + `</div>`;
+  paintSprites($("#info")); Music.ui();
+  $$("#info canvas[data-card]").forEach(cv=>drawCard(cv, cv.dataset.card));
+  $("#iBack").onclick = ()=>{ const b = infoBack || "home"; if(b === "title") renderTitle(), show("title"); else if(b === "plan") renderPlan(); else if(b === "play" || b === "trip") show(b); else if(S && S.done) endScreen(); else renderHome(); };
+  $$("#info [data-l]").forEach(b=> b.onclick = ()=>{ setLang(b.dataset.l); info(page); });
+  $$("#info [data-th]").forEach(b=> b.onclick = ()=>{ store.set("theme", b.dataset.th); applyTheme(); info(page); });
+  const cc = $("#cCopy"); if(cc) cc.onclick = ()=>{ const t = $("#code"); t.select(); try{ navigator.clipboard.writeText(t.value); }catch(e){ document.execCommand("copy"); } toast(T("copied")); };
+  const cl = $("#cLoad"); if(cl) cl.onclick = ()=>{ const s = importCode($("#codeIn").value.trim()); if(!s) return toast(T("badCode")); clearTimeout(playTimer); S = s; save(); toast(T("loaded")); enter(); };
+}
+function exportCode(){ try{ return btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }catch(e){ return ""; } }
+function importCode(c){ try{ const s = JSON.parse(decodeURIComponent(escape(atob(c)))); return s && s.v === 1 && s.st ? s : null; }catch(e){ return null; } }
+function applyTheme(){ const t = store.get("theme", "auto"); if(t === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t); }
+
+/* postcards: little painted scenes */
+function drawCard(cv, id){
+  const c = cv.getContext("2d"), W = cv.width, H = cv.height;
+  const sky = {sunset:["#F28C5B","#F7C77E"], nightlight:["#1B2346","#3B4A7A"], window:["#9CC7E0","#E9F2D8"], fort:["#A8D3EA","#E6F1F5"], temple:["#F5DDB0","#F9EED6"], beach:["#7FC4E8","#D9EEF7"], rainbow:["#8FD0F0","#E0F3FA"], pier2:["#F6D18A","#FBEBC8"]}[id] || ["#ccc","#eee"];
+  const g = c.createLinearGradient(0,0,0,H); g.addColorStop(0, sky[0]); g.addColorStop(1, sky[1]); c.fillStyle = g; c.fillRect(0,0,W,H);
+  const sea = id === "nightlight" ? "#14203F" : "#3E7FB0";
+  if(["sunset","nightlight","fort","beach","rainbow"].includes(id)){ c.fillStyle = sea; c.fillRect(0, H*.62, W, H*.38); }
+  if(id === "sunset"){ c.fillStyle = "#F4C542"; c.beginPath(); c.arc(W*.35, H*.62, 16, Math.PI, 0); c.fill(); c.fillStyle = "rgba(244,197,66,.5)"; c.fillRect(W*.25, H*.66, W*.2, 3); }
+  if(id === "nightlight"){ c.fillStyle = "#fff"; for(let i=0;i<30;i++) c.fillRect((i*37)%W, (i*23)%(H*.5), 1, 1); c.fillStyle = "rgba(255,230,140,.35)"; c.beginPath(); c.moveTo(W*.72,H*.3); c.lineTo(0,H*.1); c.lineTo(0,H*.25); c.fill(); }
+  if(id === "beach"){ c.fillStyle = "#2E2A2A"; c.fillRect(0, H*.8, W, H*.2); c.fillStyle = "#fff"; c.fillRect(0, H*.78, W, 3); }
+  const spr = {sunset:"lighthouse", nightlight:"lighthouse", window:"train", fort:"fort", temple:"temple", beach:"wave", rainbow:"rainbow", pier2:"robot"}[id];
+  if(spr && SPR[spr]){ const t = document.createElement("canvas"); drawSprite(t, SPR[spr], 4); c.drawImage(t, W*.62 - 24, H*.62 - 44); }
+  c.fillStyle = "rgba(255,255,255,.85)"; c.fillRect(0, H-14, W, 14); c.fillStyle = "#2B2536"; c.font = "10px monospace"; c.fillText(id === "window" ? "TAIPEI → KAOHSIUNG" : "KAOHSIUNG · 2025", 6, H-4);
+}
+
+/* ==== engine/trip.js ==== */
+/* =========================================================
+   adventures: explore days are played, not watched.
+   A trip = the window-seat train + a map to explore + a night + a morning walk.
+   ========================================================= */
+let TS = null, rideAnim = 0;
+function sunsetFor(){ const md = TS.date.slice(5); const r = TS.TR.map.sunsets.find(x=>md <= x[0]); return r ? r[1] : TS.TR.map.sunsets[TS.TR.map.sunsets.length-1][1]; }
+const hhmm = m => `${pad(Math.floor(m/60) % 24)}:${pad(Math.round(m % 60))}`;
+const toMin = s => { const [h, m] = s.split(":").map(Number); return h*60 + m; };
+const statNow = k => S.st[k] + ((TS && TS.g[k]) || 0);
+const rollStat = k => rand() < clamp(.35 + statNow(k)/50, .35, .95);
+function tAdd(g, mul){ for(const k in g) TS.g[k] = (TS.g[k] || 0) + g[k] * (mul == null ? 1 : mul); }
+function sceneHTML(pair){ return `<div class="msg scene"><div>${mk(pair[0])}</div><div class="zht" hidden>${esc(pair[1])}</div><div style="text-align:right;margin-top:4px"><button class="zhb" data-zh>${T("showZh")}</button> <button class="ib" style="width:30px;height:30px;vertical-align:middle" data-say="${esc(plain(pair[0]))}">${ICON.spk}</button></div></div>`; }
+
+function runTrip(id, done){
+  const TR = TRIPS[id];
+  TS = {id, TR, done, date:blockDate(S, S.day - 1), spent:0, g:{}, stress:-15, cards:[], energy:0, time:0, bike:false, visited:{}, cur:TR.map.start, sunsetOK:null, train:null};
+  show("trip"); Music.want(TR.music);
+  tripBoard();
+}
+function tripHead(title){
+  return `<div class="top"><div class="r1"><span class="date">${esc(title)}</span><span class="money">${T("cost")} ${fmt(TS.spent)}</span>
+    <button class="ib" data-music aria-label="${T("music")}">${ICON.music}</button></div></div>`;
+}
+function spend(n){ TS.spent += n; }
+
+/* ---------------- 1. the departure board ---------------- */
+function tripBoard(){
+  const B = TS.TR.board; let now = toMin(B.now), sel = -1, boarded = false, tries = 0;
+  const draw = ()=>{
+    $("#trip").innerHTML = tripHead(LANG === "en" ? "Taipei Station" : "台北車站") + `
+      <h2>${LANG === "en" ? "The departure board" : "出發時刻表"}</h2>${sceneHTML(B.task)}
+      <div class="row" style="justify-content:space-between;margin:10px 0"><span class="muted">${T("time")}</span><span class="clock">${hhmm(now)}</span></div>
+      <div class="board"><div class="bh"><span>TIME</span><span>TRAIN · TO</span><span>VIA</span><span>PLAT</span></div>
+        ${B.rows.map((r,k)=>{ const gone = toMin(r.t) <= now;
+          return `<button class="br${k === sel ? " sel" : ""}" data-k="${k}" ${gone ? "disabled style=\"opacity:.35\"" : ""}><span>${r.t}</span><span>${r.type} ${r.no}<small>${r.to}${gone ? " · DEPARTED" : ""}</small></span><span style="font-size:11px;line-height:1.25">${r.via.replace(" · ", ", ")}</span><span>${r.plat}</span></button>`; }).join("")}</div>
+      <div id="bInfo" style="margin-top:10px"></div>
+      <button class="btn" id="bGo" style="width:100%;margin-top:8px" ${sel < 0 ? "disabled" : ""}>${sel < 0 ? (LANG === "en" ? "Choose a train" : "選一班車") : (LANG === "en" ? `Go to platform ${B.rows[sel].plat}` : `去 ${B.rows[sel].plat} 月台`)}</button>`;
+    Music.ui();
+    $$("#trip .br").forEach(b=>{ if(boarded) b.disabled = true; b.onclick = ()=>{ if(boarded) return; sel = +b.dataset.k; draw(); }; });
+    $("#bGo").onclick = ()=>{
+      if(boarded) return;
+      const r = B.rows[sel]; tries++;
+      if(toMin(r.t) <= now){ toast(LANG === "en" ? "That train has left!" : "那班車已經開走了！"); return; }
+      if(!r.ok){ now += 3; sel = -1; draw(); $("#bInfo").innerHTML = sceneHTML(r.why); return; }
+      boarded = true; clearInterval(tick); $$("#trip .br").forEach(b=>b.disabled = true);
+      TS.train = {type:r.type, no:r.no, arr:r.arr, slow:r.ok === 1};
+      spend(r.ok === 1 ? TS.TR.costs.ticketSlow : TS.TR.costs.ticket);
+      if(r.ok === 2 && tries === 1) tAdd({kh:1});
+      const msg = r.ok === 1 ? [r.why[0] + " I get on anyway.", r.why[1] + "我還是上車了。"] : ["I find my seat: a window seat, of course.", "我找到我的位子：當然是靠窗。"];
+      $("#bInfo").innerHTML = sceneHTML(msg);
+      $("#bGo").textContent = T("next"); $("#bGo").disabled = false; $("#bGo").onclick = tripRide;
+    };
+  };
+  const tick = setInterval(()=>{
+    if(boarded || !$("#trip").classList.contains("on")) return;
+    now++; const last = Math.max(...B.rows.filter(r=>r.ok).map(r=>toMin(r.t)));
+    if(now > last){ clearInterval(tick); boarded = true;
+      TS.train = {type:B.late.type, no:B.late.no, arr:B.late.arr, late:true}; spend(TS.TR.costs.ticket);
+      draw(); $("#bInfo").innerHTML = sceneHTML(["I miss the train! I buy a ticket for the 9:00 Tze-Chiang. I drink a coffee and wait.","我錯過火車了！只好買九點那班自強號的票，喝杯咖啡等車。"]);
+      $("#bGo").textContent = T("next"); $("#bGo").disabled = false; $("#bGo").onclick = tripRide; return; }
+    const c = $("#trip .clock"); if(c) c.textContent = hhmm(now);
+    if(B.rows.some(r=>toMin(r.t) === now)) draw();
+  }, 2000);
+  draw();
+}
+
+/* ---------------- 2. the window seat ---------------- */
+function drawWindow(cv, t, stop){
+  const c = cv.getContext("2d"), W = cv.width, H = cv.height;
+  const g = c.createLinearGradient(0,0,0,H); g.addColorStop(0,"#9CC7E0"); g.addColorStop(1,"#E6F0DA"); c.fillStyle = g; c.fillRect(0,0,W,H);
+  c.fillStyle = "#B9CFD6"; for(let x=-40;x<W+40;x+=4){ const X = (x + t*.15) % (W+80) - 40; const h = 22 + 12*Math.sin((x+t*.15)*.02); c.fillRect(W - X, 78 - h, 4, h); }
+  c.fillStyle = "#7BBF6A"; c.fillRect(0, 78, W, H-78);
+  for(let k=0;k<14;k++){ const X = W - ((k*53 + t*1.2) % (W+60)) + 30; c.fillStyle = k%3 ? "#5FA05A" : "#E5D27A"; c.fillRect(X, 86 + (k%4)*6, 34, 4); }
+  for(let k=0;k<6;k++){ const X = W - ((k*97 + t*2.4) % (W+80)) + 40; c.fillStyle = "#3E8E5E"; c.fillRect(X, 70, 8, 22); c.fillRect(X-6, 62, 20, 12); }
+  for(let k=0;k<10;k++){ const X = W - ((k*41 + t*5) % (W+40)) + 20; c.fillStyle = "#8C8577"; c.fillRect(X, H-26, 4, 26); }
+  if(stop){ c.fillStyle = "#E9E4D8"; c.fillRect(0, H-34, W, 34); c.fillStyle = "#2F5D8A"; c.fillRect(W/2-60, 30, 120, 22); c.fillStyle = "#fff"; c.font = "bold 13px monospace"; c.textAlign = "center"; c.fillText(stop.toUpperCase(), W/2, 46); c.textAlign = "left"; }
+  c.fillStyle = "#3A3F47"; c.fillRect(0,0,W,6); c.fillRect(0,H-6,W,6); c.fillRect(0,0,6,H); c.fillRect(W-6,0,6,H);
+}
+function tripRide(){
+  const R = TS.TR.ride; let k = 0;
+  if(!TS.cards.includes("window")) TS.cards.push("window");
+  const step = ()=>{
+    cancelAnimationFrame(rideAnim);
+    if(k >= R.length) return arriveKhh();
+    const st = R[k];
+    $("#trip").innerHTML = tripHead(LANG === "en" ? "The window seat" : "靠窗的位子") + `
+      <canvas class="win" id="win" width="320" height="150"></canvas>
+      <div class="msg" style="margin-top:10px"><div class="from"><span>🔊 ${LANG === "en" ? "Announcement" : "車廂廣播"}</span><button class="ib" style="width:30px;height:30px" data-say="${esc(st.ann)}">${ICON.spk}</button></div><div>${esc(st.ann)}</div><div class="zht">${esc(st.zh)}</div></div>
+      <div id="rScene" style="margin-top:8px"></div>`;
+    Music.ui();
+    const cv = $("#win"); let t = k*400, stopAt = performance.now() + 2200;
+    const loop = now => { const moving = now < stopAt; if(moving) t += 3; drawWindow(cv, t, moving ? null : st.at); rideAnim = requestAnimationFrame(loop); };
+    rideAnim = requestAnimationFrame(loop);
+    setTimeout(()=>{ if(!$("#rScene")) return; choiceBlock($("#rScene"), st.scene, st.opts, ()=>{ k++; step(); }); }, 2300);
+  };
+  step();
+}
+/* a scene with options; stat checks, costs and gains; then a Next button */
+function choiceBlock(box, scene, opts, next){
+  box.innerHTML = sceneHTML(scene) + `<div class="choices" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${opts.map((o,j)=>`<button class="btn alt" data-o="${j}" style="justify-content:flex-start;text-align:left">${esc(plain(LANG === "en" ? o.en : o.zh + "　" + o.en))}${o.cost ? ` <span class="tag">NT$${o.cost}</span>` : ""}${o.stat ? ` <span class="tag">${statName(o.stat)}</span>` : ""}</button>`).join("")}</div>`;
+  box.querySelectorAll("[data-o]").forEach(b=> b.onclick = e=>{
+    const o = opts[+b.dataset.o]; const ok = o.stat ? rollStat(o.stat) : true;
+    if(o.cost) spend(o.cost);
+    if(o.g) tAdd(o.g, ok ? 1 : .5);
+    if(o.st) TS.stress += o.st;
+    if(o.energy) TS.energy += o.energy;
+    if(o.min) TS.time += o.min;
+    if(o.bike) TS.bike = o.bike;
+    if(o.card && !TS.cards.includes(o.card)) TS.cards.push(o.card);
+    if(o.h){ TS.h = TS.h || {}; for(const k in o.h) TS.h[k] = (TS.h[k] || 0) + o.h[k]; }
+    const res = ok ? o.ok : (o.fail || o.ok);
+    box.innerHTML = sceneHTML(scene) + `<div style="margin-top:8px">${sceneHTML(res)}</div>
+      ${o.stat ? `<p class="muted" style="font-size:13px">${statName(o.stat)}：${ok ? (LANG === "en" ? "success!" : "成功！") : (LANG === "en" ? "not this time" : "這次差一點")}</p>` : ""}
+      <button class="btn" style="width:100%;margin-top:8px" id="cNext">${T("next")}</button>`;
+    box.querySelector("#cNext").onclick = next;
+    updTripHead();
+  });
+}
+function updTripHead(){ const m = $("#trip .top .money"); if(m) m.textContent = `${T("cost")} ${fmt(TS.spent)}`; drawHud(); }
+
+/* ---------------- 3. the island ---------------- */
+function arriveKhh(){
+  const M = TS.TR.map;
+  TS.time = toMin(TS.train.arr) + M.arriveMin;
+  TS.energy += M.energyBase + Math.floor(S.st.fi); TS.energy = clamp(TS.energy, 10, 100);
+  spend(TS.TR.costs.mrt + M.ferry);
+  $("#trip").innerHTML = tripHead("Kaohsiung") + sceneHTML([
+    `The train arrives at ${hhmm(toMin(TS.train.arr)).replace(/^0/,"")}. I take the MRT to the harbor and get on the [[ferry|ferry]] to Cijin. The ride is only a few minutes!`,
+    `火車 ${hhmm(toMin(TS.train.arr))} 到站。我搭捷運到港邊，坐上往旗津的渡輪，只要幾分鐘！`]) +
+    `<p class="muted" style="font-size:14px;margin-top:8px">${LANG === "en" ? `Plan your afternoon: every walk takes time and energy. The sun sets at ${sunsetFor()}. Can you reach the lighthouse in time?` : `規劃妳的下午：每段路都要花時間和體力。日落是 ${sunsetFor()}，妳來得及在日落前爬上燈塔嗎？`}</p>
+    <button class="btn" id="aGo" style="width:100%;margin-top:8px">${T("go2")}</button>`;
+  Music.ui();
+  $("#aGo").onclick = mapScreen;
+}
+function linkCost(a, b, l){
+  const M = TS.TR.map, hill = M.nodes[a].hill || M.nodes[b].hill;
+  if(TS.bike === "e" && !hill) return {min:Math.round(l[2]*.6), en:Math.max(1, Math.round(l[3]*.4))};
+  if(TS.bike === "p" && !hill) return {min:Math.round(l[2]*.7), en:Math.max(1, Math.round(l[3]*.7))};
+  return {min:l[2], en:l[3]};
+}
+function neighbors(){
+  const M = TS.TR.map;
+  return M.links.filter(l=>l[0] === TS.cur || l[1] === TS.cur).map(l=>{ const to = l[0] === TS.cur ? l[1] : l[0]; return Object.assign({to}, linkCost(TS.cur, to, l)); });
+}
+function drawMap(cv){
+  const M = TS.TR.map, c = cv.getContext("2d"), W = cv.width, H = cv.height;
+  c.fillStyle = "#5C9CC9"; c.fillRect(0,0,W,H);
+  c.fillStyle = "#4E8BB8"; for(let y=8;y<H;y+=16) for(let x=(y/16%2)*10;x<W;x+=24) c.fillRect(x, y, 8, 2);
+  /* mainland (Gushan) at the top right, harbor between */
+  c.fillStyle = "#9FC98A"; c.beginPath(); c.moveTo(150,0); c.lineTo(W,0); c.lineTo(W,40); c.lineTo(200,18); c.closePath(); c.fill();
+  /* Cijin: a long thin island running south */
+  c.fillStyle = "#E8D9A8"; c.beginPath(); c.moveTo(190,30); c.lineTo(255,60); c.lineTo(240,92); c.lineTo(175,130); c.lineTo(110,220); c.lineTo(80,330); c.lineTo(40,350); c.lineTo(48,250); c.lineTo(90,150); c.lineTo(130,80); c.closePath(); c.fill();
+  c.fillStyle = "#7BBF6A"; c.beginPath(); c.arc(220,58,26,0,7); c.fill();   /* Cihou hill */
+  c.fillStyle = "#3B3735"; c.beginPath(); c.moveTo(48,250); c.lineTo(90,150); c.lineTo(84,150); c.lineTo(42,250); c.closePath(); c.fill();  /* black sand */
+  c.strokeStyle = "rgba(43,37,54,.35)"; c.lineWidth = 2; c.setLineDash([4,4]);
+  M.links.forEach(l=>{ const a = M.nodes[l[0]], b = M.nodes[l[1]]; c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(b.x,b.y); c.stroke(); });
+  c.setLineDash([]);
+  c.strokeStyle = "#fff"; c.setLineDash([2,3]); c.beginPath(); c.moveTo(150,58); c.lineTo(175,14); c.stroke(); c.setLineDash([]);
+  Object.entries(M.nodes).forEach(([id,n])=>{
+    const t = document.createElement("canvas"); drawSprite(t, SPR[n.spr], 2);
+    c.fillStyle = TS.visited[id] ? "#F4C542" : "#fff"; c.beginPath(); c.arc(n.x, n.y, 15, 0, 7); c.fill();
+    c.drawImage(t, n.x-12, n.y-12);
+    if(id === TS.cur){ c.strokeStyle = "#D9534F"; c.lineWidth = 3; c.beginPath(); c.arc(n.x, n.y, 17, 0, 7); c.stroke(); }
+  });
+  const m = document.createElement("canvas"); drawSprite(m, SPR.mia, 1); const n = M.nodes[TS.cur]; c.drawImage(m, n.x+10, n.y-22, 16, 16);
+}
+function drawHud(){
+  const h = $("#hud"); if(!h) return;
+  const M = TS.TR.map;
+  h.innerHTML = `<div class="pv"><b>${hhmm(TS.time)}</b>${T("time")}</div><div class="pv"><b>${Math.max(0, Math.round(TS.energy))}</b>${T("energy")}</div><div class="pv"><b>${sunsetFor()}</b>${LANG === "en" ? "Sunset" : "日落"}</div>`;
+}
+function mapScreen(){
+  const M = TS.TR.map, here = M.nodes[TS.cur];
+  if(TS.time >= toMin(M.close)) return nightScene(true);
+  const nb = neighbors();
+  $("#trip").innerHTML = tripHead("Cijin · 旗津") + `<canvas class="map" id="map" width="300" height="350"></canvas>
+    <div class="hud" id="hud"></div>
+    <h3>${LANG === "en" ? "You are at" : "妳在"}：${esc(N(here))}</h3>
+    <div class="nodes">${nb.map(x=>{ const n = M.nodes[x.to], can = TS.energy >= x.en;
+      return `<button class="node${TS.visited[x.to] ? " done" : ""}" data-to="${x.to}" ${can ? "" : "disabled"}><span><span class="nm">${esc(N(n))}</span>${TS.visited[x.to] ? " ✓" : ""}${n.hill ? ` <span class="tag">${LANG === "en" ? "hill" : "上坡"}</span>` : ""}</span>
+        <span class="cost">${x.min} ${LANG === "en" ? "min" : "分"} · ${T("energy")} −${x.en}${can ? "" : (LANG === "en" ? " · too tired" : " · 體力不夠")}</span></button>`; }).join("")}</div>
+    <button class="btn alt" id="mEnd" style="width:100%;margin-top:10px">${T("leave")}</button>`;
+  drawMap($("#map")); drawHud(); Music.ui();
+  $$("#trip .node").forEach(b=> b.onclick = ()=>{
+    const x = nb.find(y=>y.to === b.dataset.to); TS.time += x.min; TS.energy -= x.en; TS.cur = x.to;
+    visit(x.to);
+  });
+  $("#mEnd").onclick = ()=>askConfirm(T("confirmEnd"), ()=>nightScene(false));
+}
+function visit(id){
+  const M = TS.TR.map, v = M.visits[id];
+  if(!v || TS.visited[id]){ return mapScreen(); }
+  TS.visited[id] = true;
+  if(v.big) return lighthouse();
+  TS.time += v.min;
+  $("#trip").innerHTML = tripHead("Cijin · " + N(M.nodes[id])) + `<div class="hud" id="hud"></div><div id="vBox"></div>`;
+  drawHud(); Music.ui();
+  choiceBlock($("#vBox"), v.scene, v.opts, mapScreen);
+}
+function lighthouse(){
+  const M = TS.TR.map, B = M.big, sun = toMin(sunsetFor());
+  $("#trip").innerHTML = tripHead(N(M.nodes.light)) + `<div class="hud" id="hud"></div><div id="lBox"></div>`;
+  drawHud(); Music.ui();
+  const box = $("#lBox");
+  const climb = ()=>{
+    TS.time += 15;
+    let res, card;
+    if(TS.energy < B.need){ res = B.tired; TS.stress += 4; }
+    else if(TS.time <= sun){ res = B.win; card = "sunset"; tAdd({sty:1, co:1}); TS.stress -= 10; TS.sunsetOK = true; }
+    else { res = B.late; card = "nightlight"; tAdd({kh:.5}); TS.stress -= 5; TS.sunsetOK = false; }
+    TS.energy -= 10;
+    if(card && !TS.cards.includes(card)) TS.cards.push(card);
+    box.innerHTML = sceneHTML(B.climb) + `<div style="margin-top:8px">${sceneHTML(res)}</div><button class="btn" id="lNext" style="width:100%;margin-top:8px">${T("next")}</button>`;
+    drawHud(); box.querySelector("#lNext").onclick = mapScreen;
+  };
+  if(D.wd(TS.date) === 0){
+    box.innerHTML = sceneHTML(["The gate is closed. A sign says: “Closed on Mondays.” I look at the sea from the path instead.","大門關著，牌子上寫：「週一休館」。我只好在步道上看海。"]) + `<button class="btn" id="lNext" style="width:100%;margin-top:8px">${T("next")}</button>`;
+    box.querySelector("#lNext").onclick = mapScreen; return;
+  }
+  if(TS.time < sun - 30){
+    box.innerHTML = sceneHTML(B.early.map(x=>x.replace("{t}", sunsetFor()))) + `<div class="choices" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+      <button class="btn alt" id="lWait">${LANG === "en" ? "Sit at the café and wait for sunset (rest, NT$120)" : "在咖啡座坐著等日落（休息，NT$120）"}</button>
+      <button class="btn alt" id="lNow">${LANG === "en" ? "Climb to the top now" : "現在就爬上去"}</button>
+      <button class="btn alt" id="lLater">${LANG === "en" ? "Come back later" : "等一下再來"}</button></div>`;
+    $("#lWait").onclick = ()=>{ TS.energy += Math.round((sun - 25 - TS.time)/10); TS.time = sun - 25; spend(120); climb(); };
+    $("#lNow").onclick = climb;
+    $("#lLater").onclick = ()=>{ TS.visited.light = false; mapScreen(); };
+  } else climb();
+}
+
+/* ---------------- 4. a night at the hostel ---------------- */
+function nightScene(forced){
+  const M = TS.TR.map;
+  if(TS.energy < 10) TS.stress += 5;
+  spend(M.ferry);   /* the ferry back */
+  const st = M.stay, okStay = o => !o.hearts || Object.keys(o.hearts).every(k=>S.hearts[k] >= o.hearts[k]);
+  $("#trip").innerHTML = tripHead(LANG === "en" ? "Night in Kaohsiung" : "高雄的夜晚") +
+    (forced ? sceneHTML(["It is late. The lighthouse is closing, so I take the ferry back across the harbor.","很晚了，燈塔要關了，我搭渡輪回到對岸。"]) : sceneHTML(["I take the ferry back. The harbor lights shine on the water.","我搭渡輪回去，港口的燈光映在水面上。"])) +
+    `<h3 style="margin-top:12px">${esc(LANG === "en" ? st.q[0] : st.q[1])}</h3>
+    <div style="display:flex;flex-direction:column;gap:8px">${st.opts.map(o=>`<button class="btn alt" data-stay="${o.id}" style="justify-content:flex-start;text-align:left;white-space:normal" ${okStay(o) ? "" : "disabled"}>${esc(N(o))}${okStay(o) ? "" : `<br><small>${esc(LANG === "en" ? o.why[0] : o.why[1])}</small>`}</button>`).join("")}</div>
+    <div id="nBox" style="margin-top:8px"></div>`;
+  Music.want(STAGE.music.night); Music.ui();
+  $$("#trip [data-stay]").forEach(b=> b.onclick = ()=>{
+    const o = st.opts.find(x=>x.id === b.dataset.stay); spend(o.cost); TS.stay = o.id;
+    $$("#trip [data-stay]").forEach(x=>x.disabled = true); b.classList.add("on");
+    const sc = o.id === "hostel" ? M.night : M[o.id];
+    choiceBlock($("#nBox"), sc.scene, sc.opts, walkScene);
+  });
+}
+
+/* ---------------- 5. morning walk with clues ---------------- */
+function walkScene(){
+  const W = TS.TR.walk; let k = 0;
+  Music.want(TS.TR.music);
+  const draw = (msg)=>{
+    if(k >= W.clues.length){ return tripEnd(); }
+    const cl = W.clues[k];
+    $("#trip").innerHTML = tripHead("Pier-2 · 駁二") + (k === 0 ? sceneHTML(W.intro) : "") +
+      `<h3 style="margin-top:10px">${LANG === "en" ? `Clue ${k+1} of 3` : `線索 ${k+1}／3`}</h3>${sceneHTML(cl.q)}
+      <div class="clues" style="margin-top:8px">${W.pics.map(p=>`<button class="clue" data-p="${p.id}"><canvas width="12" height="12" data-spr="${p.spr}" style="background:#EFE8D8"></canvas><div class="cn">${esc(N(p))}</div></button>`).join("")}</div>
+      <div id="wMsg" style="margin-top:8px">${msg || ""}</div>`;
+    paintSprites($("#trip")); Music.ui();
+    $$("#trip .clue").forEach(b=> b.onclick = ()=>{
+      if(b.dataset.p === cl.a){ b.classList.add("ok"); tAdd({en:.4}); k++; setTimeout(()=>draw(sceneHTML(["Click! Good photo.","喀嚓！拍得好。"])), 450); }
+      else { b.classList.add("no"); $("#wMsg").innerHTML = sceneHTML(["Hmm, not this one. Read the clue again.","嗯，不是這個。再讀一次線索。"]); }
+    });
+  };
+  draw();
+}
+function tripEnd(){
+  const W = TS.TR.walk;
+  if(!TS.cards.includes("pier2")) TS.cards.push("pier2");
+  spend(TS.TR.costs.ticket);   /* the train home */
+  const g = {}; Object.keys(TS.g).forEach(k=>{ g[k] = Math.round(TS.g[k]*10)/10; });
+  const line = TS.sunsetOK === true ? "Kaohsiung! Train, ferry, island, and a sunset at the lighthouse."
+             : TS.sunsetOK === false ? "Kaohsiung! Train, ferry, island, and the lighthouse at night."
+             : "Kaohsiung! Train, ferry, seafood and the sea.";
+  const res = {spent:TS.spent, g, stress:Math.round(TS.stress), cards:TS.cards.slice(), line, h:TS.h || {}};
+  $("#trip").innerHTML = tripHead(LANG === "en" ? "Home again" : "回家了") + sceneHTML(W.done) + `<div style="margin-top:8px">${sceneHTML(W.home)}</div>
+    <h3 style="margin-top:12px">${LANG === "en" ? "Trip results" : "旅行成果"}</h3>
+    <div class="ticks" style="display:flex;flex-wrap:wrap;gap:6px 10px;font-size:15px">${ticksHTML({money:-res.spent, stress:res.stress, st:g})}</div>
+    <div class="album" style="margin-top:10px">${res.cards.map(c=>`<div class="post"><canvas width="150" height="100" data-card="${c}"></canvas><div class="pt">${esc(N(TS.TR.cards[c]))}</div></div>`).join("")}</div>
+    <button class="btn" id="tDone" style="width:100%;margin-top:12px">${LANG === "en" ? "Back to Taipei" : "回到台北"}</button>`;
+  $$("#trip canvas[data-card]").forEach(cv=>drawCard(cv, cv.dataset.card)); Music.ui();
+  $("#tDone").onclick = ()=>{ const d = TS.done; TS = null; d(res); };
+}
+
+/* ==== engine/main.js ==== */
+/* boot */
+applyTheme(); setLang(LANG); renderTitle();
+["touchend","click"].forEach(t=>document.addEventListener(t, ()=>{ if(SYN && !window.__spk){ window.__spk = 1; try{ const u = new SpeechSynthesisUtterance(" "); u.volume = 0; SYN.speak(u); }catch(e){} } }, true));
+
+</script>
+</body>
+</html>
