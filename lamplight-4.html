@@ -285,7 +285,18 @@ const LEVEL = {
   zh:"燈下小書・第四級", kicker:"INKQUEST · LEVEL 4 · B2",
   version:"1.0・2026 年 10 月",
   rank:4,
-  sayAs:{"Thames":"Temz","Harwich":"Harrij","Keawe":"Kay-ah-vay","Bazalgette":"Bazzle-jet","Porto":"Portoo","São Bento":"Sow Bentoo","Lyme":"Lime","Belém":"Beh-lem","Valentin":"Valentan","Flambeau":"Flahm-bo"},
+  /* voice-only respellings so the English voice says foreign words the local way (pt-PT, French) */
+  sayAs:{"Thames":"Temz","Harwich":"Harrij","Keawe":"Kay-ah-vay","Bazalgette":"Bazzle-jet","Aristide":"Ah-ree-steed","Valentin":"Vah-lahn-tan","Flambeau":"Flahm-bo","centimes":"sahn-teems","centime":"sahn-teem","Kaohsiung":"Gow-shong","Cijin":"Chee-jin","Yi-ting":"Yee-ting","Tomás":"Too-mahsh","Porto":"Por-too","Lyme":"Lime"},
+  foreign:{"fado":["pt-PT","fah doo"],"saudade":["pt-PT","sau dahd"],"azulejos":["pt-PT","ah zoo lay zhoosh"],"azulejo":["pt-PT","ah zoo lay zhoo"],
+    "bom dia":["pt-PT","bon dee ah"],"obrigado":["pt-PT","oh bree gah doo"],"obrigada":["pt-PT","oh bree gah dah"],
+    "calçada portuguesa":["pt-PT","kal sah dah poor too gay zah"],"calçada":["pt-PT","kal sah dah"],
+    "Miradouro da Senhora do Monte":["pt-PT","mee rah doh roo dah sin yor ah doo mont"],"Miradouro de Santa Luzia":["pt-PT","mee rah doh roo duh san tah loo zee ah"],
+    "miradouros":["pt-PT","mee rah doh roosh"],"miradouro":["pt-PT","mee rah doh roo"],
+    "Elevador de Santa Justa":["pt-PT","ee leh vah dor duh san tah zhoosh tah"],"Praça do Comércio":["pt-PT","prah sah doo koo mair see oo"],
+    "Rua Augusta":["pt-PT","roo ah ah oo goosh tah"],"25 de Abril":["pt-PT","vint ee sing koo duh ah breel","vinte e cinco de Abril"],
+    "Pastéis de Belém":["pt-PT","pash tays duh buh layn"],"Belém":["pt-PT","buh layn"],"Jerónimos":["pt-PT","zheh ron ee moosh"],
+    "Bairro Alto":["pt-PT","by roo al too"],"Baixa":["pt-PT","by shah"],"Graça":["pt-PT","grah sah"],"Alfama":["pt-PT","al fah muh"],"Pombal":["pt-PT","pom bahl"],
+    "São Bento":["pt-PT","sau ben too"],"Oriente":["pt-PT","or yent"],"Coimbra":["pt-PT","kweem bruh"]},
   /* a moonless night: deep blue sky full of stars, for the last light */
   scene:{sky:["#0B1030","#141C48","#22295E","#323A73"], moon:false, stars:true, rain:false, sun:false, birds:false},
   storyTracks:[2,0,2,1,2,0,1,0,1,2],
@@ -602,11 +613,11 @@ const S = [
      "她是翻譯。她幫台北一家出版社把葡萄牙小說翻成中文，每個星期一都要花一整天，在波多跟一位編輯討論那些難翻的字。這段車程將近三個小時。她通常整路都在工作，戴著耳機，字典攤開，葡萄牙就在窗外飛快掠過，像一部她沒時間看的電影。","calm"],
     ["Seat 41, across the little table, belonged to a man with paint on his fingers. He was about thirty-five, with untidy dark hair and a gray sweater with a hole in one elbow. He never used a laptop. Instead, he opened a small [[sketchbook]] and drew what he saw through the window: a line of [[cork oaks|c:cork]], a white church on a hill, a heron standing in a rice field. When the train went too fast, he closed his eyes for a moment, as if he were remembering the view, and then drew it anyway.",
      "小桌子對面的四十一號，坐著一個手指上沾著顏料的男人。他大約三十五歲，一頭亂亂的黑髮，灰色毛衣的手肘破了一個洞。他從不用筆電，而是打開一本小小的素描本，把窗外看到的東西畫下來：一排軟木橡樹、山丘上的白色教堂、站在稻田裡的一隻蒼鷺。火車開太快的時候，他會閉上眼睛一下，好像在回想剛才的景色，然後還是把它畫出來。","gentle"],
-    ["They never spoke. Lisbon people are polite, and so are people from Taichung. For twelve Mondays, they nodded “bom dia” when they sat down and nodded again in Porto when they stood up. Yi-ting knew the shape of his hands and the sound of his pencil better than she knew the faces of her neighbors. She did not know his name.",
+    ["They never spoke. Lisbon people are polite, and so are people from Taichung. For twelve Mondays, they nodded “[[bom dia|c:bomdia]]” when they sat down and nodded again in Porto when they stood up. Yi-ting knew the shape of his hands and the sound of his pencil better than she knew the faces of her neighbors. She did not know his name.",
      "他們從來沒說過話。里斯本人很有禮貌，台中人也是。十二個星期一，他們坐下時點頭說一聲「早安」，到了波多站起來時再點一次頭。怡婷對他雙手的形狀和鉛筆的聲音，比對她鄰居的臉還熟悉。可是她不知道他叫什麼名字。","wistful"],
     ["On the thirteenth Monday, the train stopped in a field outside Coimbra and did not move. Ten minutes passed, then thirty. A voice announced, first in Portuguese and then in English, that there was a problem with the line ahead and that the [[delay]] would be at least an hour. The carriage filled with sighs. Yi-ting took off her headphones. The man across from her put down his pencil. For the first time, there was nothing to do but look at each other.",
      "第十三個星期一，火車停在科英布拉外的一片田野裡，就不動了。過了十分鐘，然後三十分鐘。廣播先用葡萄牙文、再用英文宣布，前方路段出了問題，至少會延誤一個小時。整節車廂都是嘆氣聲。怡婷拿下耳機。對面的男人放下鉛筆。第一次，他們除了看著對方，沒有別的事可以做。","curious"],
-    ["“Well,” he said in English, with an embarrassed smile. “At last, a view that stays still.” His name was Tomás. He restored old [[tiles]], the blue-and-white [[azulejos|c:azulejo]] that cover half the buildings in Portugal. For a year he had been working in Porto, at [[São Bento|c:n-saobento]] station, where about twenty thousand tiles on the walls tell the history of the country in pictures. Some of them were cracked, some were missing, and he was replacing them, one by one, painted by hand.",
+    ["“Well,” he said in English, with an embarrassed smile. “At last, a view that stays still.” His name was [[Tomás|c:n-tomas]]. He restored old [[tiles]], the blue-and-white [[azulejos|c:azulejo]] that cover half the buildings in Portugal. For a year he had been working in Porto, at [[São Bento|c:n-saobento]] station, where about twenty thousand tiles on the walls tell the history of the country in pictures. Some of them were cracked, some were missing, and he was replacing them, one by one, painted by hand.",
      "「嗯，」他用英文說，不好意思地笑了笑，「終於有一片不會跑掉的風景了。」他叫托馬斯，是修復老磁磚的師傅，修的是葡萄牙一半建築上都貼著的那種藍白色花磚「azulejo」。這一年來，他都在波多的聖本篤車站工作。那裡的牆上大約有兩萬片磁磚，用圖畫講述這個國家的歷史。有些裂了，有些不見了，他正一片一片地用手繪的新磁磚把它們補回去。","warm"],
     ["“And you?” he asked. “You always look as if you are fighting with your computer.” She laughed and explained. She told him about the book she was translating, about a sentence she had been stuck on for a week. It was a sentence about the sea, and there was a Portuguese word in it, [[saudade|c:saudade]], that had no word in Chinese. “It means missing something,” she said, “but it’s more than that. It’s missing something that maybe never comes back, and loving the missing.” Tomás nodded slowly. “That’s the most Portuguese word there is.”",
      "「那妳呢？」他問，「妳看起來總像在跟電腦吵架。」她笑了，跟他解釋。她說起她正在翻譯的書，說起一個她卡了一個星期的句子。那是一個關於大海的句子，裡面有一個葡萄牙字「saudade」，中文裡找不到對應的詞。「它的意思是想念，」她說，「可是不只這樣。它是想念某個也許再也不會回來的東西，而且連那份想念都一起愛著。」托馬斯慢慢點頭。「那是最葡萄牙的一個字了。」","thoughtful"],
@@ -706,7 +717,7 @@ const S = [
      "不管走到哪裡，都看看牆壁。里斯本到處都貼著「azulejo」，彩繪的瓷磚，教堂、火車站、商店、普通的民宅上都有。有些是藍白色的，有些是綠色或黃色的，有些用圖畫講完一整個故事。如果你喜歡，國家磁磚博物館裡收藏了好幾百年的磁磚。可是，請不要從建築物上拿一片回家，就算它已經鬆了也不要。已經有太多磁磚就是這樣不見的。","firm"],
     ["When the sun goes down, find a small restaurant in Alfama or the Bairro Alto and listen to [[fado|c:fado]], Lisbon’s own music. A singer stands in front of two guitarists and sings about the sea, lost love and saudade, a kind of sad, sweet longing. In 2011, UNESCO added fado to its list of the world’s Intangible Cultural Heritage. You do not need to understand Portuguese. You will understand anyway. Just remember: during the songs, the room goes completely silent. No talking, no clinking glasses, no phones.",
      "太陽下山以後，在阿爾法瑪或上城區找一家小餐廳，聽一聽法朵，里斯本自己的音樂。一位歌手站在兩位吉他手前面，唱著大海、失去的愛情，還有 saudade，一種既哀傷又甜美的思念。2011 年，聯合國教科文組織把法朵列入人類無形文化遺產。你不需要懂葡萄牙文，你還是會聽懂的。只要記得：唱歌的時候，整個房間會完全安靜。不說話，不碰杯，不滑手機。","tender"],
-    ["One last thing. Lisbon has become very popular, and in some old neighborhoods, many homes have been turned into holiday flats. Prices have risen, and some families who lived there for generations have had to leave. You can help a little. Eat in small local places, buy from local shops, say “bom dia” and “obrigado” or “obrigada,” and be quiet in the streets at night. People live there.",
+    ["One last thing. Lisbon has become very popular, and in some old neighborhoods, many homes have been turned into holiday flats. Prices have risen, and some families who lived there for generations have had to leave. You can help a little. Eat in small local places, buy from local shops, say “[[bom dia|c:bomdia]]” and “[[obrigado|c:obrigado]]” or “obrigada,” and be quiet in the streets at night. People live there.",
      "最後一件事。里斯本變得非常熱門，在一些老街區，很多住家被改成了度假公寓。房價漲了，有些在那裡住了好幾代的家庭不得不搬走。你可以幫上一點忙：在當地的小店吃飯、跟在地的店家買東西、說一聲「早安」（bom dia）和「謝謝」（男生說 obrigado，女生說 obrigada），晚上在街上保持安靜。那裡有人住。","thoughtful"],
     ["Lisbon does not reward hurry. It rewards people who stop on a staircase to catch their breath and notice the view, who sit for an hour over one coffee, who get lost in Alfama on purpose. Walk until your legs hurt, eat one more custard tart than you planned, and save your last evening for a miradouro at sunset. You will understand why so many travelers leave Lisbon with saudade of their own.",
      "里斯本不獎勵趕路的人。它獎勵的，是那些停在階梯上喘口氣、順便發現風景的人，是那些一杯咖啡坐一個小時的人，是那些故意在阿爾法瑪迷路的人。走到腿痠，多吃一個本來沒打算吃的蛋塔，把最後一個晚上留給夕陽下的觀景台。你就會明白，為什麼有那麼多旅人離開里斯本時，心裡也帶著屬於自己的 saudade。","warm"]
@@ -818,8 +829,8 @@ const VOCAB = {
 /* ---------------- culture & names ---------------- */
 const CULT = {
 "c:n-harwich":{name:1,h:"Harwich",kk:"[ˋhærɪdʒ]",say:"HARR-ij",zh:"哈威治",d:"英格蘭東岸的港口，有船往返荷蘭。w 不發音，結尾念 -ij。英國地名常常跟拼法不一樣！"},
-"c:n-valentin":{name:1,h:"Aristide Valentin",kk:"[͵ærɪsˋtid ͵vælɑ̃ˋtæ̃]",say:"a-ree-STEED va-lahn-TAN",zh:"亞里斯提德．華倫丁",d:"法文名字，Valentin 結尾是鼻音，不念英文的 Valentine。"},
-"c:n-flambeau":{name:1,h:"Flambeau",kk:"[flæmˋbo]",say:"flahm-BOH",zh:"弗蘭博",d:"法文，意思是「火炬」。故事裡全歐洲最有名的大盜。"},
+"c:n-valentin":{name:1,h:"Aristide Valentin",kk:"[͵ærɪsˋtid ͵vælɑ̃ˋtæ̃]",say:"a-ree-STEED va-lahn-TAN",lang:"fr-FR",zh:"亞里斯提德．華倫丁",d:"法文名字，Valentin 結尾是鼻音，不念英文的 Valentine。"},
+"c:n-flambeau":{name:1,h:"Flambeau",kk:"[flæmˋbo]",say:"flahm-BOH",lang:"fr-FR",zh:"弗蘭博",d:"法文，意思是「火炬」。故事裡全歐洲最有名的大盜。"},
 "c:n-hampstead":{name:1,h:"Hampstead Heath",kk:"[ˋhæmpstɪd ˋhiθ]",say:"HAMP-stid HEETH",zh:"漢普斯特德荒野",d:"倫敦北邊一大片起伏的草地和樹林，可以遠眺市中心。heath 是長著矮草和灌木的荒地。"},
 "c:n-fatherbrown":{name:1,h:"Father Brown",kk:"[ˋfɑðɚ ˋbraʊn]",say:"FAH-thur BROWN",zh:"布朗神父",d:"卻斯特頓筆下的天主教神父偵探，外表平凡、看起來傻傻的，其實非常了解人性。Father 是對神父的稱呼。"},
 "c:n-hawaii":{name:1,h:"Hawaii",kk:"[həˋwaɪ]",say:"huh-WHY",zh:"夏威夷",d:"太平洋上的群島。故事發生在十九世紀，當時夏威夷還是一個獨立的王國。"},
@@ -830,7 +841,7 @@ const CULT = {
 "c:leprosy":{h:"leprosy",kk:"[ˋlɛprəsɪ]",zh:"痲瘋病（漢生病）",d:"一種會傷害皮膚和神經的細菌感染疾病。十九世紀沒有藥可以醫，夏威夷王國把病人強制送到摩洛凱島隔離。今天已經可以完全治癒，台灣也改稱「漢生病」，避免歧視。"},
 "c:n-molokai":{name:1,h:"Molokai",kk:"[͵moloˋkaɪ]",say:"moh-loh-KYE",zh:"摩洛凱島",d:"夏威夷的一座島。十九世紀，痲瘋病人被強制隔離在島上北邊的半島。"},
 "c:n-honolulu":{name:1,h:"Honolulu",kk:"[͵hɑnəˋlulu]",say:"hon-uh-LOO-loo",zh:"檀香山",d:"夏威夷最大的城市，現在是夏威夷州的首府。"},
-"c:centime":{h:"centime",kk:"[ˋsɑntim]",zh:"生丁",d:"法國以前的小硬幣，一百生丁等於一法郎。故事裡大溪地用法國的錢，五生丁大約等於美國的一分錢。"},
+"c:centime":{h:"centime",kk:"[ˋsɑntim]",say:"SAHN-teem",lang:"fr-FR",zh:"生丁",d:"法國以前的小硬幣，一百生丁等於一法郎。故事裡大溪地用法國的錢，五生丁大約等於美國的一分錢。"},
 "c:n-tahiti":{name:1,h:"Tahiti",kk:"[təˋhitɪ]",say:"tuh-HEE-tee",zh:"大溪地",d:"南太平洋的島嶼，當時是法國的殖民地，所以用法國的錢。"},
 "c:boatswain":{h:"boatswain",kk:"[ˋbosṇ]",zh:"水手長",d:"船上管理水手和甲板工作的人。拼法很長，念起來卻只有 BOH-sun 兩個音節，也常寫成 bosun。"},
 "c:n-baltimore":{name:1,h:"Baltimore",kk:"[ˋbɔltə͵mor]",say:"BAWL-tih-mor",zh:"巴爾的摩",d:"美國東岸馬里蘭州的港口城市，也是作者費茲傑羅晚年住過的地方。"},
@@ -845,18 +856,21 @@ const CULT = {
 "c:pterodactyl":{h:"pterodactyl",kk:"[͵tɛrəˋdæktɪl]",zh:"翼手龍",d:"會飛的古代爬蟲類（嚴格來說不是恐龍）。開頭的 p 不發音。"},
 "c:n-tainan":{name:1,h:"Tainan",kk:"[ˋtaɪˋnɑn]",say:"TIE-NAHN",zh:"台南",d:"台灣最古老的城市之一。"},
 "c:dm":{h:"dungeon master (DM)",zh:"地下城主",d:"龍與地下城裡負責說故事、扮演所有怪物和路人、裁判規則的人。玩家扮演英雄，DM 扮演整個世界。"},
-"c:n-porto":{name:1,h:"Porto",kk:"[ˋportu]",say:"POR-too",zh:"波多",d:"葡萄牙第二大城，波特酒（port wine）的故鄉。葡萄牙文結尾的 o 念起來像 oo。"},
+"c:n-porto":{name:1,h:"Porto",kk:"[ˋportu]",say:"POR-too",lang:"pt-PT",zh:"波多",d:"葡萄牙第二大城，波特酒（port wine）的故鄉。葡萄牙文結尾的 o 念起來像 oo。"},
 "c:cork":{h:"cork oak",kk:"[ˋkɔrk ͵ok]",zh:"軟木橡樹",d:"樹皮可以做成軟木塞的橡樹。葡萄牙是全世界最大的軟木產地，剝樹皮不用砍樹，每九年左右可以剝一次。"},
-"c:azulejo":{h:"azulejo",kk:"[͵æzuˋleʒo]",zh:"葡萄牙彩繪磁磚",d:"葡萄牙到處可見的彩繪瓷磚，最有名的是藍白色的，貼在教堂、車站、民宅的牆上，有些拼成一整幅圖畫。"},
-"c:n-saobento":{name:1,h:"São Bento",kk:"[saʊ ˋbɛntu]",say:"sow BEN-too",zh:"聖本篤車站",d:"波多市中心的火車站，大廳牆上大約有兩萬片藍白磁磚，畫著葡萄牙的歷史場景，建於二十世紀初。"},
-"c:saudade":{h:"saudade",kk:"[saʊˋdɑdə]",zh:"（葡萄牙文）思念、鄉愁",d:"葡萄牙人最愛說「翻譯不出來」的字：對不在身邊、甚至可能再也回不來的人事物，那種又苦又甜的思念。"},
+"c:azulejo":{h:"azulejo",kk:"[͵ɑzuˋleʒu]",say:"uh-zoo-LAY-zhoo",lang:"pt-PT",zh:"葡萄牙彩繪磁磚",d:"葡萄牙到處可見的彩繪瓷磚，最有名的是藍白色的，貼在教堂、車站、民宅的牆上，有些拼成一整幅圖畫。"},
+"c:bomdia":{h:"bom dia",kk:"[bɔ̃ ˋdiə]",say:"bon DEE-uh",lang:"pt-PT",zh:"（葡萄牙文）早安、日安",d:"葡萄牙文的「早安」，從早上一直用到午餐時間。進店、上車、跟鄰居打招呼都用得到。下午改說 boa tarde（BOH-uh TARD），天黑以後說 boa noite（BOH-uh NOYT）。"},
+"c:obrigado":{h:"obrigado / obrigada",speak:"obrigado. obrigada.",kk:"[͵obriˋgɑdu]",say:"oh-bree-GAH-doo／oh-bree-GAH-duh",lang:"pt-PT",zh:"（葡萄牙文）謝謝",d:"葡萄牙文的「謝謝」，字面意思是「我欠你一份情」。跟著說話的人自己的性別變：男生說 obrigado，女生說 obrigada，跟對方是誰無關。別人跟你道謝，可以回 de nada（duh NAH-duh），「不客氣」。"},
+"c:n-tomas":{name:1,h:"Tomás",kk:"[tuˋmɑʃ]",say:"too-MAHSH",lang:"pt-PT",zh:"托馬斯",d:"葡萄牙名字，等於英文的 Thomas。在葡萄牙，字尾的 s 常常念成「ㄕ」的音。"},
+"c:n-saobento":{name:1,h:"São Bento",kk:"[saʊ ˋbɛntu]",say:"sow BEN-too",lang:"pt-PT",zh:"聖本篤車站",d:"波多市中心的火車站，大廳牆上大約有兩萬片藍白磁磚，畫著葡萄牙的歷史場景，建於二十世紀初。"},
+"c:saudade":{h:"saudade",kk:"[saʊˋdɑd]",say:"sow-DAHD",lang:"pt-PT",zh:"（葡萄牙文）思念、鄉愁",d:"葡萄牙人最愛說「翻譯不出來」的字：對不在身邊、甚至可能再也回不來的人事物，那種又苦又甜的思念。"},
 "c:transceiver":{h:"transceiver",kk:"[trænsˋsivɚ]",zh:"無線電收發機",d:"transmitter（發射機）加 receiver（接收機）。普通收音機只能聽，收發機可以收也可以發，業餘無線電玩家（ham radio）就是用它跟遠方的人通話。"},
 "c:lighthouse":{h:"Kaohsiung Lighthouse",zh:"高雄燈塔（旗後燈塔）",d:"位在旗津旗後山上。最早建於 1883 年，現在的白色八角形燈塔是 1918 年重建的，燈至今仍在運作。2022 年 9 月起開放夜間參觀，到晚上九點，週一公休。實際開放時間請以官方公告為準。"},
-"c:calcada":{h:"calçada portuguesa",kk:"[kɑlˋsɑdə]",zh:"葡萄牙碎石路",d:"用手工把白色石灰岩和黑色玄武岩小石塊排成圖案的人行道，是葡萄牙的招牌街景。下雨時很滑。"},
-"c:n-alfama":{name:1,h:"Alfama",kk:"[ælˋfɑmə]",say:"al-FAH-muh",zh:"阿爾法瑪",d:"里斯本最古老的街區，名字來自阿拉伯文。"},
-"c:miradouro":{h:"miradouro",kk:"[͵mirəˋdoru]",zh:"觀景台",d:"葡萄牙文的「觀景台」。里斯本建在山丘上，有很多免費的 miradouro 可以看整座城市。"},
-"c:n-belem":{name:1,h:"Belém",kk:"[bɛˋlɛm]",say:"beh-LEM",zh:"貝倫",d:"里斯本西邊的河岸區，葡萄牙文的「伯利恆」。這裡有熱羅尼莫斯修道院、貝倫塔，還有那家有名的蛋塔店。"},
-"c:fado":{h:"fado",kk:"[ˋfɑdu]",zh:"法朵",d:"里斯本的傳統歌曲，通常由一位歌手和兩把吉他（其中一把是葡萄牙吉他）演出，主題常是大海、命運和思念。2011 年列入聯合國教科文組織人類無形文化遺產。"},
+"c:calcada":{h:"calçada portuguesa",kk:"[kɑlˋsɑdə]",say:"kal-SAH-duh poor-too-GAY-zuh",lang:"pt-PT",zh:"葡萄牙碎石路",d:"用手工把白色石灰岩和黑色玄武岩小石塊排成圖案的人行道，是葡萄牙的招牌街景。下雨時很滑。"},
+"c:n-alfama":{name:1,h:"Alfama",kk:"[ælˋfɑmə]",say:"al-FAH-muh",lang:"pt-PT",zh:"阿爾法瑪",d:"里斯本最古老的街區，名字來自阿拉伯文。"},
+"c:miradouro":{h:"miradouro",kk:"[͵mirəˋdoru]",say:"mee-ruh-DOH-roo",lang:"pt-PT",zh:"觀景台",d:"葡萄牙文的「觀景台」。里斯本建在山丘上，有很多免費的 miradouro 可以看整座城市。"},
+"c:n-belem":{name:1,h:"Belém",kk:"[bəˋleŋ]",say:"buh-LAYNG",lang:"pt-PT",zh:"貝倫",d:"里斯本西邊的河岸區，葡萄牙文的「伯利恆」。這裡有熱羅尼莫斯修道院、貝倫塔，還有那家有名的蛋塔店。"},
+"c:fado":{h:"fado",kk:"[ˋfɑdu]",say:"FAH-doo",lang:"pt-PT",zh:"法朵",d:"里斯本的傳統歌曲，通常由一位歌手和兩把吉他（其中一把是葡萄牙吉他）演出，主題常是大海、命運和思念。2011 年列入聯合國教科文組織人類無形文化遺產。"},
 "c:n-thames":{name:1,h:"Thames",kk:"[tɛmz]",say:"TEMZ",zh:"泰晤士河",d:"流過倫敦的河。th 念 [t]，a 念 [ɛ]，結尾念 z：TEMZ。"},
 "c:n-faraday":{name:1,h:"Michael Faraday",kk:"[ˋfærə͵de]",say:"FAIR-uh-day",zh:"麥可．法拉第",d:"英國科學家，發現電磁感應，奠定了發電機和電動機的原理。"},
 "c:miasma":{h:"miasma theory",kk:"[maɪˋæzmə]",zh:"瘴氣說",d:"十九世紀以前很普遍的看法：疾病是從臭的、髒的空氣傳來的。後來細菌理論證明，很多疾病其實是透過水、食物或病菌傳播。"},
@@ -1136,7 +1150,37 @@ function narrator(s){
 }
 if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
 const sayAs = t => Object.entries(LEVEL.sayAs || {}).reduce((x,[w,r])=>x.split(w).join(r), t);  /* voice-only respellings */
-const speakable = t => sayAs(plain(t)).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/…/g,"...").replace(/—/g,", ").replace(/\$(\d+)/g,"$1 dollars");
+const speakable = t => plain(t).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/…/g,"...").replace(/—/g,", ").replace(/\$(\d+)/g,"$1 dollars");
+/* ---------------- foreign words ----------------
+   LEVEL.foreign = {"fado":["pt-PT","fah doo"], "dàn bǐng":["zh-TW","dahn bing","蛋餅"]}
+   [language, English-voice respelling, optional text for the native voice].
+   If the device has a voice for that language, the word is spoken by it (mid-sentence too);
+   otherwise the English voice reads the respelling. Matching ignores case. */
+const FOREIGN = {};
+Object.entries(LEVEL.foreign || {}).forEach(([k,v])=>{ FOREIGN[k.toLowerCase()] = {lang:v[0], en:v[1], nat:v[2] || k}; });
+const FRX = Object.keys(FOREIGN).length ? new RegExp("(^|[^\\p{L}])(" + Object.keys(FOREIGN).sort((a,b)=>b.length-a.length)
+  .map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|") + ")(?![\\p{L}])", "giu") : null;
+function nativeVoice(lang){
+  if(!SYN || !lang) return null; const L = lang.toLowerCase(), base = L.split("-")[0];
+  const vs = SYN.getVoices().filter(v=>!NOVELTY.test(v.name)), norm = v => String(v.lang).replace("_","-").toLowerCase();
+  const best = a => a.slice().sort((x,y)=>vq(y)-vq(x))[0];
+  return best(vs.filter(v=>norm(v) === L)) || best(vs.filter(v=>norm(v).split("-")[0] === base)) || null;
+}
+/* split a (sayAs-processed) sentence into parts: [{t, nv}] where nv is a native voice, or absent for the English voice */
+function speakParts(s){
+  const raw = [];
+  if(FRX){ let i = 0, m; FRX.lastIndex = 0;
+    while((m = FRX.exec(s))){ const st = m.index + m[1].length;
+      if(st > i) raw.push({t:s.slice(i, st)}); raw.push({t:m[2], f:FOREIGN[m[2].toLowerCase()]}); i = st + m[2].length; FRX.lastIndex = i; }
+    if(i < s.length) raw.push({t:s.slice(i)});
+  } else raw.push({t:s});
+  const parts = [];
+  raw.forEach(p=>{ const nv = p.f && nativeVoice(p.f.lang);
+    if(nv){ parts.push({t:p.f.nat, nv}); return; }
+    const t = p.f ? p.f.en : sayAs(p.t), last = parts[parts.length-1];
+    if(last && !last.nv) last.t += t; else parts.push({t}); });
+  return parts.filter(p=>p.nv || /[\p{L}\p{N}]/u.test(p.t));
+}
 function sentences(t){
   const s = speakable(t).replace(/\b([ap])\.m\./g,"$1_m_").replace(/\b(Mr|Mrs|Ms|Dr|St)\./g,"$1_");
   return (s.match(/[^.!?]+(?:[.!?]+["']?|$)/g) || [s]).map(x=>x.replace(/([ap])_m_/g,"$1.m.").replace(/\b(Mr|Mrs|Ms|Dr|St)_/g,"$1.").trim()).filter(Boolean);
@@ -1151,7 +1195,8 @@ function pushTTS(q, it){
   const ss = sentences(it.text), v = narrator(S[cur]);
   ss.forEach((s,n)=>{ const pr = prosody(s, it.mood), last = n === ss.length-1;
     const gap = last ? 450 : /\.\.\.["']?$/.test(s) ? 450 : /\?["']?$/.test(s) ? 320 : 260;
-    q.push({text:s, el:it.el, gap, voice:v, rate:pr.rate, pitch:pr.pitch}); });
+    const ps = speakParts(s);
+    ps.forEach((p,m)=>q.push({text:p.t, el:it.el, gap: m === ps.length-1 ? gap : 40, voice:p.nv || v, rate:p.nv ? Math.min(pr.rate, .95) : pr.rate, pitch:p.nv ? 1 : pr.pitch})); });
 }
 const CLIPS = new Set();
 const player = new Audio(); player.preload = "auto";
@@ -1194,8 +1239,10 @@ function runQueue(){
   };
   setTimeout(next, 60);
 }
-function sayWord(t){ if(!SYN) return; stopSpeech(); const u = new SpeechSynthesisUtterance(sayAs(t)); const v = VOICES.main;
-  if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "en-US"; u.rate = Math.min(1, rate); SYN.speak(u); }
+function sayWord(t, lang){ if(!SYN) return; stopSpeech();
+  const nv = nativeVoice(lang);  /* a note with its own lang (a Portuguese name card) is read whole by that voice */
+  (nv ? [{t:speakable(t), nv}] : speakParts(speakable(t))).forEach(p=>{ const u = new SpeechSynthesisUtterance(p.t), v = p.nv || VOICES.main;
+    if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "en-US"; u.rate = Math.min(p.nv ? .9 : 1, rate); SYN.speak(u); }); }
 let speechUnlocked = false;
 function unlockSpeech(){ if(speechUnlocked || !SYN) return; speechUnlocked = true;
   try{ const u = new SpeechSynthesisUtterance(" "); u.volume = 0; u.lang = "en-US"; SYN.speak(u); }catch(e){} }
@@ -1311,7 +1358,7 @@ const pop = $("#pop");
 function popHTML(k){
   if(k.startsWith("c:")){ const c = CULT[k]; if(!c) return "";
     const pk = c.kk ? `<span class="pk">${esc(c.kk)}</span>` : "";
-    return `<div class="ph"><span class="pw">${esc(c.h)}</span>${pk}<span class="lvb">${c.name ? "名字發音" : "文化小知識"}</span><span class="px2"><button class="ib" data-say="${esc(c.h)}" aria-label="聽發音">${SVGI.spk}</button><button class="ib" data-close aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg></button></span></div>
+    return `<div class="ph"><span class="pw">${esc(c.h)}</span>${pk}<span class="lvb">${c.name ? "名字發音" : "文化小知識"}</span><span class="px2"><button class="ib" data-say="${esc(c.speak || c.h)}"${c.lang ? ` data-lang="${esc(c.lang)}"` : ""} aria-label="聽發音">${SVGI.spk}</button><button class="ib" data-close aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg></button></span></div>
       <p class="pz">${esc(c.zh)}</p>${c.say ? `<p class="pd">念起來像 <b>${esc(c.say)}</b></p>` : ""}<p class="pd">${esc(c.d)}</p>`; }
   const v = VOCAB[k]; if(!v) return "";
   const hi = (CEFR[v.lv] || 1) > LEVEL.rank, st = stars.includes(k);
@@ -1403,7 +1450,7 @@ document.addEventListener("click", e=>{
   if(t.closest("#zhBtn")){ setZh(!showZh); return; }
   const qo = t.closest(".qo button"); if(qo){ answer(+qo.closest(".q").dataset.q, +qo.dataset.o); return; }
   if(t.closest("#stampBtn")){ stamp(); return; }
-  const say = t.closest("[data-say]"); if(say){ sayWord(say.dataset.say); return; }
+  const say = t.closest("[data-say]"); if(say){ sayWord(say.dataset.say, say.dataset.lang); return; }
   const star = t.closest("[data-star]");
   if(star){ const k = star.dataset.star, i = stars.indexOf(k); if(i < 0) stars.push(k); else stars.splice(i,1); store.set("stars", stars);
     openPop(k); toast(i < 0 ? "收藏到詞彙的「我的收藏」" : "取消收藏"); if(!$("#p-words").hidden) buildWords(); return; }

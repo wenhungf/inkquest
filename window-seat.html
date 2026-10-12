@@ -2055,7 +2055,37 @@ function voiceFor(who){
 }
 if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
 const sayAs = t => Object.entries(BOOK.sayAs || {}).reduce((x,[w,r])=>x.split(w).join(r), t);  /* voice-only respellings for names TTS gets wrong */
-const speakable = t => sayAs(plain(t)).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/_{3}/g,"blank").replace(/…/g,"...");
+const speakable = t => plain(t).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/_{3}/g,"blank").replace(/…/g,"...");
+/* ---------------- foreign words ----------------
+   BOOK.foreign = {"fado":["pt-PT","fah doo"], "dàn bǐng":["zh-TW","dahn bing","蛋餅"]}
+   [language, English-voice respelling, optional text for the native voice].
+   If the device has a voice for that language, the word is spoken by it (mid-sentence too);
+   otherwise the English voice reads the respelling. Matching ignores case. */
+const FOREIGN = {};
+Object.entries(BOOK.foreign || {}).forEach(([k,v])=>{ FOREIGN[k.toLowerCase()] = {lang:v[0], en:v[1], nat:v[2] || k}; });
+const FRX = Object.keys(FOREIGN).length ? new RegExp("(^|[^\\p{L}])(" + Object.keys(FOREIGN).sort((a,b)=>b.length-a.length)
+  .map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|") + ")(?![\\p{L}])", "giu") : null;
+function nativeVoice(lang){
+  if(!SYN || !lang) return null; const L = lang.toLowerCase(), base = L.split("-")[0];
+  const vs = SYN.getVoices().filter(v=>!NOVELTY.test(v.name)), norm = v => String(v.lang).replace("_","-").toLowerCase();
+  const best = a => a.slice().sort((x,y)=>vq(y)-vq(x))[0];
+  return best(vs.filter(v=>norm(v) === L)) || best(vs.filter(v=>norm(v).split("-")[0] === base)) || null;
+}
+/* split a (sayAs-processed) sentence into parts: [{t, nv}] where nv is a native voice, or absent for the English voice */
+function speakParts(s){
+  const raw = [];
+  if(FRX){ let i = 0, m; FRX.lastIndex = 0;
+    while((m = FRX.exec(s))){ const st = m.index + m[1].length;
+      if(st > i) raw.push({t:s.slice(i, st)}); raw.push({t:m[2], f:FOREIGN[m[2].toLowerCase()]}); i = st + m[2].length; FRX.lastIndex = i; }
+    if(i < s.length) raw.push({t:s.slice(i)});
+  } else raw.push({t:s});
+  const parts = [];
+  raw.forEach(p=>{ const nv = p.f && nativeVoice(p.f.lang);
+    if(nv){ parts.push({t:p.f.nat, nv}); return; }
+    const t = p.f ? p.f.en : sayAs(p.t), last = parts[parts.length-1];
+    if(last && !last.nv) last.t += t; else parts.push({t}); });
+  return parts.filter(p=>p.nv || /[\p{L}\p{N}]/u.test(p.t));
+}
 function sentences(t){
   const s = speakable(t).replace(/\b([ap])\.m\./g,"$1_m_");
   return (s.match(/[^.!?]+(?:[.!?]+["']?|$)/g) || [s]).map(x=>x.replace(/([ap])_m_/g,"$1.m.").trim()).filter(Boolean);
@@ -2074,7 +2104,8 @@ function pushTTS(q, it){
   ss.forEach((s,n)=>{
     const pr = prosody(s, mood, it.who), last = n === ss.length-1;
     const gap = last ? (it.gap || 250) : /\.\.\.$/.test(s) ? 450 : /\?["']?$/.test(s) ? 320 : /!["']?$/.test(s) ? 220 : 260;
-    q.push({text:s, el:it.el, gap, voice:v, rate:pr.rate, pitch:pr.pitch});
+    const ps = speakParts(s);
+    ps.forEach((p,m)=>q.push({text:p.t, el:it.el, gap: m === ps.length-1 ? gap : 40, voice:p.nv || v, rate:p.nv ? Math.min(pr.rate, .95) : pr.rate, pitch:p.nv ? 1 : pr.pitch}));
   });
 }
 
@@ -2144,7 +2175,10 @@ function runQueue(){
   };
   setTimeout(next, 60);
 }
-const say = t => sayQueue([{text:t}]);
+/* a note with its own lang (a French place name) is read whole by a native voice when the device has one */
+function say(t, lang){ const nv = nativeVoice(lang);
+  if(nv){ stopSpeech(); const u = new SpeechSynthesisUtterance(speakable(t)); u.voice = nv; u.lang = nv.lang; u.rate = Math.min(.9, rate); SYN.speak(u); return; }
+  sayQueue([{text:t}]); }
 /* iOS unlocks speech only when speak() runs inside a tap. A <select> change isn't a tap,
    so the first real tap anywhere speaks one silent utterance to unlock it for later. */
 let speechUnlocked = false;
@@ -2276,7 +2310,7 @@ function popHTML(k){
   const c = CULT[k]; if(!c) return "";
   /* names and places can carry a pronunciation key: kk + an easy respelling */
   const pk = c.kk ? `<p class="p-kk">${esc(c.kk)}${c.say ? ` · 念起來像 <b>${esc(c.say)}</b>` : ""}</p>` : "";
-  return `<div class="p-tag"><b class="cu">${c.name ? "名字發音 NAME" : "文化 CULTURE"}</b></div><div class="p-h"><span class="p-w">${esc(c.h)}</span><button class="spk" data-say="${esc(c.h)}" aria-label="聽發音">${SVGI.spk}</button></div>
+  return `<div class="p-tag"><b class="cu">${c.name ? "名字發音 NAME" : "文化 CULTURE"}</b></div><div class="p-h"><span class="p-w">${esc(c.h)}</span><button class="spk" data-say="${esc(c.speak || c.h)}"${c.lang ? ` data-lang="${esc(c.lang)}"` : ""} aria-label="聽發音">${SVGI.spk}</button></div>
     ${pk}<p class="p-zh">${esc(c.zh)}</p><p class="p-d">${c.d}</p>`;
 }
 function openPop(k){
@@ -2286,7 +2320,7 @@ function openPop(k){
 function closePop(){ pop.classList.remove("on"); pop.setAttribute("aria-hidden","true"); }
 $("#popX").onclick = closePop;
 pop.addEventListener("click", e=>{
-  const s = e.target.closest("[data-say]"); if(s){ say(s.dataset.say); return; }
+  const s = e.target.closest("[data-say]"); if(s){ say(s.dataset.say, s.dataset.lang); return; }
   const j = e.target.closest("[data-jump]");
   if(j){ closePop(); const el = document.getElementById(j.dataset.jump); if(el){ el.scrollIntoView({block:"start",behavior:"smooth"}); } }
 });
@@ -2294,7 +2328,7 @@ pop.addEventListener("click", e=>{
 /* ---------------- reader events ---------------- */
 $("#reader").addEventListener("click", e=>{
   const g = e.target.closest(".g"); if(g){ openPop(g.dataset.k); return; }
-  const sp = e.target.closest("[data-say]"); if(sp){ say(sp.dataset.say); return; }
+  const sp = e.target.closest("[data-say]"); if(sp){ say(sp.dataset.say, sp.dataset.lang); return; }
   const wr = e.target.closest(".wr"); if(wr){ openPop(wr.dataset.k); return; }
   const ln = e.target.closest("[data-line]");
   if(ln){ const l = L[cur], j = +ln.dataset.line, x = l.talk.lines[j];
@@ -2449,7 +2483,7 @@ $("#bankMode").addEventListener("click", e=>{
   buildBank();
 });
 $("#bank").addEventListener("click", e=>{
-  const s = e.target.closest("[data-say]"); if(s){ say(s.dataset.say); return; }
+  const s = e.target.closest("[data-say]"); if(s){ say(s.dataset.say, s.dataset.lang); return; }
   const g = e.target.closest("[data-goto]");
   if(g){ closeDrawer(); leaveCover(); const sel = g.dataset.sel;
     go(+g.dataset.goto, ()=>{ const el = $(sel); if(el){ el.scrollIntoView({block:"center",behavior:"smooth"}); if(el.classList.contains("g")) openPop(el.dataset.k); } }); return; }

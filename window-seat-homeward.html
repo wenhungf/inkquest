@@ -614,7 +614,13 @@ const BOOK = {
   version:"1.0・2026 年 10 月",
   hi:/C/,
   /* read-aloud respellings for names the browser voices tend to get wrong */
-  sayAs:{"Walthamstow":"Wallthamstoe","Lyon":"Lee-on","Part-Dieu":"Par Dyuh","Fourvière":"Foor-vyair","St Pancras":"Saint Pancras","Taoyuan":"Tao-yuan"},
+  sayAs:{"Walthamstow":"Wallthamstoe","St Pancras":"Saint Pancras","Taoyuan":"Tao-yuan","Élise":"Eh-leez","Lyon":"Lee-on","Valence":"Vah-lahnss"},
+  foreign:{"Lyon Part-Dieu":["fr-FR","lee on par dew"],"Part-Dieu":["fr-FR","par dew"],"Fourvière":["fr-FR","foor vee air"],"Gare de Lyon":["fr-FR","gar duh lee on"],
+    "bienvenue":["fr-FR","bee yan vuh new"],"la bise":["fr-FR","lah beez"],"bises":["fr-FR","beez","bises"],"bise":["fr-FR","beez"],
+    "bon appétit":["fr-FR","bon ap uh tee","Bon appétit"],"tarte aux pralines":["fr-FR","tart oh prah leen"],
+    "bonjour":["fr-FR","bon zhoor"],"merci":["fr-FR","mair see"],"traboules":["fr-FR","trah bool"],"traboule":["fr-FR","trah bool"],
+    "Für Elise":["de-DE","fur eh leez"],
+    "dàn bǐng":["zh-TW","dahn bing","蛋餅"],"bàn shǒu lǐ":["zh-TW","bahn show lee","伴手禮"]},
   gradBadge:"回家",
   about:`<h4>關於這本《Window Seat・Homeward》</h4>
         <p>第四冊，Mia 在英國的後半年。熟客的英式幽默、一個升職的機會、一趟從倫敦到里昂和巴塞隆納的火車旅行、一班錯過的列車、一場歡送會，最後是十三個小時的回家航程，和陳阿姨的一句「老樣子？」。</p>
@@ -784,6 +790,7 @@ const L = [
     ["Bit of a long one.","有點長的一天／一班。","bit of a + 名詞 = 有點……。英國人常用這種輕描淡寫的說法，實際上可能是「累死了」。"]
   ]
 },
+
 /* ---------------- 2 ---------------- */
 { theme:"think", icon:"scale", title:"The Offer", zt:"升職邀請",
   read:[
@@ -830,6 +837,7 @@ const L = [
     ["Let me sleep on it.","讓我考慮一下。","字面是「讓我睡在上面」，意思是先不急著決定，隔天再回覆。"]
   ]
 },
+
 /* ---------------- 3 ---------------- */
 { theme:"know", icon:"map", title:"Planning the Grand Tour", zt:"規劃壯遊",
   read:[
@@ -875,10 +883,11 @@ const L = [
     ["Off on my hols","去度假了","hols = holidays，英式口語。I’m off on my hols next week! 美國人會說 I’m going on vacation."]
   ]
 },
+
 /* ---------------- 4 ---------------- */
 { theme:"feel", icon:"croissant", title:"Lyon, with Camille", zt:"在里昂，和 Camille 一起",
   read:[
-    ["The train slowed down, and I saw her before she saw me. [[Camille|c:n-camille]] was standing on the platform at [[Lyon Part-Dieu|c:n-partdieu]] with a paper sign: BIENVENUE, MIA! It was the same kind of sign her sister had made for me in London. [[Élise|c:n-elise]] [[must have told|g:4a]] her about it. I laughed so hard that the man behind me had to wait for me to get off.",
+    ["The train slowed down, and I saw her before she saw me. [[Camille|c:n-camille]] was standing on the platform at [[Lyon Part-Dieu|c:n-partdieu]] with a paper sign: [[BIENVENUE|c:bienvenue]], MIA! It was the same kind of sign her sister had made for me in London. [[Élise|c:n-elise]] [[must have told|g:4a]] her about it. I laughed so hard that the man behind me had to wait for me to get off.",
      "火車慢下來，她還沒看到我，我就先看到她了。Camille 站在里昂帕迪厄車站的月台上，手裡拿著一張紙牌：「歡迎，MIA！」跟她妹妹在倫敦為我做的那張是同一種。一定是 Élise 跟她說了。我笑到後面的男人得等我下車。"],
     ["Then I made my first mistake. I opened my arms for a hug, and Camille [[leaned in|lean in]] to kiss my [[cheek]]. We almost hit heads. “[[La bise|c:bise]],” she said, laughing. “Right cheek, then left. In our family, it’s two. My cousins in the south do three, and nobody agrees which side goes first.” By the end of the week, I had [[greeted|greet]] eleven people this way, and I only got it wrong twice.",
      "接著我犯了第一個錯。我張開雙臂要擁抱，Camille 卻湊過來親我的臉頰，我們差點撞到頭。「這叫貼臉禮，」她笑著說，「先右邊，再左邊。我們家是兩下。我南部的表親是三下，而且沒有人說得準該先貼哪一邊。」到那個星期結束，我用這種方式跟十一個人打過招呼，只弄錯了兩次。"],
@@ -921,6 +930,7 @@ const L = [
     ["I’m stuffed.","我吃好撐。","非正式說法，在朋友家可以說。正式場合說 I couldn’t eat another bite. 比較客氣。"]
   ]
 },
+
 /* ---------------- 5 ---------------- */
 { theme:"fun", icon:"train", title:"The Missed Train", zt:"錯過的那班車",
   read:[
@@ -967,6 +977,7 @@ const L = [
     ["Cheers for this.","謝謝你幫忙。","cheers 在英式口語裡常常是「謝謝」，不只是乾杯。借東西、讓路時都可以說。"]
   ]
 },
+
 /* ---------------- 6 ---------------- */
 { theme:"think", icon:"gift", title:"Souvenir Hunting", zt:"找伴手禮",
   read:[
@@ -1013,6 +1024,7 @@ const L = [
     ["Bits and bobs","零零碎碎的小東西","英式口語。I bought a few bits and bobs at the market. = 我在市集買了些小東西。"]
   ]
 },
+
 /* ---------------- 7 ---------------- */
 { theme:"feel", icon:"pint", title:"The Leaving Do", zt:"歡送會",
   read:[
@@ -1059,6 +1071,7 @@ const L = [
     ["Haste ye back","快點回來喔","蘇格蘭的傳統送別語。hen 是蘇格蘭人對女生的暱稱，像「親愛的」。"]
   ]
 },
+
 /* ---------------- 8 ---------------- */
 { theme:"know", icon:"laptop", title:"Everything I Got Wrong", zt:"我搞錯的每一件事",
   read:[
@@ -1107,6 +1120,7 @@ const L = [
     ["To be fair…","說句公道話……","英國人很愛用的開頭，用來替別人或事情說句公道話。To be fair, it was raining."]
   ]
 },
+
 /* ---------------- 9 ---------------- */
 { theme:"feel", icon:"plane", title:"Thirteen Hours Above the Clouds", zt:"雲上十三小時",
   read:[
@@ -1153,6 +1167,7 @@ const L = [
     ["Cheers, babe.","謝啦／掰啦，寶貝。","朋友之間很親暱的說法，英國和澳洲女生之間很常用。cheers 除了「謝謝」，道別時也可以當「掰掰」。"]
   ]
 },
+
 /* ---------------- 10 ---------------- */
 { theme:"feel", icon:"pancake", title:"The Usual, Please", zt:"老樣子，謝謝",
   read:[
@@ -1199,6 +1214,7 @@ const L = [
     ["It’s a long story.","說來話長。","不想或來不及解釋時說。後面也可以加 …but basically, ___. 簡單說一下。"]
   ]
 }
+
 ];
 
 /* ---------------- VOCABULARY (150) — w · pos · kk · lv · zh · d · ex/exz ---------------- */
@@ -1419,13 +1435,14 @@ const CULT = {
 "c:schengen":{h:"the Schengen Area",kk:"[ˋʃɛŋən]",zh:"申根區",d:"歐洲二十多個國家之間取消邊境檢查的區域，法國、西班牙、義大利、德國等都在內，英國和愛爾蘭不在內。持台灣護照免簽證進入申根區，任何 180 天內最多停留 90 天。規定可能改變，出發前請查各國官方網站。"},
 "c:ees":{h:"EES (Entry/Exit System)",zh:"歐盟出入境系統",d:"歐盟的新數位出入境登記系統，2025 年 10 月開始分階段上路，2026 年 4 月全面實施。非歐盟旅客第一次入境申根區時，要登記護照資料、拍照、採集指紋，之後就不再在護照上蓋章。從倫敦搭歐洲之星，這個程序在聖潘克拉斯車站出發前就要完成，所以要提早到。"},
 "c:etias":{h:"ETIAS",kk:"[iˋtiəs]",zh:"歐洲旅行資訊及授權系統",d:"歐盟為免簽旅客（包括持台灣護照的人）設計的線上旅行許可，類似美國的 ESTA，上路後出發前要先上網申請。到 2026 年 10 月，歐盟表示預計 2026 年最後一季上路，上路初期會有過渡期，但確切日期與規定以官方公告為準。出發前務必查歐盟官方網站 travel-europe.europa.eu。"},
-"c:bise":{h:"la bise",kk:"[la biz]",zh:"貼臉禮",d:"法國人打招呼的方式：臉頰輕輕相貼，嘴巴發出親吻的聲音，嘴唇不一定真的碰到臉。親幾下、先貼哪一邊，各地區、各家庭習慣不同，兩下最常見。朋友、家人之間常用；正式場合或第一次見面的商務場合，通常還是握手。"},
+"c:bienvenue":{h:"bienvenue",kk:"[bjɛ̃vəˋny]",say:"byan-vuh-NEW",zh:"（法文）歡迎",d:"法文的「歡迎」。接機牌、商店門口、網站首頁都常看到。Bienvenue à Lyon! 就是「歡迎來到里昂！」最後的 u 要把嘴唇嘟圓了念 ee，英文沒有這個音，NEW 只是近似。"},
+"c:bise":{h:"la bise",kk:"[la biz]",say:"lah BEEZ",zh:"貼臉禮",d:"法國人打招呼的方式：臉頰輕輕相貼，嘴巴發出親吻的聲音，嘴唇不一定真的碰到臉。親幾下、先貼哪一邊，各地區、各家庭習慣不同，兩下最常見。朋友、家人之間常用；正式場合或第一次見面的商務場合，通常還是握手。"},
 "c:bonappetit":{h:"Bon appétit",kk:"[͵bɑn æpəˋti]",zh:"祝用餐愉快",d:"法文，意思是「祝你胃口好」。法國人吃飯前，通常等主人說了 Bon appétit 才開動。英語裡也直接借用這個說法。"},
 "c:praline":{h:"tarte aux pralines",zh:"粉紅果仁糖塔",d:"里昂有名的甜點。用粉紅色糖衣包住的杏仁（pralines roses）加鮮奶油熬煮，倒進塔皮裡，顏色是鮮豔的粉紅色，非常甜。"},
 "c:danbing":{h:"dàn bǐng",zh:"蛋餅",d:"台灣早餐店的招牌：薄薄的餅皮加上煎蛋，捲起來切塊，淋上醬油膏或辣椒醬。英文常說 egg pancake 或 Taiwanese egg crepe，可是外國人聽了不一定想像得出來，最好的方法還是請他們吃一次。"},
 "c:traboule":{h:"traboules",kk:"[trəˋbul]",zh:"里昂的穿堂小巷",d:"里昂老城區和紅十字坡（Croix-Rousse）特有的通道，從一棟建築的門走進去，穿過中庭和樓梯，可以通到另一條街。據說以前絲綢工人用它們搬運布料，不怕淋雨。有些開放參觀，記得保持安靜，因為裡面還有人住。"},
-"c:n-fourviere":{name:1,h:"Fourvière",kk:"[͵furvɪˋɛr]",say:"foor-VYAIR",zh:"富維耶",d:"里昂老城上方的山丘，山頂有白色的富維耶聖母院，可以俯瞰整座城市和兩條河（隆河 Rhône 和索恩河 Saône）。"},
-"c:n-partdieu":{name:1,h:"Lyon Part-Dieu",kk:"[pɑr ˋdjø]",say:"par-DYUH",zh:"里昂帕迪厄車站",d:"里昂最大的火車站，TGV 高鐵和開往巴塞隆納的直達車都從這裡出發。法文結尾的 -ieu 嘴巴要圓，像「迪呃」。"},
+"c:n-fourviere":{name:1,lang:"fr-FR",h:"Fourvière",kk:"[͵furvɪˋɛr]",say:"foor-vee-AIR",zh:"富維耶",d:"里昂老城上方的山丘，山頂有白色的富維耶聖母院，可以俯瞰整座城市和兩條河（隆河 Rhône 和索恩河 Saône）。"},
+"c:n-partdieu":{name:1,lang:"fr-FR",h:"Lyon Part-Dieu",kk:"[pɑr ˋdjø]",say:"par-DYEW",zh:"里昂帕迪厄車站",d:"里昂最大的火車站，TGV 高鐵和開往巴塞隆納的直達車都從這裡出發。法文結尾的 -ieu 嘴巴要圓，像「迪呃」。"},
 "c:n-lyon":{name:1,h:"Lyon",kk:"[liˋɑn]",say:"lee-ON",zh:"里昂",d:"法國第三大城，以美食聞名。英語母語者多半念 lee-ON；法文的 on 是鼻音，結尾的 n 不太發出來。巴黎有個車站叫 Gare de Lyon，意思是「開往里昂的車站」，它在巴黎，不在里昂。"},
 "c:n-barcelona":{name:1,h:"Barcelona",kk:"[͵bɑrsəˋlonə]",say:"bar-suh-LOH-nuh",zh:"巴塞隆納",d:"西班牙加泰隆尼亞地區的首府。重音在 LO。西班牙其他地方的人念 c 時舌頭會放在齒間，像 th 的音；當地的加泰隆尼亞語則念 s。"},
 "c:flat":{h:"My battery’s flat.",zh:"我的電池沒電了",d:"英式說法，flat 形容電池沒電、汽車電瓶沒電，也可以形容輪胎沒氣（a flat tyre）。美式比較常說 My battery’s dead."},
@@ -2130,7 +2147,37 @@ function voiceFor(who){
 }
 if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
 const sayAs = t => Object.entries(BOOK.sayAs || {}).reduce((x,[w,r])=>x.split(w).join(r), t);  /* voice-only respellings for names TTS gets wrong */
-const speakable = t => sayAs(plain(t)).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/_{3}/g,"blank").replace(/…/g,"...");
+const speakable = t => plain(t).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/_{3}/g,"blank").replace(/…/g,"...");
+/* ---------------- foreign words ----------------
+   BOOK.foreign = {"fado":["pt-PT","fah doo"], "dàn bǐng":["zh-TW","dahn bing","蛋餅"]}
+   [language, English-voice respelling, optional text for the native voice].
+   If the device has a voice for that language, the word is spoken by it (mid-sentence too);
+   otherwise the English voice reads the respelling. Matching ignores case. */
+const FOREIGN = {};
+Object.entries(BOOK.foreign || {}).forEach(([k,v])=>{ FOREIGN[k.toLowerCase()] = {lang:v[0], en:v[1], nat:v[2] || k}; });
+const FRX = Object.keys(FOREIGN).length ? new RegExp("(^|[^\\p{L}])(" + Object.keys(FOREIGN).sort((a,b)=>b.length-a.length)
+  .map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|") + ")(?![\\p{L}])", "giu") : null;
+function nativeVoice(lang){
+  if(!SYN || !lang) return null; const L = lang.toLowerCase(), base = L.split("-")[0];
+  const vs = SYN.getVoices().filter(v=>!NOVELTY.test(v.name)), norm = v => String(v.lang).replace("_","-").toLowerCase();
+  const best = a => a.slice().sort((x,y)=>vq(y)-vq(x))[0];
+  return best(vs.filter(v=>norm(v) === L)) || best(vs.filter(v=>norm(v).split("-")[0] === base)) || null;
+}
+/* split a (sayAs-processed) sentence into parts: [{t, nv}] where nv is a native voice, or absent for the English voice */
+function speakParts(s){
+  const raw = [];
+  if(FRX){ let i = 0, m; FRX.lastIndex = 0;
+    while((m = FRX.exec(s))){ const st = m.index + m[1].length;
+      if(st > i) raw.push({t:s.slice(i, st)}); raw.push({t:m[2], f:FOREIGN[m[2].toLowerCase()]}); i = st + m[2].length; FRX.lastIndex = i; }
+    if(i < s.length) raw.push({t:s.slice(i)});
+  } else raw.push({t:s});
+  const parts = [];
+  raw.forEach(p=>{ const nv = p.f && nativeVoice(p.f.lang);
+    if(nv){ parts.push({t:p.f.nat, nv}); return; }
+    const t = p.f ? p.f.en : sayAs(p.t), last = parts[parts.length-1];
+    if(last && !last.nv) last.t += t; else parts.push({t}); });
+  return parts.filter(p=>p.nv || /[\p{L}\p{N}]/u.test(p.t));
+}
 function sentences(t){
   const s = speakable(t).replace(/\b([ap])\.m\./g,"$1_m_");
   return (s.match(/[^.!?]+(?:[.!?]+["']?|$)/g) || [s]).map(x=>x.replace(/([ap])_m_/g,"$1.m.").trim()).filter(Boolean);
@@ -2149,7 +2196,8 @@ function pushTTS(q, it){
   ss.forEach((s,n)=>{
     const pr = prosody(s, mood, it.who), last = n === ss.length-1;
     const gap = last ? (it.gap || 250) : /\.\.\.$/.test(s) ? 450 : /\?["']?$/.test(s) ? 320 : /!["']?$/.test(s) ? 220 : 260;
-    q.push({text:s, el:it.el, gap, voice:v, rate:pr.rate, pitch:pr.pitch});
+    const ps = speakParts(s);
+    ps.forEach((p,m)=>q.push({text:p.t, el:it.el, gap: m === ps.length-1 ? gap : 40, voice:p.nv || v, rate:p.nv ? Math.min(pr.rate, .95) : pr.rate, pitch:p.nv ? 1 : pr.pitch}));
   });
 }
 
@@ -2219,7 +2267,10 @@ function runQueue(){
   };
   setTimeout(next, 60);
 }
-const say = t => sayQueue([{text:t}]);
+/* a note with its own lang (a French place name) is read whole by a native voice when the device has one */
+function say(t, lang){ const nv = nativeVoice(lang);
+  if(nv){ stopSpeech(); const u = new SpeechSynthesisUtterance(speakable(t)); u.voice = nv; u.lang = nv.lang; u.rate = Math.min(.9, rate); SYN.speak(u); return; }
+  sayQueue([{text:t}]); }
 /* iOS unlocks speech only when speak() runs inside a tap. A <select> change isn't a tap,
    so the first real tap anywhere speaks one silent utterance to unlock it for later. */
 let speechUnlocked = false;
@@ -2351,7 +2402,7 @@ function popHTML(k){
   const c = CULT[k]; if(!c) return "";
   /* names and places can carry a pronunciation key: kk + an easy respelling */
   const pk = c.kk ? `<p class="p-kk">${esc(c.kk)}${c.say ? ` · 念起來像 <b>${esc(c.say)}</b>` : ""}</p>` : "";
-  return `<div class="p-tag"><b class="cu">${c.name ? "名字發音 NAME" : "文化 CULTURE"}</b></div><div class="p-h"><span class="p-w">${esc(c.h)}</span><button class="spk" data-say="${esc(c.h)}" aria-label="聽發音">${SVGI.spk}</button></div>
+  return `<div class="p-tag"><b class="cu">${c.name ? "名字發音 NAME" : "文化 CULTURE"}</b></div><div class="p-h"><span class="p-w">${esc(c.h)}</span><button class="spk" data-say="${esc(c.speak || c.h)}"${c.lang ? ` data-lang="${esc(c.lang)}"` : ""} aria-label="聽發音">${SVGI.spk}</button></div>
     ${pk}<p class="p-zh">${esc(c.zh)}</p><p class="p-d">${c.d}</p>`;
 }
 function openPop(k){
@@ -2361,7 +2412,7 @@ function openPop(k){
 function closePop(){ pop.classList.remove("on"); pop.setAttribute("aria-hidden","true"); }
 $("#popX").onclick = closePop;
 pop.addEventListener("click", e=>{
-  const s = e.target.closest("[data-say]"); if(s){ say(s.dataset.say); return; }
+  const s = e.target.closest("[data-say]"); if(s){ say(s.dataset.say, s.dataset.lang); return; }
   const j = e.target.closest("[data-jump]");
   if(j){ closePop(); const el = document.getElementById(j.dataset.jump); if(el){ el.scrollIntoView({block:"start",behavior:"smooth"}); } }
 });
@@ -2369,7 +2420,7 @@ pop.addEventListener("click", e=>{
 /* ---------------- reader events ---------------- */
 $("#reader").addEventListener("click", e=>{
   const g = e.target.closest(".g"); if(g){ openPop(g.dataset.k); return; }
-  const sp = e.target.closest("[data-say]"); if(sp){ say(sp.dataset.say); return; }
+  const sp = e.target.closest("[data-say]"); if(sp){ say(sp.dataset.say, sp.dataset.lang); return; }
   const wr = e.target.closest(".wr"); if(wr){ openPop(wr.dataset.k); return; }
   const ln = e.target.closest("[data-line]");
   if(ln){ const l = L[cur], j = +ln.dataset.line, x = l.talk.lines[j];
@@ -2524,7 +2575,7 @@ $("#bankMode").addEventListener("click", e=>{
   buildBank();
 });
 $("#bank").addEventListener("click", e=>{
-  const s = e.target.closest("[data-say]"); if(s){ say(s.dataset.say); return; }
+  const s = e.target.closest("[data-say]"); if(s){ say(s.dataset.say, s.dataset.lang); return; }
   const g = e.target.closest("[data-goto]");
   if(g){ closeDrawer(); leaveCover(); const sel = g.dataset.sel;
     go(+g.dataset.goto, ()=>{ const el = $(sel); if(el){ el.scrollIntoView({block:"center",behavior:"smooth"}); if(el.classList.contains("g")) openPop(el.dataset.k); } }); return; }

@@ -286,6 +286,8 @@ const LEVEL = {
   version:"1.0・2026 年 9 月",
   /* above this CEFR rank a word is flagged in the popover */
   rank:1,
+  /* foreign words: [language, English-voice respelling, text for the native voice] */
+  foreign:{"shaobing youtiao":["zh-TW","shao bing yo tyow","燒餅油條"],"Jie":["zh-TW","jyeh","姊"]},
   storyTracks:[0,2,0,1,1,2,0,2,0,1],
   tracks:[
     {n:"Lamplight", z:"燈下・電鋼琴與鐘聲", bpm:72, swing:.12, parts:[
@@ -849,8 +851,8 @@ function mk(s){
 }
 const CEFR = {A1:1,A2:2,B1:3,B2:4,C1:5,C2:6};
 const THREAD = {dnd:"🎲 龍與地下城", women:"✨ 自信女性", love:"💕 輕鬆愛情", static:"📡 高雄三部曲"};
-const KIND = {orig:"原創故事", classic:"經典改寫", guide:"旅遊指南"};
-const KIND_EN = {orig:"ORIGINAL", classic:"CLASSIC", guide:"GUIDE"};
+const KIND = {orig:"原創故事", classic:"經典改寫", guide:"旅遊指南", history:"歷史知識"};
+const KIND_EN = {orig:"ORIGINAL", classic:"CLASSIC", guide:"GUIDE", history:"HISTORY"};
 
 /* word counts and which story each note first appears in */
 S.forEach((s,i)=>{
@@ -1097,7 +1099,37 @@ function narrator(s){
 }
 if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
 const sayAs = t => Object.entries(LEVEL.sayAs || {}).reduce((x,[w,r])=>x.split(w).join(r), t);  /* voice-only respellings */
-const speakable = t => sayAs(plain(t)).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/…/g,"...").replace(/—/g,", ").replace(/\$(\d+)/g,"$1 dollars");
+const speakable = t => plain(t).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/…/g,"...").replace(/—/g,", ").replace(/\$(\d+)/g,"$1 dollars");
+/* ---------------- foreign words ----------------
+   LEVEL.foreign = {"fado":["pt-PT","fah doo"], "dàn bǐng":["zh-TW","dahn bing","蛋餅"]}
+   [language, English-voice respelling, optional text for the native voice].
+   If the device has a voice for that language, the word is spoken by it (mid-sentence too);
+   otherwise the English voice reads the respelling. Matching ignores case. */
+const FOREIGN = {};
+Object.entries(LEVEL.foreign || {}).forEach(([k,v])=>{ FOREIGN[k.toLowerCase()] = {lang:v[0], en:v[1], nat:v[2] || k}; });
+const FRX = Object.keys(FOREIGN).length ? new RegExp("(^|[^\\p{L}])(" + Object.keys(FOREIGN).sort((a,b)=>b.length-a.length)
+  .map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|") + ")(?![\\p{L}])", "giu") : null;
+function nativeVoice(lang){
+  if(!SYN || !lang) return null; const L = lang.toLowerCase(), base = L.split("-")[0];
+  const vs = SYN.getVoices().filter(v=>!NOVELTY.test(v.name)), norm = v => String(v.lang).replace("_","-").toLowerCase();
+  const best = a => a.slice().sort((x,y)=>vq(y)-vq(x))[0];
+  return best(vs.filter(v=>norm(v) === L)) || best(vs.filter(v=>norm(v).split("-")[0] === base)) || null;
+}
+/* split a (sayAs-processed) sentence into parts: [{t, nv}] where nv is a native voice, or absent for the English voice */
+function speakParts(s){
+  const raw = [];
+  if(FRX){ let i = 0, m; FRX.lastIndex = 0;
+    while((m = FRX.exec(s))){ const st = m.index + m[1].length;
+      if(st > i) raw.push({t:s.slice(i, st)}); raw.push({t:m[2], f:FOREIGN[m[2].toLowerCase()]}); i = st + m[2].length; FRX.lastIndex = i; }
+    if(i < s.length) raw.push({t:s.slice(i)});
+  } else raw.push({t:s});
+  const parts = [];
+  raw.forEach(p=>{ const nv = p.f && nativeVoice(p.f.lang);
+    if(nv){ parts.push({t:p.f.nat, nv}); return; }
+    const t = p.f ? p.f.en : sayAs(p.t), last = parts[parts.length-1];
+    if(last && !last.nv) last.t += t; else parts.push({t}); });
+  return parts.filter(p=>p.nv || /[\p{L}\p{N}]/u.test(p.t));
+}
 function sentences(t){
   const s = speakable(t).replace(/\b([ap])\.m\./g,"$1_m_").replace(/\b(Mr|Mrs|Ms|Dr|St)\./g,"$1_");
   return (s.match(/[^.!?]+(?:[.!?]+["']?|$)/g) || [s]).map(x=>x.replace(/([ap])_m_/g,"$1.m.").replace(/\b(Mr|Mrs|Ms|Dr|St)_/g,"$1.").trim()).filter(Boolean);
@@ -1112,7 +1144,8 @@ function pushTTS(q, it){
   const ss = sentences(it.text), v = narrator(S[cur]);
   ss.forEach((s,n)=>{ const pr = prosody(s, it.mood), last = n === ss.length-1;
     const gap = last ? 450 : /\.\.\.["']?$/.test(s) ? 450 : /\?["']?$/.test(s) ? 320 : 260;
-    q.push({text:s, el:it.el, gap, voice:v, rate:pr.rate, pitch:pr.pitch}); });
+    const ps = speakParts(s);
+    ps.forEach((p,m)=>q.push({text:p.t, el:it.el, gap: m === ps.length-1 ? gap : 40, voice:p.nv || v, rate:p.nv ? Math.min(pr.rate, .95) : pr.rate, pitch:p.nv ? 1 : pr.pitch})); });
 }
 const CLIPS = new Set();
 const player = new Audio(); player.preload = "auto";
@@ -1155,8 +1188,10 @@ function runQueue(){
   };
   setTimeout(next, 60);
 }
-function sayWord(t){ if(!SYN) return; stopSpeech(); const u = new SpeechSynthesisUtterance(sayAs(t)); const v = VOICES.main;
-  if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "en-US"; u.rate = Math.min(1, rate); SYN.speak(u); }
+function sayWord(t, lang){ if(!SYN) return; stopSpeech();
+  const nv = nativeVoice(lang);  /* a note with its own lang (a Portuguese name card) is read whole by that voice */
+  (nv ? [{t:speakable(t), nv}] : speakParts(speakable(t))).forEach(p=>{ const u = new SpeechSynthesisUtterance(p.t), v = p.nv || VOICES.main;
+    if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "en-US"; u.rate = Math.min(p.nv ? .9 : 1, rate); SYN.speak(u); }); }
 let speechUnlocked = false;
 function unlockSpeech(){ if(speechUnlocked || !SYN) return; speechUnlocked = true;
   try{ const u = new SpeechSynthesisUtterance(" "); u.volume = 0; u.lang = "en-US"; SYN.speak(u); }catch(e){} }
@@ -1272,7 +1307,7 @@ const pop = $("#pop");
 function popHTML(k){
   if(k.startsWith("c:")){ const c = CULT[k]; if(!c) return "";
     const pk = c.kk ? `<span class="pk">${esc(c.kk)}</span>` : "";
-    return `<div class="ph"><span class="pw">${esc(c.h)}</span>${pk}<span class="lvb">${c.name ? "名字發音" : "文化小知識"}</span><span class="px2"><button class="ib" data-say="${esc(c.h)}" aria-label="聽發音">${SVGI.spk}</button><button class="ib" data-close aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg></button></span></div>
+    return `<div class="ph"><span class="pw">${esc(c.h)}</span>${pk}<span class="lvb">${c.name ? "名字發音" : "文化小知識"}</span><span class="px2"><button class="ib" data-say="${esc(c.speak || c.h)}"${c.lang ? ` data-lang="${esc(c.lang)}"` : ""} aria-label="聽發音">${SVGI.spk}</button><button class="ib" data-close aria-label="關閉"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg></button></span></div>
       <p class="pz">${esc(c.zh)}</p>${c.say ? `<p class="pd">念起來像 <b>${esc(c.say)}</b></p>` : ""}<p class="pd">${esc(c.d)}</p>`; }
   const v = VOCAB[k]; if(!v) return "";
   const hi = (CEFR[v.lv] || 1) > LEVEL.rank, st = stars.includes(k);
@@ -1364,7 +1399,7 @@ document.addEventListener("click", e=>{
   if(t.closest("#zhBtn")){ setZh(!showZh); return; }
   const qo = t.closest(".qo button"); if(qo){ answer(+qo.closest(".q").dataset.q, +qo.dataset.o); return; }
   if(t.closest("#stampBtn")){ stamp(); return; }
-  const say = t.closest("[data-say]"); if(say){ sayWord(say.dataset.say); return; }
+  const say = t.closest("[data-say]"); if(say){ sayWord(say.dataset.say, say.dataset.lang); return; }
   const star = t.closest("[data-star]");
   if(star){ const k = star.dataset.star, i = stars.indexOf(k); if(i < 0) stars.push(k); else stars.splice(i,1); store.set("stars", stars);
     openPop(k); toast(i < 0 ? "收藏到詞彙的「我的收藏」" : "取消收藏"); if(!$("#p-words").hidden) buildWords(); return; }
