@@ -29,6 +29,8 @@
     --sage: #93b79b;         /* Lamplight Readers Level 3 accent */
     --dawn: #e9a27e;         /* Window Seat Book 4 accent */
     --starlit: #98a8d6;      /* Lamplight Readers Level 4 accent */
+    --copper: #d98a4e;       /* Kettlebrook accent */
+    --dragon: #e0604f;       /* Hero Workshop accent */
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -172,6 +174,19 @@
     white-space: nowrap;
   }
   .start::after { content: " →"; transition: margin-left 0.18s ease; }
+
+  .note {
+    display: inline-block;
+    margin-top: 0.7rem;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--parchment);
+    border: 1px solid var(--accent, var(--gold));
+    border-radius: 6px;
+    padding: 0.25rem 0.6rem;
+  }
   .card:hover .start::after { margin-left: 4px; }
 
   /* ---------- Footer ---------- */
@@ -199,9 +214,9 @@
     </svg>
     <p class="tagline">Every quest begins with a story.</p>
     <p class="intro">
-      Textbooks, serial stories and interactive gamebooks for English learners.
-      In the gamebooks, you decide what happens next. In the serials,
-      you come back to find out. Tap any word for help.
+      Textbooks, serial stories, interactive gamebooks and a tabletop adventure
+      for English learners. In the gamebooks, you decide what happens next. In the
+      serials, you come back to find out. Tap any word for help.
     </p>
   </header>
 
@@ -358,6 +373,55 @@
         <div class="card-foot">
           <span class="level">B1–B2</span>
           <span class="start">Start reading</span>
+        </div>
+      </a>
+    </li>
+
+  </ul>
+
+  <p class="shelf-label">Tabletop adventure · Kettlebrook</p>
+
+  <ul class="stories">
+
+    <li>
+      <a class="card" href="hero-workshop.html" style="--accent: var(--dragon);">
+        <p class="eyebrow">Character builder · EN + 中文</p>
+        <h2>Hero Workshop</h2>
+        <p>Build a hero for a 5E tabletop game, step by step: choose a class,
+        roll your scores, pick your spells, and level up as the story goes on.
+        Every rule is explained in English and Chinese.</p>
+        <div class="card-foot">
+          <span class="level">Levels 1–5</span>
+          <span class="start">Make a hero</span>
+        </div>
+      </a>
+    </li>
+
+    <li>
+      <a class="card" href="kettlebrook-player.html" style="--accent: var(--copper);">
+        <p class="eyebrow">For players · Puzzles</p>
+        <h2>Kettlebrook: Player’s Book</h2>
+        <p>Ring the five bells in the right order. Pair the odd socks. Find the
+        king’s lost marbles. Handouts, puzzles and word lists for your table,
+        opened one at a time when your DM says so.</p>
+        <div class="card-foot">
+          <span class="level">A2–B1 · 5 chapters</span>
+          <span class="start">Open the book</span>
+        </div>
+      </a>
+    </li>
+
+    <li>
+      <a class="card" href="kettlebrook.html" style="--accent: var(--copper);">
+        <p class="eyebrow">Cozy fantasy · DM’s guide</p>
+        <h2>The Lost-and-Found of Kettlebrook</h2>
+        <p>A sleepy river town, five stolen bells, and a grumpy voice behind a brass
+        door. A five-chapter campaign for one or two heroes, with read-aloud text,
+        maps, monsters and every secret.</p>
+        <span class="note">For teachers and DMs only. Players, please use the Player’s Book.</span>
+        <div class="card-foot">
+          <span class="level">A2–B1 · Levels 1–5</span>
+          <span class="start">Open the guide</span>
         </div>
       </a>
     </li>

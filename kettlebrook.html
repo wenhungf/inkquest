@@ -53,11 +53,14 @@ body:not(.titled) #title{display:none;}
 #title .cc{font-size:11px;color:#6d5f86;text-align:center;max-width:560px;}
 /* title screen on short screens (laptops): never cut off the Open button; scroll if it still doesn't fit */
 #title{overflow-y:auto;justify-content:flex-start;overscroll-behavior:contain;}
+body.titled{overflow:hidden;} #title{scrollbar-width:thin;scrollbar-color:#3a2a52 transparent;}
 #title > :first-child{margin-top:auto;} #title > :last-child{margin-bottom:auto;}
 #title > *{flex:none;}
 @media (max-height:1000px){
   #title{gap:6px;padding:10px 16px;}
-  #title .stage{width:min(96vw,calc(44vh * 16 / 9),960px);}
+  #title .stage{width:min(96vw,calc(40vh * 16 / 9),960px);}
+  #title .kick{line-height:1.3;}
+  #title .tap{font-size:13px;}
   #title h1{font-size:clamp(30px,6.4vh,56px) !important;margin-top:2px;}
   #title .kick{font-size:14px;}
   #title .go{font-size:22px;padding:6px 26px 8px;}
