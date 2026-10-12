@@ -255,7 +255,8 @@ const UI = {
   removeDay:{zh:"清除這天", en:"Clear this day"}, close:{zh:"關閉", en:"Close"},
   negWarn:{zh:"小心：照這個計畫，存款會變成負的。", en:"Careful: this plan takes your money below zero."},
   stressWarn:{zh:"小心：壓力太高（超過 80）可能會生病。", en:"Careful: stress over 80 can make Mia sick."},
-  skip:{zh:"快轉", en:"Skip"}, speed:{zh:"速度", en:"Speed"}, next:{zh:"繼續", en:"Next"}, ok:{zh:"好", en:"OK"},
+  skip:{zh:"快轉", en:"Skip"}, pause:{zh:"暫停", en:"Pause"}, resume:{zh:"繼續播放", en:"Resume"},
+  viewLog:{zh:"查看這兩週的紀錄", en:"Read the two-week log"}, lastLog:{zh:"上兩週的紀錄", en:"Last two weeks"}, backSum:{zh:"回到總結", en:"Back to the summary"}, speed:{zh:"速度", en:"Speed"}, next:{zh:"繼續", en:"Next"}, ok:{zh:"好", en:"OK"},
   summary:{zh:"兩週總結", en:"Two-week summary"}, diary:{zh:"Mia 的日記", en:"Mia's diary"},
   paid:{zh:"入帳", en:"Paid"}, spent:{zh:"支出", en:"Spent"}, rentPaid:{zh:"房租和帳單", en:"Rent and bills"},
   pendingPay:{zh:"待入帳薪水", en:"Pay on the way"},
@@ -999,8 +1000,14 @@ function runDay(S, i){
   ml.days++;
 
   /* money in: paydays */
-  S.payQ.filter(p=>p.date <= date).forEach(p=>{ S.money += p.amt; out.pay.push(p);
-    out.msgs.push(["bank", `Payday! +NT$${p.amt.toLocaleString("en-US")} from the ${p.src === "dept" ? "department store" : "café"}.`, `發薪日！${p.src === "dept" ? "百貨公司" : "咖啡館"}的薪水 NT$${p.amt.toLocaleString("en-US")} 入帳了。`]); });
+  /* one paycheck per job on payday, for all the days it covers */
+  const due = S.payQ.filter(p=>p.date <= date), bySrc = {};
+  due.forEach(p=>{ const b = bySrc[p.src] = bySrc[p.src] || {amt:0, n:0, from:p.from}; b.amt += p.amt; b.n++; S.money += p.amt; out.pay.push(p); });
+  Object.entries(bySrc).forEach(([src, b])=>{
+    const en = src === "dept" ? "the department store" : "the café", zh = src === "dept" ? "百貨公司" : "咖啡館";
+    const mon = b.from ? MON_FULL[+b.from.slice(5,7)-1] : "last month", mzh = b.from ? `${+b.from.slice(5,7)} 月` : "上個月";
+    out.msgs.push(["bank", `Payday! ${en[0].toUpperCase() + en.slice(1)} pays you NT$${b.amt.toLocaleString("en-US")} for ${b.n} ${b.n === 1 ? "day" : "days"} of work in ${mon}.`,
+      `發薪日！${zh}匯來 ${mzh}${b.n} 天的薪水，共 NT$${b.amt.toLocaleString("en-US")}。`]); });
   S.payQ = S.payQ.filter(p=>p.date > date);
   /* money out: rent, bills, food */
   STAGE.bills.forEach(b=>{ if(D.day(date) === b.day){ S.money -= b.amt; out.msgs.push(["bank", `Rent and bills: −NT$${b.amt.toLocaleString("en-US")}.`, `房租和水電：−NT$${b.amt.toLocaleString("en-US")}。`]); } });
@@ -1047,7 +1054,7 @@ function runDay(S, i){
     let amt = a.pay + (a.wkBonus && wd >= 5 ? a.wkBonus : 0);
     if(!good) amt = Math.round(amt * .8);
     if(a.cash){ S.money += amt; out.cash = amt; }
-    else { S.payQ.push({date:payDate(date, a), amt, src:id}); out.later = {amt, date:payDate(date, a)}; }
+    else { S.payQ.push({date:payDate(date, a), amt, src:id, from:date}); out.later = {amt, date:payDate(date, a)}; }
     ml.earned += amt;
     if(a.port && good) S.portfolio += a.port;
   } else if(id !== "free") S.workRun = 0;
@@ -1094,6 +1101,7 @@ function closeBlock(S){
   sum.diary = null;
   for(let i=0;i<14;i++){ const d = blockDate(S, i), nx = D.add(d, 1); if(monthKey(d) !== monthKey(nx)){ sum.diary = diaryFor(S, monthKey(d)); S.diary.push(sum.diary); } }
   S.lastPlan = S.plan.slice();
+  S.lastLog = {date:S.date, feed:S.feed, sum};   /* the two weeks stay readable after they end */
   S.plan = new Array(14).fill(null); S.feed = [];
   S.blk++; S.date = D.add(S.date, 14);
   if(S.blk >= STAGE.blocks) S.done = true;
@@ -1135,7 +1143,7 @@ const screens = ["title","home","plan","play","trip","info"];
 function show(id){ screens.forEach(s=>$("#"+s).classList.toggle("on", s === id)); window.scrollTo(0,0); }
 const statName = k => T(k);
 const fmtD = v => (v > 0 ? "+" : "−") + Math.abs(v).toFixed(Math.abs(v) < 10 && v % 1 ? 1 : 0);
-let selDay = -1, menuTab = "class", playTimer = null, playSpeed = store.get("speed", 1);
+let selDay = -1, menuTab = "class", playTimer = null, playSpeed = store.get("speed", 1), paused = false;
 
 /* ---------------- shared bits ---------------- */
 function topBar(){
@@ -1232,8 +1240,10 @@ function renderHome(){
     ${S.thread.length ? `<h3 style="margin-top:14px">${T("messages")}</h3><p class="muted" style="font-size:13px">${T("tapWord")}</p><div class="thread">${S.thread.map(msgHTML).join("")}</div>` : ""}
     <div class="menu"><button class="btn" id="hPlan" style="grid-column:1/-1">${T("plan2")}</button>
       <button class="btn alt" data-go="friends">${T("friends")}</button><button class="btn alt" data-go="notebook">${T("notebook")}</button>
-      <button class="btn alt" data-go="album">${T("album")}</button><button class="btn alt" data-go="settings">${T("settings")}</button></div>`;
+      <button class="btn alt" data-go="album">${T("album")}</button><button class="btn alt" data-go="settings">${T("settings")}</button>
+      ${S.lastLog ? `<button class="btn alt" id="hLog" style="grid-column:1/-1">${T("lastLog")}</button>` : ""}</div>`;
   paintSprites($("#home")); Music.ui();
+  if(S.lastLog) $("#hLog").onclick = ()=>showLog(S.lastLog, null);
   $("#hPlan").onclick = ()=>renderPlan();
   if(S.pending && S.pending.length) setTimeout(()=>askChoice(S.pending[0]), 300);
 }
@@ -1285,8 +1295,8 @@ function whyText(r, a){
   if(r.why === "span") return T("twoDays");
   return T("locked");
 }
-function openSheet(){
-  const a0 = S.plan[selDay] && actOf(S.plan[selDay]); if(a0 && a0.menu) menuTab = a0.menu;
+function openSheet(keepTab){
+  const a0 = S.plan[selDay] && actOf(S.plan[selDay]); if(!keepTab && a0 && a0.menu) menuTab = a0.menu;   /* open on the day's own menu, but let the player switch tabs */
   const date = blockDate(S, selDay);
   const list = Object.entries(ACTS).filter(([id,a])=>a.menu === menuTab).sort((x,y)=>(canPlace(S,y[0],selDay).ok?1:0)-(canPlace(S,x[0],selDay).ok?1:0));
   const fx = a => {
@@ -1310,7 +1320,7 @@ function openSheet(){
   $("#sheet").classList.add("on"); document.body.classList.add("sheet-on");
   const sl = document.querySelector(`#plan .slot[data-i="${selDay}"]`); if(sl) setTimeout(()=>sl.scrollIntoView({block:"center", behavior:"smooth"}), 50);
   $("#shX").onclick = ()=>{ closeSheet(); selDay = -1; renderPlan(); };
-  sh.querySelectorAll(".tab").forEach(t=> t.onclick = ()=>{ menuTab = t.dataset.m; openSheet(); });
+  sh.querySelectorAll(".tab").forEach(t=> t.onclick = ()=>{ menuTab = t.dataset.m; openSheet(true); });
   sh.querySelectorAll(".act").forEach(b=> b.onclick = ()=>{
     setPlan(S, selDay, b.dataset.a); save();
     let n = selDay + (ACTS[b.dataset.a].span || 1);
@@ -1334,10 +1344,12 @@ function startPlay(){
 function playShell(){
   show("play"); Music.want(STAGE.music.play);
   $("#play").innerHTML = topBar() + `<h2>${LANG === "en" ? "Two weeks in Taipei" : "台北的兩週"}</h2><div class="feed" id="feed"></div>
-    <div class="playbar"><div class="in"><button class="btn alt small" id="spd">${T("speed")} ×${playSpeed}</button><button class="btn small" id="skip">${T("skip")} ⏩</button></div></div>`;
-  Music.ui();
-  $("#spd").onclick = ()=>{ playSpeed = playSpeed === 1 ? 2 : playSpeed === 2 ? 4 : 1; store.set("speed", playSpeed); $("#spd").textContent = `${T("speed")} ×${playSpeed}`; };
-  $("#skip").onclick = ()=>{ playSpeed = 99; };
+    <div class="playbar"><div class="in"><button class="btn alt small" id="spd">${T("speed")} ×${playSpeed}</button><button class="btn alt small" id="pau">${T("pause")}</button><button class="btn small" id="skip">${T("skip")} ⏩</button></div></div>`;
+  Music.ui(); paused = false;
+  $("#spd").onclick = ()=>{ playSpeed = {0.5:1, 1:2, 2:4, 4:0.5}[playSpeed] || 1; store.set("speed", playSpeed); $("#spd").textContent = `${T("speed")} ×${playSpeed}`; };
+  $("#pau").onclick = ()=>{ paused = !paused; $("#pau").textContent = paused ? T("resume") : T("pause"); $("#pau").classList.toggle("on", paused);
+    if(paused) clearTimeout(playTimer); else playTimer = setTimeout(nextDay, 300); };
+  $("#skip").onclick = ()=>{ paused = false; playSpeed = 99; clearTimeout(playTimer); playTimer = setTimeout(nextDay, 30); };
 }
 function resumePlay(){
   clearTimeout(playTimer); playShell();
@@ -1358,27 +1370,40 @@ function nextDay(){
   const out = runDay(S, S.day); save();
   addDayCard(out);
   if(out.trip) return goTrip(out);
-  const pause = out.msgs.length ? 1400 : 700;
-  playTimer = setTimeout(nextDay, playSpeed >= 99 ? 30 : pause / playSpeed);
+  const wait = out.msgs.length ? 2500 : 1500;   /* normal speed: 1.5 s a day, longer when messages arrive */
+  if(!paused) playTimer = setTimeout(nextDay, playSpeed >= 99 ? 30 : wait / playSpeed);
 }
 function dayScene(id){
   const a = actOf(id) || SPECIAL.free;
   const bg = {class:"#DCE7F2", work:"#F6E3CC", social:"#F6DCE5", explore:"#D7EEE4", rest:"#E7E1F3"}[a.menu] || (id === "sick" ? "#F2E0DC" : id === "typhoon" ? "#D5DCE6" : "#EFEDE6");
   return {spr:a.spr, bg};
 }
-function addDayCard(out){
+function dayCardEls(out){
   const sc = dayScene(out.id), a = actOf(out.id);
   const extra = out.later ? `<span class="muted">${T("pendingPay")} ${fmt(out.later.amt)} → ${D.short(out.later.date)}</span>` : out.cash ? `<span class="up">+${fmt(out.cash)}</span>` : "";
   const el = document.createElement("div"); el.className = "day"; el.dataset.i = out.i;
   el.innerHTML = `<canvas width="56" height="56" style="background:${sc.bg}" data-spr="${sc.spr}"></canvas><div style="flex:1">
     <div class="dh">${D.long(out.date)} · ${esc(N(a))}${out.ok === false ? " · 😅" : ""}</div>
-    <div class="ln">${out.trip ? `<i class="muted">${LANG === "en" ? "Off to the station…" : "出發去車站……"}</i>` : mk(out.line || "")}</div>
+    <div class="ln">${out.trip && !out.tripRes ? `<i class="muted">${LANG === "en" ? "Off to the station…" : "出發去車站……"}</i>` : mk(out.line || "")}</div>
     <div class="ticks">${ticksHTML(Object.assign({}, out.d, {money:out.cash ? out.d.money - out.cash : out.d.money}), extra)}</div></div>`;
-  $("#feed").appendChild(el);
   paintSprites(el);
-  out.msgs.forEach(m=>{ const w = document.createElement("div"); w.innerHTML = msgHTML(m); $("#feed").appendChild(w.firstChild); });
-  el.scrollIntoView({block:"end", behavior:"smooth"});
+  return [el].concat(out.msgs.map(m=>{ const w = document.createElement("div"); w.innerHTML = msgHTML(m); return w.firstChild; }));
+}
+function addDayCard(out){
+  const feed = $("#feed"), nearBottom = innerHeight + scrollY >= document.body.scrollHeight - 160;
+  const els = dayCardEls(out); els.forEach(e=>feed.appendChild(e));
+  if(nearBottom || playSpeed >= 99) els[0].scrollIntoView({block:"end", behavior:"smooth"});   /* don't pull the reader down while they scroll back */
   updateTop();
+}
+function showLog(log, back){
+  show("info");
+  const a = log.date, b = D.add(log.date, 13);
+  $("#info").innerHTML = `<div style="padding-top:12px"><button class="btn alt small back" id="lBack">${ICON.back} ${back ? T("backSum") : T("back")}</button>
+    <h2>${T("lastLog")}</h2><p class="muted">${D.short(a)} – ${D.short(b)}</p><div class="feed" id="logFeed"></div>
+    <button class="btn" id="lBack2" style="width:100%;margin-top:12px">${back ? T("backSum") : T("back")}</button></div>`;
+  log.feed.forEach(o=>dayCardEls(o).forEach(e=>$("#logFeed").appendChild(e)));
+  const go = ()=>{ if(back) back(); else renderHome(); };
+  $("#lBack").onclick = go; $("#lBack2").onclick = go;
 }
 function refreshTripCard(out){
   const el = $(`#feed .day[data-i="${out.i}"]`); if(!el) return;
@@ -1388,13 +1413,19 @@ function updateTop(){ const t = $("#play .top"); if(t){ t.outerHTML = topBar(); 
 function endBlock(){
   const sum = closeBlock(S);
   if(playSpeed >= 99) playSpeed = store.get("speed", 1);
+  summaryModal(sum);
+}
+function summaryModal(sum){
   const hearts = Object.keys(sum.hearts).map(k=>`<span>♥ ${esc(N(CAST[k]))} ${fmtD(sum.hearts[k])}</span>`).join("");
   modal(`<h2>${T("summary")}</h2>
     <div class="sum"><span>${T("money")}</span><b class="${sum.money >= 0 ? "up" : "dn"}">${sum.money >= 0 ? "+" : ""}${fmt(sum.money)}</b>
+      ${S.payQ.length ? `<span>${T("pendingPay")}</span><b class="muted">${fmt(S.payQ.reduce((t,p)=>t+p.amt,0))}</b>` : ""}
       <span>${T("stress")}</span><b>${Math.round(S.stress)} (${fmtD(sum.stress || 0)})</b>
       ${STATS.map(k=>sum.st[k] ? `<span>${statName(k)}</span><b class="up">${fmtD(sum.st[k])}</b>` : "").join("")}</div>
     ${hearts ? `<div class="ticks" style="display:flex;flex-wrap:wrap;gap:6px;font-size:14px">${hearts}</div>` : ""}
-    <button class="btn" id="sNext" style="width:100%;margin-top:14px">${T("next")}</button>`, box=>{
+    <button class="btn alt" id="sLog" style="width:100%;margin-top:14px">${T("viewLog")}</button>
+    <button class="btn" id="sNext" style="width:100%;margin-top:8px">${T("next")}</button>`, box=>{
+    box.querySelector("#sLog").onclick = ()=>{ closeModal(); showLog(S.lastLog, ()=>summaryModal(sum)); };
     box.querySelector("#sNext").onclick = ()=>{ if(sum.diary) showDiary(sum.diary, after); else after(); };
   });
   function after(){ closeModal(); if(S.done) return endScreen(); openBlock(S); renderHome(); Music.want(STAGE.music.home); }
