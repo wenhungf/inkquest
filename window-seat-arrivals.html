@@ -669,6 +669,8 @@ const BOOK = {
     s += `<g class="rainfall">${rain}</g>`;
     return `<svg viewBox="0 0 96 64" shape-rendering="crispEdges" role="img" aria-label="下雨的倫敦街頭：一排磚造連棟房屋，紅色雙層巴士開過，Mia 撐著阿嬤的黃雨傘，拖著行李箱">${s}</svg>`;
   },
+  /* the song each lesson opens with (index into tracks) */
+  lessonTracks:[0,1,1,0,1,0,3,0,2,3],
   tracks:[
     {n:"Mind the Gap", z:"小心月台間隙・輕快", bpm:124, hat:true, lw:"p25", lg:.18, bg:.28,
      lead:"E4 A4 C#5 E5 _ C#5 A4 C#5 | B4 _ G#4 B4 E5 _ D5 _ | C#5 _ A4 C#5 F#5 _ E5 C#5 | D5 _ F#5 _ A5 _ F#5 _ | E5 _ C#5 E5 A5 _ G#5 A5 | B5 _ G#5 _ E5 _ B4 _ | A4 D5 F#5 _ G#4 B4 E5 _ | A5 _ E5 _ A4 _ - -",
@@ -2237,9 +2239,13 @@ let showZh = !!store.get("zhdef", false);
 function secHead(id, en, zh, tools){
   return `<section class="sec" id="sec-${id}"><div class="sh"><span class="px">${en}</span><span class="shz">${zh}</span><span class="sp"></span>${tools||""}</div>`;
 }
+/* each lesson has its own song (BOOK.lessonTracks): opening a lesson switches to it, but only if music is already on */
+let musicLesson = -1;
+function lessonTrack(i){ const t = (BOOK.lessonTracks||[])[i]; return (t != null && t < BOOK.tracks.length) ? t : store.get("trk", 0); }
+function musicFor(i){ if(i === musicLesson) return; musicLesson = i; const t = lessonTrack(i); if(Music.cur >= 0 && Music.cur !== t) Music.play(t); }
 function render(i){
   stopSpeech(); closePop();
-  cur = i; store.set("pos", i);
+  cur = i; store.set("pos", i); musicFor(i);
   const l = L[i], th = THEMES[l.theme];
   $("#barTitle").innerHTML = `<b>L${pad(i+1)}</b>${esc(l.title)}`;
   let h = `<header class="lh"><div class="tile">${pix(l.icon)}</div><div>
@@ -2535,8 +2541,8 @@ function showCover(){
 }
 function leaveCover(){ document.body.classList.remove("cover"); }
 /* title screen: START = music on + open the book where the reader left off; MUSIC = toggle music, stay on the cover */
-$("#coverGo").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(store.get("trk", 0)); leaveCover(); go(cur); };
-$("#coverMusic").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(store.get("trk", 0)); else Music.stop(); };
+$("#coverGo").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(lessonTrack(cur)); leaveCover(); go(cur); };
+$("#coverMusic").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(lessonTrack(cur)); else Music.stop(); };
 
 /* keys */
 document.addEventListener("keydown", e=>{

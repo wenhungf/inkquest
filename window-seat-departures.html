@@ -677,6 +677,8 @@ const BOOK = {
     s += R(78,54,1,5,C.INK)+R(78,59,1,2,C.WOOD)+R(79,60,2,1,C.WOOD)+R(81,58,1,2,C.WOOD);
     return `<svg viewBox="0 0 96 64" shape-rendering="crispEdges" role="img" aria-label="黃昏的機場登機門：窗外停著一架飛機，座椅上放著一杯珍奶，旁邊是紅色行李箱和黃雨傘">${s}</svg>`;
   },
+  /* the song each lesson opens with (index into tracks) */
+  lessonTracks:[2,0,1,3,0,1,3,2,0,3],
   tracks:[
     {n:"Departure Board", z:"出發看板・輕快", bpm:118, hat:true, lw:"p25", lg:.18, bg:.28,
      lead:"A4 D5 F#5 A5 _ F#5 D5 F#5 | E5 _ C#5 E5 A5 _ G5 _ | F#5 _ D5 F#5 B5 _ A5 F#5 | G5 _ B5 _ D6 _ B5 _ | A5 _ F#5 A5 D6 _ C#6 D6 | E6 _ C#6 _ A5 _ E5 _ | D5 G5 B5 _ C#5 E5 A5 _ | D6 _ A5 _ D5 _ - -",
@@ -2094,9 +2096,13 @@ let showZh = !!store.get("zhdef", false);
 function secHead(id, en, zh, tools){
   return `<section class="sec" id="sec-${id}"><div class="sh"><span class="px">${en}</span><span class="shz">${zh}</span><span class="sp"></span>${tools||""}</div>`;
 }
+/* each lesson has its own song (BOOK.lessonTracks): opening a lesson switches to it, but only if music is already on */
+let musicLesson = -1;
+function lessonTrack(i){ const t = (BOOK.lessonTracks||[])[i]; return (t != null && t < BOOK.tracks.length) ? t : store.get("trk", 0); }
+function musicFor(i){ if(i === musicLesson) return; musicLesson = i; const t = lessonTrack(i); if(Music.cur >= 0 && Music.cur !== t) Music.play(t); }
 function render(i){
   stopSpeech(); closePop();
-  cur = i; store.set("pos", i);
+  cur = i; store.set("pos", i); musicFor(i);
   const l = L[i], th = THEMES[l.theme];
   $("#barTitle").innerHTML = `<b>L${pad(i+1)}</b>${esc(l.title)}`;
   let h = `<header class="lh"><div class="tile">${pix(l.icon)}</div><div>
@@ -2392,8 +2398,8 @@ function showCover(){
 }
 function leaveCover(){ document.body.classList.remove("cover"); }
 /* title screen: START = music on + open the book where the reader left off; MUSIC = toggle music, stay on the cover */
-$("#coverGo").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(store.get("trk", 0)); leaveCover(); go(cur); };
-$("#coverMusic").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(store.get("trk", 0)); else Music.stop(); };
+$("#coverGo").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(lessonTrack(cur)); leaveCover(); go(cur); };
+$("#coverMusic").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(lessonTrack(cur)); else Music.stop(); };
 
 /* keys */
 document.addEventListener("keydown", e=>{

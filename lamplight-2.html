@@ -288,6 +288,7 @@ const LEVEL = {
   sayAs:{"Thames":"Temz"},
   /* dusk instead of a rainy night */
   scene:{sky:["#2B2350","#5B3768","#A8566F","#E58E6A"], moon:false, stars:false, rain:false, sun:true, birds:true},
+  storyTracks:[1,2,2,0,2,2,0,2,0,1],
   tracks:[
     {n:"Harbor Dusk", z:"港邊黃昏・電鋼琴與鐘聲", bpm:76, swing:.1, parts:[
       {p:"ep", s:"D3+F#3+A3+C#4 _ _ _ _ _ _ _ | B2+D3+F#3+A3 _ _ _ _ _ _ _ | G2+B2+D3+F#3 _ _ _ _ _ _ _ | A2+C#3+E3+G3 _ _ _ _ _ _ _ | D3+F#3+A3+C#4 _ _ _ _ _ _ _ | F#2+A2+C#3+E3 _ _ _ _ _ _ _ | G2+B2+D3+F#3 _ _ _ _ _ _ _ | A2+D3+E3+G3 _ _ _ _ _ _ _", strum:.03},
@@ -1302,8 +1303,12 @@ function renderHome(){
     </button>`).join("") + `</div>`;
   buildToc(); window.scrollTo(0,0);
 }
+/* each story has its own song (LEVEL.storyTracks): opening a story switches to it, but only if music is already on */
+let musicStory = -1;
+function storyTrack(i){ const t = (LEVEL.storyTracks||[])[i]; return (i >= 0 && t != null && t < LEVEL.tracks.length) ? t : (store.get("trk", 0) || 0); }
+function musicFor(i){ if(i === musicStory) return; musicStory = i; const t = storyTrack(i); if(Music.cur >= 0 && Music.cur !== t) Music.play(t); }
 function renderStory(i, para){
-  stopSpeech(); closePop(); cur = i; store.set("pos", i);
+  stopSpeech(); closePop(); cur = i; store.set("pos", i); musicFor(i);
   const s = S[i], prev = S[i-1], next = S[i+1], a = quiz[s.id] || [];
   $("#main").innerHTML = `<article class="story">
     <p class="sk">STORY ${pad(i+1)} · ${KIND_EN[s.kind]}</p>
@@ -1498,8 +1503,8 @@ $("#vol").addEventListener("input", e=>Music.setVol(e.target.value/100));
 /* ---------------- cover ---------------- */
 function leaveCover(){ document.body.classList.remove("cover"); Scene.stop(); }
 /* cover: START = music on + open the book where the reader left off; MUSIC = toggle music, stay on the cover */
-$("#goBtn").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(store.get("trk", 0) || 0); leaveCover(); };
-$("#coverMusic").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(store.get("trk", 0) || 0); else Music.stop(); };
+$("#goBtn").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(storyTrack(cur)); leaveCover(); };
+$("#coverMusic").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(storyTrack(cur)); else Music.stop(); };
 ["touchend","click"].forEach(t=>document.addEventListener(t, ()=>Music.wake(), true));
 
 /* ---------------- boot ---------------- */
