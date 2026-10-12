@@ -85,6 +85,9 @@ h3{font-size:18px;margin:2px 0 6px;}
 /* home */
 .hero{display:flex;gap:12px;align-items:center;}
 .hero canvas{width:96px;height:96px;border-radius:14px;background:var(--tint);flex:none;}
+.hero canvas#endBust{image-rendering:pixelated;image-rendering:crisp-edges;}
+.room{margin:4px 0 10px;border-radius:14px;overflow:hidden;line-height:0;box-shadow:0 6px 18px rgba(0,0,0,.25);}
+.room canvas{width:100%;height:auto;display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
 .hero .who{font-family:var(--f-disp);font-size:20px;}
 .hero .sub{font-size:14px;color:var(--muted);}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:12px;}
@@ -157,7 +160,8 @@ body.sheet-on #plan{padding-bottom:58vh;}
 #modal.on{display:flex;}
 #modal .box{width:100%;max-width:448px;max-height:86vh;overflow-y:auto;background:var(--surface);border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.3);margin-bottom:env(safe-area-inset-bottom,0px);}
 #modal .choices{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
-#modal .choices .btn{width:100%;text-align:left;justify-content:flex-start;}
+#trip .btn{white-space:normal;}
+#modal .choices .btn,.choices .btn{width:100%;text-align:left;justify-content:flex-start;white-space:normal;flex-wrap:wrap;}
 .diary{font-family:var(--f-disp);font-size:18px;line-height:1.55;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:16px;background-image:repeating-linear-gradient(transparent,transparent 27px,var(--rule) 27px,var(--rule) 28px);}
 
 /* glossary words */
@@ -276,27 +280,25 @@ const UI = {
   portfolio:{zh:"作品集", en:"Portfolio"}, time:{zh:"時間", en:"Time"}, energy:{zh:"體力值", en:"Energy"},
   leave:{zh:"結束今天", en:"End the day"}, go2:{zh:"出發", en:"Go"},
   perDay:{zh:"每天", en:"a day"}, payday:{zh:"發薪日", en:"payday"}, cash:{zh:"當天付現", en:"paid the same day"},
+  w_clear:{zh:"晴天", en:"Clear"}, w_cloudy:{zh:"多雲", en:"Cloudy"}, w_rain:{zh:"下雨", en:"Rainy"}, w_storm:{zh:"颱風快來了", en:"A typhoon is coming"},
   livingCost:{zh:"生活費（吃飯、交通）", en:"Living costs (food, transport)"}
 };
 
 /* ==== content/book1/tracks.js ==== */
-/* songs: the four Book 1 songs from the textbook, plus the train song */
+/* songs: the three Lamplight Readers Level 1 songs (trial). home + plan = Lamplight, play = Library Clock, trip = Rain on Glass */
 const TRACKS = [
-    {n:"Morning Walk", z:"晨間散步・輕快", bpm:112, hat:true, lw:"p25", lg:0.18, bg:0.281,
-     lead:"E5 _ G5 _ C6 _ G5 E5 | D5 _ G5 _ B5 _ A5 G5 | C5 _ E5 _ A5 _ G5 E5 | F5 _ A5 _ G5 F5 E5 D5 | E5 _ G5 _ C6 _ D6 E6 | D6 _ B5 _ G5 _ A5 B5 | A5 _ F5 A5 G5 _ D5 F5 | E5 _ D5 _ C5 _ - -",
-     bass:"C3 - G3 - C3 - G3 - | G2 - D3 - G2 - D3 - | A2 - E3 - A2 - E3 - | F2 - C3 - F2 - C3 - | C3 - G3 - C3 - G3 - | G2 - D3 - G2 - D3 - | F2 - C3 - G2 - D3 - | C3 - G3 - C3 - - -"},
-    {n:"Rainy Window", z:"雨天窗邊・抒情", bpm:84, hat:false, lw:"square", lg:0.126, bg:0.247,
-     lead:"A4 _ C5 _ E5 _ _ _ | F5 _ E5 _ C5 _ _ _ | E5 _ G5 _ C5 _ D5 _ | B4 _ _ _ D5 _ _ _ | A4 _ C5 _ E5 _ A5 _ | G5 _ F5 _ E5 _ C5 _ | D5 _ B4 _ D5 _ G5 _ | E5 _ _ _ A4 _ _ _",
-     bass:"A2 E3 A3 E3 A2 E3 A3 E3 | F2 C3 F3 C3 F2 C3 F3 C3 | C3 G3 C4 G3 C3 G3 C4 G3 | G2 D3 G3 D3 G2 D3 G3 D3 | A2 E3 A3 E3 A2 E3 A3 E3 | F2 C3 F3 C3 F2 C3 F3 C3 | G2 D3 G3 D3 G2 D3 G3 D3 | A2 E3 A3 E3 A2 E3 A3 E3"},
-    {n:"Night Market", z:"夜市小跑步・活潑", bpm:128, hat:true, lw:"p25", lg:0.18, bg:0.297,
-     lead:"C5 F5 A5 F5 C6 _ A5 _ | D5 F5 A#5 _ A5 G5 F5 _ | E5 G5 C6 _ A#5 A5 G5 _ | A5 _ F5 _ C5 _ - - | D5 F5 A5 D6 _ C6 A5 _ | A#5 _ A5 G5 F5 _ D5 _ | C5 E5 G5 A#5 A5 G5 E5 _ | F5 _ A5 _ F5 _ - -",
-     bass:"F2 F3 C3 F3 F2 F3 C3 F3 | A#1 A#2 F2 A#2 A#1 A#2 F2 A#2 | C2 C3 G2 C3 C2 C3 G2 C3 | F2 F3 C3 F3 F2 F3 C3 F3 | D2 D3 A2 D3 D2 D3 A2 D3 | A#1 A#2 F2 A#2 A#1 A#2 F2 A#2 | C2 C3 G2 C3 C2 C3 G2 C3 | F2 F3 C3 F3 F2 - - -"},
-    {n:"Tea Break", z:"午後茶點・悠閒", bpm:100, hat:true, lw:"p25", lg:0.162, bg:0.264,
-     lead:"B4 _ D5 G5 _ _ F#5 G5 | E5 _ G5 B5 _ _ A5 G5 | E5 _ C5 E5 G5 _ E5 _ | F#5 _ A5 _ D5 _ _ _ | B4 D5 G5 _ B5 _ A5 G5 | G5 _ E5 _ B4 _ E5 G5 | E5 _ G5 _ F#5 _ A5 _ | G5 _ _ _ - - - -",
-     bass:"G2 - D3 - G2 - D3 - | E2 - B2 - E2 - B2 - | C3 - G2 - C3 - G2 - | D3 - A2 - D3 - A2 - | G2 - D3 - G2 - D3 - | E2 - B2 - E2 - B2 - | C3 - G2 - D3 - A2 - | G2 - D3 - G2 - - -"},
-  {n:"Southbound", z:"南下列車・輕快", bpm:120, hat:true, lw:"p25", lg:0.17, bg:0.28,
-   lead:"G5 _ B5 _ D6 _ B5 G5 | A5 _ C6 _ E6 _ D6 C6 | B5 _ G5 _ D5 _ G5 B5 | A5 _ _ _ F#5 _ D5 _ | G5 _ B5 _ D6 _ G6 _ | F#6 _ E6 D6 C6 _ A5 _ | B5 _ D6 _ C6 _ A5 F#5 | G5 _ _ _ - - - -",
-   bass:"G2 - D3 - G2 - D3 - | A2 - E3 - A2 - E3 - | G2 - D3 - B2 - D3 - | D2 - A2 - D2 - F#2 - | G2 - D3 - G2 - D3 - | C3 - G2 - C3 - G2 - | G2 - D3 - D2 - A2 - | G2 - D3 - G2 - - -"}
+    {n:"Lamplight", z:"燈下・電鋼琴與鐘聲", bpm:72, swing:.12, parts:[
+      {p:"ep", s:"F3+A3+C4+E4 _ _ _ _ _ _ _ | E3+G3+B3+D4 _ _ _ _ _ _ _ | D3+F3+A3+C4 _ _ _ _ _ _ _ | C3+E3+G3+B3 _ _ _ _ _ _ _ | F3+A3+C4+E4 _ _ _ _ _ _ _ | E3+G3+B3+D4 _ _ _ _ _ _ _ | D3+F3+A3+E4 _ _ _ _ _ _ _ | G3+C4+D4+F4 _ _ _ _ _ _ _", strum:.028},
+      {p:"bass", s:"F2 _ _ _ C3 _ _ _ | E2 _ _ _ B2 _ _ _ | D2 _ _ _ A2 _ _ _ | C2 _ _ _ G2 _ _ _ | F2 _ _ _ C3 _ _ _ | E2 _ _ _ B2 _ _ _ | D2 _ _ _ A2 _ _ _ | G2 _ _ _ D3 _ _ _"},
+      {p:"bell", s:"- - A5 _ G5 _ E5 _ | - - G5 _ _ _ D5 _ | - - F5 _ E5 _ C5 _ | E5 _ _ _ _ _ - - | - - A5 _ C6 _ A5 _ | G5 _ _ _ E5 _ - - | F5 _ E5 _ D5 _ C5 _ | D5 _ _ _ _ _ - -"}]},
+    {n:"Rain on Glass", z:"窗上的雨・鋪底與鐘聲琶音", bpm:66, swing:0, parts:[
+      {p:"pad", s:"A2+E3+G3+B3+C4 _ _ _ _ _ _ _ | F2+C3+E3+A3 _ _ _ _ _ _ _ | C3+G3+B3+E4 _ _ _ _ _ _ _ | G2+D3+E3+B3 _ _ _ _ _ _ _ | A2+E3+G3+B3+C4 _ _ _ _ _ _ _ | F2+C3+E3+A3 _ _ _ _ _ _ _ | C3+G3+B3+E4 _ _ _ _ _ _ _ | E3+G#3+B3+D4 _ _ _ _ _ _ _"},
+      {p:"bell", s:"E5 A5 B5 C6 B5 A5 E5 C5 | C5 F5 A5 E6 A5 F5 C5 A4 | E5 G5 B5 D6 B5 G5 E5 D5 | D5 G5 B5 E6 B5 G5 D5 B4 | E5 A5 B5 C6 B5 A5 E5 C5 | C5 F5 A5 E6 A5 F5 C5 A4 | E5 G5 B5 D6 B5 G5 E5 D5 | E5 G#5 B5 D6 B5 G#5 E5 D5", vel:.55},
+      {p:"bass", s:"A1 _ _ _ _ _ _ _ | F1 _ _ _ _ _ _ _ | C2 _ _ _ _ _ _ _ | G1 _ _ _ _ _ _ _ | A1 _ _ _ _ _ _ _ | F1 _ _ _ _ _ _ _ | C2 _ _ _ _ _ _ _ | E2 _ _ _ _ _ _ _", vel:.8}]},
+    {n:"Library Clock", z:"圖書館的時鐘・木琴", bpm:92, swing:.1, parts:[
+      {p:"mar", s:"D4 A4 F#5 A4 C#5 A4 F#5 A4 | B3 F#4 D5 F#4 A4 F#4 D5 F#4 | G3 D4 B4 D4 F#4 D4 B4 D4 | A3 E4 D5 E4 G4 E4 D5 E4 | D4 A4 F#5 A4 C#5 A4 F#5 A4 | B3 F#4 D5 F#4 A4 F#4 D5 F#4 | G3 D4 B4 D4 F#4 D4 B4 D4 | A3 E4 C#5 E4 G4 E4 C#5 E4", vel:.8},
+      {p:"bass", s:"D2 _ _ _ D2 _ A2 _ | B1 _ _ _ B1 _ F#2 _ | G1 _ _ _ G1 _ D2 _ | A1 _ _ _ A1 _ E2 _ | D2 _ _ _ D2 _ A2 _ | B1 _ _ _ B1 _ F#2 _ | G1 _ _ _ G1 _ D2 _ | A1 _ _ _ A1 _ C#2 _"},
+      {p:"ep", s:"- - - - F#5 _ E5 _ | D5 _ _ _ - - - - | - - - - B5 _ A5 _ | A5 _ _ _ - - - - | - - - - F#5 _ A5 _ | B5 _ A5 _ F#5 _ - - | - - - - D5 _ E5 _ | C#5 _ _ _ - - - -", vel:.7}]}
 ];
 
 /* ==== content/book1/gloss.js ==== */
@@ -377,7 +379,7 @@ const STAGE = {
   gain:.3,                                     /* stat growth per day: the full game spans 52 blocks */
   recover:.5,                                   /* stress a night's sleep takes away */
   bills:[],                                     /* she lives at home: no rent in Taiwan */
-  music:{home:0, plan:3, play:0, trip:4, rain:1, night:2}
+  music:{home:0, plan:0, play:2, trip:1, night:1}
 };
 
 /* the people Mia can spend time with (hearts 0–100, one heart per 20) */
@@ -542,7 +544,7 @@ const RANKUP = {
    Sunset in Kaohsiung (calculated): about 18:48 in early July, 18:40 on Aug 1, 18:31 mid-August, 18:17 on Aug 31. */
 const TRIPS = {
 khh:{
-  zh:"高雄兩天一夜", en:"Kaohsiung weekend", music:4,
+  zh:"高雄兩天一夜", en:"Kaohsiung weekend", music:1,
   board:{
     now:"07:40", task:["Find the fast train to Kaohsiung. Tap it, then go to the platform.","找到往高雄的快車。點一下，然後去月台。"],
     rows:[
@@ -778,18 +780,23 @@ function paintSprites(root){
   (root || document).querySelectorAll("canvas[data-spr]").forEach(cv=>{ const g = SPR[cv.dataset.spr]; if(g) drawSprite(cv, g); });
 }
 
-/* ---------------- 8-bit music (the Window Seat books' chiptune player) ---------------- */
-const Music = (()=>{
-  const TR = TRACKS;
-  function midi(n){ const m = /^([A-G])(#?)(\d)$/.exec(n); return 12*(+m[3]+1) + {C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]] + (m[2]?1:0); }
-  function parse(str){
-    const t = str.split(/\s+/).filter(x=>x && x!=="|"); const ev = {}; let last = null;
-    t.forEach((k,i)=>{ if(k==="-"){ last=null; return; } if(k==="_"){ if(last) last.len++; return; } last = {m:midi(k), len:1}; ev[i] = last; });
-    return {n:t.length, ev};
-  }
-  TR.forEach(t=>{ t.L = parse(t.lead); t.B = parse(t.bass); });
-  let ctx=null, out=null, lp=null, timer=null, cur=-1, step=0, nextT=0, noise=null, p25=null, keeper=null;
-  let vol = store.get("vol", 55) / 100;
+/* ---------------- FM music ---------------- */
+const Music = (()=>{  /* the Lamplight Readers FM player */
+  let ctx=null, bus, out, timer=null, cur=-1, step=0, nextT=0, keeper=null, ducked=false;
+  let vol = store.get("vol", 50) / 100;
+  const midi = n=>{ const m=/^([A-G])(#?)(\d)$/.exec(n); return 12*(+m[3]+1)+{C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+(m[2]?1:0); };
+  const hz = m=>440*Math.pow(2,(m-69)/12);
+  const P = {
+    ep:   {mods:[{r:1,i:1.6,d:.9},{r:14,i:.5,d:.07}], a:.004, dec:2.2, sus:0, g:.16, lp:3200},
+    bell: {mods:[{r:3.5,i:2.6,d:1.6}], a:.002, dec:2.6, sus:0, g:.10, lp:6000},
+    bass: {mods:[{r:1,i:2.2,d:.22}], a:.005, dec:.9, sus:.35, g:.24, lp:900},
+    pad:  {mods:[{r:2,i:.7,d:9}], a:.9, dec:4, sus:.8, g:.07, lp:2400, det:6},
+    mar:  {mods:[{r:4,i:2.4,d:.09}], a:.002, dec:.55, sus:0, g:.13, lp:4200}
+  };
+  function parse(str){ const t=str.split(/\s+/).filter(z=>z&&z!=="|"), ev={}; let last=null;
+    t.forEach((k,i)=>{ if(k==="-"){last=null;return;} if(k==="_"){ if(last) last.len++; return; } last={ms:k.split("+").map(midi),len:1}; ev[i]=last; });
+    return {n:t.length, ev}; }
+  const TR = TRACKS; TR.forEach(t=>t.parts.forEach(p=>p.q=parse(p.s)));
   function silentWav(){
     const n = 4000, buf = new ArrayBuffer(44+n), v = new DataView(buf), w = (o,s)=>{ for(let i=0;i<s.length;i++) v.setUint8(o+i,s.charCodeAt(i)); };
     w(0,"RIFF"); v.setUint32(4,36+n,true); w(8,"WAVE"); w(12,"fmt "); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
@@ -798,62 +805,77 @@ const Music = (()=>{
     let s = ""; new Uint8Array(buf).forEach(b=> s += String.fromCharCode(b));
     return "data:audio/wav;base64," + btoa(s);
   }
+  /* iOS: play through the silent switch, and keep the session alive */
   function unlockIOS(){
     try{ if(navigator.audioSession) navigator.audioSession.type = "playback"; }catch(e){}
     try{ if(!keeper){ keeper = new Audio(silentWav()); keeper.loop = true; keeper.setAttribute("playsinline",""); keeper.volume = 0.01; }
       const pr = keeper.play(); if(pr && pr.catch) pr.catch(()=>{}); }catch(e){}
   }
+  function impulse(sec){ const n=ctx.sampleRate*sec, b=ctx.createBuffer(2,n,ctx.sampleRate);
+    for(let c=0;c<2;c++){ const ch=b.getChannelData(c); for(let i=0;i<n;i++) ch[i]=(Math.random()*2-1)*Math.pow(1-i/n,3.2); } return b; }
   function init(){
-    const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return false;
-    ctx = new AC(); out = ctx.createGain(); lp = ctx.createBiquadFilter();
-    lp.type = "lowpass"; lp.frequency.value = 3200; lp.connect(out); out.connect(ctx.destination);
-    const M = 40, re = new Float32Array(M), im = new Float32Array(M);
-    for(let n=1;n<M;n++) re[n] = (2/(n*Math.PI)) * Math.sin(n*Math.PI*.25);
-    p25 = ctx.createPeriodicWave(re, im);
-    noise = ctx.createBuffer(1, ctx.sampleRate*.05, ctx.sampleRate);
-    const d = noise.getChannelData(0); for(let i=0;i<d.length;i++) d[i] = Math.random()*2-1;
-    out.gain.value = vol*1.65; return true;
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false;
+    ctx=new AC(); out=ctx.createGain(); bus=ctx.createGain();
+    const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-18; comp.ratio.value=3;
+    const rev=ctx.createConvolver(); rev.buffer=impulse(3); const rg=ctx.createGain(); rg.gain.value=.32;
+    const dly=ctx.createDelay(1); dly.delayTime.value=.42; const fb=ctx.createGain(); fb.gain.value=.28;
+    const dlp=ctx.createBiquadFilter(); dlp.type="lowpass"; dlp.frequency.value=1800; const dg=ctx.createGain(); dg.gain.value=.18;
+    bus.connect(comp); bus.connect(rev); rev.connect(rg); rg.connect(comp);
+    bus.connect(dly); dly.connect(dlp); dlp.connect(fb); fb.connect(dly); dlp.connect(dg); dg.connect(comp);
+    comp.connect(out); out.connect(ctx.destination); out.gain.value=0; return true;
   }
-  function note(t, m, dur, type, peak){
-    const o = ctx.createOscillator(), g = ctx.createGain();
-    if(type==="p25") o.setPeriodicWave(p25); else o.type = type;
-    o.frequency.value = 440*Math.pow(2,(m-69)/12);
-    g.gain.setValueAtTime(.0001,t); g.gain.linearRampToValueAtTime(peak,t+.01);
-    g.gain.setTargetAtTime(peak*.55,t+.02,.12); g.gain.setTargetAtTime(.0001,t+Math.max(.04,dur-.03),.025);
-    o.connect(g); g.connect(lp); o.start(t); o.stop(t+dur+.25);
-  }
-  function hat(t){
-    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
-    s.buffer = noise; f.type = "highpass"; f.frequency.value = 7000;
-    g.gain.setValueAtTime(.035,t); g.gain.exponentialRampToValueAtTime(.001,t+.04);
-    s.connect(f); f.connect(g); g.connect(out); s.start(t); s.stop(t+.05);
+  function applyVol(){ if(out) out.gain.setTargetAtTime(cur < 0 ? 0 : vol*(ducked?.3:1), ctx.currentTime, .08); }
+  function voice(t, m, dur, p, vel){
+    const f=hz(m), amp=ctx.createGain(), lp=ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=p.lp;
+    const carriers=[f]; if(p.det) carriers.push(f*Math.pow(2,p.det/1200));
+    const stopAt=t+dur+p.dec+.2;
+    carriers.forEach(cf=>{
+      const c=ctx.createOscillator(); c.frequency.value=cf;
+      p.mods.forEach(md=>{ const o=ctx.createOscillator(), g=ctx.createGain(); o.frequency.value=cf*md.r;
+        const idx=cf*md.i; g.gain.setValueAtTime(idx,t); g.gain.setTargetAtTime(idx*.15,t+.005,md.d/3);
+        o.connect(g); g.connect(c.frequency); o.start(t); o.stop(stopAt); });
+      c.connect(lp); c.start(t); c.stop(stopAt);
+    });
+    const pk=p.g*(vel||1)/carriers.length;
+    amp.gain.setValueAtTime(0,t); amp.gain.linearRampToValueAtTime(pk,t+p.a);
+    amp.gain.setTargetAtTime(pk*p.sus,t+p.a,p.dec/3);
+    amp.gain.setTargetAtTime(0,t+Math.max(p.a,dur),p.sus?.5:.25);
+    lp.connect(amp); amp.connect(bus);
   }
   function tick(){
-    const Tk = TR[cur], sd = 60/Tk.bpm/2;
-    while(nextT < ctx.currentTime + .15){
-      const a = Tk.L.ev[step % Tk.L.n], b = Tk.B.ev[step % Tk.B.n];
-      if(a) note(nextT, a.m, a.len*sd*.95, Tk.lw, Tk.lg);
-      if(b) note(nextT, b.m, b.len*sd*.9, "triangle", Tk.bg);
-      if(Tk.hat && step % 2 === 1) hat(nextT);
+    const T=TR[cur], sd=60/T.bpm/2;
+    while(nextT < ctx.currentTime+.25){
+      const sw = step%2 ? sd*T.swing : 0;
+      T.parts.forEach(pt=>{ const e=pt.q.ev[step%pt.q.n]; if(!e) return;
+        e.ms.forEach((m,k)=>voice(nextT+sw+(pt.strum||0)*k, m, e.len*sd*.96, P[pt.p], pt.vel)); });
       nextT += sd; step++;
     }
   }
   function play(i){
     if(!ctx && !init()){ toast(T("noMusic")); return; }
-    unlockIOS(); const r = ctx.resume(); if(r && r.catch) r.catch(()=>{});
-    clearInterval(timer); cur = i; step = 0; nextT = ctx.currentTime + .08;
-    tick(); timer = setInterval(tick, 25); store.set("music", true); ui();
+    unlockIOS();
+    const r = ctx.resume(); if(r && r.catch) r.catch(()=>{});
+    clearInterval(timer); cur=i; step=0; nextT=ctx.currentTime+.1; applyVol();
+    tick(); timer=setInterval(tick,40); store.set("music", true); ui();
   }
-  function stop(){ clearInterval(timer); timer = null; cur = -1; if(keeper) keeper.pause(); store.set("music", false); ui(); }
+  function stop(){ clearInterval(timer); timer=null; cur=-1; if(ctx) applyVol(); if(keeper) keeper.pause(); store.set("music", false); ui(); }
   function want(i){ if(cur >= 0 && cur !== i) play(i); }  /* switch song only if music is on */
+  function restart(){ if(cur >= 0){ nextT = ctx.currentTime + .05; clearInterval(timer); timer = setInterval(tick,40); } }
+  function wake(){ if(ctx && cur >= 0 && ctx.state !== "running"){ unlockIOS(); ctx.resume().then(restart).catch(()=>{}); } }
   function ui(){ $$("[data-music]").forEach(b=>{ b.classList.toggle("on", cur >= 0); b.setAttribute("aria-pressed", cur >= 0); }); }
   document.addEventListener("visibilitychange", ()=>{
     if(!ctx || cur < 0) return;
     if(document.hidden){ clearInterval(timer); ctx.suspend(); }
-    else { ctx.resume().then(()=>{ nextT = ctx.currentTime + .05; timer = setInterval(tick,25); }); }
+    else ctx.resume().then(restart).catch(()=>{});
   });
-  return { play, stop, want, ui, get cur(){ return cur; } };
+  return { TR, play, stop, want, wake, ui,
+    get cur(){ return cur; }, get state(){ return ctx ? ctx.state : "none"; },
+    setVol(v){ vol=v; store.set("vol", Math.round(v*100)); if(ctx) applyVol(); }, get vol(){ return vol; },
+    duck(on){ ducked=on; if(ctx) applyVol(); } };
 })();
+
+/* iOS: a tap brings the music back after a call or a lock screen */
+["touchend","click"].forEach(t=>document.addEventListener(t, ()=>Music.wake(), true));
 
 /* ---------------- speech: English voice for messages and announcements ---------------- */
 const SYN = window.speechSynthesis || null;
@@ -898,6 +920,259 @@ document.addEventListener("click", e=>{
   const sp = e.target.closest("[data-say]"); if(sp){ say(sp.dataset.say); return; }
   if(e.target.closest("[data-close]") || !e.target.closest("#pop")) $("#pop").classList.remove("on");
 }, true);
+
+/* ==== engine/room.js ==== */
+/* ---------------- Mia's room (320×180, Bayer-dithered, from the Lamplight cover) ----------------
+   The window changes with the time of day and the weather. Mia's bust sits in front, lit from the
+   window by day and from the desk lamp by night. */
+const Room = (()=>{
+  const W = 320, H = 180;
+  const B4 = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+  const hex = h => [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+  const bay = (x,y)=>(B4[y&3][x&3]+.5)/16;
+
+  /* time of day and weather → colours and props */
+  const SKIES = {
+    night:  {sky:["#15183A","#232A5A","#3B3872","#5A4A83"], wall:["#2A2336","#352B40","#3F3246"], floor:["#6E4B35","#5C3E2C","#4A3223"],
+             town:"#241F3C", lit:true, lamp:true, moon:true, stars:true, curtain:["#8C4F5E","#7B4453"], frame:"#5A4232", hill:"#1E1A33"},
+    dusk:   {sky:["#3B3872","#8A5585","#E0806A","#F7B26A"], wall:["#3E2E3E","#4A3646","#55404C"], floor:["#7A5238","#68452F","#553826"],
+             town:"#3A2B48", lit:true, lamp:true, sun:[60,84], curtain:["#9A5864","#874C58"], frame:"#5E4535", hill:"#4A3458"},
+    morning:{sky:["#7FA8E0","#A9C6EC","#E9D9C9","#F6D9B0"], wall:["#BCA990","#C6B49B","#CFBEA6"], floor:["#A47753","#926846","#7E5939"],
+             town:"#7C8AA0", lit:false, lamp:false, sun:[36,70], birds:true, curtain:["#C27886","#B06C7A"], frame:"#7A5A43", hill:"#8EA79A"},
+    day:    {sky:["#3E7FD0","#5C9BE0","#86BCEB","#B9DCF2"], wall:["#C9B79C","#D2C1A6","#DACAB0"], floor:["#A87A55","#956A48","#82593B"],
+             town:"#6F7F95", lit:false, lamp:false, sun:[124,32], birds:true, curtain:["#C77C8A","#B5707E"], frame:"#7A5A43", hill:"#7FA08A"}
+  };
+  const WEATHER = {
+    clear:{}, cloudy:{clouds:"#E6E9EE", cloud2:"#BFC6D0", dim:.12},
+    rain:{clouds:"#8F98A6", cloud2:"#6F7886", rain:44, dim:.3, grey:["#5E6A7A","#6E7A89","#808B98","#929CA7"]},
+    storm:{clouds:"#4E5664", cloud2:"#3A414D", rain:90, slant:1, dim:.42, flash:true, grey:["#2E3440","#3B4250","#4A5260","#56606C"]}
+  };
+  const pick = (S)=>{
+    const end = D.add(S.date, 13);
+    const storm = Object.entries(S.locks || {}).some(([d,v])=>v === "typhoon" && d >= S.date && d <= end);
+    let h = 0; for(const ch of S.date) h = (h*31 + ch.charCodeAt(0)) >>> 0;
+    h = (h ^ (h >>> 7)) * 2654435761 >>> 0;
+    const time = ["morning","day","dusk","night"][h % 4];
+    const weather = storm ? "storm" : ["clear","clear","cloudy","rain"][(h >>> 3) % 4];
+    return {time: storm && time === "morning" ? "day" : time, weather};
+  };
+
+  /* ---------- Mia's bust: 56×76, built from shapes, then hand-placed features ---------- */
+  const BW = 56, BH = 76;
+  const MC = {o:"#1E1824", h:"#2E2433", H:"#46384F", R:"#6A5470", s:"#F2C9A5", S:"#DDA684", T:"#C38B6C", L:"#FBDCC0",
+              b:"#6FA8DC", B:"#4E86BE", C:"#3B6C9E", U:"#9CC8EE", w:"#FFFFFF", W:"#DCE3EA", k:"#2B2536",
+              e:"#F7F2EC", i:"#4A3230", j:"#8A5A44", p:"#EC9AA8", m:"#B4555E", M:"#D9858A", n:"#C98F72"};
+  function bust(lightRight){
+    const g = Array.from({length:BH}, ()=>Array(BW).fill("."));
+    const set = (x,y,c)=>{ if(x>=0 && y>=0 && x<BW && y<BH) g[y][x] = c; };
+    const at = (x,y)=> (x>=0 && y>=0 && x<BW && y<BH) ? g[y][x] : ".";
+    const cx = 28, side = x => lightRight ? (x - cx) : (cx - x);   /* >0 on the lit side */
+    /* shoulders and top */
+    for(let y=56;y<BH;y++){ const t = (y-56)/(BH-56), half = Math.round(9 + Math.sqrt(t)*19);
+      for(let x=cx-half;x<=cx+half;x++){ const sd = side(x)/half;
+        let c = sd > .55 ? "U" : sd > -.35 ? "b" : sd > -.75 ? "B" : "C";
+        if(sd > .3 && sd <= .55 && bay(x,y) < .5) c = "U";
+        if(sd <= -.35 && sd > -.5 && bay(x,y) < .5) c = "b";
+        set(x,y,c); } }
+    /* a fold line under each arm */
+    for(let y=66;y<BH;y++){ set(cx-15+((y-66)>>2), y, "B"); set(cx+15-((y-66)>>2), y, "B"); }
+    /* neck */
+    for(let y=48;y<60;y++) for(let x=cx-5;x<=cx+5;x++) set(x,y, side(x) < -1 ? "T" : "S");
+    for(let x=cx-5;x<=cx+5;x++) set(x,56,"T");
+    /* white collar: a V that opens to the neck */
+    for(let y=56;y<64;y++){ const k = y-56;
+      for(let d=0;d<4;d++){ set(cx-6-k+d, y, d===0 ? "W" : "w"); set(cx+6+k-d, y, d===0 ? "W" : "w"); } }
+    for(let y=58;y<63;y++){ const k = y-58; for(let x=cx-3+k;x<=cx+3-k;x++) set(x,y, "S"); }
+    /* back hair: long, falls past the shoulders */
+    for(let y=7;y<70;y++){
+      const half = y < 30 ? Math.round(Math.sqrt(Math.max(0, 1 - Math.pow((30-y)/23,2)))*18) : Math.round(18 - Math.max(0,y-50)*.4);
+      if(half < 3) continue;
+      for(let x=cx-half;x<=cx+half;x++){
+        if((y >= 56 && Math.abs(x-cx) < 11) || (y >= 47 && Math.abs(x-cx) <= 5)) continue;   /* the neck and collar show through */
+        const sd = side(x)/half;
+        let c = "h";
+        if(sd > .74) c = "H";
+        if(sd > .88 && bay(x,y) < .55) c = "R";
+        set(x,y,c); } }
+    /* hair ends: uneven tips */
+    [[-16,70],[-14,71],[-11,70],[11,70],[14,71],[16,70]].forEach(([dx,y])=>set(cx+dx,y,"h"));
+    /* face: an egg, narrower at the chin */
+    const fy = 34;
+    for(let y=18;y<=52;y++) for(let x=cx-13;x<=cx+13;x++){
+      const top = y < fy, ry = top ? 16 : 18, dy = (y-fy)/ry;
+      const rx = top ? 12.5 : 12.5 - Math.pow(Math.max(0,y-fy)/ry,1.7)*8;
+      if(Math.abs(x-cx) > rx*Math.sqrt(Math.max(0,1-dy*dy))) continue;
+      const sd = side(x)/12.5;
+      let c = "s";
+      if(sd < -.6) c = "S";
+      else if(sd < -.42 && bay(x,y) < .5) c = "S";
+      if(sd > .45 && y > 27 && y < 46 && bay(x,y) < .3) c = "L";
+      if(y >= 50) c = sd < -.2 ? "T" : "S";
+      set(x,y,c); }
+    /* bangs: a soft fringe, a few strands longer than the rest */
+    const tips = [26,27,25,24,26,23,24,25,22,24,23,25,26,24,22,23,25,24,22,24,25,23,24,26,25,27,28];
+    for(let x=cx-13;x<=cx+13;x++){ const end = tips[x-(cx-13)];
+      for(let y=11;y<=end;y++){ const sd = side(x)/13; let c = "h";
+        if(sd > .72) c = "H";
+        set(x,y,c); } }
+    /* the shine on the crown: a dithered arc */
+    for(let x=cx-10;x<=cx+10;x++){ const y = 14 + Math.round(Math.pow((x-cx)/10,2)*3) + (lightRight ? 0 : 0);
+      const sd = side(x)/10; if(sd < -.5) continue;
+      set(x,y,"H"); if(bay(x,y+1) < .5) set(x,y+1,"H"); if(sd > .1 && sd < .6) set(x,y,"R"); }
+    /* side locks frame the cheeks */
+    for(let y=24;y<56;y++){ const w = y < 42 ? 2 : 2 + ((y-42)>>2);
+      for(let d=0;d<w;d++){ set(cx-13+d-(y>46?1:0), y, side(cx-13) > 0 ? "H" : "h"); set(cx+13-d+(y>46?1:0), y, side(cx+13) > 0 ? "H" : "h"); } }
+    /* brows, just under the fringe */
+    [[-10,29],[-9,28],[-8,28],[-7,28],[-6,28]].forEach(([dx,y])=>{ set(cx+dx,y,"H"); set(cx-dx,y,"H"); });
+    /* eyes */
+    const eye = [".kkkkk.","kkeiiek",".eiwjie","..iij.."];
+    const put = (x0, rows, flip)=>rows.forEach((r,y)=>[...r].forEach((c,x)=>{ if(c !== ".") set(flip ? x0+r.length-1-x : x0+x, 31+y, c); }));
+    put(cx-10, eye, false); put(cx+4, eye, true);
+    set(cx-11,30,"k"); set(cx+11,30,"k");
+    /* nose, cheeks, mouth */
+    set(lightRight ? cx-1 : cx+1, 39, "n"); set(lightRight ? cx-1 : cx+1, 40, "n"); set(cx, 41, "n");
+    [[-9,38],[-8,38],[-7,38],[-8,39],[7,38],[8,38],[9,38],[8,39]].forEach(([dx,y])=>{ if(bay(cx+dx,y) < .75) set(cx+dx,y,"p"); });
+    set(cx-2,44,"m"); set(cx-1,45,"m"); set(cx,45,"m"); set(cx+1,45,"m"); set(cx+2,44,"m"); set(cx,46,"M");
+    /* outline the silhouette */
+    const out = g.map(r=>r.slice());
+    for(let y=0;y<BH;y++) for(let x=0;x<BW;x++){ if(at(x,y) !== ".") continue;
+      if([[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>at(x+dx,y+dy) !== ".")) out[y][x] = "o"; }
+    return out.map(r=>r.join(""));
+  }
+  const BUSTS = {L:bust(false), R:bust(true)};
+
+  /* a stand-alone portrait (for the end screen and anywhere else) */
+  function drawBust(cv, lightRight){
+    const rows = BUSTS[lightRight ? "R" : "L"]; cv.width = BW; cv.height = BW;
+    const c = cv.getContext("2d"); c.clearRect(0,0,BW,BW);
+    rows.slice(2, 2+BW).forEach((r,y)=>{ for(let x=0;x<r.length;x++){ const ch = r[x]; if(ch === ".") continue; c.fillStyle = MC[ch]; c.fillRect(x,y,1,1); } });
+  }
+
+  /* ---------- the room ---------- */
+  let anim = null;
+  function draw(cv, S, force){
+    if(anim){ anim.on = false; anim = null; }
+    const {time, weather} = force || pick(S);
+    const P = SKIES[time], Wt = WEATHER[weather];
+    const x = cv.getContext("2d"); cv.width = W; cv.height = H;
+    const img = x.createImageData(W,H), d = img.data, mask = new Uint8Array(W*H);
+    const put = (px,py,c)=>{ if(px<0||py<0||px>=W||py>=H) return; const i=(py*W+px)*4; d[i]=c[0]; d[i+1]=c[1]; d[i+2]=c[2]; d[i+3]=255; };
+    const rect = (x0,y0,w,h,c)=>{ c=hex(c); for(let yy=y0;yy<y0+h;yy++) for(let xx=x0;xx<x0+w;xx++) put(xx,yy,c); };
+    const vgrad = (x0,y0,w,h,cols)=>{ const cs=cols.map(hex), n=cs.length-1;
+      for(let yy=0;yy<h;yy++){ const t=yy/(h-1)*n, k=Math.min(n-1,Math.floor(t)), f=t-k;
+        for(let xx=0;xx<w;xx++) put(x0+xx,y0+yy, f>bay(xx,yy)?cs[k+1]:cs[k]); } };
+    const glow = (cx,cy,r,col,str)=>{ const c=hex(col);
+      for(let yy=cy-r;yy<=cy+r;yy++) for(let xx=cx-r;xx<=cx+r;xx++){
+        if(xx<0||yy<0||xx>=W||yy>=H) continue;
+        const dd=Math.hypot(xx-cx,(yy-cy)*1.1)/r; if(dd>1) continue;
+        const t=(1-dd)*(1-dd)*str, b=bay(xx,yy), i=(yy*W+xx)*4, a = t>b ? .55 : t>b*.5 ? .25 : 0;
+        if(a){ d[i]+=(c[0]-d[i])*a; d[i+1]+=(c[1]-d[i+1])*a; d[i+2]+=(c[2]-d[i+2])*a; } } };
+    const shade = (x0,y0,w,h,col,a)=>{ const c=hex(col);   /* dithered dimming, for grey weather */
+      for(let yy=y0;yy<y0+h;yy++) for(let xx=x0;xx<x0+w;xx++){ const i=(yy*W+xx)*4; d[i]+=(c[0]-d[i])*a; d[i+1]+=(c[1]-d[i+1])*a; d[i+2]+=(c[2]-d[i+2])*a; } };
+
+    /* wall */
+    vgrad(0,0,W,124,P.wall);
+    for(let xx=0;xx<W;xx+=16) rect(xx,0,1,124, time === "night" || time === "dusk" ? "#2E2639" : "#BBA88D");
+    /* window: sky */
+    rect(18,14,132,92,"#1B1726");
+    const sky = Wt.grey && (time === "day" || time === "morning") ? Wt.grey : Wt.grey && time === "dusk" ? ["#3A3448","#5A4658","#7A5A62","#8A6A6A"] : Wt.grey ? ["#101326","#181C36","#22264A","#2C2E52"] : P.sky;
+    vgrad(22,18,124,84,sky);
+    if(P.stars && !Wt.clouds) [[30,24],[52,30],[70,21],[96,28],[118,23],[134,34],[42,40],[88,44],[60,46],[140,26]].forEach(p=>put(p[0],p[1],hex("#E8E3FF")));
+    if(P.moon && !Wt.rain){ for(let yy=-8;yy<=8;yy++) for(let xx=-8;xx<=8;xx++){ if(xx*xx+yy*yy<=64) put(124+xx,32+yy,hex((xx+yy)>5?"#D9CFAE":"#F4EBCB")); }
+      rect(120,28,3,2,"#E2D7B6"); rect(127,35,2,2,"#E2D7B6"); }
+    if(P.sun && !Wt.rain){ const [sx,sy] = P.sun, r = time === "day" ? 8 : 12;
+      for(let yy=-r;yy<=r;yy++) for(let xx=-r;xx<=r;xx++){ if(xx*xx+yy*yy<=r*r) put(sx+xx,sy+yy,hex(time === "day" ? "#FFF4C8" : yy>3?"#F59A62":yy>-3?"#FDB46E":"#FFD08A")); } }
+    if(time === "dusk" && !Wt.rain) for(let yy=60;yy<100;yy+=5) rect(22,yy,124,1,yy>82?"#E58A6A":"#D9798A");
+    /* hills behind the city: Taipei sits in a basin */
+    for(let xx=22;xx<146;xx++){ const hy = 80 + Math.round(Math.sin(xx/13)*3 + Math.sin(xx/5.3)*1.5); rect(xx,hy,1,102-hy, P.hill); }
+    /* city, with Taipei 101 */
+    const town = Wt.grey && !P.lit ? "#5A6474" : P.town;
+    const sk=[[22,82,12,20],[34,74,12,28],[46,86,14,16],[60,78,10,24],[70,84,12,18],[84,76,10,26],[94,82,6,20],[114,80,12,22],[126,72,10,30],[136,84,10,18]];
+    sk.forEach(b=>rect(b[0],b[1],b[2],b[3],town));
+    rect(101,92,12,10,town); rect(103,72,8,20,town);
+    for(let s=0;s<8;s++){ const y0 = 40 + s*4; rect(103,y0,8,4,town); rect(102,y0,10,1,town); }
+    rect(104,36,6,4,town); rect(105,32,4,4,town); rect(106,22,2,10,town); put(106,21,hex(town));
+    if(P.lit){ for(let i=0;i<54;i++){ const b=sk[i%sk.length]; const wx=b[0]+2+((i*5)%(b[2]-3)), wy=b[1]+3+((i*7)%(b[3]-6)); if(i%3) put(wx,wy,hex(i%4?"#F2C46B":"#FFE3A3")); }
+      for(let s=0;s<8;s++){ put(104+(s%3)*2, 42+s*4, hex("#9FE0D8")); put(109-(s%2)*2, 41+s*4, hex("#9FE0D8")); }
+      put(106,21,hex("#FF6B6B")); }
+    else for(let i=0;i<40;i++){ const b=sk[i%sk.length]; const wx=b[0]+2+((i*5)%(b[2]-3)), wy=b[1]+3+((i*7)%(b[3]-6)); if(i%2) put(wx,wy,hex("#4E5A6C")); }
+    /* clouds */
+    const clouds = Wt.clouds ? [[24,24,30],[70,30,38],[116,22,28],[40,46,26],[98,48,30]] : time === "day" || time === "morning" ? [[30,30,22],[104,44,20]] : [];
+    const cloudCol = Wt.clouds || "#FFFFFF", cloudSh = Wt.cloud2 || "#DCE8F4";
+    const cloud = (cx,cy,w)=>{ for(let yy=-6;yy<=4;yy++) for(let xx=-w/2;xx<=w/2;xx++){
+      const e = Math.pow(xx/(w/2),2) + Math.pow(yy/(yy<0?6:4),2) - Math.sin((xx+cx)/3)*.12; if(e>1) continue;
+      const px=(cx+xx)|0, py=cy+yy; if(px<22||px>=146||py<18||py>=102) continue; put(px,py,hex(yy>1||(yy>-1&&bay(px,py)<.4)?cloudSh:cloudCol)); } };
+    clouds.forEach(c=>cloud(c[0],c[1],c[2]));
+    if(Wt.dim) shade(22,18,124,84, time === "night" ? "#0E1022" : "#5A6070", Wt.dim*.6);
+    /* frame, sill, curtains */
+    rect(18,14,132,4,P.frame); rect(18,102,132,5,P.frame); rect(18,14,4,92,P.frame); rect(146,14,4,92,P.frame); rect(82,18,4,84,P.frame); rect(22,58,124,3,P.frame);
+    rect(14,106,140,4,"#7A5A43");
+    for(let yy=10;yy<112;yy++){ const w=8+Math.round(Math.sin(yy/9)*2); rect(6,yy,w,1,yy%6<3?P.curtain[0]:P.curtain[1]); rect(154-w+8,yy,w,1,yy%6<3?P.curtain[0]:P.curtain[1]); }
+    rect(4,8,160,3,"#4A3528");
+    /* cork board with two polaroids from her shoots and a note */
+    rect(206,26,52,36,"#6B4A33"); rect(208,28,48,32,"#C49A64");
+    for(let yy=28;yy<60;yy++) for(let xx=208;xx<256;xx++) if(bay(xx,yy) < .18) put(xx,yy,hex("#A87F4E"));
+    rect(212,31,14,17,"#F4F0E8"); rect(214,33,10,10,time === "night" ? "#6B7FA8" : "#7FB0D8"); rect(216,37,4,6,"#2E2433"); rect(217,36,2,2,"#F2C9A5");
+    rect(230,34,14,17,"#F4F0E8"); rect(232,36,10,10,"#E58E7A"); rect(235,39,4,7,"#2E2433"); rect(236,38,2,2,"#F2C9A5");
+    rect(246,44,8,10,"#F4E27A"); rect(247,46,6,1,"#9A8A3A"); rect(247,48,5,1,"#9A8A3A"); rect(247,50,6,1,"#9A8A3A");
+    put(219,31,hex("#D9534F")); put(237,34,hex("#3E8E5E")); put(250,44,hex("#2F5D8A"));
+    /* floor */
+    vgrad(0,124,W,56,P.floor);
+    rect(0,124,W,2,"#8A6147");
+    for(let xx=0;xx<W;xx+=40) rect(xx,132,24,1,"#5F4130");
+    /* desk on the right with the lamp, books and a mug */
+    rect(196,112,124,5,"#7A5638"); rect(196,112,124,1,"#9A7050"); rect(198,117,6,50,"#5A3E2A"); rect(306,117,6,50,"#5A3E2A"); rect(204,117,102,3,"#4A3223");
+    [["#5F7FA8",214,104,40,4],["#B96F7D",217,100,34,4],["#6F9277",212,96,38,4]].forEach(b=>{rect(b[1],b[2],b[3],b[4],b[0]); rect(b[1],b[2],b[3],1,"#FFFFFF"); rect(b[1]+2,b[2]+2,b[3]-4,1,"#F4E7CF");});
+    rect(256,100,14,12,"#E9E1D2"); rect(256,100,14,2,"#FFFFFF"); rect(258,101,10,2,"#9A6A3F"); rect(270,103,3,2,"#E9E1D2"); rect(272,103,2,6,"#E9E1D2"); rect(270,108,3,2,"#E9E1D2");
+    rect(280,108,26,4,"#2E2A30"); rect(291,70,4,38,"#3A3540"); rect(289,68,8,3,"#3A3540");
+    for(let yy=0;yy<20;yy++){ const w=16+yy; rect(293-w/2|0,48+yy,w,1, P.lamp ? (yy<2?"#F7D59A":yy%4?"#E8B561":"#DDA955") : (yy<2?"#D8C7A6":yy%4?"#C4AE88":"#B8A27C")); }
+    rect(279,68,28,2,P.lamp ? "#C98E43" : "#9A8460");
+    /* plant on the floor under the window */
+    rect(30,132,18,12,"#B1634A"); rect(29,131,20,2,"#C9745A");
+    [[36,116,3,16],[40,112,3,20],[32,120,3,12],[44,118,3,14]].forEach(s=>rect(s[0],s[1],s[2],s[3],"#4E8A5B"));
+    [[30,118,6,3],[42,110,6,3],[34,112,5,3],[45,116,6,3],[26,124,6,3]].forEach(s=>rect(s[0],s[1],s[2],s[3],"#6FAE78"));
+    /* warm or cool light over the room */
+    if(P.lamp) glow(293,80,96,"#F6C57A",.6);
+    if(!P.lamp && !Wt.rain) glow(84,60,120, time === "morning" ? "#FFE6C0" : "#FFF6DC", .28);
+    if(Wt.dim && !P.lamp) shade(0,0,W,H,"#4A4E5C",Wt.dim*.55);
+    /* Mia, between the window and the desk */
+    const lightRight = !!P.lamp, bx = 140, by = H - BH;
+    BUSTS[lightRight ? "R" : "L"].forEach((r,y)=>{ for(let xx=0;xx<BW;xx++){ const ch = r[xx]; if(ch === ".") continue; put(bx+xx,by+y,hex(MC[ch])); mask[(by+y)*W+bx+xx] = 1; } });
+    if(P.lamp) glow(bx+BW, by+30, 30, "#F6C57A", .35);
+
+    const base = new Uint8ClampedArray(d);
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const A = anim = {on:true};
+    const nDrops = Wt.rain || 0, drops = Array.from({length:nDrops},()=>({x:22+Math.random()*124, y:18+Math.random()*84, v:(Wt.slant?2.6:1.6)+Math.random()*1.4}));
+    const rain = hex(time === "night" ? "#9DB2E6" : "#D6E0EE"), rain2 = hex(time === "night" ? "#6F7FB8" : "#A8B6C8");
+    const birds = P.birds && !Wt.rain ? [{x:40,y:34,v:.35,p:0},{x:56,y:40,v:.3,p:2},{x:100,y:28,v:.4,p:4}] : [], bird = hex("#3A2440");
+    const st1 = hex("#F4EFE6"), st2 = hex("#C9BFB6"), steam = Array.from({length:8},(_,i)=>({t:i/8}));
+    const lash = hex(MC.k);
+    let frame = 0, last = 0, flash = 0, blink = 0;
+    function paint(){
+      d.set(base);
+      if(P.lamp){ const fl = 1 + (Math.sin(frame*.7)+Math.sin(frame*1.9))*.03; glow(293,58,30,"#FFE2A8",.75*fl); }
+      if(P.moon && !Wt.rain) glow(124,32,22,"#CFC8FF",.3);
+      birds.forEach(b=>{ b.x+=b.v; if(b.x>146) b.x=22; const bx2=b.x|0, flap=(frame+b.p)%6<3;
+        put(bx2,b.y+(flap?0:1),bird); put(bx2+1,b.y+1,bird); put(bx2+2,b.y+(flap?0:1),bird); });
+      drops.forEach(p=>{ p.y+=p.v; if(Wt.slant) p.x -= p.v*.5; if(p.y>101 || p.x<22){ p.y=18; p.x=22+Math.random()*130; }
+        const px=p.x|0, py=p.y|0, glass = (gx,gy)=>gx>=22 && gx<146 && gy>=18 && gy<102 && !(gx>=82 && gx<86) && !(gy>=58 && gy<61) && !mask[gy*W+gx];
+        if(glass(px,py)) put(px,py,rain); const tx = px+(Wt.slant?1:0); if(glass(tx,py-1)) put(tx,py-1,rain2); });
+      if(Wt.flash){ if(flash > 0){ flash--; shade(22,18,124,84,"#F2F4FF",.5); } else if(Math.random() < .012) flash = 2; }
+      steam.forEach((s,i)=>{ s.t=(s.t+.02)%1; const sy=98-s.t*18, sx=262+Math.round(Math.sin(s.t*6+i)*2)+(i%3)*2;
+        if(s.t<.8){ const c=s.t<.4?st1:st2; put(sx,sy|0,c); } });
+      /* Mia blinks every few seconds */
+      blink = (blink + 1) % 48;
+      if(blink < 2) [-10,4].forEach(dx=>{ for(let xx=0;xx<7;xx++){ const px = bx+28+dx+xx, o = ((by+35)*W+px)*4;
+        for(let yy=0;yy<4;yy++){ if(yy === 1) put(px, by+31+yy, lash); else if(!(yy === 0 && (xx === 0 || xx === 6))) d.set(d.subarray(o,o+3), ((by+31+yy)*W+px)*4); } } });
+      x.putImageData(img,0,0);
+    }
+    function loop(ts){ if(!A.on || !cv.isConnected) return; if(cv.offsetParent === null){ requestAnimationFrame(loop); return; } if(ts-last >= 83){ last = ts; frame++; paint(); } requestAnimationFrame(loop); }
+    paint(); if(!reduce) requestAnimationFrame(loop);
+    return {time, weather};
+  }
+  return {draw, drawBust, pick};
+})();
 
 /* ==== engine/sim.js ==== */
 /* =========================================================
@@ -1192,9 +1467,11 @@ document.addEventListener("click", e=>{
   const go = e.target.closest("[data-go]"); if(go){ info(go.dataset.go); return; }
 });
 function musicFor(){
-  const scr = screens.find(s=>$("#"+s).classList.contains("on"));
+  let scr = screens.find(s=>$("#"+s).classList.contains("on"));
+  if(scr === "info") scr = S && S.done ? "home" : infoBack;
   if(scr === "trip") return STAGE.music.trip;
   if(scr === "plan") return STAGE.music.plan;
+  if(scr === "play") return STAGE.music.play;
   return STAGE.music.home;
 }
 
@@ -1240,8 +1517,9 @@ function renderHome(){
   const stats = STATS.map(k=>`<div class="stat"><div class="n"><span>${statName(k)}</span><span class="px">${Math.floor(S.st[k])}</span></div><div class="bar"><i style="width:${S.st[k]}%"></i></div></div>`).join("");
   const pend = S.payQ.reduce((t,p)=>t+p.amt, 0);
   $("#home").innerHTML = topBar() + `
-    <div class="hero">${spriteHTML("mia")}<div><div class="who">Mia</div>
-      <div class="sub">${LANG === "en" ? `Block ${S.blk+1} of ${STAGE.blocks} · Taipei` : `第 ${S.blk+1} / ${STAGE.blocks} 個兩週・台北`}</div>
+    <div class="room"><canvas id="roomCv" width="320" height="180"></canvas></div>
+    <div class="hero noimg"><div><div class="who">Mia</div>
+      <div class="sub">${LANG === "en" ? `Block ${S.blk+1} of ${STAGE.blocks} · Taipei` : `第 ${S.blk+1} / ${STAGE.blocks} 個兩週・台北`} · ${T("w_"+Room.pick(S).weather)}</div>
       ${pend ? `<div class="sub">${T("pendingPay")}：${fmt(pend)}</div>` : ""}${S.portfolio ? `<div class="sub">${T("portfolio")}：${S.portfolio}</div>` : ""}</div></div>
     <div class="stats">${stats}</div>
     ${S.thread.length ? `<h3 style="margin-top:14px">${T("messages")}</h3><p class="muted" style="font-size:13px">${T("tapWord")}</p><div class="thread">${S.thread.map(msgHTML).join("")}</div>` : ""}
@@ -1249,7 +1527,7 @@ function renderHome(){
       <button class="btn alt" data-go="friends">${T("friends")}</button><button class="btn alt" data-go="notebook">${T("notebook")}</button>
       <button class="btn alt" data-go="album">${T("album")}</button><button class="btn alt" data-go="settings">${T("settings")}</button>
       ${S.lastLog ? `<button class="btn alt" id="hLog" style="grid-column:1/-1">${T("lastLog")}</button>` : ""}</div>`;
-  paintSprites($("#home")); Music.ui();
+  paintSprites($("#home")); Room.draw($("#roomCv"), S); Music.ui();
   if(S.lastLog) $("#hLog").onclick = ()=>showLog(S.lastLog, null);
   $("#hPlan").onclick = ()=>renderPlan();
   if(S.pending && S.pending.length) setTimeout(()=>askChoice(S.pending[0]), 300);
@@ -1352,7 +1630,7 @@ function playShell(){
   show("play"); Music.want(STAGE.music.play);
   $("#play").innerHTML = topBar() + `<h2>${LANG === "en" ? "Two weeks in Taipei" : "台北的兩週"}</h2><div class="feed" id="feed"></div>
     <div class="playbar"><div class="in"><button class="btn alt small" id="spd">${T("speed")} ×${playSpeed}</button><button class="btn alt small" id="pau">${T("pause")}</button><button class="btn small" id="skip">${T("skip")} ⏩</button></div></div>`;
-  Music.ui(); paused = false;
+  Music.ui(); paused = false; tripPending = false;
   $("#spd").onclick = ()=>{ playSpeed = {0.5:1, 1:2, 2:4, 4:0.5}[playSpeed] || 1; store.set("speed", playSpeed); $("#spd").textContent = `${T("speed")} ×${playSpeed}`; };
   $("#pau").onclick = ()=>{ paused = !paused; $("#pau").textContent = paused ? T("resume") : T("pause"); $("#pau").classList.toggle("on", paused);
     if(paused) clearTimeout(playTimer); else playTimer = setTimeout(nextDay, 300); };
@@ -1366,13 +1644,16 @@ function resumePlay(){
     const out = runDay(S, S.day); save(); addDayCard(out); return goTrip(out); }
   playTimer = setTimeout(nextDay, 500);
 }
+let tripPending = false;   /* while a trip is open, the days wait for it */
 function goTrip(out){
-  return setTimeout(()=>runTrip(out.trip, res=>{ applyTrip(S, res); save();
-      show("play"); Music.want(STAGE.music.play); refreshTripCard(S.feed[S.feed.length-1]); updateTop();
+  tripPending = true; clearTimeout(playTimer);
+  return setTimeout(()=>runTrip(out.trip, res=>{ tripPending = false; applyTrip(S, res); save();
+      show("play"); Music.want(STAGE.music.play); const last = S.feed[S.feed.length-1]; if(last) refreshTripCard(last); updateTop();
       playTimer = setTimeout(nextDay, 600); }), 500);
 }
 function nextDay(){
   clearTimeout(playTimer);
+  if(tripPending) return;
   if(S.day >= 14) return endBlock();
   const out = runDay(S, S.day); save();
   addDayCard(out);
@@ -1435,7 +1716,7 @@ function summaryModal(sum){
     box.querySelector("#sLog").onclick = ()=>{ closeModal(); showLog(S.lastLog, ()=>summaryModal(sum)); };
     box.querySelector("#sNext").onclick = ()=>{ if(sum.diary) showDiary(sum.diary, after); else after(); };
   });
-  function after(){ closeModal(); if(S.done) return endScreen(); openBlock(S); renderHome(); Music.want(STAGE.music.home); }
+  function after(){ closeModal(); Music.want(STAGE.music.home); if(S.done) return endScreen(); openBlock(S); renderHome(); }
 }
 function showDiary(dy, then){
   modal(`<h2>${T("diary")}</h2><div class="diary">${dy.lines.map(l=>`<p>${mk(l)}</p>`).join("")}</div>
@@ -1449,14 +1730,14 @@ function endScreen(){
   show("info");
   const top2 = STATS.slice().sort((a,b)=>S.st[b]-S.st[a]).slice(0,2);
   $("#info").innerHTML = `<div style="padding-top:20px"><h2>${T("endSlice")}</h2>
-    <div class="hero">${spriteHTML("mia")}<div><div class="who">Mia</div><div class="sub">${fmt(S.money)} · ${T("stress")} ${Math.round(S.stress)}</div>
+    <div class="hero"><canvas id="endBust"></canvas><div><div class="who">Mia</div><div class="sub">${fmt(S.money)} · ${T("stress")} ${Math.round(S.stress)}</div>
     ${S.payQ.length ? `<div class="sub">${T("pendingPay")}：${fmt(S.payQ.reduce((t,p)=>t+p.amt,0))}</div>` : ""}<div class="sub">${statName(top2[0])} ${Math.floor(S.st[top2[0]])} · ${statName(top2[1])} ${Math.floor(S.st[top2[1]])}</div></div></div>
     <div class="diary" style="margin-top:12px">${LANG === "en"
       ? "<p>That's July and August. In the full game, Stage 1 runs to the Mid-Autumn Festival on October 6, 2025, and closes with the Mid-Autumn Night Market Stall. Then Mia's working-holiday dream begins.</p>"
       : "<p>七月和八月結束了。完整版的第一階段會一直玩到 2025 年 10 月 6 日中秋節，以中秋夜市擺攤收尾。接著，Mia 的打工度假夢就要開始了。</p>"}</div>
     <div class="menu"><button class="btn alt" data-go="album">${T("album")}</button><button class="btn alt" data-go="notebook">${T("notebook")}</button>
     <button class="btn" id="eNew" style="grid-column:1/-1">${T("newGame")}</button></div></div>`;
-  paintSprites($("#info"));
+  paintSprites($("#info")); Room.drawBust($("#endBust"), false);
   $("#eNew").onclick = ()=>askConfirm(T("confirmNew"), ()=>{ S = newGame(); openBlock(S); enter(); });
 }
 
@@ -1489,7 +1770,7 @@ function info(page){
   $("#info").innerHTML = h + `</div>`;
   paintSprites($("#info")); Music.ui();
   $$("#info canvas[data-card]").forEach(cv=>drawCard(cv, cv.dataset.card));
-  $("#iBack").onclick = ()=>{ const b = infoBack || "home"; if(b === "title") renderTitle(), show("title"); else if(b === "plan") renderPlan(); else if(b === "play" || b === "trip") show(b); else if(S && S.done) endScreen(); else renderHome(); };
+  $("#iBack").onclick = ()=>{ const b = infoBack || "home"; if(b === "title") renderTitle(), show("title"); else if(b === "plan") renderPlan(); else if(b === "play" || b === "trip"){ show(b); Music.want(b === "trip" ? STAGE.music.trip : STAGE.music.play); } else if(S && S.done) endScreen(); else renderHome(); };
   $$("#info [data-l]").forEach(b=> b.onclick = ()=>{ setLang(b.dataset.l); info(page); });
   $$("#info [data-th]").forEach(b=> b.onclick = ()=>{ store.set("theme", b.dataset.th); applyTheme(); info(page); });
   const cc = $("#cCopy"); if(cc) cc.onclick = ()=>{ const t = $("#code"); t.select(); try{ navigator.clipboard.writeText(t.value); }catch(e){ document.execCommand("copy"); } toast(T("copied")); };
@@ -1614,7 +1895,7 @@ function tripRide(){
 }
 /* a scene with options; stat checks, costs and gains; then a Next button */
 function choiceBlock(box, scene, opts, next){
-  box.innerHTML = sceneHTML(scene) + `<div class="choices" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${opts.map((o,j)=>`<button class="btn alt" data-o="${j}" style="justify-content:flex-start;text-align:left">${esc(plain(LANG === "en" ? o.en : o.zh + "　" + o.en))}${o.cost ? ` <span class="tag">NT$${o.cost}</span>` : ""}${o.stat ? ` <span class="tag">${statName(o.stat)}</span>` : ""}</button>`).join("")}</div>`;
+  box.innerHTML = sceneHTML(scene) + `<div class="choices" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${opts.map((o,j)=>`<button class="btn alt" data-o="${j}" style="justify-content:flex-start;text-align:left;white-space:normal;flex-wrap:wrap;width:100%">${LANG === "en" ? esc(plain(o.en)) : `<span style="display:block;width:100%">${esc(plain(o.zh))}</span><span style="display:block;width:100%;font-weight:400;opacity:.85">${esc(plain(o.en))}</span>`}${o.cost ? ` <span class="tag">NT$${o.cost}</span>` : ""}${o.stat ? ` <span class="tag">${statName(o.stat)}</span>` : ""}</button>`).join("")}</div>`;
   box.querySelectorAll("[data-o]").forEach(b=> b.onclick = e=>{
     const o = opts[+b.dataset.o]; const ok = o.stat ? rollStat(o.stat) : true;
     if(o.cost) spend(o.cost);
