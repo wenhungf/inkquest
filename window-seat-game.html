@@ -6,7 +6,7 @@
 <title>Window Seat: The Game</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Atkinson+Hyperlegible+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 html{-webkit-text-size-adjust:100%;}
 [hidden]{display:none!important;}
@@ -20,7 +20,7 @@ html{-webkit-text-size-adjust:100%;}
   --shadow:rgba(36,38,46,.18);
   --f-body:'Atkinson Hyperlegible',"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
   --f-disp:'Fraunces',Georgia,"PingFang TC","Noto Serif TC",serif;
-  --f-px:'Pixelify Sans',ui-monospace,"PingFang TC",monospace;
+  --f-px:'Atkinson Hyperlegible Mono',ui-monospace,"PingFang TC",monospace;
   --c-class:#5B8DB8; --c-work:#D9904A; --c-social:#D46A8C; --c-explore:#3E9C7A; --c-rest:#8C7BB5; --c-lock:#9A958A;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
@@ -58,7 +58,7 @@ h3{font-size:18px;margin:2px 0 6px;}
 
 /* title */
 #title{text-align:center;padding-top:24px;}
-#title canvas{width:100%;max-width:448px;margin:0 auto;border-radius:18px;box-shadow:0 6px 18px var(--shadow);}
+#title canvas{width:100%;max-width:448px;image-rendering:pixelated;image-rendering:crisp-edges;margin:0 auto;border-radius:18px;box-shadow:0 6px 18px var(--shadow);}
 #title .kick{font-family:var(--f-px);letter-spacing:.12em;color:var(--accent);font-size:14px;margin-top:18px;}
 #title h1{font-size:40px;margin:4px 0 2px;}
 #title .zh{font-size:18px;color:var(--muted);margin-bottom:6px;}
@@ -72,7 +72,7 @@ h3{font-size:18px;margin:2px 0 6px;}
 .top{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 0 8px;border-bottom:1px solid var(--rule);margin:0 -16px 12px;padding-left:16px;padding-right:16px;}
 .top .r1{display:flex;justify-content:space-between;align-items:center;gap:8px;}
 .top .date{font-family:var(--f-px);font-size:16px;}
-.top .money{font-family:var(--f-px);font-size:16px;font-weight:600;}
+.top .money{font-family:var(--f-px);font-size:16px;font-weight:700;}
 .top .money.neg{color:var(--bad);}
 .bar{height:10px;border-radius:6px;background:var(--rule);overflow:hidden;flex:1;}
 .bar i{display:block;height:100%;background:var(--good);border-radius:6px;transition:width .4s;}
@@ -127,13 +127,13 @@ h3{font-size:18px;margin:2px 0 6px;}
 #sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;transform:translateY(110%);transition:transform .25s, visibility .25s;visibility:hidden;}
 #sheet.on{transform:none;visibility:visible;}
 body.sheet-on #plan{padding-bottom:58vh;}
-#sheet .in{max-width:480px;margin:0 auto;background:var(--surface);border-radius:18px 18px 0 0;box-shadow:0 -6px 24px var(--shadow);padding:12px 14px calc(16px + env(safe-area-inset-bottom,0px));max-height:56vh;display:flex;flex-direction:column;}
+#sheet .in{max-width:480px;margin:0 auto;background:var(--surface);border-radius:18px 18px 0 0;box-shadow:0 -6px 24px var(--shadow);padding:12px 14px calc(16px + env(safe-area-inset-bottom,0px));height:56vh;height:56svh;min-height:300px;display:flex;flex-direction:column;}
 #sheet .hd{flex:none;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
 .tabs{flex:none;display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;}
-.tab{flex:none;padding:6px 12px;border-radius:999px;border:2px solid var(--rule);font-size:15px;}
+.tab{flex:none;padding:6px 10px;border-radius:999px;border:2px solid var(--rule);font-size:14px;}
 .tab.on{color:#fff;border-color:transparent;}
 .tab.on.m-class{background:var(--c-class);} .tab.on.m-work{background:var(--c-work);} .tab.on.m-social{background:var(--c-social);} .tab.on.m-explore{background:var(--c-explore);} .tab.on.m-rest{background:var(--c-rest);}
-.acts{overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 0;}
+.acts{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:8px;padding:4px 0;}
 .act{display:flex;gap:10px;align-items:center;text-align:left;padding:10px;border-radius:12px;border:1px solid var(--rule);background:var(--bg);width:100%;}
 .act canvas{width:36px;height:36px;flex:none;}
 .act .t{font-weight:700;}
@@ -145,6 +145,8 @@ body.sheet-on #plan{padding-bottom:58vh;}
 
 /* play */
 .feed{display:flex;flex-direction:column;gap:8px;}
+#play{padding-bottom:24px;}
+.feed > *{scroll-margin-bottom:84px;}   /* clears the fixed button bar */
 .day{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:10px;animation:pop .25s ease-out;}
 @keyframes pop{from{transform:translateY(8px);opacity:0;}to{transform:none;opacity:1;}}
 .day canvas{width:56px;height:56px;border-radius:10px;flex:none;}
@@ -243,11 +245,11 @@ const UI = {
   stress:{zh:"壓力", en:"Stress"}, money:{zh:"存款", en:"Money"},
   en:{zh:"英文", en:"English"}, co:{zh:"自信", en:"Confidence"}, fi:{zh:"體力", en:"Fitness"},
   cr:{zh:"手藝", en:"Craft"}, sty:{zh:"風格", en:"Style"}, kh:{zh:"生活力", en:"Know-how"},
-  plan2:{zh:"規劃接下來兩週", en:"Plan the next two weeks"}, friends:{zh:"朋友", en:"Friends"},
+  plan2:{zh:"規劃接下來兩週", en:"Plan the next two weeks"}, friends:{zh:"親友", en:"People"},
   notebook:{zh:"單字本", en:"Notebook"}, album:{zh:"相簿", en:"Album"}, settings:{zh:"設定", en:"Settings"},
   messages:{zh:"訊息", en:"Messages"}, block:{zh:"第 {n} 個兩週", en:"Block {n}"},
   week1:{zh:"第一週", en:"Week 1"}, week2:{zh:"第二週", en:"Week 2"},
-  m_class:{zh:"上課", en:"Class"}, m_work:{zh:"打工", en:"Work"}, m_social:{zh:"朋友", en:"Social"},
+  m_class:{zh:"上課", en:"Class"}, m_work:{zh:"打工", en:"Work"}, m_social:{zh:"親友", en:"Social"},
   m_explore:{zh:"出遊", en:"Explore"}, m_rest:{zh:"休息", en:"Rest"},
   pickDay:{zh:"點一天來安排活動", en:"Tap a day to plan it"},
   fillRest:{zh:"空白的日子都排這個", en:"Fill empty days"}, copyLast:{zh:"沿用上次", en:"Copy last plan"}, clear:{zh:"清除", en:"Clear"},
@@ -281,11 +283,14 @@ const UI = {
   leave:{zh:"結束今天", en:"End the day"}, go2:{zh:"出發", en:"Go"},
   perDay:{zh:"每天", en:"a day"}, payday:{zh:"發薪日", en:"payday"}, cash:{zh:"當天付現", en:"paid the same day"},
   w_clear:{zh:"晴天", en:"Clear"}, w_cloudy:{zh:"多雲", en:"Cloudy"}, w_rain:{zh:"下雨", en:"Rainy"}, w_storm:{zh:"颱風快來了", en:"A typhoon is coming"},
+  emptyDays:{zh:"還有 {n} 天沒有安排，這些天會變成自由日。", en:"{n} days have no plan yet. They will be free days."}, emptyDay1:{zh:"還有 1 天沒有安排，這天會變成自由日。", en:"1 day has no plan yet. It will be a free day."},
+  keepPlanning:{zh:"回去安排", en:"Keep planning"}, startAnyway:{zh:"直接開始", en:"Start anyway"},
   livingCost:{zh:"生活費（吃飯、交通）", en:"Living costs (food, transport)"}
 };
 
 /* ==== content/book1/tracks.js ==== */
-/* songs: the three Lamplight Readers Level 1 songs (trial). home + plan = Lamplight, play = Library Clock, trip = Rain on Glass */
+/* songs: three Lamplight Readers Level 1 songs (trial) plus Southbound, written for the game.
+   home + plan = Lamplight, play = Library Clock, trip = Southbound, night = Rain on Glass */
 const TRACKS = [
     {n:"Lamplight", z:"燈下・電鋼琴與鐘聲", bpm:72, swing:.12, parts:[
       {p:"ep", s:"F3+A3+C4+E4 _ _ _ _ _ _ _ | E3+G3+B3+D4 _ _ _ _ _ _ _ | D3+F3+A3+C4 _ _ _ _ _ _ _ | C3+E3+G3+B3 _ _ _ _ _ _ _ | F3+A3+C4+E4 _ _ _ _ _ _ _ | E3+G3+B3+D4 _ _ _ _ _ _ _ | D3+F3+A3+E4 _ _ _ _ _ _ _ | G3+C4+D4+F4 _ _ _ _ _ _ _", strum:.028},
@@ -298,7 +303,12 @@ const TRACKS = [
     {n:"Library Clock", z:"圖書館的時鐘・木琴", bpm:92, swing:.1, parts:[
       {p:"mar", s:"D4 A4 F#5 A4 C#5 A4 F#5 A4 | B3 F#4 D5 F#4 A4 F#4 D5 F#4 | G3 D4 B4 D4 F#4 D4 B4 D4 | A3 E4 D5 E4 G4 E4 D5 E4 | D4 A4 F#5 A4 C#5 A4 F#5 A4 | B3 F#4 D5 F#4 A4 F#4 D5 F#4 | G3 D4 B4 D4 F#4 D4 B4 D4 | A3 E4 C#5 E4 G4 E4 C#5 E4", vel:.8},
       {p:"bass", s:"D2 _ _ _ D2 _ A2 _ | B1 _ _ _ B1 _ F#2 _ | G1 _ _ _ G1 _ D2 _ | A1 _ _ _ A1 _ E2 _ | D2 _ _ _ D2 _ A2 _ | B1 _ _ _ B1 _ F#2 _ | G1 _ _ _ G1 _ D2 _ | A1 _ _ _ A1 _ C#2 _"},
-      {p:"ep", s:"- - - - F#5 _ E5 _ | D5 _ _ _ - - - - | - - - - B5 _ A5 _ | A5 _ _ _ - - - - | - - - - F#5 _ A5 _ | B5 _ A5 _ F#5 _ - - | - - - - D5 _ E5 _ | C#5 _ _ _ - - - -", vel:.7}]}
+      {p:"ep", s:"- - - - F#5 _ E5 _ | D5 _ _ _ - - - - | - - - - B5 _ A5 _ | A5 _ _ _ - - - - | - - - - F#5 _ A5 _ | B5 _ A5 _ F#5 _ - - | - - - - D5 _ E5 _ | C#5 _ _ _ - - - -", vel:.7}]},
+    {n:"Southbound", z:"南下列車・木琴與鐘聲", bpm:104, swing:.08, parts:[
+      {p:"ep", s:"D3+F#3+A3+D4 _ _ _ _ _ _ _ | C#3+E3+A3+E4 _ _ _ _ _ _ _ | B2+D3+F#3+A3 _ _ _ _ _ _ _ | G2+B2+D3+F#3 _ _ _ _ _ _ _ | D3+F#3+A3+E4 _ _ _ _ _ _ _ | A2+C#3+E3+B3 _ _ _ _ _ _ _ | G2+B2+D3+A3 _ _ _ _ _ _ _ | A2+C#3+E3+G3 _ _ _ _ _ _ _", strum:.022, vel:.75},
+      {p:"mar", s:"D5 A4 F#4 A4 D5 A4 F#4 A4 | E5 A4 C#5 A4 E5 A4 C#5 A4 | D5 B4 F#4 B4 D5 B4 F#4 B4 | D5 B4 G4 B4 D5 B4 G4 B4 | D5 A4 F#4 A4 D5 A4 F#4 A4 | E5 C#5 A4 C#5 E5 C#5 A4 C#5 | D5 B4 G4 B4 D5 B4 A4 B4 | C#5 A4 E4 A4 G4 A4 C#5 E5", vel:.6},
+      {p:"bass", s:"D2 _ A2 _ D3 _ A2 _ | C#2 _ A2 _ E2 _ A2 _ | B1 _ F#2 _ B2 _ F#2 _ | G1 _ D2 _ G2 _ D2 _ | D2 _ A2 _ D3 _ A2 _ | A1 _ E2 _ A2 _ E2 _ | G1 _ D2 _ G2 _ B2 _ | A1 _ E2 _ A1 _ C#2 _"},
+      {p:"bell", s:"F#5 _ A5 _ D6 _ _ _ | C#6 _ B5 _ A5 _ E5 _ | F#5 _ _ _ B5 _ A5 _ | G5 _ F#5 _ E5 _ _ _ | F#5 _ A5 _ D6 _ E6 _ | C#6 _ _ _ A5 _ B5 _ | D6 _ B5 _ G5 _ B5 _ | A5 _ _ _ - - - -", vel:.8}]}
 ];
 
 /* ==== content/book1/gloss.js ==== */
@@ -379,16 +389,16 @@ const STAGE = {
   gain:.3,                                     /* stat growth per day: the full game spans 52 blocks */
   recover:.5,                                   /* stress a night's sleep takes away */
   bills:[],                                     /* she lives at home: no rent in Taiwan */
-  music:{home:0, plan:0, play:2, trip:1, night:1}
+  music:{home:0, plan:0, play:2, trip:3, night:1}
 };
 
 /* the people Mia can spend time with (hearts 0–100, one heart per 20) */
 const CAST = {
-  family:{zh:"家人", en:"Family", spr:"mom", d:{zh:"媽媽、爸爸和弟弟 Leo。星期天一起吃晚餐。", en:"Mom, Dad and her brother Leo. Dinner together on Sundays."}},
-  leo:{zh:"Leo（弟弟）", en:"Leo (brother)", spr:"leo", d:{zh:"愛吃又愛冒險的弟弟。夜市任務的搭檔。", en:"Her little brother. Partner for night market missions."}},
-  ben:{zh:"Ben（同事）", en:"Ben (coworker)", spr:"ben", d:{zh:"百貨公司男裝部的同事，很會講笑話。", en:"Works in men's wear. Always has a funny story."}},
-  ting:{zh:"婷（好朋友）", en:"Ting (best friend)", spr:"ting", d:{zh:"最好的朋友，正在加拿大溫哥華打工度假。", en:"Her best friend, on a working holiday in Vancouver."}},
-  chen:{zh:"陳阿姨", en:"Auntie Chen", spr:"chen", d:{zh:"街角早餐店的老闆娘，叫每個人「帥哥」「美女」。", en:"Runs the breakfast shop on the corner. Calls everyone “handsome” or “pretty.”"}}
+  family:{zh:"家人", en:"Family", spr:"mom", d:{zh:"媽媽、爸爸和我弟弟 Leo。我們星期天一起吃晚餐。", en:"Mom, Dad and my brother Leo. We eat dinner together on Sundays."}},
+  leo:{zh:"Leo（弟弟）", en:"Leo (brother)", spr:"leo", d:{zh:"我弟弟，愛吃又愛冒險。我的夜市任務搭檔。", en:"My little brother. My partner for night market missions."}},
+  ben:{zh:"Ben（同事）", en:"Ben (coworker)", spr:"ben", d:{zh:"我在百貨公司的同事，在男裝部，很會講笑話。", en:"My coworker in men's wear. He always has a funny story."}},
+  ting:{zh:"婷（好朋友）", en:"Ting (best friend)", spr:"ting", d:{zh:"我最好的朋友，正在加拿大溫哥華打工度假。", en:"My best friend. She's on a working holiday in Vancouver."}},
+  chen:{zh:"陳阿姨", en:"Auntie Chen", spr:"chen", d:{zh:"街角早餐店的老闆娘，叫每個人「帥哥」「美女」。", en:"She runs the breakfast shop on the corner. She calls everyone “handsome” or “pretty.”"}}
 };
 
 /* ---------------- activities ----------------
@@ -544,7 +554,7 @@ const RANKUP = {
    Sunset in Kaohsiung (calculated): about 18:48 in early July, 18:40 on Aug 1, 18:31 mid-August, 18:17 on Aug 31. */
 const TRIPS = {
 khh:{
-  zh:"高雄兩天一夜", en:"Kaohsiung weekend", music:1,
+  zh:"高雄兩天一夜", en:"Kaohsiung weekend", music:3,
   board:{
     now:"07:40", task:["Find the fast train to Kaohsiung. Tap it, then go to the platform.","找到往高雄的快車。點一下，然後去月台。"],
     rows:[
@@ -958,95 +968,125 @@ const Room = (()=>{
   };
 
   /* ---------- Mia's bust: 56×76, built from shapes, then hand-placed features ---------- */
-  const BW = 56, BH = 76;
+  /* Mia's bust is built at any scale K from the same shapes (a 56×76 design grid), so a bigger
+     Mia keeps 1-pixel detail instead of blocky pixels. Eyes, brows, nose, mouth and blush are
+     drawn at the target size. */
   const MC = {o:"#1E1824", h:"#2E2433", H:"#46384F", R:"#6A5470", s:"#F2C9A5", S:"#DDA684", T:"#C38B6C", L:"#FBDCC0",
               b:"#6FA8DC", B:"#4E86BE", C:"#3B6C9E", U:"#9CC8EE", w:"#FFFFFF", W:"#DCE3EA", k:"#2B2536",
               e:"#F7F2EC", i:"#4A3230", j:"#8A5A44", p:"#EC9AA8", m:"#B4555E", M:"#D9858A", n:"#C98F72"};
-  function bust(lightRight){
+  function bust(lightRight, K){
+    const BW = Math.round(56*K), BH = Math.round(76*K), cx = 28;
     const g = Array.from({length:BH}, ()=>Array(BW).fill("."));
     const set = (x,y,c)=>{ if(x>=0 && y>=0 && x<BW && y<BH) g[y][x] = c; };
     const at = (x,y)=> (x>=0 && y>=0 && x<BW && y<BH) ? g[y][x] : ".";
-    const cx = 28, side = x => lightRight ? (x - cx) : (cx - x);   /* >0 on the lit side */
-    /* shoulders and top */
-    for(let y=56;y<BH;y++){ const t = (y-56)/(BH-56), half = Math.round(9 + Math.sqrt(t)*19);
-      for(let x=cx-half;x<=cx+half;x++){ const sd = side(x)/half;
-        let c = sd > .55 ? "U" : sd > -.35 ? "b" : sd > -.75 ? "B" : "C";
-        if(sd > .3 && sd <= .55 && bay(x,y) < .5) c = "U";
-        if(sd <= -.35 && sd > -.5 && bay(x,y) < .5) c = "b";
-        set(x,y,c); } }
-    /* a fold line under each arm */
-    for(let y=66;y<BH;y++){ set(cx-15+((y-66)>>2), y, "B"); set(cx+15-((y-66)>>2), y, "B"); }
-    /* neck */
-    for(let y=48;y<60;y++) for(let x=cx-5;x<=cx+5;x++) set(x,y, side(x) < -1 ? "T" : "S");
-    for(let x=cx-5;x<=cx+5;x++) set(x,56,"T");
-    /* white collar: a V that opens to the neck */
-    for(let y=56;y<64;y++){ const k = y-56;
-      for(let d=0;d<4;d++){ set(cx-6-k+d, y, d===0 ? "W" : "w"); set(cx+6+k-d, y, d===0 ? "W" : "w"); } }
-    for(let y=58;y<63;y++){ const k = y-58; for(let x=cx-3+k;x<=cx+3-k;x++) set(x,y, "S"); }
-    /* back hair: long, falls past the shoulders */
-    for(let y=7;y<70;y++){
-      const half = y < 30 ? Math.round(Math.sqrt(Math.max(0, 1 - Math.pow((30-y)/23,2)))*18) : Math.round(18 - Math.max(0,y-50)*.4);
-      if(half < 3) continue;
-      for(let x=cx-half;x<=cx+half;x++){
-        if((y >= 56 && Math.abs(x-cx) < 11) || (y >= 47 && Math.abs(x-cx) <= 5)) continue;   /* the neck and collar show through */
-        const sd = side(x)/half;
-        let c = "h";
-        if(sd > .74) c = "H";
-        if(sd > .88 && bay(x,y) < .55) c = "R";
-        set(x,y,c); } }
-    /* hair ends: uneven tips */
-    [[-16,70],[-14,71],[-11,70],[11,70],[14,71],[16,70]].forEach(([dx,y])=>set(cx+dx,y,"h"));
-    /* face: an egg, narrower at the chin */
-    const fy = 34;
-    for(let y=18;y<=52;y++) for(let x=cx-13;x<=cx+13;x++){
-      const top = y < fy, ry = top ? 16 : 18, dy = (y-fy)/ry;
-      const rx = top ? 12.5 : 12.5 - Math.pow(Math.max(0,y-fy)/ry,1.7)*8;
-      if(Math.abs(x-cx) > rx*Math.sqrt(Math.max(0,1-dy*dy))) continue;
-      const sd = side(x)/12.5;
-      let c = "s";
-      if(sd < -.6) c = "S";
-      else if(sd < -.42 && bay(x,y) < .5) c = "S";
-      if(sd > .45 && y > 27 && y < 46 && bay(x,y) < .3) c = "L";
-      if(y >= 50) c = sd < -.2 ? "T" : "S";
-      set(x,y,c); }
-    /* bangs: a soft fringe, a few strands longer than the rest */
+    const side = X => lightRight ? (X - cx) : (cx - X);        /* >0 on the lit side */
     const tips = [26,27,25,24,26,23,24,25,22,24,23,25,26,24,22,23,25,24,22,24,25,23,24,26,25,27,28];
-    for(let x=cx-13;x<=cx+13;x++){ const end = tips[x-(cx-13)];
-      for(let y=11;y<=end;y++){ const sd = side(x)/13; let c = "h";
-        if(sd > .72) c = "H";
-        set(x,y,c); } }
-    /* the shine on the crown: a dithered arc */
-    for(let x=cx-10;x<=cx+10;x++){ const y = 14 + Math.round(Math.pow((x-cx)/10,2)*3) + (lightRight ? 0 : 0);
-      const sd = side(x)/10; if(sd < -.5) continue;
-      set(x,y,"H"); if(bay(x,y+1) < .5) set(x,y+1,"H"); if(sd > .1 && sd < .6) set(x,y,"R"); }
-    /* side locks frame the cheeks */
-    for(let y=24;y<56;y++){ const w = y < 42 ? 2 : 2 + ((y-42)>>2);
-      for(let d=0;d<w;d++){ set(cx-13+d-(y>46?1:0), y, side(cx-13) > 0 ? "H" : "h"); set(cx+13-d+(y>46?1:0), y, side(cx+13) > 0 ? "H" : "h"); } }
-    /* brows, just under the fringe */
-    [[-10,29],[-9,28],[-8,28],[-7,28],[-6,28]].forEach(([dx,y])=>{ set(cx+dx,y,"H"); set(cx-dx,y,"H"); });
-    /* eyes */
-    const eye = [".kkkkk.","kkeiiek",".eiwjie","..iij.."];
-    const put = (x0, rows, flip)=>rows.forEach((r,y)=>[...r].forEach((c,x)=>{ if(c !== ".") set(flip ? x0+r.length-1-x : x0+x, 31+y, c); }));
-    put(cx-10, eye, false); put(cx+4, eye, true);
-    set(cx-11,30,"k"); set(cx+11,30,"k");
-    /* nose, cheeks, mouth */
-    set(lightRight ? cx-1 : cx+1, 39, "n"); set(lightRight ? cx-1 : cx+1, 40, "n"); set(cx, 41, "n");
-    [[-9,38],[-8,38],[-7,38],[-8,39],[7,38],[8,38],[9,38],[8,39]].forEach(([dx,y])=>{ if(bay(cx+dx,y) < .75) set(cx+dx,y,"p"); });
-    set(cx-2,44,"m"); set(cx-1,45,"m"); set(cx,45,"m"); set(cx+1,45,"m"); set(cx+2,44,"m"); set(cx,46,"M");
-    /* outline the silhouette */
+    const tip = X => { const f = X - (cx-13), i = Math.floor(f), t = f - i; const a = tips[Math.max(0,Math.min(26,i))], b2 = tips[Math.max(0,Math.min(26,i+1))]; return a + (b2-a)*t; };
+    for(let y=0;y<BH;y++) for(let x=0;x<BW;x++){
+      const X = (x+.5)/K, Y = (y+.5)/K, dx = X - cx, b = bay(x,y);
+      let c = null;
+      /* shirt and shoulders */
+      if(Y >= 56){ const t = (Y-56)/20, half = 9 + Math.sqrt(t)*19;
+        if(Math.abs(dx) <= half){ const sd = side(X)/half;
+          c = sd > .55 ? "U" : sd > -.35 ? "b" : sd > -.75 ? "B" : "C";
+          if(sd > .3 && sd <= .55 && b < .5) c = "U";
+          if(sd <= -.35 && sd > -.5 && b < .5) c = "b";
+          if(Y >= 66 && (Math.abs(X - (cx-15+(Y-66)/4)) < .6 || Math.abs(X - (cx+15-(Y-66)/4)) < .6)) c = "B"; } }
+      /* neck */
+      if(Y >= 48 && Y < 60 && Math.abs(dx) <= 5.5) c = Y >= 56 && Y < 57 ? "T" : side(X) < -1 ? "T" : "S";
+      /* collar */
+      if(Y >= 56 && Y < 64){ const k = Y - 56;
+        for(const sg of [-1,1]){ const inner = cx + sg*(6+k); const d0 = sg < 0 ? X - (inner) : inner - X;
+          if(d0 >= -.5 && d0 < 3.5) c = d0 < .5 ? "W" : "w"; }
+        if(Y >= 58 && Y < 63 && Math.abs(dx) <= 3.5 - (Y-58)) c = "S"; }
+      /* long hair behind */
+      if(Y >= 7 && Y < 70){ const half = Y < 30 ? Math.sqrt(Math.max(0, 1 - Math.pow((30-Y)/23,2)))*18 : 18 - Math.max(0,Y-50)*.4;
+        const hole = (Y >= 56 && Math.abs(dx) < 11) || (Y >= 47 && Math.abs(dx) <= 5.5);
+        if(half >= 3 && Math.abs(dx) <= half && !hole){ const sd = side(X)/half; c = sd > .88 && b < .55 ? "R" : sd > .74 ? "H" : "h";
+          if(K > 1.2 && sd < .6 && Y > 20 && Math.abs(Math.sin(X*2.3 + Y*.22)) < .05) c = "H"; } }   /* strands, at larger sizes */
+      /* face */
+      const fy = 34;
+      if(Y >= 18 && Y <= 52.5){ const top = Y < fy, ry = top ? 16 : 18, dy = (Y-fy)/ry;
+        const rx = top ? 12.5 : 12.5 - Math.pow(Math.max(0,Y-fy)/ry,1.7)*8;
+        if(Math.abs(dx) <= rx*Math.sqrt(Math.max(0,1-dy*dy))){ const sd = side(X)/12.5;
+          c = "s"; if(sd < -.6) c = "S"; else if(sd < -.42 && b < .5) c = "S";
+          if(sd > .45 && Y > 27 && Y < 46 && b < .3) c = "L";
+          if(Y >= 50) c = sd < -.2 ? "T" : "S"; } }
+      /* fringe */
+      if(X >= cx-13 && X < cx+14 && Y >= 11 && Y <= tip(X) + .5) c = side(X)/13 > .72 ? "H" : "h";
+      /* shine on the crown */
+      if(Math.abs(dx) <= 10){ const ay = 14 + Math.pow(dx/10,2)*3, sd = side(X)/10;
+        if(sd >= -.5 && Y >= ay && Y < ay + 1){ c = sd > .1 && sd < .6 ? "R" : "H"; }
+        else if(sd >= -.5 && Y >= ay + 1 && Y < ay + 2 && b < .5) c = "H"; }
+      /* side locks */
+      if(Y >= 24 && Y < 56){ const w = Y < 42 ? 2 : 2 + (Y-42)/4, o = Y > 46 ? 1 : 0;
+        if(X >= cx-13-o && X < cx-13-o+w) c = side(cx-13) > 0 ? "H" : "h";
+        if(X <= cx+14+o && X > cx+14+o-w) c = side(cx+13) > 0 ? "H" : "h"; }
+      if(c) g[y][x] = c;
+    }
+    const U = v => Math.round(v*K);
+    /* brows: soft arcs, thicker at the inner end */
+    for(const sg of [-1,1]) for(let x=0;x<BW;x++){ const X = (x+.5)/K, dx = (X - cx)*sg;
+      if(dx < 4.6 || dx > 10.4) continue;
+      const f = (dx - 4.6)/5.8, yc = 28.9 - Math.sin(f*Math.PI)*.9 + f*.3, th = (.95 - f*.35);
+      for(let y=0;y<BH;y++){ const Y = (y+.5)/K; if(Math.abs(Y - yc) <= th/2 + .5/K) set(x, y, "H"); } }
+    /* eyes: a lash line, white, a round iris with a lighter lower half, a highlight, a faint lower lash */
+    const ew = Math.max(7, U(7)), eh = Math.max(4, Math.round(4.6*K)), ey = U(30.6), lid = Math.max(1, Math.round(K*.75)), eyes = [];
+    for(const sg of [-1,1]){
+      const exL = U(cx-10), ex = sg < 0 ? exL : 2*U(cx) - exL - ew + 1;   /* mirrored, so both eyes sit evenly */
+      eyes.push({x:ex, y:ey, w:ew, h:eh});
+      const icx = ex + ew/2 + (sg < 0 ? .4 : -.4), icy = ey + lid + (eh-lid)*.48, ir = (eh - lid)*.56;
+      for(let yy=0;yy<eh;yy++) for(let xx=0;xx<ew;xx++){
+        const u = (xx + .5)/ew - .5;
+        if(yy < lid){ if(Math.abs(u) < .5 - (yy === 0 && K < 1.4 ? .08 : 0)) set(ex+xx, ey+yy, "k"); continue; }
+        const v = (yy - lid + .5)/(eh - lid);
+        if(Math.abs(u) > .5 - Math.pow(Math.max(0, v-.35), 1.4)*.55) continue;          /* almond */
+        const d = Math.hypot(ex+xx+.5 - icx, (ey+yy+.5 - icy));
+        set(ex+xx, ey+yy, d <= ir ? (ey+yy+.5 > icy + ir*.15 ? "j" : "i") : "e"); }
+      /* outer lashes thicken the line and flick out */
+      const outer = sg < 0 ? ex : ex + ew - 1, out1 = outer - sg;
+      set(outer + (sg < 0 ? -1 : 1), ey, "k"); set(out1, ey + lid, "k");
+      if(K >= 1.4){ set(outer + (sg < 0 ? -2 : 2), ey - 1, "k"); set(outer, ey + lid, "k"); }
+      const hx = Math.round(icx - ir*.45), hy = ey + lid + (K >= 1.4 ? 1 : 0);
+      set(hx, hy, "w"); if(K >= 1.4){ set(hx+1, hy, "w"); set(hx, hy+1, "w"); }
+      if(K >= 1.4) for(let xx=1;xx<ew-1;xx++){ const u = (xx+.5)/ew - .5; if(u*sg > 0 && Math.abs(u) < .42) set(ex+xx, ey+eh, "n"); }
+    }
+    /* nose: a short shadow on the dark side and a nostril */
+    const nx = U(cx) + (lightRight ? -1 : 1);
+    set(nx, U(39.6), "n"); if(K >= 1.4) set(nx, U(39.6)+1, "n");
+    set(U(cx), U(41.2), "n");
+    /* blush */
+    for(const sg of [-1,1]) for(let yy=-3;yy<=3;yy++) for(let xx=-5;xx<=5;xx++){
+      const px = U(cx) + sg*(U(cx+8)-U(cx)) + xx, py = U(38.3) + yy; if((xx*xx)/(2.4*K*2.4*K) + (yy*yy)/(1.1*K*1.1*K) > 1) continue;
+      if(g[py] && /[sSL]/.test(g[py][px]) && bay(px,py) < .55) set(px, py, "p"); }
+    /* mouth: a small smile; at larger sizes a lighter lower lip */
+    const mw = Math.max(5, U(4.4)) | 1, mx0 = U(cx) - (mw >> 1), my = U(44.6);
+    for(let xx=1;xx<mw-1;xx++) set(mx0+xx, my, "m");
+    set(mx0, my-1, "m"); set(mx0+mw-1, my-1, "m");
+    if(K >= 1.4){ set(U(cx)-1, my+1, "M"); set(U(cx), my+1, "M"); set(U(cx)+1, my+1, "M"); } else set(U(cx), my+1, "M");
+    /* outline */
     const out = g.map(r=>r.slice());
     for(let y=0;y<BH;y++) for(let x=0;x<BW;x++){ if(at(x,y) !== ".") continue;
       if([[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>at(x+dx,y+dy) !== ".")) out[y][x] = "o"; }
-    return out.map(r=>r.join(""));
+    return {rows: out.map(r=>r.join("")), w:BW, h:BH, eyes};
   }
-  const BUSTS = {L:bust(false), R:bust(true)};
-
+  const BUSTS = {};
+  const getBust = (lightRight, K)=> BUSTS[(lightRight ? "R" : "L") + K] || (BUSTS[(lightRight ? "R" : "L") + K] = bust(lightRight, K));
+  /* closing the eyes for a blink: a lash line across the middle, skin from just below the eye elsewhere */
+  function blinkEyes(d, Wd, bx, by, B, lashRGB){
+    B.eyes.forEach(e=>{ const mid = e.y + Math.floor(e.h/2), src = e.y + e.h + 1;
+      for(let xx=-2;xx<=e.w+1;xx++){ const px = bx + e.x + xx, o = ((by+src)*Wd + px)*4;
+        for(let yy=-2;yy<e.h;yy++){ const py = by + e.y + yy, i = (py*Wd + px)*4;
+          if(yy === mid - e.y && xx >= 0 && xx < e.w){ d[i]=lashRGB[0]; d[i+1]=lashRGB[1]; d[i+2]=lashRGB[2]; }
+          else if(B.rows[e.y+yy] && "kewij".includes(B.rows[e.y+yy][e.x+xx])) d.set(d.subarray(o,o+3), i); } } });
+  }
   /* a stand-alone portrait (for the end screen and anywhere else) */
   function drawBust(cv, lightRight){
-    const rows = BUSTS[lightRight ? "R" : "L"]; cv.width = BW; cv.height = BW;
-    const c = cv.getContext("2d"); c.clearRect(0,0,BW,BW);
-    rows.slice(2, 2+BW).forEach((r,y)=>{ for(let x=0;x<r.length;x++){ const ch = r[x]; if(ch === ".") continue; c.fillStyle = MC[ch]; c.fillRect(x,y,1,1); } });
+    const B = getBust(!!lightRight, 1); cv.width = B.w; cv.height = B.w;
+    const c = cv.getContext("2d"); c.clearRect(0,0,B.w,B.w);
+    B.rows.slice(2, 2+B.w).forEach((r,y)=>{ for(let x=0;x<r.length;x++){ const ch = r[x]; if(ch === ".") continue; c.fillStyle = MC[ch]; c.fillRect(x,y,1,1); } });
   }
+
 
   /* ---------- the room ---------- */
   let anim = null;
@@ -1136,9 +1176,9 @@ const Room = (()=>{
     if(!P.lamp && !Wt.rain) glow(84,60,120, time === "morning" ? "#FFE6C0" : "#FFF6DC", .28);
     if(Wt.dim && !P.lamp) shade(0,0,W,H,"#4A4E5C",Wt.dim*.55);
     /* Mia, between the window and the desk */
-    const lightRight = !!P.lamp, bx = 140, by = H - BH;
-    BUSTS[lightRight ? "R" : "L"].forEach((r,y)=>{ for(let xx=0;xx<BW;xx++){ const ch = r[xx]; if(ch === ".") continue; put(bx+xx,by+y,hex(MC[ch])); mask[(by+y)*W+bx+xx] = 1; } });
-    if(P.lamp) glow(bx+BW, by+30, 30, "#F6C57A", .35);
+    const lightRight = !!P.lamp, MB = getBust(lightRight, 1.6), bx = 128, by = H - MB.h;
+    MB.rows.forEach((r,y)=>{ for(let xx=0;xx<MB.w;xx++){ const ch = r[xx]; if(ch === ".") continue; put(bx+xx,by+y,hex(MC[ch])); mask[(by+y)*W+bx+xx] = 1; } });
+    if(P.lamp) glow(bx+MB.w, by+48, 44, "#F6C57A", .35);
 
     const base = new Uint8ClampedArray(d);
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1148,7 +1188,7 @@ const Room = (()=>{
     const birds = P.birds && !Wt.rain ? [{x:40,y:34,v:.35,p:0},{x:56,y:40,v:.3,p:2},{x:100,y:28,v:.4,p:4}] : [], bird = hex("#3A2440");
     const st1 = hex("#F4EFE6"), st2 = hex("#C9BFB6"), steam = Array.from({length:8},(_,i)=>({t:i/8}));
     const lash = hex(MC.k);
-    let frame = 0, last = 0, flash = 0, blink = 0;
+    let frame = 0, last = 0, flash = 0, blink = 2;
     function paint(){
       d.set(base);
       if(P.lamp){ const fl = 1 + (Math.sin(frame*.7)+Math.sin(frame*1.9))*.03; glow(293,58,30,"#FFE2A8",.75*fl); }
@@ -1158,20 +1198,122 @@ const Room = (()=>{
       drops.forEach(p=>{ p.y+=p.v; if(Wt.slant) p.x -= p.v*.5; if(p.y>101 || p.x<22){ p.y=18; p.x=22+Math.random()*130; }
         const px=p.x|0, py=p.y|0, glass = (gx,gy)=>gx>=22 && gx<146 && gy>=18 && gy<102 && !(gx>=82 && gx<86) && !(gy>=58 && gy<61) && !mask[gy*W+gx];
         if(glass(px,py)) put(px,py,rain); const tx = px+(Wt.slant?1:0); if(glass(tx,py-1)) put(tx,py-1,rain2); });
-      if(Wt.flash){ if(flash > 0){ flash--; shade(22,18,124,84,"#F2F4FF",.5); } else if(Math.random() < .012) flash = 2; }
+      if(Wt.flash){ if(flash > 0){ flash--; { const c = hex("#F2F4FF"); for(let yy=18;yy<102;yy++) for(let xx=22;xx<146;xx++){ if(mask[yy*W+xx]) continue; const i=(yy*W+xx)*4; d[i]+=(c[0]-d[i])*.5; d[i+1]+=(c[1]-d[i+1])*.5; d[i+2]+=(c[2]-d[i+2])*.5; } } } else if(Math.random() < .012) flash = 2; }
       steam.forEach((s,i)=>{ s.t=(s.t+.02)%1; const sy=98-s.t*18, sx=262+Math.round(Math.sin(s.t*6+i)*2)+(i%3)*2;
         if(s.t<.8){ const c=s.t<.4?st1:st2; put(sx,sy|0,c); } });
       /* Mia blinks every few seconds */
       blink = (blink + 1) % 48;
-      if(blink < 2) [-10,4].forEach(dx=>{ for(let xx=0;xx<7;xx++){ const px = bx+28+dx+xx, o = ((by+35)*W+px)*4;
-        for(let yy=0;yy<4;yy++){ if(yy === 1) put(px, by+31+yy, lash); else if(!(yy === 0 && (xx === 0 || xx === 6))) d.set(d.subarray(o,o+3), ((by+31+yy)*W+px)*4); } } });
+      if(blink < 2) blinkEyes(d, W, bx, by, MB, lash);
       x.putImageData(img,0,0);
     }
-    function loop(ts){ if(!A.on || !cv.isConnected) return; if(cv.offsetParent === null){ requestAnimationFrame(loop); return; } if(ts-last >= 83){ last = ts; frame++; paint(); } requestAnimationFrame(loop); }
+    function loop(ts){ if(!A.on || !cv.isConnected) return; if(cv.offsetParent === null){ setTimeout(()=>requestAnimationFrame(loop), 500); return; } if(ts-last >= 83){ last = ts; frame++; paint(); } requestAnimationFrame(loop); }
     paint(); if(!reduce) requestAnimationFrame(loop);
     return {time, weather};
   }
-  return {draw, drawBust, pick};
+
+  /* ---------- the title cover: Mia in a window seat on a train heading south ----------
+     The camera stands in the aisle a row ahead, looking back at her. The window wall runs
+     diagonally toward a vanishing point behind her; the empty aisle seat is cut off at the right. */
+  let coverAnim = null;
+  function cover(cv){
+    if(coverAnim){ coverAnim.on = false; coverAnim = null; }
+    const x = cv.getContext("2d"); cv.width = W; cv.height = H;
+    const img = x.createImageData(W,H), d = img.data;
+    const put = (px,py,c)=>{ if(px<0||py<0||px>=W||py>=H) return; const i=(py*W+px)*4; d[i]=c[0]; d[i+1]=c[1]; d[i+2]=c[2]; d[i+3]=255; };
+    const rect = (x0,y0,w,h,c)=>{ c=hex(c); for(let yy=y0;yy<y0+h;yy++) for(let xx=x0;xx<x0+w;xx++) put(xx,yy,c); };
+    const glow = (cx,cy,r,col,str,clip)=>{ const c=hex(col);
+      for(let yy=cy-r;yy<=cy+r;yy++) for(let xx=cx-r;xx<=cx+r;xx++){
+        if(xx<0||yy<0||xx>=W||yy>=H) continue; if(clip && !clip(xx,yy)) continue;
+        const dd=Math.hypot(xx-cx,(yy-cy)*1.1)/r; if(dd>1) continue;
+        const t=(1-dd)*(1-dd)*str, b=bay(xx,yy), i=(yy*W+xx)*4, a = t>b ? .55 : t>b*.5 ? .25 : 0;
+        if(a){ d[i]+=(c[0]-d[i])*a; d[i+1]+=(c[1]-d[i+1])*a; d[i+2]+=(c[2]-d[i+2])*a; } } };
+    const C = c => hex(c);
+    /* perspective: the wall's near edge is at x = 0, it vanishes at VP */
+    const VX = 600, VY = 70, NT = -20, NB = 200;                 /* near top and bottom of the wall */
+    const sAt = px => (VX - px) / VX;                            /* 1 at the near edge, 0 at the vanishing point */
+    const wallTop = px => VY + (NT - VY) * sAt(px), wallBot = px => VY + (NB - VY) * sAt(px);
+    const atH = (px, f) => wallTop(px) + (wallBot(px) - wallTop(px)) * f;   /* a height on the wall, 0 = top, 1 = floor */
+    const WIN0 = .1, WIN1 = .8, WX0 = 0, WX1 = 320;            /* the window band and its length along the wall */
+    const posts = [.95, .82, .7, .58, .47].map(s=>Math.round(VX*(1-s)));
+    const inWin = (px,py)=> px>=WX0 && px<WX1 && py>atH(px,WIN0) && py<atH(px,WIN1) && !posts.some(p=>Math.abs(px-p) <= Math.max(1, Math.round(3*sAt(px))));
+    /* ceiling, wall and floor */
+    const sky = ["#86BCE6","#A9D0EE","#E7DCC4","#F4CFA4"].map(C);
+    for(let yy=0;yy<H;yy++) for(let xx=0;xx<W;xx++){
+      const t = wallTop(xx), bt = wallBot(xx), f = (yy - t) / (bt - t);
+      let c;
+      if(yy < t) c = (yy + xx*.2) % 22 < 2 ? "#CFC9BC" : "#E4DFD3";                     /* ceiling */
+      else if(yy > bt) c = (xx + yy) % 9 === 0 ? "#6C665C" : "#7A746A";                  /* floor */
+      else if(f < .03) c = "#8F8A80";                                                     /* luggage rack */
+      else if(f < WIN0 - .02) c = "#D9D3C5";
+      else if(f < WIN1 + .03) c = f < WIN0 || f > WIN1 ? "#5B5A60" : "#B9B4A8";          /* window frame */
+      else if(f < WIN1 + .07) c = "#8C8678";                                              /* sill */
+      else c = bay(xx,yy) < .3 ? "#BDB5A3" : "#C6BEAC";                                   /* lower panel */
+      put(xx,yy,C(c));
+    }
+    /* luggage-rack bars, shrinking into the distance */
+    for(let xx=6;xx<VX-40;xx+=Math.max(3, Math.round(14*sAt(xx)))) { const y0 = atH(xx,0)|0, y1 = atH(xx,.03)|0; for(let yy=y0;yy<=y1;yy++) put(xx,yy,C("#77726A")); }
+    /* window posts */
+    posts.forEach(p=>{ const w = Math.max(1, Math.round(3*sAt(p))); for(let yy=atH(p,WIN0)|0; yy<atH(p,WIN1); yy++) for(let k=-w;k<=w;k++) put(p+k,yy,C("#5B5A60")); });
+    /* seats: hers by the window, and the empty aisle seat cut off at the right edge */
+    const seat = (x0, y0, w)=>{
+      rect(x0, y0, w, H-y0, "#2F5D8A"); rect(x0, y0, w, 3, "#3E6FA0"); rect(x0, y0, 3, H-y0, "#3E6FA0"); rect(x0+w-3, y0, 3, H-y0, "#264C73");
+      for(let yy=y0+8;yy<H;yy+=6) rect(x0+6, yy, w-12, 1, "#2A5480");
+      const ch = Math.round(w*.36); rect(x0+7, y0+6, w-14, ch, "#F4F1EA"); rect(x0+7, y0+6+ch-2, w-14, 2, "#DCD7CC");
+      for(let xx=x0+9;xx<x0+w-9;xx+=4) put(xx, y0+8, C("#DCD7CC"));
+    };
+    /* head runs from about by+13 (hair top) to by+95 (chin) at K 1.8: a third of it shows above the seat */
+    seat(156, 84, 124);
+    seat(285, 84, 124);
+    rect(280, 128, 5, 52, "#3A3A40"); rect(278, 126, 9, 4, "#55555C");                  /* the armrest between them */
+    rect(292, 150, 40, 30, "#2A5480"); rect(292, 150, 40, 2, "#3E6FA0");               /* the empty seat's cushion */
+    /* Mia, lit from the window on her right */
+    const MB = getBust(false, 1.8), bx = 156 + Math.round((124 - MB.w)/2), by = H - MB.h;
+    MB.rows.forEach((r,y)=>{ for(let xx=0;xx<MB.w;xx++){ const ch = r[xx]; if(ch !== ".") put(bx+xx,by+y,C(MC[ch])); } });
+    glow(bx+8, by+62, 54, "#FFE6BE", .3, (px,py)=>px >= 156);
+    const base = new Uint8ClampedArray(d);
+    /* the view: sampled through the window with perspective, so the near panes show more */
+    const winPx = [], glass = C("#B9B4A8");                     /* only pixels still showing glass after seats and Mia are drawn */
+    for(let xx=WX0; xx<WX1; xx++) for(let yy=Math.max(0,atH(xx,WIN0)|0); yy<atH(xx,WIN1); yy++){ const i = (yy*W+xx)*4;
+      if(inWin(xx,yy) && base[i] === glass[0] && base[i+1] === glass[1] && base[i+2] === glass[2]) winPx.push(xx,yy); }
+    const mtn = C("#93AEC6"), mtn2 = C("#77A08F"), mtnH = C("#A6BED2"), field = C("#83C26C"), field2 = C("#6DAE5C"), water = C("#B8DDE6"),
+          roof = C("#B5523B"), wall = C("#ECE4D2"), trunk = C("#7A6A50"), leaf = C("#4E8A5B"), pole = C("#4A4038"), wire = C("#3A3430"), sun = C("#FFF2CC");
+    const fr = v => v - Math.floor(v);
+    function view(xx, yy, t){
+      const s = sAt(xx), v = (yy - atH(xx,WIN0)) / (atH(xx,WIN1) - atH(xx,WIN0)), u = 60 / s;     /* u: distance along the train */
+      const near = u - t*3.2, mid = u*.55 - t*.9, far = u*.18 - t*.12;
+      /* poles and wires, closest to the track */
+      if(fr(near/46) < .045) return pole;
+      const sag = .14 + Math.sin(fr(near/46)*Math.PI)*.07;
+      if(Math.abs(v - sag) < .012 || Math.abs(v - sag - .07) < .012) return wire;
+      const hz = .6;
+      if(v < hz){
+        const m1 = .24 + Math.abs(Math.sin(far/2.3))*.16 + Math.sin(far*1.7)*.03, m2 = .44 + Math.abs(Math.sin(far/1.6+1))*.08;
+        /* palms and houses stand up from the fields into the sky */
+        const pm = fr(mid/23); if(pm < .02 && v > .4) return trunk;
+        if(pm < .07 && v > .36 && v < .42) return leaf;
+        const hs = fr(mid/61); if(hs > .2 && hs < .3 && v > .52){ return v < .545 ? roof : wall; }
+        if(v > m2) return mtn2; if(v > m1) return bay(xx,yy) < .2 ? mtnH : mtn;
+        const sx = fr(far/9); if(Math.hypot((sx-.5)*40, (v-.12)*30) < 3) return sun;
+        const k = v / hz * 3, i = Math.min(2, Math.floor(k)); return fr(k) > bay(xx,yy) ? sky[i+1] : sky[i];
+      }
+      const pm = fr(mid/23); if(pm < .02 && v < .66) return trunk;
+      const row = Math.floor((v - hz) * 26) % 2;
+      if(!row && bay(xx,yy) < .14) return water;
+      return row ? field2 : field;
+    }
+    const A = coverAnim = {on:true}, reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let last = 0, blink = 2, t = 0;
+    function paint(){
+      d.set(base); t += 1;
+      for(let k=0;k<winPx.length;k+=2){ const xx = winPx[k], yy = winPx[k+1]; put(xx, yy, view(xx, yy, t)); }
+      blink = (blink + 1) % 52;
+      if(blink < 2) blinkEyes(d, W, bx, by, MB, C(MC.k));
+      x.putImageData(img,0,0);
+    }
+    function loop(ts){ if(!A.on || !cv.isConnected) return; if(cv.offsetParent === null){ setTimeout(()=>requestAnimationFrame(loop), 500); return; } if(ts-last >= 83){ last = ts; paint(); } requestAnimationFrame(loop); }
+    paint(); if(!reduce) requestAnimationFrame(loop);
+  }
+  return {draw, drawBust, pick, cover, getBust, MC};
 })();
 
 /* ==== engine/sim.js ==== */
@@ -1422,7 +1564,7 @@ function diaryFor(S, mkey){
    screens: title, home, planner, play, summary, info pages
    ========================================================= */
 const screens = ["title","home","plan","play","trip","info"];
-function show(id){ screens.forEach(s=>$("#"+s).classList.toggle("on", s === id)); window.scrollTo(0,0); }
+function show(id){ const was = screens.find(s=>$("#"+s).classList.contains("on")); screens.forEach(s=>$("#"+s).classList.toggle("on", s === id)); if(was !== id){ window.scrollTo(0,0); $("#"+id).scrollIntoView({block:"start"}); } }
 const statName = k => T(k);
 const fmtD = v => (v > 0 ? "+" : "−") + Math.abs(v).toFixed(Math.abs(v) < 10 && v % 1 ? 1 : 0);
 let selDay = -1, menuTab = "class", playTimer = null, playSpeed = store.get("speed", 1), paused = false;
@@ -1478,32 +1620,19 @@ function musicFor(){
 /* ---------------- title ---------------- */
 function renderTitle(){
   const has = !!load();
-  $("#title").innerHTML = `<canvas id="cover" width="224" height="140"></canvas>
+  $("#title").innerHTML = `<canvas id="cover" width="320" height="180"></canvas>
     <p class="kick">${T("kicker")}</p><h1>Window Seat</h1><p class="zh">${T("titleZh")}</p>
     <p class="blurb">${T("blurb")}</p>
     <div class="btns">${has ? `<button class="btn" id="tCont">${T("cont")}</button>` : ""}
       <button class="btn${has ? " alt" : ""}" id="tNew">${T("start")}</button>
       <div class="row"><button class="btn alt small" data-music>♪ ${T("music")}</button><button class="btn alt small" id="tLang">${T("langBtn")}</button></div></div>
     <p class="foot">© 2026 Wen-Hung Fang. All rights reserved.</p>`;
-  drawCover($("#cover")); Music.ui();
+  Room.cover($("#cover")); Music.ui();
   if(has) $("#tCont").onclick = ()=>{ S = load(); enter(); };
   $("#tNew").onclick = ()=>{ const go = ()=>{ S = newGame(); openBlock(S); enter(); }; if(has) askConfirm(T("confirmNew"), go); else go(); };
   $("#tLang").onclick = ()=>{ setLang(LANG === "zh" ? "en" : "zh"); renderTitle(); };
 }
 function setLang(l){ LANG = l; store.set("lang", l); document.documentElement.lang = l === "zh" ? "zh-Hant" : "en"; }
-function drawCover(cv){  /* a train window: Taipei at morning */
-  const c = cv.getContext("2d"), W = 224, H = 140;
-  const g = c.createLinearGradient(0,0,0,H); g.addColorStop(0,"#F6C9A8"); g.addColorStop(.55,"#F9E2B8"); g.addColorStop(1,"#BFD9C8");
-  c.fillStyle = g; c.fillRect(0,0,W,H);
-  c.fillStyle = "#F4C542"; c.beginPath(); c.arc(170,52,16,0,7); c.fill();
-  c.fillStyle = "#8FB3A8"; for(let x=0;x<W;x+=6){ const h = 18 + 10*Math.sin(x*.07) + 6*Math.sin(x*.21); c.fillRect(x, 92-h, 6, h); }
-  c.fillStyle = "#6E8F86"; [[20,30],[44,46],[60,24],[96,60],[104,40],[132,34],[150,52],[188,28],[200,44]].forEach(([x,h])=>c.fillRect(x, 96-h, 14, h));
-  c.fillStyle = "#4E6B64"; c.fillRect(102, 26, 6, 70); c.fillRect(99, 40, 12, 4); c.fillRect(100, 54, 10, 4); c.fillRect(100, 68, 10, 4);  /* a tower */
-  c.fillStyle = "#7BBF6A"; c.fillRect(0,96,W,44);
-  c.fillStyle = "#5FA05A"; for(let x=0;x<W;x+=10) c.fillRect(x, 102 + (x%20 ? 4 : 0), 6, 2);
-  c.fillStyle = "#3A3F47"; c.fillRect(0,0,W,8); c.fillRect(0,H-10,W,10); c.fillRect(0,0,8,H); c.fillRect(W-8,0,8,H); c.fillRect(110,0,4,H);
-  c.fillStyle = "rgba(255,255,255,.25)"; c.fillRect(16,14,30,4); c.fillRect(124,14,22,4);
-}
 function enter(){
   Music.want(STAGE.music.home);
   if(S.done) return endScreen();
@@ -1563,11 +1692,20 @@ function renderPlan(){
     ${pv.end < 0 ? `<p class="warn">${T("negWarn")}</p>` : ""}${pv.stress > 80 ? `<p class="warn">${T("stressWarn")}</p>` : ""}
     <button class="btn" id="pGo" style="width:100%;margin-top:6px">${T("go")}</button>`;
   paintSprites($("#plan")); Music.ui();
-  $$("#plan .slot").forEach(b=> b.onclick = ()=>{ const i = +b.dataset.i; if(S.plan[i] === "khh2") selDay = i-1; else selDay = i; openSheet(); renderPlan(); });
+  $$("#plan .slot").forEach(b=> b.onclick = ()=>{ const i = +b.dataset.i; if(S.plan[i] === "khh2") selDay = i-1; else selDay = i; renderPlan(); openSheet(); });
   $("#pBack").onclick = ()=>{ selDay = -1; closeSheet(); renderHome(); };
   $("#pClear").onclick = ()=>{ S.plan = new Array(14).fill(null); save(); renderPlan(); };
   $("#pCopy").onclick = ()=>{ copyLast(); save(); renderPlan(); };
-  $("#pGo").onclick = ()=>{ closeSheet(); selDay = -1; startPlay(); };
+  $("#pGo").onclick = ()=>{
+    const empty = [...Array(14).keys()].filter(i=>!S.plan[i] && !lockOf(S, i)).length;
+    const go = ()=>{ closeSheet(); selDay = -1; startPlay(); };
+    if(!empty) return go();
+    modal(`<p style="font-size:17px">${empty === 1 ? T("emptyDay1") : T("emptyDays").replace("{n}", empty)}</p><div class="row" style="justify-content:flex-end;flex-wrap:wrap;margin-top:14px"><button class="btn alt" id="eGo">${T("startAnyway")}</button><button class="btn" id="eBack">${T("keepPlanning")}</button></div>`, box=>{
+      box.querySelector("#eBack").onclick = ()=>{ closeModal(); const i = [...Array(14).keys()].find(i=>!S.plan[i] && !lockOf(S, i)); selDay = i; renderPlan(); openSheet(); };
+      box.querySelector("#eGo").onclick = ()=>{ closeModal(); go(); };
+      setTimeout(()=>{ const b = box.querySelector("#eBack"); if(b) b.focus(); }, 30);
+    });
+  };
 }
 function copyLast(){
   S.plan = new Array(14).fill(null);
@@ -1583,7 +1721,7 @@ function whyText(r, a){
 function openSheet(keepTab){
   const a0 = S.plan[selDay] && actOf(S.plan[selDay]); if(!keepTab && a0 && a0.menu) menuTab = a0.menu;   /* open on the day's own menu, but let the player switch tabs */
   const date = blockDate(S, selDay);
-  const list = Object.entries(ACTS).filter(([id,a])=>a.menu === menuTab).sort((x,y)=>(canPlace(S,y[0],selDay).ok?1:0)-(canPlace(S,x[0],selDay).ok?1:0));
+  const list = Object.entries(ACTS).filter(([id,a])=>a.menu === menuTab);   /* same order every day, so rows never jump */
   const fx = a => {
     const parts = [];
     if(a.cost) parts.push(`−NT$${a.cost}`); if(a.est) parts.push(`≈ −NT$${a.est.toLocaleString("en-US")}`);
@@ -1603,21 +1741,37 @@ function openSheet(keepTab){
       ${S.plan[selDay] && ACTS[S.plan[selDay]] && ACTS[S.plan[selDay]].span !== 2 ? `<button class="btn alt small" id="shFill">${T("fillRest")}</button>` : ""}</div>`;
   paintSprites(sh);
   $("#sheet").classList.add("on"); document.body.classList.add("sheet-on");
-  const sl = document.querySelector(`#plan .slot[data-i="${selDay}"]`); if(sl) setTimeout(()=>sl.scrollIntoView({block:"center", behavior:"smooth"}), 50);
+  sheetDrawn = Date.now(); keepDayInView();
   $("#shX").onclick = ()=>{ closeSheet(); selDay = -1; renderPlan(); };
-  sh.querySelectorAll(".tab").forEach(t=> t.onclick = ()=>{ menuTab = t.dataset.m; openSheet(true); });
+  sh.querySelectorAll(".tab").forEach(t=> t.onclick = ()=>{ if(tooSoon()) return; menuTab = t.dataset.m; openSheet(true); });
   sh.querySelectorAll(".act").forEach(b=> b.onclick = ()=>{
+    if(tooSoon()) return;
     setPlan(S, selDay, b.dataset.a); save();
     let n = selDay + (ACTS[b.dataset.a].span || 1);
     while(n < 14 && (S.plan[n] || lockOf(S, n))) n++;
     selDay = n < 14 ? n : -1;
-    if(selDay < 0) closeSheet(); else openSheet();
     renderPlan();
+    if(selDay < 0) closeSheet(); else openSheet();
   });
   const del = $("#shDel"); if(del) del.onclick = ()=>{ setPlan(S, selDay, null); save(); openSheet(); renderPlan(); };
   const fill = $("#shFill"); if(fill) fill.onclick = ()=>{ const id = S.plan[selDay];
     for(let i=0;i<14;i++) if(!S.plan[i] && canPlace(S, id, i).ok) setPlan(S, i, id);
     save(); closeSheet(); selDay = -1; renderPlan(); };
+}
+/* the planner keeps the menu still: it scrolls the calendar only when the chosen day is hidden,
+   shows a whole week at a time, and ignores taps for a moment after the menu redraws or the page moves */
+let sheetDrawn = 0, pageMoved = 0;
+addEventListener("scroll", ()=>{ pageMoved = Date.now(); }, {passive:true});
+function tooSoon(){ const t = Date.now(); return t - sheetDrawn < 350 || t - pageMoved < 250; }
+function keepDayInView(){
+  if(selDay < 0) return;
+  const week = $$("#plan h3.px")[selDay < 7 ? 0 : 1], sl = document.querySelector(`#plan .slot[data-i="${selDay}"]`);
+  if(!week || !sl) return;
+  const bar = $("#plan .top"), barB = bar ? bar.getBoundingClientRect().bottom : 0;   /* the sticky bar at the top */
+  const sheetTop = innerHeight - $("#sheet .in").offsetHeight, r = sl.getBoundingClientRect();
+  if(r.top >= barB + 4 && r.bottom <= sheetTop - 8) return;              /* already visible between the bar and the menu */
+  week.style.scrollMarginTop = (barB + 6) + "px";              /* scrollIntoView, not window.scrollTo: the app's frame may not scroll like a page */
+  week.scrollIntoView({block:"start", behavior:"smooth"});
 }
 function closeSheet(){ $("#sheet").classList.remove("on"); document.body.classList.remove("sheet-on"); }
 
@@ -1630,7 +1784,7 @@ function playShell(){
   show("play"); Music.want(STAGE.music.play);
   $("#play").innerHTML = topBar() + `<h2>${LANG === "en" ? "Two weeks in Taipei" : "台北的兩週"}</h2><div class="feed" id="feed"></div>
     <div class="playbar"><div class="in"><button class="btn alt small" id="spd">${T("speed")} ×${playSpeed}</button><button class="btn alt small" id="pau">${T("pause")}</button><button class="btn small" id="skip">${T("skip")} ⏩</button></div></div>`;
-  Music.ui(); paused = false; tripPending = false;
+  Music.ui(); paused = false; tripPending = false; follow = true;
   $("#spd").onclick = ()=>{ playSpeed = {0.5:1, 1:2, 2:4, 4:0.5}[playSpeed] || 1; store.set("speed", playSpeed); $("#spd").textContent = `${T("speed")} ×${playSpeed}`; };
   $("#pau").onclick = ()=>{ paused = !paused; $("#pau").textContent = paused ? T("resume") : T("pause"); $("#pau").classList.toggle("on", paused);
     if(paused) clearTimeout(playTimer); else playTimer = setTimeout(nextDay, 300); };
@@ -1648,7 +1802,7 @@ let tripPending = false;   /* while a trip is open, the days wait for it */
 function goTrip(out){
   tripPending = true; clearTimeout(playTimer);
   return setTimeout(()=>runTrip(out.trip, res=>{ tripPending = false; applyTrip(S, res); save();
-      show("play"); Music.want(STAGE.music.play); const last = S.feed[S.feed.length-1]; if(last) refreshTripCard(last); updateTop();
+      show("play"); autoAt = Date.now(); follow = true; toLogEnd(false); Music.want(STAGE.music.play); const last = S.feed[S.feed.length-1]; if(last) refreshTripCard(last); updateTop();
       playTimer = setTimeout(nextDay, 600); }), 500);
 }
 function nextDay(){
@@ -1677,10 +1831,34 @@ function dayCardEls(out){
   paintSprites(el);
   return [el].concat(out.msgs.map(m=>{ const w = document.createElement("div"); w.innerHTML = msgHTML(m); return w.firstChild; }));
 }
+/* the log follows new days until the player scrolls up to read; scrolling back to the bottom resumes it */
+let follow = true, lastHand = 0, autoAt = 0;
+/* measured from the last card, so it works whether the page or the app around it does the scrolling */
+const atBottom = ()=>{ const l = $("#feed") && $("#feed").lastElementChild; return !l || l.getBoundingClientRect().bottom <= innerHeight - 30; };
+let watch = null;
+function watchLast(){
+  if(!("IntersectionObserver" in window)) return;
+  if(watch) watch.disconnect();
+  const l = $("#feed") && $("#feed").lastElementChild; if(!l) return;
+  watch = new IntersectionObserver(es=>{ const e = es[es.length-1];
+    if(lastHand > autoAt && Date.now() - lastHand < 1500) follow = e.isIntersecting; }, {rootMargin:"0px 0px -40px 0px"});
+  watch.observe(l);
+}
+/* when the app grows the frame after a new card, catch up to the end */
+addEventListener("resize", ()=>{ if(follow && $("#play").classList.contains("on")) toLogEnd(false); });
+function toLogEnd(smooth){ const l = $("#feed") && $("#feed").lastElementChild; if(l) l.scrollIntoView({block:"end", behavior: smooth ? "smooth" : "auto"}); }
+/* a drag, a wheel or a scrolling key counts as the player's hand; a tap on a button does not */
+["wheel","touchmove"].forEach(t=>addEventListener(t, ()=>{ lastHand = Date.now(); }, {passive:true}));
+addEventListener("keydown", e=>{ if(/Arrow|Page|Home|End|^ $/.test(e.key)) lastHand = Date.now(); });
+addEventListener("scroll", ()=>{
+  if(!$("#play").classList.contains("on") || lastHand < autoAt || Date.now() - lastHand > 1500) return;   /* our own scrolling, or no hand */
+  follow = atBottom();
+}, {passive:true});
 function addDayCard(out){
-  const feed = $("#feed"), nearBottom = innerHeight + scrollY >= document.body.scrollHeight - 160;
+  const feed = $("#feed");
   const els = dayCardEls(out); els.forEach(e=>feed.appendChild(e));
-  if(nearBottom || playSpeed >= 99) els[0].scrollIntoView({block:"end", behavior:"smooth"});   /* don't pull the reader down while they scroll back */
+  if(follow || playSpeed >= 99){ autoAt = Date.now(); toLogEnd(playSpeed < 99); }
+  watchLast();
   updateTop();
 }
 function showLog(log, back){
