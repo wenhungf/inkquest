@@ -38,7 +38,7 @@ html,body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-s
 body{min-height:100vh;-webkit-tap-highlight-color:transparent;overflow-x:hidden;}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
 canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block;}
-#app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;padding:0 16px 96px;}
+#app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;padding:env(safe-area-inset-top,0px) 16px 96px;}   /* clear the iPhone status bar */
 .scr{display:none;} .scr.on{display:block;}
 .px{font-family:var(--f-px);}
 .muted{color:var(--muted);}
@@ -69,7 +69,7 @@ h3{font-size:18px;margin:2px 0 6px;}
 #title .foot{margin-top:18px;font-size:13px;color:var(--muted);}
 
 /* top bar */
-.top{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 0 8px;border-bottom:1px solid var(--rule);margin:0 -16px 12px;padding-left:16px;padding-right:16px;}
+.top{position:sticky;top:0;z-index:20;background:var(--bg);padding:calc(10px + env(safe-area-inset-top,0px)) 16px 8px;border-bottom:1px solid var(--rule);margin:calc(-1 * env(safe-area-inset-top,0px)) -16px 12px;}   /* when stuck, its background covers the status bar */
 .top .r1{display:flex;justify-content:space-between;align-items:center;gap:8px;}
 .top .date{font-family:var(--f-px);font-size:16px;}
 .top .money{font-family:var(--f-px);font-size:16px;font-weight:700;}
@@ -1564,7 +1564,7 @@ function diaryFor(S, mkey){
    screens: title, home, planner, play, summary, info pages
    ========================================================= */
 const screens = ["title","home","plan","play","trip","info"];
-function show(id){ const was = screens.find(s=>$("#"+s).classList.contains("on")); screens.forEach(s=>$("#"+s).classList.toggle("on", s === id)); if(was !== id){ window.scrollTo(0,0); $("#"+id).scrollIntoView({block:"start"}); } }
+function show(id){ const was = screens.find(s=>$("#"+s).classList.contains("on")); screens.forEach(s=>$("#"+s).classList.toggle("on", s === id)); if(was !== id){ window.scrollTo(0,0); $("#app").scrollIntoView({block:"start"}); } }   /* #app holds the status-bar padding, so this never tucks content under it */
 const statName = k => T(k);
 const fmtD = v => (v > 0 ? "+" : "−") + Math.abs(v).toFixed(Math.abs(v) < 10 && v % 1 ? 1 : 0);
 let selDay = -1, menuTab = "class", playTimer = null, playSpeed = store.get("speed", 1), paused = false;
