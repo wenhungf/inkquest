@@ -38,7 +38,7 @@ html,body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-s
 body{min-height:100vh;-webkit-tap-highlight-color:transparent;overflow-x:hidden;}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
 canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block;}
-#app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;padding:env(safe-area-inset-top,0px) 16px 96px;}   /* clear the iPhone status bar */
+#app{overflow-anchor:none;max-width:480px;margin:0 auto;min-height:100vh;position:relative;padding:env(safe-area-inset-top,0px) 16px 96px;}   /* clear the iPhone status bar */
 .scr{display:none;} .scr.on{display:block;}
 .px{font-family:var(--f-px);}
 .muted{color:var(--muted);}
@@ -173,7 +173,8 @@ body.sheet-on #plan{padding-bottom:58vh;}
 #modal .choices{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
 #trip .btn{white-space:normal;}
 #modal .choices .btn,.choices .btn{width:100%;text-align:left;justify-content:flex-start;white-space:normal;flex-wrap:wrap;}
-.diary{font-family:var(--f-disp);font-size:18px;line-height:1.55;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:16px;background-image:repeating-linear-gradient(transparent,transparent 27px,var(--rule) 27px,var(--rule) 28px);}
+.diary{font-family:var(--f-disp);font-size:18px;line-height:28px;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:14px 16px;background-image:repeating-linear-gradient(to bottom,transparent 0 21px,var(--rule) 21px 22px,transparent 22px 28px);background-origin:content-box;}   /* each line of text sits on a rule: 28px lines, the rule just under the baseline */
+.diary p{margin:0;}
 
 /* glossary words */
 .g{border-bottom:2px dotted var(--accent);cursor:pointer;}
@@ -214,6 +215,8 @@ body.sheet-on #plan{padding-bottom:58vh;}
 .post .pt{font-size:13px;padding:6px 8px;}
 .nb{display:flex;flex-direction:column;gap:6px;}
 .nb .it{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:10px;background:var(--surface);border:1px solid var(--rule);}
+.nb .it > span:first-child{flex:1;min-width:0;}
+.nb .it > span:last-child{flex:0 0 auto;max-width:48%;text-align:right;}
 #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:14px;z-index:80;opacity:0;transition:opacity .3s;pointer-events:none;max-width:88vw;text-align:center;}
 #toast.on{opacity:1;}
 .set .rowi{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--rule);gap:8px;}
@@ -297,7 +300,7 @@ const UI = {
   livingCost:{zh:"生活費（吃飯、交通）", en:"Living costs (food, transport)"},
   holTag:{zh:"假", en:"Off"}, saleTag:{zh:"慶", en:"Sale"}, newTag:{zh:"新", en:"New"},
   classHoliday:{zh:"國定假日不上課", en:"No class on a national holiday"}, petsTrip:{zh:"顧寵物的兩週不能出遠門", en:"No trips in two weeks with pet-sitting"},
-  licenseDone:{zh:"已經拿到駕照，或十堂課都排好了", en:"You have your license, or all ten lessons are planned"}, plusComm:{zh:"＋抽成", en:" + commission"}, commIn:{zh:"抽成", en:"Commission"}
+  libClosed:{zh:"圖書館週一休館", en:"The library is closed on Mondays"}, licenseDone:{zh:"已經拿到駕照，或十堂課都排好了", en:"You have your license, or all ten lessons are planned"}, plusComm:{zh:"＋抽成", en:" + commission"}, commIn:{zh:"抽成", en:"Commission"}
 };
 
 /* ==== content/book1/tracks.js ==== */
@@ -463,7 +466,8 @@ const ACTS = {
     slip:["I forget my homework. I feel [[silly]]."]},
   yoga:{menu:"class", open:0, s:{zh:"瑜伽", en:"Yoga"}, zh:"瑜伽課", en:"Yoga class", spr:"mat", days:[0,2], cost:400, st:-3, g:{fi:1.8, sty:0.6}, odds:"fi", cls:true,
     ok:["My legs shake, but I hold the tree pose for one minute.", "I can touch my toes today!"], slip:["I am too tired. I lie on my mat and [[breathe]]."]},
-  study:{menu:"class", open:0, s:{zh:"自習", en:"Study"}, zh:"圖書館自習", en:"Self-study at the library", spr:"lib", days:null, cost:0, st:2, g:{en:1.0, kh:0.8}, odds:"en", cls:true,
+  study:{menu:"class", open:0, s:{zh:"自習", en:"Study"}, zh:"圖書館自習", en:"Self-study at the library", spr:"lib", days:[1,2,3,4,5,6], cost:0, st:2, g:{en:1.0, kh:0.8}, odds:"en", cls:true,
+    sub:{zh:"免費・圖書館週一休館", en:"Free · the library is closed on Mondays"},
     ok:["I study at the [[library]]. It is quiet and cool.", "I read a short English story. I understand most of it!"], slip:["I fall asleep on my book."]},
   tutor:{menu:"class", open:1, s:{zh:"家教", en:"Tutor"}, zh:"英文家教", en:"English tutor", spr:"laptop", days:null, cost:1000, st:5, g:{en:3.2}, odds:"en", cls:true,
     ok:["My [[tutor]] is [[patient]]. We talk for one hour, only in English."], slip:["My tutor asks many questions. My head is full."]},
@@ -604,7 +608,7 @@ const EVENTS = [
     msgs:[["news","[[Typhoon]] warning! A strong typhoon is coming on Wednesday. The city says: no work and no school that day.","颱風警報！強颱星期三來襲，台北市宣布停班停課。"]],
     fx:S=>{ S.locks[D.add(S.date, 2)] = "typhoon"; }},
   {id:"fathers", at:"start", when:S=>S.blk === 2,
-    msgs:[["leo","Saturday is [[Father's Day]]! 8/8, “ba ba,” like “Dad.” What do we give him?","星期六是父親節！八八，「爸爸」。我們要送他什麼？"]],
+    msgs:[["leo","Saturday is [[Father's Day]]! What do we give Dad?","星期六是父親節！我們要送爸爸什麼？"]],
     choice:{q:["What do you do for Dad?","妳要為爸爸做什麼？"], opts:[
       {en:"Buy him a nice shirt (NT$800)", zh:"買一件好看的襯衫（NT$800）", fx:S=>{ S.money -= 800; S.hearts.family += 10; S.flags.dadGift = "shirt";
         return ["family","Dad wears the shirt every day now. Every day!","爸爸現在每天都穿那件襯衫，每天喔！"]; }},
@@ -1035,11 +1039,16 @@ function pickVoice(){
 }
 if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
 const sayAs = t => Object.entries(SAY_AS).reduce((x,[w,r])=>x.split(w).join(r), t);
+/* say() tells the page when speech starts and ends, so the play log can wait while Mia's words are read */
+let sayId = 0;
+const ping = n => document.dispatchEvent(new Event(n));
 function say(t){
   if(!SYN) return; SYN.cancel();
+  const id = ++sayId;
   const u = new SpeechSynthesisUtterance(sayAs(plain(t)).replace(/[“”]/g,'"').replace(/[’‘]/g,"'"));
   if(VOICE){ u.voice = VOICE; u.lang = VOICE.lang; } else u.lang = "en-US";
-  u.rate = .9; SYN.speak(u);
+  u.rate = .9; u.onend = u.onerror = ()=>{ if(id === sayId) ping("ws:sayEnd"); };
+  ping("ws:say"); SYN.speak(u);
 }
 const ICON = {
   spk:'<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg>',
@@ -1060,13 +1069,13 @@ function openGloss(k, anchor){
     <div class="z">${esc(g.zh)}</div>${g.d ? `<div class="d">${esc(g.d)}</div>` : ""}`;
   const r = anchor.getBoundingClientRect();
   p.style.top = (r.bottom + 8 + 150 > innerHeight ? Math.max(8, r.top - 158) : r.bottom + 8) + "px";
-  p.classList.add("on");
+  p.classList.add("on"); ping("ws:tip");
   anchor.classList.add("seen");
 }
 document.addEventListener("click", e=>{
   const g = e.target.closest(".g"); if(g){ e.stopPropagation(); openGloss(g.dataset.k, g); return; }
   const sp = e.target.closest("[data-say]"); if(sp){ say(sp.dataset.say); return; }
-  if(e.target.closest("[data-close]") || !e.target.closest("#pop")) $("#pop").classList.remove("on");
+  if((e.target.closest("[data-close]") || !e.target.closest("#pop")) && $("#pop").classList.contains("on")){ $("#pop").classList.remove("on"); ping("ws:tipEnd"); }
 }, true);
 
 /* ==== engine/room.js ==== */
@@ -1884,6 +1893,7 @@ function copyLast(){
 }
 function whyText(r, a){
   if(r.why === "days") return `${T("onlyOn")} ${a.days.map(d=>LANG === "en" ? WD_EN[d] : "週"+WD_ZH[d]).join(LANG === "en" ? ", " : "、")}` + (a === ACTS.cafe ? `（${LANG === "en" ? "Tue " + T("closed") : "週二" + T("closed")}）` : "");
+  if(r.why === "days" && a === ACTS.study) return T("libClosed");
   if(r.why === "need") return `${T("needs")} ${statName(r.k)} ${r.v}`;
   if(r.why === "flag") return T("notYet");
   if(r.why === "span") return T("twoDays");
@@ -1960,11 +1970,13 @@ function playShell(){
   show("play"); Music.want(STAGE.music.play);
   $("#play").innerHTML = topBar() + `<h2>${LANG === "en" ? "Two weeks in Taipei" : "台北的兩週"}</h2><div class="feed" id="feed"></div>
     <div class="playbar"><div class="in"><button class="btn alt small" id="spd">${T("speed")} ×${playSpeed}</button><button class="btn alt small" id="pau">${T("pause")}</button><button class="btn small" id="skip">${T("skip")} ⏩</button></div></div>`;
-  Music.ui(); paused = false; tripPending = false; follow = true;
+  Music.ui(); paused = false; tripPending = false; follow = true; holds.clear();
   $("#spd").onclick = ()=>{ playSpeed = {0.5:1, 1:2, 2:4, 4:0.5}[playSpeed] || 1; store.set("speed", playSpeed); $("#spd").textContent = `${T("speed")} ×${playSpeed}`; };
-  $("#pau").onclick = ()=>{ paused = !paused; $("#pau").textContent = paused ? T("resume") : T("pause"); $("#pau").classList.toggle("on", paused);
-    if(paused) clearTimeout(playTimer); else playTimer = setTimeout(nextDay, 300); };
-  $("#skip").onclick = ()=>{ paused = false; playSpeed = 99; clearTimeout(playTimer); playTimer = setTimeout(nextDay, 30); };
+  $("#pau").onclick = ()=>{
+    if(paused || holds.size){ paused = false; holds.clear(); follow = true; autoAt = Date.now(); toLogEnd(true); clearTimeout(playTimer); playTimer = setTimeout(nextDay, 300); }
+    else { paused = true; clearTimeout(playTimer); }
+    pauUI(); };
+  $("#skip").onclick = ()=>{ paused = false; holds.clear(); pauUI(); playSpeed = 99; clearTimeout(playTimer); playTimer = setTimeout(nextDay, 30); };
 }
 function resumePlay(){
   clearTimeout(playTimer); playShell();
@@ -1977,12 +1989,13 @@ function resumePlay(){
 let tripPending = false;   /* while a trip is open, the days wait for it */
 function goTrip(out){
   tripPending = true; clearTimeout(playTimer);
-  return setTimeout(()=>runTrip(out.trip, res=>{ tripPending = false; applyTrip(S, res); save();
+  return setTimeout(()=>runTrip(out.trip, res=>{ tripPending = false; holds.clear(); pauUI(); applyTrip(S, res); save();
       show("play"); autoAt = Date.now(); follow = true; toLogEnd(false); Music.want(STAGE.music.play); const last = S.feed[S.feed.length-1]; if(last) refreshTripCard(last); updateTop();
       playTimer = setTimeout(nextDay, 600); }), 500);
 }
 function nextDay(){
   clearTimeout(playTimer);
+  if(holds.size || paused) return;   /* waiting for the player: a tooltip, a voice, or a hand on the log */
   if(tripPending) return;
   if(S.day >= 14) return endBlock();
   const out = runDay(S, S.day); save();
@@ -2010,8 +2023,37 @@ function dayCardEls(out){
 }
 /* the log follows new days until the player scrolls up to read; scrolling back to the bottom resumes it */
 let follow = true, lastHand = 0, autoAt = 0;
-/* measured from the last card, so it works whether the page or the app around it does the scrolling */
-const atBottom = ()=>{ const l = $("#feed") && $("#feed").lastElementChild; return !l || l.getBoundingClientRect().bottom <= innerHeight - 30; };
+/* measured from the last card, so it works whether the page or the app around it does the scrolling:
+   the bottom means the last card sits fully above the button bar */
+const atBottom = ()=>{ const l = $("#feed") && $("#feed").lastElementChild, bar = $("#play .playbar");
+  return !l || l.getBoundingClientRect().bottom <= (bar ? bar.getBoundingClientRect().top : innerHeight) + 2; };
+
+/* ---- the week waits for the player (2026-10-14) ----
+   Touching the log (a tap, a drag, a wheel), opening a word's tooltip or playing a voice pauses the days.
+   Closing the tooltip, the voice ending, or scrolling back to the very bottom carries on; a tap at the
+   bottom carries on too, for logs too short to scroll. The Pause button still works on its own. */
+const holds = new Set();
+let leftBottom = false;
+const playingNow = ()=> !!S && $("#play").classList.contains("on") && S.phase === "play" && S.day < 14 && !tripPending && playSpeed < 99;
+function pauUI(){ const b = $("#pau"); if(!b) return; const on = paused || holds.size > 0; b.textContent = on ? T("resume") : T("pause"); b.classList.toggle("on", on); }
+function hold(r){ if(!playingNow()) return; if(r === "hand" && !holds.has("hand")) leftBottom = !atBottom(); holds.add(r); clearTimeout(playTimer); follow = false; pauUI(); }
+function release(r){
+  if(!holds.delete(r)) return; pauUI();
+  if(!holds.size && !paused && playingNow()){ follow = true; autoAt = Date.now(); toLogEnd(true); clearTimeout(playTimer); playTimer = setTimeout(nextDay, 700); }
+}
+document.addEventListener("ws:tip", ()=>hold("tip"));
+document.addEventListener("ws:tipEnd", ()=>release("tip"));
+document.addEventListener("ws:say", ()=>hold("say"));
+document.addEventListener("ws:sayEnd", ()=>release("say"));
+addEventListener("pointerdown", e=>{
+  if(!e.target.closest || !e.target.closest("#feed") || e.target.closest(".g,[data-say]")) return;   /* words and voices hold on their own */
+  if(holds.has("hand") && atBottom()) release("hand"); else hold("hand");
+}, true);
+["wheel","touchmove"].forEach(t=>addEventListener(t, ()=>{ if($("#play").classList.contains("on")) hold("hand"); }, {passive:true}));
+addEventListener("scroll", ()=>{
+  if(!holds.has("hand")) return;
+  if(!atBottom()) leftBottom = true; else if(leftBottom) release("hand");
+}, {passive:true});
 let watch = null;
 function watchLast(){
   if(!("IntersectionObserver" in window)) return;
@@ -2174,6 +2216,13 @@ function tripHead(title){
     <button class="ib" data-music aria-label="${T("music")}">${ICON.music}</button></div></div>`;
 }
 function spend(n){ TS.spent += n; }
+/* a new trip screen starts at the top; a result that appears in place is moved into view below the sticky bar */
+function tripTop(){ window.scrollTo(0,0); const a = $("#app"); if(a) a.scrollIntoView({block:"start"}); }
+function reveal(el){
+  const bar = $("#trip .top"), bb = bar ? bar.getBoundingClientRect().bottom : 0, r = el.getBoundingClientRect();
+  if(r.top < bb + 6){ el.style.scrollMarginTop = (bb + 8) + "px"; el.scrollIntoView({block:"start"}); }
+  else if(r.bottom > innerHeight - 8){ el.style.scrollMarginBottom = "16px"; el.scrollIntoView({block:"end"}); }
+}
 
 /* ---------------- 1. the departure board ---------------- */
 function tripBoard(){
@@ -2213,7 +2262,7 @@ function tripBoard(){
     const c = $("#trip .clock"); if(c) c.textContent = hhmm(now);
     if(B.rows.some(r=>toMin(r.t) === now)) draw();
   }, 2000);
-  draw();
+  draw(); tripTop();
 }
 
 /* ---------------- 2. the window seat ---------------- */
@@ -2238,7 +2287,7 @@ function tripRide(){
     $("#trip").innerHTML = tripHead(LANG === "en" ? "The window seat" : "靠窗的位子") + `
       <canvas class="win" id="win" width="320" height="150"></canvas>
       <div class="msg" style="margin-top:10px"><div class="from"><span>🔊 ${LANG === "en" ? "Announcement" : "車廂廣播"}</span><button class="ib" style="width:30px;height:30px" data-say="${esc(st.ann)}">${ICON.spk}</button></div><div>${esc(st.ann)}</div><div class="zht">${esc(st.zh)}</div></div>
-      <div id="rScene" style="margin-top:8px"></div>`;
+      <div id="rScene" style="margin-top:8px"></div>`; tripTop();
     Music.ui();
     const cv = $("#win"); let t = k*400, stopAt = performance.now() + 2200;
     const loop = now => { const moving = now < stopAt; if(moving) t += 3; drawWindow(cv, t, moving ? null : st.at); rideAnim = requestAnimationFrame(loop); };
@@ -2266,6 +2315,7 @@ function choiceBlock(box, scene, opts, next){
       <button class="btn" style="width:100%;margin-top:8px" id="cNext">${T("next")}</button>`;
     box.querySelector("#cNext").onclick = next;
     updTripHead();
+    reveal(box);
   });
 }
 function updTripHead(){ const m = $("#trip .top .money"); if(m) m.textContent = `${T("cost")} ${fmt(TS.spent)}`; drawHud(); }
@@ -2280,7 +2330,7 @@ function arriveKhh(){
     `The train arrives at ${hhmm(toMin(TS.train.arr)).replace(/^0/,"")}. I take the MRT to the harbor and get on the [[ferry|ferry]] to Cijin. The ride is only a few minutes!`,
     `火車 ${hhmm(toMin(TS.train.arr))} 到站。我搭捷運到港邊，坐上往旗津的渡輪，只要幾分鐘！`]) +
     `<p class="muted" style="font-size:14px;margin-top:8px">${LANG === "en" ? `Plan your afternoon: every walk takes time and energy. The sun sets at ${sunsetFor()}. Can you reach the lighthouse in time?` : `規劃妳的下午：每段路都要花時間和體力。日落是 ${sunsetFor()}，妳來得及在日落前爬上燈塔嗎？`}</p>
-    <button class="btn" id="aGo" style="width:100%;margin-top:8px">${T("go2")}</button>`;
+    <button class="btn" id="aGo" style="width:100%;margin-top:8px">${T("go2")}</button>`; tripTop();
   Music.ui();
   $("#aGo").onclick = mapScreen;
 }
@@ -2331,7 +2381,7 @@ function mapScreen(){
     <div class="nodes">${nb.map(x=>{ const n = M.nodes[x.to], can = TS.energy >= x.en;
       return `<button class="node${TS.visited[x.to] ? " done" : ""}" data-to="${x.to}" ${can ? "" : "disabled"}><span><span class="nm">${esc(N(n))}</span>${TS.visited[x.to] ? " ✓" : ""}${n.hill ? ` <span class="tag">${LANG === "en" ? "hill" : "上坡"}</span>` : ""}</span>
         <span class="cost">${x.min} ${LANG === "en" ? "min" : "分"} · ${T("energy")} −${x.en}${can ? "" : (LANG === "en" ? " · too tired" : " · 體力不夠")}</span></button>`; }).join("")}</div>
-    <button class="btn alt" id="mEnd" style="width:100%;margin-top:10px">${T("leave")}</button>`;
+    <button class="btn alt" id="mEnd" style="width:100%;margin-top:10px">${T("leave")}</button>`; tripTop();
   drawMap($("#map")); drawHud(); Music.ui();
   $$("#trip .node").forEach(b=> b.onclick = ()=>{
     const x = nb.find(y=>y.to === b.dataset.to); TS.time += x.min; TS.energy -= x.en; TS.cur = x.to;
@@ -2345,13 +2395,13 @@ function visit(id){
   TS.visited[id] = true;
   if(v.big) return lighthouse();
   TS.time += v.min;
-  $("#trip").innerHTML = tripHead("Cijin · " + N(M.nodes[id])) + `<div class="hud" id="hud"></div><div id="vBox"></div>`;
+  $("#trip").innerHTML = tripHead("Cijin · " + N(M.nodes[id])) + `<div class="hud" id="hud"></div><div id="vBox"></div>`; tripTop();
   drawHud(); Music.ui();
   choiceBlock($("#vBox"), v.scene, v.opts, mapScreen);
 }
 function lighthouse(){
   const M = TS.TR.map, B = M.big, sun = toMin(sunsetFor());
-  $("#trip").innerHTML = tripHead(N(M.nodes.light)) + `<div class="hud" id="hud"></div><div id="lBox"></div>`;
+  $("#trip").innerHTML = tripHead(N(M.nodes.light)) + `<div class="hud" id="hud"></div><div id="lBox"></div>`; tripTop();
   drawHud(); Music.ui();
   const box = $("#lBox");
   const climb = ()=>{
@@ -2390,7 +2440,7 @@ function nightScene(forced){
     (forced ? sceneHTML(["It is late. The lighthouse is closing, so I take the ferry back across the harbor.","很晚了，燈塔要關了，我搭渡輪回到對岸。"]) : sceneHTML(["I take the ferry back. The harbor lights shine on the water.","我搭渡輪回去，港口的燈光映在水面上。"])) +
     `<h3 style="margin-top:12px">${esc(LANG === "en" ? st.q[0] : st.q[1])}</h3>
     <div style="display:flex;flex-direction:column;gap:8px">${st.opts.map(o=>`<button class="btn alt" data-stay="${o.id}" style="justify-content:flex-start;text-align:left;white-space:normal" ${okStay(o) ? "" : "disabled"}>${esc(N(o))}${okStay(o) ? "" : `<br><small>${esc(LANG === "en" ? o.why[0] : o.why[1])}</small>`}</button>`).join("")}</div>
-    <div id="nBox" style="margin-top:8px"></div>`;
+    <div id="nBox" style="margin-top:8px"></div>`; tripTop();
   Music.want(STAGE.music.night); Music.ui();
   $$("#trip [data-stay]").forEach(b=> b.onclick = ()=>{
     const o = st.opts.find(x=>x.id === b.dataset.stay); spend(o.cost); TS.stay = o.id;
@@ -2410,7 +2460,7 @@ function walkScene(){
     $("#trip").innerHTML = tripHead("Pier-2 · 駁二") + (k === 0 ? sceneHTML(W.intro) : "") +
       `<h3 style="margin-top:10px">${LANG === "en" ? `Clue ${k+1} of 3` : `線索 ${k+1}／3`}</h3>${sceneHTML(cl.q)}
       <div class="clues" style="margin-top:8px">${W.pics.map(p=>`<button class="clue" data-p="${p.id}"><canvas width="12" height="12" data-spr="${p.spr}" style="background:#EFE8D8"></canvas><div class="cn">${esc(N(p))}</div></button>`).join("")}</div>
-      <div id="wMsg" style="margin-top:8px">${msg || ""}</div>`;
+      <div id="wMsg" style="margin-top:8px">${msg || ""}</div>`; tripTop();
     paintSprites($("#trip")); Music.ui();
     $$("#trip .clue").forEach(b=> b.onclick = ()=>{
       if(b.dataset.p === cl.a){ b.classList.add("ok"); tAdd({en:.4}); k++; setTimeout(()=>draw(sceneHTML(["Click! Good photo.","喀嚓！拍得好。"])), 450); }
@@ -2433,7 +2483,7 @@ function tripEnd(){
     <h3 style="margin-top:12px">${LANG === "en" ? "Trip results" : "旅行成果"}</h3>
     <div class="ticks" style="display:flex;flex-wrap:wrap;gap:6px 10px;font-size:15px">${ticksHTML({money:-res.spent, stress:res.stress, st:g})}</div>
     <div class="album" style="margin-top:10px">${res.cards.map(c=>`<div class="post"><canvas width="150" height="100" data-card="${c}"></canvas><span class="stamp">${c === "window" ? "TAIPEI → KAOHSIUNG" : "KAOHSIUNG"}</span><div class="pt">${esc(N(TS.TR.cards[c]))}</div></div>`).join("")}</div>
-    <button class="btn" id="tDone" style="width:100%;margin-top:12px">${LANG === "en" ? "Back to Taipei" : "回到台北"}</button>`;
+    <button class="btn" id="tDone" style="width:100%;margin-top:12px">${LANG === "en" ? "Back to Taipei" : "回到台北"}</button>`; tripTop();
   $$("#trip canvas[data-card]").forEach(cv=>drawCard(cv, cv.dataset.card)); Music.ui();
   $("#tDone").onclick = ()=>{ const d = TS.done; TS = null; d(res); };
 }
