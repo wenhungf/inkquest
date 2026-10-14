@@ -106,10 +106,19 @@ h3{font-size:18px;margin:2px 0 6px;}
 /* planner */
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:6px;}
 .cal .wd{text-align:center;font-size:12px;color:var(--muted);font-family:var(--f-px);}
-.slot{position:relative;aspect-ratio:1/1.25;border-radius:10px;border:2px dashed var(--rule);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:3px 1px;overflow:hidden;}
+.slot{position:relative;min-height:66px;border-radius:10px;border:2px dashed var(--rule);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:3px 1px;overflow:hidden;}
 .slot .d{font-family:var(--f-px);font-size:12px;color:var(--muted);line-height:1;}
-.slot canvas{width:28px;height:28px;margin-top:3px;}
-.slot .a{font-size:10.5px;line-height:1.15;text-align:center;margin-top:2px;word-break:break-word;}
+.slot canvas{width:24px;height:24px;margin-top:3px;flex:none;}
+.slot .a{font-size:10.5px;line-height:1.2;text-align:center;margin-top:2px;word-break:break-word;padding-bottom:2px;}
+.slot .d .tg{font-style:normal;font-family:var(--f-zh,inherit);font-size:9px;margin-left:2px;color:var(--bad);}
+.slot .d .tg.sale{color:var(--accent);}
+.slot.hol .d{color:var(--bad);}
+.pnotes{font-size:12px;margin:6px 0 0;}
+.tag.new{background:var(--gold);color:#2B2536;}
+.infobar .r1{position:relative;}
+.infobar .ttl{position:absolute;left:96px;right:96px;text-align:center;font-size:16px;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.post{position:relative;}
+.post .stamp{position:absolute;left:6px;top:6px;font-family:var(--f-px);font-size:10px;letter-spacing:.04em;background:rgba(255,255,255,.85);color:#2B2536;padding:1px 5px;border-radius:4px;}
 .slot.set{border-style:solid;}
 .slot.sel{outline:3px solid var(--gold);outline-offset:1px;}
 .slot.lock{background:repeating-linear-gradient(45deg,var(--surface),var(--surface) 6px,var(--rule) 6px,var(--rule) 8px);border-style:solid;cursor:default;}
@@ -238,7 +247,7 @@ const UI = {
   start:{zh:"開始新遊戲", en:"New game"}, cont:{zh:"繼續", en:"Continue"}, music:{zh:"音樂", en:"Music"},
   langBtn:{zh:"English", en:"中文"}, kicker:{zh:"INKQUEST · 遊戲版 · 第一階段", en:"INKQUEST · THE GAME · STAGE 1"},
   titleZh:{zh:"靠窗的位子：遊戲版", en:"靠窗的位子：遊戲版"},
-  blurb:{zh:"幫 Mia 規劃台北的每一天：上課、打工、和朋友出去，或是搭火車去冒險。這是試玩版：2025 年 7 月到 8 月。", en:"Plan Mia's days in Taipei: classes, work, friends, or a train trip south. This slice covers July and August 2025."},
+  blurb:{zh:"幫 Mia 規劃台北的每一天：上課、打工、和朋友出去，或是搭火車去冒險。第一階段：2026 年 7 月到 2027 年 1 月（製作中）。", en:"Plan Mia's days in Taipei: classes, work, friends, or a train trip south. Stage 1 runs from July 2026 to January 2027 (still being built)."},
   confirmNew:{zh:"要開始新遊戲嗎？目前的進度會被覆蓋。", en:"Start a new game? Your current save will be replaced."}, yes:{zh:"確定", en:"Yes"}, cancel:{zh:"取消", en:"Cancel"},
   confirmEnd:{zh:"要結束今天的島上行程嗎？還沒去的地方就去不了了。", en:"End your day on the island? You can't visit the other places today."},
   noMusic:{zh:"這個瀏覽器無法播放音樂", en:"This browser can't play music"},
@@ -278,14 +287,17 @@ const UI = {
   hearts:{zh:"好感度", en:"Hearts"}, rank:{zh:"等級", en:"Rank"},
   r0:{zh:"初級", en:"Beginner"}, r1:{zh:"中級", en:"Regular"}, r2:{zh:"高級", en:"Advanced"},
   sick:{zh:"生病了", en:"Sick"}, typhoon:{zh:"颱風假", en:"Typhoon day"}, locked:{zh:"已固定", en:"Fixed"},
-  trip:{zh:"冒險", en:"Adventure"}, endSlice:{zh:"試玩版結束", en:"End of the slice"},
+  trip:{zh:"冒險", en:"Adventure"}, endSlice:{zh:"第一階段（製作中）結束", en:"End of Stage 1 (so far)"},
   portfolio:{zh:"作品集", en:"Portfolio"}, time:{zh:"時間", en:"Time"}, energy:{zh:"體力值", en:"Energy"},
   leave:{zh:"結束今天", en:"End the day"}, go2:{zh:"出發", en:"Go"},
   perDay:{zh:"每天", en:"a day"}, payday:{zh:"發薪日", en:"payday"}, cash:{zh:"當天付現", en:"paid the same day"},
   w_clear:{zh:"晴天", en:"Clear"}, w_cloudy:{zh:"多雲", en:"Cloudy"}, w_rain:{zh:"下雨", en:"Rainy"}, w_storm:{zh:"颱風快來了", en:"A typhoon is coming"},
   emptyDays:{zh:"還有 {n} 天沒有安排，這些天會變成自由日。", en:"{n} days have no plan yet. They will be free days."}, emptyDay1:{zh:"還有 1 天沒有安排，這天會變成自由日。", en:"1 day has no plan yet. It will be a free day."},
   keepPlanning:{zh:"回去安排", en:"Keep planning"}, startAnyway:{zh:"直接開始", en:"Start anyway"},
-  livingCost:{zh:"生活費（吃飯、交通）", en:"Living costs (food, transport)"}
+  livingCost:{zh:"生活費（吃飯、交通）", en:"Living costs (food, transport)"},
+  holTag:{zh:"假", en:"Off"}, saleTag:{zh:"慶", en:"Sale"}, newTag:{zh:"新", en:"New"},
+  classHoliday:{zh:"國定假日不上課", en:"No class on a national holiday"}, petsTrip:{zh:"顧寵物的兩週不能出遠門", en:"No trips in two weeks with pet-sitting"},
+  licenseDone:{zh:"已經拿到駕照，或十堂課都排好了", en:"You have your license, or all ten lessons are planned"}, plusComm:{zh:"＋抽成", en:" + commission"}, commIn:{zh:"抽成", en:"Commission"}
 };
 
 /* ==== content/book1/tracks.js ==== */
@@ -342,7 +354,7 @@ const GLOSS = {
   "blink":{w:"blink", kk:"[blɪŋk]", zh:"眨眼"},
   "stinky tofu":{w:"stinky tofu", kk:"[ˋstɪŋkɪ ˋtofu]", zh:"臭豆腐"},
   "ktv":{w:"KTV", zh:"KTV、唱歌包廂", d:"英美比較常說 karaoke [ˏkɑrəˋokɪ]。KTV 是台灣和亞洲的說法。"},
-  "youbike":{w:"YouBike", zh:"YouBike 微笑單車", d:"台灣的公共自行車。YouBike 2.0 在台北、新北前 30 分鐘 NT$5，之後每 30 分鐘 NT$10；台中、高雄前 30 分鐘免費。電輔車 2.0E 前兩小時每 30 分鐘 NT$20。"},
+  "youbike":{w:"YouBike", zh:"YouBike 微笑單車", d:"台灣的公共自行車。台北、新北的會員騎 YouBike 2.0，前 30 分鐘免費，之後每 30 分鐘 NT$10。各縣市的費率不一樣，也常常調整，騎之前先看官網。"},
   "weekend":{w:"weekend", kk:"[ˋwikˋɛnd]", zh:"週末"},
   "working holiday":{w:"working holiday", kk:"[ˋwɝkɪŋ ˋhɑləˏde]", zh:"打工度假", d:"年輕人到國外一邊旅行、一邊工作，通常是一到兩年。"},
   "seafood":{w:"seafood", kk:"[ˋsiˏfud]", zh:"海鮮"},
@@ -365,7 +377,24 @@ const GLOSS = {
   "warehouse":{w:"warehouse", kk:"[ˋwɛrˏhaʊs]", zh:"倉庫"},
   "metal":{w:"metal", kk:"[ˋmɛtḷ]", zh:"金屬"},
   "painting":{w:"painting", kk:"[ˋpentɪŋ]", zh:"畫"},
-  "jie":{w:"Jie", zh:"姊", d:"華人常叫姊姊「姊」，不直接叫名字。英文通常直接叫名字。"}
+  "jie":{w:"Jie", zh:"姊", d:"華人常叫姊姊「姊」，不直接叫名字。英文通常直接叫名字。"},
+  "mirror":{w:"mirror", kk:"[ˋmɪrɚ]", zh:"鏡子；後照鏡"},
+  "latte art":{w:"latte art", kk:"[ˋlɑte ɑrt]", zh:"咖啡拉花"},
+  "cv":{w:"CV", kk:"[ˏsiˋvi]", zh:"履歷", d:"英式英文說 CV，美式英文多說 résumé [ˋrɛzəˏme]。"},
+  "interview":{w:"interview", kk:"[ˋɪntɚˏvju]", zh:"面試"},
+  "rule":{w:"rule", kk:"[rul]", zh:"規則"},
+  "roll":{w:"roll", kk:"[rol]", zh:"擲（骰子）"},
+  "mooncake":{w:"mooncake", kk:"[ˋmunˏkek]", zh:"月餅"},
+  "flyer":{w:"flyer", kk:"[ˋflaɪɚ]", zh:"傳單"},
+  "language exchange":{w:"language exchange", kk:"[ˋlæŋgwɪdʒ ɪksˋtʃendʒ]", zh:"語言交換"},
+  "board game":{w:"board game", kk:"[bord gem]", zh:"桌遊"},
+  "styling":{w:"styling", kk:"[ˋstaɪlɪŋ]", zh:"造型"},
+  "scooter":{w:"scooter", kk:"[ˋskutɚ]", zh:"機車（速克達）", d:"台灣常見的小型機車，英文叫 scooter；motorcycle 多半指比較大的重型機車。"},
+  "ttrpg":{w:"TTRPG", zh:"桌上角色扮演遊戲（跑團）", d:"tabletop role-playing game 的縮寫，例如《龍與地下城》。大家圍著桌子，用骰子和想像力一起說故事。"},
+  "anniversary sale":{w:"anniversary sale", kk:"[ˏænəˋvɝsərɪ sel]", zh:"週年慶"},
+  "commission":{w:"commission", kk:"[kəˋmɪʃən]", zh:"業績抽成；佣金", d:"賣出越多，抽成越多。"},
+  "road test":{w:"road test", kk:"[rod tɛst]", zh:"路考"},
+  "driver's license":{w:"driver's license", kk:"[ˋdraɪvɚz ˋlaɪsṇs]", zh:"駕照", d:"美式英文。英式英文寫 driving licence。"},
 };
 
 /* words the English voice says the local way */
@@ -373,7 +402,8 @@ const SAY_AS = {"Kaohsiung":"Gow-shong", "Cijin":"Chee-jin", "Jie":"Jyeh", "Tze-
 
 /* ==== content/book1/stage.js ==== */
 /* =========================================================
-   STAGE 1 · HOME (Book 1, A1) — vertical slice: July 7 – August 31, 2025
+   STAGE 1 · HOME (Book 1 and the start of Book 2, A1 → A2)
+   July 6, 2026 – January 3, 2027: 13 two-week blocks.
    Canon (Window Seat Book 1): Mia, 27, sells bags on the third floor of a
    Taipei department store. In the game she lives at home with her family
    (decided 2026-10-12), so she pays no rent in Taiwan. Her brother Leo,
@@ -382,7 +412,7 @@ const SAY_AS = {"Kaohsiung":"Gow-shong", "Cijin":"Chee-jin", "Jie":"Jyeh", "Tze-
    next door, and her best friend Ting, who is abroad.
    ========================================================= */
 const STAGE = {
-  id:1, book:"Window Seat (Book 1)", start:"2025-07-07", end:"2025-08-31", blocks:4,
+  id:1, book:"Window Seat (Books 1–2)", start:"2026-07-06", end:"2027-01-03", blocks:13,
   money:20000, stress:20,
   stats:{en:8, co:15, fi:20, cr:15, sty:22, kh:15},
   living:200,                                   /* lunch and transport each day; she eats at home */
@@ -391,6 +421,27 @@ const STAGE = {
   bills:[],                                     /* she lives at home: no rent in Taiwan */
   music:{home:0, plan:0, play:2, trip:3, night:1}
 };
+
+/* Taiwan's minimum hourly wage: NT$196 in 2026, NT$205 from January 1, 2027
+   (Ministry of Labor; the 2027 rate approved by the wage council in September 2026) */
+const MIN_WAGE = [["2027-01-01", 205], ["2026-01-01", 196]];
+const wageOn = date => (MIN_WAGE.find(w=>date >= w[0]) || MIN_WAGE[MIN_WAGE.length-1])[1];
+
+/* national days off (2025 holiday law). Classes don't meet; shops stay open and sell more. */
+const HOLIDAYS = {
+  "2026-09-25":{zh:"中秋節", en:"Mid-Autumn Festival"},
+  "2026-09-28":{zh:"教師節", en:"Teachers' Day"},
+  "2026-10-09":{zh:"國慶日補假", en:"National Day (day off)"},
+  "2026-10-10":{zh:"國慶日", en:"National Day"},
+  "2026-10-25":{zh:"光復節", en:"Retrocession Day"},
+  "2026-10-26":{zh:"光復節補假", en:"Retrocession Day (day off)"},
+  "2026-12-25":{zh:"行憲紀念日", en:"Constitution Day"},
+  "2027-01-01":{zh:"元旦", en:"New Year's Day"}
+};
+/* the store's big sale: Far Eastern SOGO's Taipei anniversary sale, November 5–16, 2026 */
+const SALES = [{from:"2026-11-05", to:"2026-11-16", zh:"週年慶", en:"Anniversary sale"}];
+const holidayOn = date => HOLIDAYS[date] || null;
+const saleOn = date => SALES.find(x=>date >= x.from && date <= x.to) || null;
 
 /* the people Mia can spend time with (hearts 0–100, one heart per 20) */
 const CAST = {
@@ -403,75 +454,122 @@ const CAST = {
 
 /* ---------------- activities ----------------
    days: allowed weekdays (0 = Monday); cost per day; pay per day and when it arrives;
-   g: stat gains on a good day; st: stress change; odds: the stat behind success. */
+   g: stat gains on a good day; st: stress change; odds: the stat behind success;
+   open: the block (0 = the first) when it first appears in the planner. */
 const ACTS = {
   /* classes */
-  english:{menu:"class", s:{zh:"英文課", en:"English"}, zh:"英文會話班", en:"English class", spr:"book", days:[1,3], cost:450, st:4, g:{en:2.2, co:0.6}, odds:"en", cls:true,
+  english:{menu:"class", open:0, s:{zh:"英文課", en:"English"}, zh:"英文會話班", en:"English class", spr:"book", days:[1,3], cost:450, st:4, g:{en:2.2, co:0.6}, odds:"en", cls:true,
     ok:["We practice [[ordering|order]] food in English. I can do it!", "The teacher asks, “Where are you from?” I answer with a big smile.", "We learn ten new words. I write them in my [[notebook]]."],
     slip:["I forget my homework. I feel [[silly]]."]},
-  yoga:{menu:"class", s:{zh:"瑜伽", en:"Yoga"}, zh:"瑜伽課", en:"Yoga class", spr:"mat", days:[0,2], cost:400, st:-3, g:{fi:1.8, sty:0.6}, odds:"fi", cls:true,
+  yoga:{menu:"class", open:0, s:{zh:"瑜伽", en:"Yoga"}, zh:"瑜伽課", en:"Yoga class", spr:"mat", days:[0,2], cost:400, st:-3, g:{fi:1.8, sty:0.6}, odds:"fi", cls:true,
     ok:["My legs shake, but I hold the tree pose for one minute.", "I can touch my toes today!"], slip:["I am too tired. I lie on my mat and [[breathe]]."]},
-  cooking:{menu:"class", s:{zh:"烹飪", en:"Cooking"}, zh:"烹飪課", en:"Cooking class", spr:"pot", days:[5], cost:900, st:-2, g:{cr:2.6}, odds:"cr", cls:true,
-    ok:["We make [[dumplings|dumpling]]. Mine are ugly but [[delicious]].", "Today we cook three-cup chicken. The kitchen smells wonderful."], slip:["I burn the rice. The whole room smells funny."]},
-  styling:{menu:"class", s:{zh:"造型", en:"Styling"}, zh:"造型攝影課", en:"Styling and photo class", spr:"camera", days:[6], cost:750, st:3, g:{sty:2.6, co:0.4}, odds:"sty", cls:true,
-    ok:["We learn about colors. Blue is my color!", "I take photos of a classmate, and she takes photos of me."], slip:["My photos are all [[blurry]]."]},
-  tutor:{menu:"class", s:{zh:"家教", en:"Tutor"}, zh:"英文家教", en:"English tutor", spr:"laptop", days:null, cost:1000, st:5, g:{en:3.2}, odds:"en", cls:true,
-    ok:["My [[tutor]] is [[patient]]. We talk for one hour, only in English."], slip:["My tutor asks many questions. My head is full."]},
-  study:{menu:"class", s:{zh:"自習", en:"Study"}, zh:"圖書館自習", en:"Self-study at the library", spr:"lib", days:null, cost:0, st:2, g:{en:1.0, kh:0.8}, odds:"en", cls:true,
+  study:{menu:"class", open:0, s:{zh:"自習", en:"Study"}, zh:"圖書館自習", en:"Self-study at the library", spr:"lib", days:null, cost:0, st:2, g:{en:1.0, kh:0.8}, odds:"en", cls:true,
     ok:["I study at the [[library]]. It is quiet and cool.", "I read a short English story. I understand most of it!"], slip:["I fall asleep on my book."]},
-  exchange:{menu:"class", s:{zh:"語交", en:"Exchange"}, zh:"語言交換", en:"Language exchange", spr:"chat", days:[2], cost:150, st:-2, g:{en:1.2, co:1.4}, odds:"co", cls:true,
+  tutor:{menu:"class", open:1, s:{zh:"家教", en:"Tutor"}, zh:"英文家教", en:"English tutor", spr:"laptop", days:null, cost:1000, st:5, g:{en:3.2}, odds:"en", cls:true,
+    ok:["My [[tutor]] is [[patient]]. We talk for one hour, only in English."], slip:["My tutor asks many questions. My head is full."]},
+  exchange:{menu:"class", open:1, s:{zh:"語交", en:"Exchange"}, zh:"語言交換", en:"Language exchange", spr:"chat", days:[2], cost:150, st:-2, g:{en:1.2, co:1.4}, odds:"co", cls:true,
     ok:["Tonight I talk with people from five countries!", "A student from Germany teaches me English. I teach her Chinese."], slip:["I am [[shy]] tonight. I only say “Hi.”"]},
+  cooking:{menu:"class", open:2, s:{zh:"烹飪", en:"Cooking"}, zh:"烹飪課", en:"Cooking class", spr:"pot", days:[5], cost:900, st:-2, g:{cr:2.6}, odds:"cr", cls:true,
+    ok:["We make [[dumplings|dumpling]]. Mine are ugly but [[delicious]].", "Today we cook three-cup chicken. The kitchen smells wonderful."], slip:["I burn the rice. The whole room smells funny."]},
+  styling:{menu:"class", open:4, s:{zh:"造型", en:"Styling"}, zh:"造型攝影課", en:"Styling and photo class", spr:"camera", days:[6], cost:750, st:3, g:{sty:2.6, co:0.4}, odds:"sty", cls:true,
+    ok:["We learn about colors. Blue is my color!", "I take photos of a classmate, and she takes photos of me."], slip:["My photos are all [[blurry]]."]},
+  /* a car course: about NT$15,800 for ten two-hour lessons over five weeks, two weekday lessons a week (Taipei, 2026) */
+  driving:{menu:"class", open:6, s:{zh:"駕訓", en:"Driving"}, zh:"汽車駕訓班", en:"Driving lessons", spr:"car", days:[0,2], cost:1580, st:7, g:{kh:1.4, co:0.4}, odds:"kh", cls:true,
+    sub:{zh:"一週兩堂（一、三）・十堂結業・每堂 NT$1,580", en:"Mon and Wed · ten lessons · NT$1,580 a lesson"},
+    ok:["I drive around the practice course. I stop on the line every time!", "Today I learn to park. The teacher says, “Not bad!”"], slip:["I forget to look in the [[mirror]]. The teacher hits his brake."]},
+  /* barista certificate courses run about four full Saturdays and cost around NT$12,000–15,000 */
+  barista:{menu:"class", open:6, s:{zh:"咖啡師", en:"Barista"}, zh:"咖啡師課程", en:"Barista course", spr:"brew", days:[5], cost:1500, st:4, g:{cr:2.0, co:0.3}, odds:"cr",
+    cls:true, sub:{zh:"週六・上到中級，咖啡館時薪 +NT$20", en:"Saturdays · reach Regular for NT$20 more an hour at the café"},
+    ok:["I make my first [[latte art]]. It is a heart! Well, almost.", "We taste six coffees. I can tell the light one from the dark one."], slip:["The milk is too hot. It screams in the jug."]},
+  cvwork:{menu:"class", open:6, s:{zh:"履歷", en:"CV"}, zh:"面試與履歷工作坊", en:"Interview and CV workshop", spr:"tie", days:[5], cost:600, st:4, g:{en:1.2, kh:1.2}, odds:"en", cls:true,
+    sub:{zh:"週六・英文面試練習和履歷・NT$600", en:"Saturdays · English interview practice and CVs · NT$600"},
+    ok:["I write my first English [[CV]]. One page. It looks so serious!", "We do a practice [[interview]]. “Tell me about yourself.” I can answer now."], slip:["In the practice interview, I say “um” twenty times."]},
 
   /* work */
-  dept:{menu:"work", s:{zh:"百貨", en:"Store"}, zh:"百貨公司櫃位", en:"Department store", spr:"bag", days:null, cost:0, pay:1600, wkBonus:300, payday:5, st:5, g:{sty:0.8, co:0.8}, odds:"sty", need:{sty:20},
-    sub:{zh:"三樓包包櫃・時薪 NT$200，週末多抽成", en:"Bags, 3rd floor · NT$200/hr, weekend commission"},
+  dept:{menu:"work", open:0, s:{zh:"百貨", en:"Store"}, zh:"百貨公司櫃位", en:"Department store", spr:"bag", days:null, cost:0, pay:"dept", payday:5, st:5, g:{sty:0.8, co:0.8}, odds:"sty", need:{sty:20},
+    sub:{zh:"三樓包包櫃・時薪 NT$196（2027 年起 NT$205）加業績抽成・週末、假日和週年慶抽成高", en:"Bags, 3rd floor · NT$196/hr (NT$205 from 2027) plus commission · more on weekends, holidays and sale days"},
     ok:["I sell three [[handbags|handbag]] today. My feet hurt, but I am happy.", "A [[customer]] wants a red bag. I find the perfect one.", "Ben brings me a coffee. “Busy day?” he asks. “Very!”"],
     slip:["I give a customer the wrong [[receipt]]. My [[manager]] is not happy."]},
-  cafe:{menu:"work", s:{zh:"咖啡館", en:"Café"}, zh:"咖啡館打工", en:"Café shift", spr:"cup", days:[0,2,3,4,5,6], cost:0, pay:1140, payday:10, st:4, g:{cr:1.2, co:0.6}, odds:"cr",
-    sub:{zh:"巷口咖啡館・時薪 NT$190・週二公休", en:"Corner café · NT$190/hr · closed Tuesdays"},
+  cafe:{menu:"work", open:0, s:{zh:"咖啡館", en:"Café"}, zh:"咖啡館打工", en:"Café shift", spr:"cup", days:[0,2,3,4,5,6], cost:0, pay:"cafe", payday:10, st:4, g:{cr:1.2, co:0.6}, odds:"cr",
+    sub:{zh:"巷口咖啡館・一班六小時・時薪 NT$196，2027 年起 NT$205・週二公休", en:"Corner café · 6-hour shift · NT$196/hr, NT$205 from 2027 · closed Tuesdays"},
     ok:["I make twenty [[lattes|latte]]. Some are beautiful!", "A [[regular]] says, “Your coffee is the best!”"], slip:["I drop a cup. [[Oops]]!"]},
+  /* in-home pet-sitting in Taipei: about NT$300–800 an hour for a single visit (PRO360, 2025) */
+  petsit:{menu:"work", open:3, s:{zh:"寵物", en:"Pets"}, zh:"幫鄰居顧寵物", en:"Pet-sitting for the neighbors", spr:"dog", days:[5,6], cost:0, pay:700, cash:true, st:-2, g:{kh:0.8}, odds:"kh", noTrip:true,
+    sub:{zh:"鄰居週末出門・一天兩次到府・NT$700，當天付現・排了就不能在同兩週出遠門", en:"When the neighbors go away on weekends · two visits a day · NT$700, paid the same day · no trips in the same two weeks"},
+    ok:["Mochi's family is away. I feed her and clean her box. She sits on my feet.", "I walk Lucky the dog two times. He pulls me to every tree."], slip:["Lucky runs after a cat. I run after Lucky."]},
+  /* Uber Eats says riders net about NT$270 an hour while delivering (2025); unions say waiting time makes it less */
+  delivery:{menu:"work", open:4, s:{zh:"外送", en:"Delivery"}, zh:"騎機車送外送", en:"Food delivery by scooter", spr:"scooter", days:null, cost:0, pay:1300, weekly:true, st:6, g:{kh:0.8, fi:0.8}, odds:"kh", need:{fi:25},
+    sub:{zh:"約五小時・NT$1,300・每週三入帳上週的錢", en:"About 5 hours · NT$1,300 · paid every Wednesday for last week"},
+    ok:["Twelve orders today. I know every alley near the night market now.", "A customer tips me NT$50 and says, “Thank you, be safe!”"], slip:["Rain! I wait under a bridge for twenty minutes. The noodles get cold."]},
   /* modeling (checked with Wen-Hung, 2026-10-12): new models shoot on a mutual-benefit basis (互惠),
      no fee either way, sharing travel costs; experienced models earn about NT$2,500–6,000 for a 3-hour session */
-  shoot:{menu:"work", s:{zh:"互惠外拍", en:"Shoot"}, zh:"互惠外拍", en:"Mutual-benefit photo shoot", spr:"model", days:[5,6], cost:100, pay:0, cash:true, st:6, g:{sty:2.0, co:1.2}, odds:"sty", need:{sty:15}, flag:"shoot", port:1,
+  shoot:{menu:"work", open:2, s:{zh:"互惠外拍", en:"Shoot"}, zh:"互惠外拍", en:"Mutual-benefit photo shoot", spr:"model", days:[5,6], cost:100, pay:0, cash:true, st:6, g:{sty:2.0, co:1.2}, odds:"sty", need:{sty:15}, flag:"shoot", port:1,
     sub:{zh:"週末・不收費，互相累積作品・分攤交通 NT$100・作品集 +1", en:"Weekend · no fee either way · share travel NT$100 · portfolio +1"},
     ok:["The photographer says, “Look at the light. Good!” I learn a new [[pose]].", "We shoot by the river. The photos look like a magazine!"], slip:["I [[blink]] in every photo. We try again and again."]},
-
-  shootPaid:{menu:"work", s:{zh:"付費外拍", en:"Paid shoot"}, zh:"付費外拍", en:"Paid photo shoot", spr:"camera", days:[5,6], cost:0, pay:2800, cash:true, st:7, g:{sty:2.2, co:1.4}, odds:"sty", need:{sty:25}, flag:"paidShoot", port:1,
+  shootPaid:{menu:"work", open:2, s:{zh:"付費外拍", en:"Paid shoot"}, zh:"付費外拍", en:"Paid photo shoot", spr:"camera", days:[5,6], cost:0, pay:2800, cash:true, st:7, g:{sty:2.2, co:1.4}, odds:"sty", need:{sty:25}, flag:"paidShoot", port:1,
     sub:{zh:"週末三小時・NT$2,800・當天付清", en:"3 hours on a weekend · NT$2,800 · paid the same day"},
     ok:["Three hours of photos for a café's new menu. My smile is tired, but my wallet is happy.", "The client loves the photos. “Can we work together again?”"], slip:["The sun is too strong. We wait for clouds, and it takes four hours."]},
 
   /* social */
-  boba:{menu:"social", s:{zh:"手搖", en:"Boba"}, zh:"和 Ben 喝手搖", en:"Bubble tea with Ben", spr:"boba", days:null, cost:90, st:-7, h:{ben:8}, g:{},
+  boba:{menu:"social", open:0, s:{zh:"手搖", en:"Boba"}, zh:"和 Ben 喝手搖", en:"Bubble tea with Ben", spr:"boba", days:null, cost:90, st:-7, h:{ben:8}, g:{},
     ok:["Ben and I drink bubble tea after work. He tells funny stories about customers."]},
-  nightmkt:{menu:"social", s:{zh:"夜市", en:"Market"}, zh:"和 Leo 逛夜市", en:"Night market with Leo", spr:"lantern", days:null, cost:300, st:-10, h:{leo:8}, g:{kh:0.4},
-    ok:["Leo and I eat [[stinky tofu]] and grilled corn. Night market mission complete!", "Leo wins a toy at a game stall. He is very proud."]},
-  ktv:{menu:"social", s:{zh:"KTV", en:"KTV"}, zh:"同事 KTV", en:"KTV with coworkers", spr:"mic", days:[4,5], cost:650, st:-16, h:{ben:6}, g:{co:1.0},
-    ok:["We sing for three hours at [[KTV]]. My voice is gone!"]},
-  family:{menu:"social", s:{zh:"家聚", en:"Family"}, zh:"家庭晚餐", en:"Family dinner", spr:"bowl", days:[6], cost:0, st:-9, h:{family:8}, g:{cr:0.4},
+  family:{menu:"social", open:0, s:{zh:"家聚", en:"Family"}, zh:"家庭晚餐", en:"Family dinner", spr:"bowl", days:[6], cost:0, st:-9, h:{family:8}, g:{cr:0.4},
     ok:["Dad cooks fish. Mom asks, “Are you eating well?”", "No phones at the table. We talk and laugh all night."]},
-  callting:{menu:"social", s:{zh:"視訊", en:"Call"}, zh:"和婷視訊", en:"Video call with Ting", spr:"phone", days:null, cost:0, st:-5, h:{ting:8}, g:{en:0.4},
+  callting:{menu:"social", open:0, s:{zh:"視訊", en:"Call"}, zh:"和婷視訊", en:"Video call with Ting", spr:"phone", days:null, cost:0, st:-5, h:{ting:8}, g:{en:0.4},
     ok:["Ting calls from Canada. It is morning there and night here.", "Ting shows me the mountains in Vancouver. So beautiful!"]},
+  nightmkt:{menu:"social", open:1, s:{zh:"夜市", en:"Market"}, zh:"和 Leo 逛夜市", en:"Night market with Leo", spr:"lantern", days:null, cost:300, st:-10, h:{leo:8}, g:{kh:0.4},
+    ok:["Leo and I eat [[stinky tofu]] and grilled corn. Night market mission complete!", "Leo wins a toy at a game stall. He is very proud."]},
+  ktv:{menu:"social", open:2, s:{zh:"KTV", en:"KTV"}, zh:"同事 KTV", en:"KTV with coworkers", spr:"mic", days:[4,5], cost:650, st:-16, h:{ben:6}, g:{co:1.0},
+    ok:["We sing for three hours at [[KTV]]. My voice is gone!"]},
+  /* Taipei board game cafés: about NT$250–300 a person for three hours (2024 guides) */
+  boardgame:{menu:"social", open:3, s:{zh:"桌遊", en:"Games"}, zh:"和 Ben 玩桌遊", en:"Board game café with Ben", spr:"meeple", days:null, cost:280, st:-8, h:{ben:5}, g:{kh:0.6, co:0.3},
+    ok:["We play a game about trains. I read the [[rules|rule]] out loud. Ben wins, again!", "A new game about farms. I build the best farm on the table."]},
+  ttrpg:{menu:"social", open:6, s:{zh:"跑團", en:"TTRPG"}, zh:"桌上角色扮演遊戲之夜", en:"TTRPG night", spr:"d20", days:[4], cost:400, st:-6, h:{leo:4}, g:{co:1.0, cr:0.4},
+    sub:{zh:"星期五晚上・和 Leo 一起・NT$400", en:"Friday nights · with Leo · NT$400"},
+    ok:["I play an elf who is afraid of spiders. The whole table laughs.", "I [[roll]] a 20! My character saves the town."], slip:["I roll a 1. My character falls into the river."]},
 
   /* rest */
-  rest:{menu:"rest", s:{zh:"休息", en:"Rest"}, zh:"在家休息", en:"Rest at home", spr:"bed", days:null, cost:0, st:-14, g:{},
+  rest:{menu:"rest", open:0, s:{zh:"休息", en:"Rest"}, zh:"在家休息", en:"Rest at home", spr:"bed", days:null, cost:0, st:-14, g:{},
     ok:["I sleep late and read a book. A slow day is a good day."]},
-  ride:{menu:"rest", s:{zh:"單車", en:"Bike"}, zh:"河濱騎單車", en:"Riverside bike ride", spr:"bike", days:null, cost:25, st:-8, g:{fi:0.8},
+  /* YouBike in Taipei: free for the first 30 minutes, then NT$10 per 30 minutes: NT$20 for 90 minutes */
+  ride:{menu:"rest", open:0, s:{zh:"單車", en:"Bike"}, zh:"河濱騎單車", en:"Riverside bike ride", spr:"bike", days:null, cost:20, st:-8, g:{fi:0.8},
     ok:["I ride a [[YouBike]] by the river for an hour and a half. The evening wind feels good."]},
 
   /* explore: a two-day adventure */
-  khh:{menu:"explore", s:{zh:"高雄", en:"Trip"}, zh:"高雄兩天一夜", en:"Kaohsiung weekend", spr:"train", days:null, cost:0, est:3000, span:2, trip:"khh", st:0, g:{},
-    sub:{zh:"火車南下・旗津冒險・NT$2,300–4,100（看住哪裡）", en:"Train south · Cijin adventure · NT$2,300–4,100, by where you stay"}}
+  khh:{menu:"explore", open:1, s:{zh:"高雄", en:"Trip"}, zh:"高雄兩天一夜", en:"Kaohsiung weekend", spr:"train", days:null, cost:0, est:3200, span:2, trip:"khh", st:0, g:{},
+    sub:{zh:"火車南下・旗津冒險・約 NT$2,200–4,500（看住哪裡、花多少）", en:"Train south · Cijin adventure · about NT$2,200–4,500, by where you stay and what you buy"}}
 };
 /* the activity that fills an empty day, and the special days */
 const SPECIAL = {
   free:{s:{zh:"自由", en:"Free"}, zh:"自由日", en:"Free day", spr:"sun", st:-6, g:{}, ok:["A free day. I clean my room and water my plants."]},
   sick:{s:{zh:"生病", en:"Sick"}, zh:"生病", en:"Sick", spr:"sick", st:-8, g:{}, ok:["I am sick in bed. Mom brings me soup."]},
   typhoon:{s:{zh:"颱風假", en:"Typhoon"}, zh:"颱風假", en:"Typhoon day", spr:"rain", st:-10, g:{}, ok:["Typhoon day! No work, no class. The rain is loud on my window."]},
+  /* a placeholder until the Mid-Autumn Night Market Stall is built (Phase C) */
+  midautumn:{s:{zh:"中秋", en:"Moon"}, zh:"中秋節", en:"Mid-Autumn Festival", spr:"moon", st:-12, g:{cr:0.4}, h:{family:6},
+    ok:["Mid-Autumn! Dad grills meat on the street with the neighbors. We eat [[mooncakes|mooncake]] and look at the big, round moon."]},
   khh2:{s:{zh:"高雄②", en:"Trip ②"}, zh:"高雄（第二天）", en:"Kaohsiung, day 2", spr:"train", st:0, g:{}}
 };
 const MENUS = ["class","work","social","explore","rest"];
 const RANKS = [0, 6, 14];          /* sessions needed for Beginner, Regular, Advanced */
 const RANK_MUL = [1, 1.3, 1.6];
+const DRIVE_DONE = 10;             /* lessons in a driving course */
+
+/* a day's pay for a job: the store pays the hourly wage for eight hours plus commission on what Mia sells */
+function payFor(S, id, date, good){
+  const a = ACTS[id];
+  if(a.pay === "dept"){
+    const base = wageOn(date) * 8, busy = D.wd(date) >= 5 || !!holidayOn(date), sale = saleOn(date);
+    const sales = (busy ? 14000 : 8000) * (sale ? 2 : 1) * (.6 + (S.st.sty + S.st.co)/100) * (good ? 1 : .5);
+    const comm = Math.round(sales * (sale ? .04 : .03) / 10) * 10;
+    return {amt:base + comm, base, comm};
+  }
+  if(a.pay === "cafe"){
+    const rate = wageOn(date) + ((S.sessions.barista || 0) >= RANKS[1] ? 20 : 0), amt = Math.round(rate * 6 * (good ? 1 : .8));
+    return {amt, base:amt, comm:0};
+  }
+  const amt = good ? a.pay : Math.round(a.pay * .8);
+  return {amt, base:amt, comm:0};
+}
 
 /* ==== content/book1/events.js ==== */
 /* ---------------- events: messages at the start of a block, and surprises on the way ----------------
@@ -480,12 +578,17 @@ const RANK_MUL = [1, 1.3, 1.6];
 const EVENTS = [
   {id:"intro", at:"start", when:S=>S.blk === 0,
     msgs:[["family","Mia! Don't be late for dinner on Sunday. Dad is cooking fish.","Mia！星期天晚餐別遲到喔，爸爸要煮魚。"],
-          ["ben","Big summer sale this month. They need people on [[weekends|weekend]]!","這個月夏季特賣，週末很缺人喔！"],
+          ["ben","The summer sale is over, but [[weekends|weekend]] are still busy. The store needs people!","夏季特賣結束了，不過週末還是很忙，店裡很缺人喔！"],
           ["ting","Hi from Vancouver! I am here on a [[working holiday]]. Call me sometime!","從溫哥華跟妳打招呼！我在這裡打工度假。有空打給我！"]]},
   {id:"khhHint", at:"start", when:S=>S.blk === 1,
     msgs:[["leo","You need a trip, [[Jie|jie]]. Take the train to Kaohsiung! Cijin has the best [[seafood]].","姊，妳需要出去走走。坐火車去高雄啦！旗津的海鮮最好吃。"],
-          ["ben","[[KTV]] on Friday or Saturday? The whole team is going!","星期五或星期六去唱 KTV？大家都會去！"]]},
-  {id:"shootOffer", at:"start", once:false, when:S=>S.blk >= 1 && S.st.sty >= 15 && !S.flags.shoot,
+          ["flyer","A [[flyer]] at the MRT station: “English [[tutor]]. One-on-one lessons. Any day, any time.”","捷運站的傳單：「英文家教，一對一上課，哪天、幾點都可以。」"],
+          ["ben","There is a [[language exchange]] at a café every Wednesday night. You should go!","每個星期三晚上，有一間咖啡館辦語言交換。妳應該去看看！"],
+          ["leo","And the night market this week? You pay, I eat. Deal?","還有，這禮拜去逛夜市？妳付錢，我負責吃。成交？"]]},
+  {id:"open2", at:"start", when:S=>S.blk === 2,
+    msgs:[["ben","It's my birthday next week! [[KTV]] on Friday or Saturday? The whole team is going!","下週是我生日！星期五或星期六去唱 KTV？大家都會去！"],
+          ["flyer","New at the community center: a Saturday cooking class. “Learn to cook like Grandma!”","社區中心新開課：週六烹飪課。「學會像阿嬤一樣做菜！」"]]},
+  {id:"shootOffer", at:"start", once:false, when:S=>S.blk >= 2 && S.st.sty >= 15 && !S.flags.shoot,
     msgs:[["photo","Hi Mia! I am a photographer. I saw your photo on your friend's page. Do you want to [[model]] for a photo shoot? It is a [[mutual-benefit]] shoot: no one pays. You get photos for your [[portfolio]], and I get photos for mine.","Mia 妳好！我是攝影師，在妳朋友的頁面看到妳的照片。想不想一起外拍？這是互惠拍攝，雙方都不收費：妳拿照片做作品集，我也拿照片放我的作品集。"]],
     choice:{q:["What do you do?","妳要怎麼做？"], opts:[
       {en:"Check his page and ask Ben to come with me", zh:"先看他的作品頁，再請 Ben 陪我去", fx:S=>{ S.flags.shoot = true; S.st.kh += 1;
@@ -501,7 +604,7 @@ const EVENTS = [
     msgs:[["news","[[Typhoon]] warning! A strong typhoon is coming on Wednesday. The city says: no work and no school that day.","颱風警報！強颱星期三來襲，台北市宣布停班停課。"]],
     fx:S=>{ S.locks[D.add(S.date, 2)] = "typhoon"; }},
   {id:"fathers", at:"start", when:S=>S.blk === 2,
-    msgs:[["leo","Friday is [[Father's Day]]! 8/8, “ba ba,” like “Dad.” What do we give him?","星期五是父親節！八八，「爸爸」。我們要送他什麼？"]],
+    msgs:[["leo","Saturday is [[Father's Day]]! 8/8, “ba ba,” like “Dad.” What do we give him?","星期六是父親節！八八，「爸爸」。我們要送他什麼？"]],
     choice:{q:["What do you do for Dad?","妳要為爸爸做什麼？"], opts:[
       {en:"Buy him a nice shirt (NT$800)", zh:"買一件好看的襯衫（NT$800）", fx:S=>{ S.money -= 800; S.hearts.family += 10; S.flags.dadGift = "shirt";
         return ["family","Dad wears the shirt every day now. Every day!","爸爸現在每天都穿那件襯衫，每天喔！"]; }},
@@ -511,8 +614,25 @@ const EVENTS = [
       {en:"Make a card with Leo", zh:"和 Leo 一起做卡片", fx:S=>{ S.hearts.family += 6; S.hearts.leo += 4; S.flags.dadGift = "card";
         return ["leo","Dad put our card on the fridge. He reads it every morning.","爸爸把我們的卡片貼在冰箱上，每天早上都會看。"]; }}]}},
   {id:"tingWH", at:"start", when:S=>S.blk === 3,
-    msgs:[["ting","Guess what? I got a job at a café in Vancouver! You should try a [[working holiday]] too. Maybe London?","跟妳說！我在溫哥華的咖啡館找到工作了！妳也該試試打工度假，也許去倫敦？"]],
+    msgs:[["ting","Guess what? I got a job at a café in Vancouver! You should try a [[working holiday]] too. Think about it!","跟妳說！我在溫哥華的咖啡館找到工作了！妳也該試試打工度假。想一想嘛！"]],
     fx:S=>{ S.flags.whIdea = true; }},
+  {id:"open3", at:"start", when:S=>S.blk === 3,
+    msgs:[["ben","Do you like board games? I go to a [[board game]] café after work. Come with me!","妳喜歡桌遊嗎？我下班都去桌遊咖啡館，一起來吧！"],
+          ["neighbor","Mia, we are going away on many weekends this autumn. Can you feed Mochi and walk our dog, Lucky? We will pay you.","Mia，我們今年秋天很多個週末都要出門。妳可以幫忙餵麻糬、遛我們家的狗 Lucky 嗎？我們會付錢給妳。"]]},
+  {id:"open4a", at:"start", when:S=>S.blk === 4 && S.portfolio > 0,
+    msgs:[["photo","You pose well now! A [[styling]] class can help you more. There is one on Sundays.","妳現在很會擺姿勢了！上造型課會更有幫助，星期天有一班。"]]},
+  {id:"open4b", at:"start", when:S=>S.blk === 4 && !S.portfolio,
+    msgs:[["flyer","A new [[styling]] and photo class starts on Sundays. “Find your colors. Learn to pose.”","星期天新開一班造型攝影課。「找到妳的顏色，學會擺姿勢。」"]]},
+  {id:"open4", at:"start", when:S=>S.blk === 4,
+    msgs:[["flyer","An ad on my phone: “Ride with us! Deliver food by [[scooter]]. Work when you want.”","手機上的廣告：「加入我們！騎機車送外送，想什麼時候工作都可以。」"]]},
+  {id:"midautumn", at:"start", when:S=>S.blk === 5,
+    msgs:[["family","Mid-Autumn is on Friday the 25th. Take the day off! Dad wants to grill meat on the street with the neighbors.","中秋節是 25 號星期五，那天請個假吧！爸爸想跟鄰居在門口烤肉。"]],
+    fx:S=>{ S.locks["2026-09-25"] = "midautumn"; }},
+  {id:"open6", at:"start", when:S=>S.blk === 6,
+    msgs:[["leo","Jie, my friends play a [[TTRPG]] on Friday nights. Dragons, dice, snacks. Come play!","姊，我朋友星期五晚上都在跑團。有龍、有骰子、有零食。來玩嘛！"],
+          ["flyer","Three new classes near the station: driving lessons on Mondays and Wednesdays, a barista course on Saturdays, and an English [[interview]] and [[CV]] workshop.","車站附近開了三種新課：週一、週三的汽車駕訓班，週六的咖啡師課程，還有英文面試與履歷工作坊。"]]},
+  {id:"sale", at:"start", when:S=>S.blk === 8,
+    msgs:[["ben","The [[anniversary sale]] starts on Thursday, November 5. Twelve crazy days! More sales, more [[commission]]. Rest before it starts!","週年慶 11 月 5 日星期四開始，瘋狂十二天！賣得多、抽成就多。開始前先休息一下！"]]},
   {id:"lowMoney", at:"start", when:S=>S.money < 3000 && !S.flags.momLoan,
     msgs:[["family","Mia, is your money OK? Eat dinner at home more. Here is some money for this month.","Mia，錢還夠用嗎？多在家吃晚餐。這個月的錢先拿去用。"]],
     fx:S=>{ S.money += 5000; S.flags.momLoan = true; S.stress += 5; }},
@@ -528,7 +648,7 @@ const EVENTS = [
 const FROM = {
   family:{zh:"媽媽", en:"Mom", spr:"mom"}, leo:{zh:"Leo", en:"Leo", spr:"leo"}, ben:{zh:"Ben", en:"Ben", spr:"ben"},
   ting:{zh:"婷", en:"Ting", spr:"ting"}, chen:{zh:"陳阿姨", en:"Auntie Chen", spr:"chen"}, photo:{zh:"攝影師", en:"Photographer", spr:"camera"},
-  news:{zh:"新聞", en:"News", spr:"rain"}, mochi:{zh:"麻糬", en:"Mochi", spr:"cat"}, mia:{zh:"Mia", en:"Mia", spr:"mia"},
+  news:{zh:"新聞", en:"News", spr:"rain"}, flyer:{zh:"廣告", en:"Ad", spr:"book"}, neighbor:{zh:"鄰居", en:"Neighbor", spr:"dog"}, mochi:{zh:"麻糬", en:"Mochi", spr:"cat"}, mia:{zh:"Mia", en:"Mia", spr:"mia"},
   teacher:{zh:"老師", en:"Teacher", spr:"book"}, bank:{zh:"銀行", en:"Bank", spr:"coin"}
 };
 
@@ -540,18 +660,27 @@ const RANKUP = {
   styling:["You have a good eye for color.","妳對顏色很有眼光。"],
   tutor:["You speak more and stop less. I am proud of you.","妳說得更多、停得更少了。我以妳為榮。"],
   study:["I can read a whole page without my phone dictionary!","我可以不查手機字典讀完一整頁了！"],
-  exchange:["Everyone wants to talk with you now, Mia!","現在大家都想跟妳聊天了，Mia！"]
+  exchange:["Everyone wants to talk with you now, Mia!","現在大家都想跟妳聊天了，Mia！"],
+  driving:["You can park now. Really park! Good job.","妳現在會停車了，是真的會停！做得好。"],
+  barista:["Your milk is smooth now. The café will pay you more, NT$20 an hour!","妳打的奶泡現在很綿密了。咖啡館會幫妳加薪，時薪多 NT$20！"],
+  cvwork:["Your CV is clear and short. Any boss can read it in one minute.","妳的履歷清楚又簡短，任何老闆一分鐘就能看完。"]
 };
 
 /* ==== content/book1/trip-khh.js ==== */
 /* ---------------- Kaohsiung weekend: the Stage 1 adventure ----------------
-   Facts checked 2026-10-12: TRA Tze-Chiang Taipei–Kaohsiung NT$843, about 4–5 hours (Seat61);
+   Facts checked 2026-10-14: Taiwan Railway fares since June 23, 2025: Taipei–Kaohsiung NT$994 Tze-Chiang,
+   NT$767 Chu-Kuang; Tze-Chiang takes about 4–5 hours. Kaohsiung MRT, Kaohsiung Station to Hamasen (O1)
+   for the Gushan ferry: NT$35 by single ticket, NT$30 by card; the game charges NT$30 each way
+   (Wen-Hung, 2026-10-14; the light rail home is a flat NT$30 too).
    Gushan–Cijin ferry, a few minutes, about NT$40, 05:00–02:00 (2026 guide; older sources say NT$30);
    Cijin Tianhou Temple founded 1673, Kaohsiung's first Mazu temple (Wikipedia);
    Cihou Fort, Qing-era, guarded the harbor entrance; Kaohsiung (Cihou) Lighthouse: 1883, rebuilt 1918,
    open to 21:00, closed Mondays; Cijin Beach has black sand; Rainbow Church is an art frame in the
-   seaside park; YouBike: 2.0 free for the first 30 min in Kaohsiung then NT$10/30 min; 2.0E NT$20/30 min for the first 2 hours (Wen-Hung, 2026-10-12). Train numbers on the board are made up. Chu-Kuang Taipei–Kaohsiung NT$650.
-   Sunset in Kaohsiung (calculated): about 18:48 in early July, 18:40 on Aug 1, 18:31 mid-August, 18:17 on Aug 31. */
+   seaside park. YouBike in Kaohsiung (official rate page, 2026-10-14): members pay NT$5 for the first
+   30 minutes on a 2.0 bike, then NT$10 per 30 minutes (two hours: NT$35); a 2.0E costs NT$10 for the
+   first 30 minutes, then NT$20 (two hours: NT$70). Train numbers on the board are made up.
+   Sunset on Cijin (calculated): 18:48 in early July, 18:30 mid-August, 17:50 at the end of September,
+   17:26 in late October, 17:14 in late November, 17:19 at the winter solstice. */
 const TRIPS = {
 khh:{
   zh:"高雄兩天一夜", en:"Kaohsiung weekend", music:3,
@@ -582,7 +711,7 @@ khh:{
   ],
   /* Cijin island. x,y on a 300×360 map; links: [node, minutes on foot, energy]. Hills cost more. */
   map:{
-    start:"pier", arriveMin:60, ferry:40, sunsets:[["07-25","18:45"],["08-05","18:40"],["08-20","18:30"],["12-31","18:20"]], close:"21:00", energyBase:50,
+    start:"pier", arriveMin:60, ferry:40, sunsets:[["01-10","17:28"],["07-13","18:47"],["07-27","18:43"],["08-10","18:35"],["08-24","18:24"],["09-07","18:11"],["09-21","17:57"],["10-05","17:43"],["10-19","17:31"],["11-02","17:22"],["11-16","17:16"],["11-30","17:14"],["12-14","17:16"],["12-31","17:23"]], close:"21:00", energyBase:50,
     nodes:{
       pier:{x:150, y:58, zh:"旗津渡輪站", en:"Cijin Ferry Pier", spr:"boat"},
       oldst:{x:132, y:108, zh:"旗津老街", en:"Cijin Old Street", spr:"squid"},
@@ -602,9 +731,9 @@ khh:{
       temple:{min:30, scene:["Tianhou Temple is very old. People built it in 1673, for Mazu, the [[goddess]] of the sea. A visitor asks, “Who is Mazu?”","天后宮非常古老，1673 年就蓋好了，供奉海上的女神媽祖。一位遊客問：「媽祖是誰？」"],
         opts:[{en:"“She protects people on the sea, like fishermen.”", zh:"「她保護在海上的人，像是漁夫。」", stat:"en", ok:["“Like a [[lifeguard|lifeguard]] for the whole sea!” he says. Yes, exactly.","「像是整片海的救生員！」他說。對，就是這樣。"], fail:["“Mazu… sea… help.” He nods slowly. I think he understands.","「媽祖……海……幫忙。」他慢慢點頭，應該懂了吧。"], g:{en:1, kh:.6}, card:"temple"},
               {en:"Look quietly at the old stones", zh:"安靜地看著那些老石頭", ok:["The stone steps are very old. Many people walked here before me.","石階非常古老。在我之前，已經有好多人走過這裡。"], g:{kh:.6}, st:-3, card:"temple"}]},
-      bikes:{min:10, scene:["There is a [[YouBike]] station here. A regular YouBike is free for the first 30 minutes in Kaohsiung. An [[electric|electric]] one costs NT$20 for every 30 minutes.","這裡有 YouBike 站。高雄的一般 YouBike 前 30 分鐘免費；電輔車每 30 分鐘 NT$20。"],
-        opts:[{en:"Take an electric YouBike for two hours (NT$80)", zh:"騎電輔 YouBike 兩小時（NT$80）", cost:80, ok:["I ride along the sea. With a little help from the motor, flat roads are easy!","我沿著海邊騎，有馬達幫一點忙，平路好輕鬆！"], bike:"e"},
-              {en:"Take a regular YouBike for two hours (NT$30)", zh:"騎一般 YouBike 兩小時（NT$30）", cost:30, ok:["I ride along the sea. My legs work, but it is faster than walking.","我沿著海邊騎。腳要出力，不過比走路快。"], bike:"p", g:{fi:.4}},
+      bikes:{min:10, scene:["There is a [[YouBike]] station here. A regular YouBike costs NT$5 for the first 30 minutes, then NT$10 for every 30 minutes. An [[electric|electric]] one costs NT$10 for the first 30 minutes, then NT$20.","這裡有 YouBike 站。一般 YouBike 前 30 分鐘 NT$5，之後每 30 分鐘 NT$10。電輔車前 30 分鐘 NT$10，之後每 30 分鐘 NT$20。"],
+        opts:[{en:"Take an electric YouBike for two hours (NT$70)", zh:"騎電輔 YouBike 兩小時（NT$70）", cost:70, ok:["I ride along the sea. With a little help from the motor, flat roads are easy!","我沿著海邊騎，有馬達幫一點忙，平路好輕鬆！"], bike:"e"},
+              {en:"Take a regular YouBike for two hours (NT$35)", zh:"騎一般 YouBike 兩小時（NT$35）", cost:35, ok:["I ride along the sea. My legs work, but it is faster than walking.","我沿著海邊騎。腳要出力，不過比走路快。"], bike:"p", g:{fi:.4}},
               {en:"No, I like to walk", zh:"不用，我喜歡走路", ok:["My legs are strong. Let's go!","我的腿很有力，出發！"]}]},
       fort:{min:35, scene:["Cihou Fort sits on the hill. Soldiers watched the [[harbor]] from here a long time ago. The stairs are steep.","旗後砲台在山丘上，很久以前士兵從這裡守著港口。樓梯很陡。"],
         opts:[{en:"Climb to the top", zh:"爬到最上面", stat:"fi", ok:["At the top, I see ships come into the harbor. Big ones!","在最上面，我看到船開進港口，好大的船！"], fail:["I stop three times on the stairs. But I make it.","我在樓梯上停了三次，但還是爬上去了。"], g:{fi:1.2}, card:"fort", energy:-6}]},
@@ -658,7 +787,7 @@ khh:{
     done:["Three photos, three clues. The sun is hot, so I buy a lemon drink and take the light rail to the station.","三張照片、三個線索。太陽好大，我買了一杯檸檬飲料，搭輕軌去車站。"],
     home:["On the train home, I sit by the window again. The fields turn gold, then dark. I sleep until Taipei.","回程的火車上，我又坐在窗邊。田野變成金色，然後暗下來。我一路睡到台北。"]
   },
-  costs:{ticket:843, ticketSlow:650, mrt:35, food:0},
+  costs:{ticket:994, ticketSlow:767, mrt:30, food:0},
   cards:{
     window:{zh:"窗外的南台灣", en:"The window seat, going south"},
     fort:{zh:"旗後砲台", en:"Cihou Fort"}, temple:{zh:"天后宮的老石階", en:"Old steps at Tianhou Temple"},
@@ -715,7 +844,16 @@ const SPR = {
   tracks:["n.n..n..n.n.".slice(0,12),"eeeeeeeeeeee","n..n..n..n..","n..n..n..n..","eeeeeeeeeeee","n..n..n..n..","...gg.......","..gGgg......","n..n..n..n..","eeeeeeeeeeee","n..n..n..n..","............"],
   mural:["kkkkkkkkkkkk","kbbbbbbbbbbk","kbbyybbbbbbk","kbbyybbbbbbk","kbbbbbbbgbbk","kbbbbbbgggbk","kbbbbbgggggk","kbgbbgggggk.".padEnd(12,"k"),"kgggggggggggk".slice(0,12),"kkkkkkkkkkkk","eeeeeeeeeeee","eeeeeeeeeeee"],
   door:["kkkkkkkkkkkk","knnnnnnnnnnk","knkkkkkkkknk","knkNNNNNNknk","knkNNNNNNknk","knkkkkkkkknk","knkNNNNNNknk","knkNNNNNNknk","knkkkkkkkknk","knnnnnnnnnnk","eeeeeeeeeeee","............"],
-  lock:["............","....kkkk....","...k....k...","...k....k...","..kkkkkkkk..","..kyyyyyyk..","..kyyykyyk..","..kyyykyyk..","..kyyyyyyk..","..kkkkkkkk..","............","............"]
+  lock:["............","....kkkk....","...k....k...","...k....k...","..kkkkkkkk..","..kyyyyyyk..","..kyyykyyk..","..kyyykyyk..","..kyyyyyyk..","..kkkkkkkk..","............","............"],
+  /* added in Phase A: new activities and the Mid-Autumn day */
+  meeple:["............", ".....yy.....", "....yyyy....", "....yyyy....", ".yyyyyyyyyy.", "yyyyyyyyyyyy", "yyyyyyyyyyyy", "...yyyyyy...", "..yyyyyyyy..", "..yyy..yyy..", ".yyy....yyy.", "kkkkkkkkkkkk"],
+  d20:[".....kk.....", "...kkmmkk...", ".kkmmwmmmkk.", ".kmmwmwmmmk.", ".kmwmmmwmmk.", ".kwwwwwwwwk.", ".kmmwmmwmmk.", ".kmmmwwmmmk.", ".kkmmwwmmkk.", "...kkmmkk...", ".....kk.....", "............"],
+  scooter:["............", "........kk..", ".yyy.....k..", ".yyy.....k..", ".yyy.....k..", "..rrrrr..k..", ".rrrrrrrrk..", ".rrrrrrrrrr.", ".kk.....kk..", "k..k...k..k.", "k..k...k..k.", ".kk.....kk.."],
+  car:["............", "............", "...uuuuuu...", "..ullllllu..", "..ullllllu..", ".uuuuuuuuuu.", "uyuuuuuuuuyu", "uuuuuuuuuuuu", "uuuuuuuuuuuu", ".kk......kk.", "keek....keek", ".kk......kk."],
+  dog:["............", ".nn......nn.", ".nnn....nnn.", "..nnnnnnnn..", "..nknnnnkn..", "..nnnnnnnn..", "...nnkknn...", "....nrrn....", "...nnnnnn...", "..nnnnnnnn..", "..nn.nn.nn..", "..nn.nn.nn.."],
+  tie:["............", "....kkkk....", "....krrk....", ".....rr.....", "....rrrr....", "....rrrr....", "...rrrrrr...", "...rrrrrr...", "...rrrrrr...", "....rrrr....", ".....rr.....", "............"],
+  brew:["............", "..eeeeeeee..", "..eEEEEEEe..", "..eeeeeeee..", "...kkkkkk...", "...knnnnkkkk", "...kkkkkk...", "....n..n....", "....n..n....", "...kkkkkk...", "...kwwwwk...", "...kkkkkk..."],
+  moon:["............", "....yyyy....", "...yyyyyy...", "..yyyyyyyy..", "..yyyyyyyy..", "..yyyyyyyy..", "..yyyyyyyy..", "...yyyyyy...", "....yyyy....", "............", "...nnnnnn...", "..nnnnnnnn.."],
 };
 
 /* ==== engine/core.js ==== */
@@ -1325,7 +1463,7 @@ let S = null;
 const STATS = ["en","co","fi","cr","sty","kh"];
 
 function newGame(){
-  return {v:1, stage:STAGE.id, date:STAGE.start, blk:0, phase:"home", day:0,
+  return {v:2, stage:STAGE.id, date:STAGE.start, blk:0, phase:"home", day:0,
     money:STAGE.money, stress:STAGE.stress, st:Object.assign({}, STAGE.stats),
     hearts:{family:20, leo:20, ben:10, ting:30, chen:10}, flags:{}, locks:{}, seen:{},
     plan:new Array(14).fill(null), lastPlan:null, sessions:{}, payQ:[], sickLeft:0,
@@ -1333,7 +1471,7 @@ function newGame(){
     notes:[], album:[], diary:[], mlog:{}, thread:[], feed:[], snap:null, done:false, trips:0};
 }
 function save(){ if(S) store.set("save", S); }
-function load(){ const s = store.get("save", null); return s && s.v === 1 ? s : null; }
+function load(){ const s = store.get("save", null); return s && s.v === 2 ? s : null; }
 
 const blockDate = (S, i) => D.add(S.date, i);
 const monthKey = d => d.slice(0,7);
@@ -1344,7 +1482,17 @@ function actOf(id){ return ACTS[id] || SPECIAL[id] || null; }
 function canPlace(S, id, i){
   const a = ACTS[id], date = blockDate(S, i), wd = D.wd(date);
   if(lockOf(S, i)) return {ok:false, why:"locked"};
+  if((a.open || 0) > S.blk) return {ok:false, why:"flag"};
   if(a.days && !a.days.includes(wd)) return {ok:false, why:"days"};
+  if(a.cls && a.days && holidayOn(date)) return {ok:false, why:"holiday"};
+  if(id === "driving"){   /* ten lessons make a course; no more once they are booked or done */
+    const booked = S.plan.filter((p,k)=>p === "driving" && k !== i).length;
+    if(S.flags.license || (S.sessions.driving || 0) + booked >= DRIVE_DONE) return {ok:false, why:"done"};
+  }
+  /* pet-sitting and a trip can't share two weeks; the day being replaced doesn't count */
+  const others = S.plan.map((p,k)=>(k === i || (S.plan[i] === "khh" && k === i+1) || (S.plan[i] === "khh2" && k === i-1) || (a.span === 2 && k === i+1)) ? null : p);
+  if(a.trip && others.some(p=>p && ACTS[p] && ACTS[p].noTrip)) return {ok:false, why:"pets"};
+  if(a.noTrip && others.some(p=>p && (ACTS[p] ? ACTS[p].trip : p === "khh2"))) return {ok:false, why:"pets"};
   if(a.need) for(const k in a.need) if(S.st[k] < a.need[k]) return {ok:false, why:"need", k, v:a.need[k]};
   if(a.flag && !S.flags[a.flag]) return {ok:false, why:"flag"};
   if(a.span === 2){ if(i >= 13 || lockOf(S, i+1)) return {ok:false, why:"span"}; }
@@ -1360,24 +1508,26 @@ function setPlan(S, i, id){
 
 /* the money and stress a plan would mean, before it plays */
 function preview(S){
-  let cost = 0, income = 0, stress = S.stress;
+  let cost = 0, income = 0, stress = S.stress, cashIn = 0;
   for(let i=0;i<14;i++){
     const date = blockDate(S, i), lk = lockOf(S, i), id = lk || S.plan[i] || "free", a = actOf(id);
     cost += STAGE.living;
     STAGE.bills.forEach(b=>{ if(D.day(date) === b.day) cost += b.amt; });
     if(!a) continue;
     cost += a.cost || 0; if(a.est) cost += a.est;
-    if(a.pay) income += a.pay + (a.wkBonus && D.wd(date) >= 5 ? a.wkBonus : 0);
+    if(a.pay && ACTS[id]){ const amt = payFor(S, id, date, true).amt; income += amt;
+      if(a.cash || (a.weekly && payDate(date, a) <= blockDate(S, 13))) cashIn += amt; }   /* money that arrives inside these two weeks */
     stress = clamp(stress + (a.st || 0) - (id === "khh" || id === "khh2" ? 0 : STAGE.recover), 0, 100);
     if(id === "khh") stress = clamp(stress - 15, 0, 100);
   }
   const cash = S.payQ.filter(p=>p.date <= blockDate(S, 13)).reduce((t,p)=>t+p.amt, 0);
-  return {cost, income, stress, end:S.money - cost + cash};
+  return {cost, income, stress, end:S.money - cost + cash + cashIn};
 }
 
-/* when a job's pay arrives: a set day of the next month, or the same day */
+/* when a job's pay arrives: a set day of the next month, the Wednesday after the week, or the same day */
 function payDate(date, a){
   if(a.cash) return date;
+  if(a.weekly) return D.add(date, 7 - D.wd(date) + 2);
   const dt = D.parse(date); dt.setUTCDate(1); dt.setUTCMonth(dt.getUTCMonth()+1); dt.setUTCDate(a.payday);
   return D.iso(dt);
 }
@@ -1423,15 +1573,20 @@ function runDay(S, i){
   /* one paycheck per job on payday, for all the days it covers */
   const due = S.payQ.filter(p=>p.date <= date), bySrc = {};
   due.forEach(p=>{ const b = bySrc[p.src] = bySrc[p.src] || {amt:0, n:0, from:p.from}; b.amt += p.amt; b.n++; S.money += p.amt; out.pay.push(p); });
-  Object.entries(bySrc).forEach(([src, b])=>{  /* labels for each job */
-    const en = src === "dept" ? "the department store" : "the café", zh = src === "dept" ? "百貨公司" : "咖啡館";
-    const mon = b.from ? MON_FULL[+b.from.slice(5,7)-1] : "last month", mzh = b.from ? `${+b.from.slice(5,7)} 月` : "上個月";
-    b.msg = [en, zh, mon, mzh];
-  });
   /* a real-world bank notice, sent after the deposits land */
-  Object.values(bySrc).forEach(b=>{ const [en, zh, mon, mzh] = b.msg;
-    out.msgs.push(["bank", `[[Deposit]] received: NT$${b.amt.toLocaleString("en-US")}, your ${mon} [[salary]] from ${en} (${b.n} ${b.n === 1 ? "day" : "days"}). Your [[balance]] is now NT$${Math.round(S.money).toLocaleString("en-US")}.`,
-      `入帳通知：${zh}匯入 ${mzh}薪資 NT$${b.amt.toLocaleString("en-US")}（${b.n} 天）。目前帳戶餘額 NT$${Math.round(S.money).toLocaleString("en-US")}。`]); });
+  const PAYER = {dept:["the department store","百貨公司"], cafe:["the café","咖啡館"], delivery:["the delivery app","外送平台"]};
+  Object.entries(bySrc).forEach(([src, b])=>{
+    const [en, zh] = PAYER[src] || ["work","打工"], amt = b.amt.toLocaleString("en-US"), bal = Math.round(S.money).toLocaleString("en-US"), days = `${b.n} ${b.n === 1 ? "day" : "days"}`;
+    if(ACTS[src] && ACTS[src].weekly){
+      out.msgs.push(["bank", `[[Deposit]] received: NT$${amt}, last week's pay from ${en} (${days}). Your [[balance]] is now NT$${bal}.`,
+        `入帳通知：${zh}匯入上週收入 NT$${amt}（${b.n} 天）。目前帳戶餘額 NT$${bal}。`]);
+      return;
+    }
+    const mon = b.from ? MON_FULL[+b.from.slice(5,7)-1] : "last month", mzh = b.from ? `${+b.from.slice(5,7)} 月` : "上個月";
+    const what = src === "dept" ? ["[[salary]] and [[commission]]", "薪資和業績抽成"] : ["[[salary]]", "薪資"];
+    out.msgs.push(["bank", `[[Deposit]] received: NT$${amt}, your ${mon} ${what[0]} from ${en} (${days}). Your [[balance]] is now NT$${bal}.`,
+      `入帳通知：${zh}匯入 ${mzh}${what[1]} NT$${amt}（${b.n} 天）。目前帳戶餘額 NT$${bal}。`]);
+  });
   S.payQ = S.payQ.filter(p=>p.date > date);
   /* money out: rent, bills, food */
   STAGE.bills.forEach(b=>{ if(D.day(date) === b.day){ S.money -= b.amt; out.msgs.push(["bank", `Rent and bills: −NT$${b.amt.toLocaleString("en-US")}.`, `房租和水電：−NT$${b.amt.toLocaleString("en-US")}。`]); } });
@@ -1446,6 +1601,7 @@ function runDay(S, i){
   if(id === "sick") S.sickLeft--;
   if(id && S.plan[i] === "khh" && S.plan[i+1] === "khh2") S.plan[i+1] = null;   /* a lost first day cancels the trip */
   if(!id) id = S.plan[i] || "free";
+  if(id === "driving" && S.flags.license) id = "free";   /* a lesson after the license becomes a free day */
   out.id = id;
   const a = actOf(id);
 
@@ -1465,7 +1621,10 @@ function runDay(S, i){
     if(S.lastCls === id) S.clsRun++; else { S.lastCls = id; S.clsRun = 1; }
     if(S.clsRun >= 3) mul *= 1.2;
     const r1 = rankOf(n0 + 1);
-    if(r1 > r0 && RANKUP[id]) out.msgs.push([id === "study" ? "mia" : "teacher", RANKUP[id][0], RANKUP[id][1]]), out.rankUp = r1;
+    if(r1 > r0 && RANKUP[id] && !(id === "barista" && r1 === 2)) out.msgs.push([id === "study" ? "mia" : "teacher", RANKUP[id][0], RANKUP[id][1]]), out.rankUp = r1;
+    if(id === "driving" && n0 + 1 === DRIVE_DONE && !S.flags.license){ S.flags.license = date; S.st.kh += 2; S.st.co += 2;
+      out.msgs.push(["teacher", "You passed the [[road test]]! Here is your [[driver's license]]. One thing: in the UK, many car rental companies want a license you have had for a year.",
+        "妳通過路考了！這是妳的駕照。提醒妳一件事：在英國，很多租車公司要求駕照要滿一年。"]); }
   } else { S.lastCls = null; S.clsRun = 0; }
   if(S.stress > 60) mul *= .8;
   for(const k in (a.g || {})) S.st[k] += a.g[k] * mul * STAGE.gain;
@@ -1475,8 +1634,8 @@ function runDay(S, i){
   if(a.menu === "work"){
     S.workRun++;
     if(S.workRun >= 7){ S.stress += 4; if(S.workRun === 7) out.msgs.push(["mia","Seven work days in a row. I am so tired.","連續上班七天了，好累。"]); }
-    let amt = a.pay + (a.wkBonus && wd >= 5 ? a.wkBonus : 0);
-    if(!good) amt = Math.round(amt * .8);
+    const pf = payFor(S, id, date, good), amt = pf.amt;
+    if(pf.comm) out.comm = pf.comm;
     if(a.cash){ S.money += amt; out.cash = amt; }
     else { S.payQ.push({date:payDate(date, a), amt, src:id, from:date}); out.later = {amt, date:payDate(date, a)}; }
     ml.earned += amt;
@@ -1541,12 +1700,14 @@ function diaryFor(S, mkey){
   const ml = S.mlog[mkey] || {acts:{}, earned:0}, A = ml.acts, m = MON_FULL[+mkey.slice(5)-1];
   const n = ids => ids.reduce((t,k)=>t+(A[k]||0), 0);
   const lines = [`${m} is over. Here is my month.`];
-  const work = n(["dept","cafe","shoot","shootPaid"]), cls = n(["english","yoga","cooking","styling","tutor","study","exchange"]);
-  const fun = n(["boba","nightmkt","ktv","family","callting"]), rest = n(["rest","ride","free","sick","typhoon"]);
+  const work = n(["dept","cafe","shoot","shootPaid","petsit","delivery"]);
+  const fun = n(["boba","nightmkt","ktv","family","callting","boardgame","ttrpg","midautumn"]);
   if(work) lines.push(`I worked ${nw(work)} ${work === 1 ? "day" : "days"}. ${work > 18 ? "That is a lot. My feet are tired!" : "My wallet is happy."}`);
   else lines.push("I did not work this month. My wallet is sad!");
   if(n(["english","tutor","study","exchange"])) lines.push("I studied English. Every day I know a few more words.");
   if(A.cooking) lines.push("In cooking class, I learned to make new [[dishes|dish]].");
+  if(A.driving) lines.push(S.flags.license && monthKey(S.flags.license) <= mkey ? "I have my [[driver's license]] now!" : "I am learning to drive. The car is big, and I am small.");
+  if(A.barista) lines.push("At the barista course, I made coffee all day. I love the smell.");
   const sh = (A.shoot||0) + (A.shootPaid||0);
   if(sh) lines.push(`I did ${nw(sh)} photo ${sh === 1 ? "shoot" : "shoots"}. I am learning to [[pose]].`);
   if(A.khh) lines.push("The best day: my trip to Kaohsiung. I want to travel more.");
@@ -1555,7 +1716,7 @@ function diaryFor(S, mkey){
   if(A.sick) lines.push("I got sick. Next month, I will rest more.");
   else if(S.stress > 60) lines.push("I feel tired. I need a slow day soon.");
   else lines.push("I feel good. Life in Taipei is busy, but it is mine.");
-  if(S.flags.whIdea && mkey === "2025-08") lines.push("Ting's message is still in my head. A [[working holiday]]… in London?");
+  if(S.flags.whIdea && mkey === "2026-08") lines.push("Ting's message is still in my head. A [[working holiday]]… me?");
   return {month:mkey, lines};
 }
 
@@ -1678,7 +1839,8 @@ function renderPlan(){
   const cells = i => {
     const date = blockDate(S, i), lk = lockOf(S, i), id = lk || S.plan[i], a = id ? actOf(id) : null;
     const cls = ["slot"]; if(id) cls.push("set"); if(lk) cls.push("lock"); if(a && a.menu) cls.push("m-"+a.menu); if(id === "khh2") cls.push("m-explore"); if(i === selDay) cls.push("sel");
-    return `<button class="${cls.join(" ")}" data-i="${i}" ${lk ? "disabled" : ""}><span class="d">${D.day(date)}</span>${a ? spriteHTML(a.spr) : ""}<span class="a">${a ? esc(N(a.s || a)) : `<span class="muted">${T("empty")}</span>`}</span></button>`;
+    const hol = holidayOn(date), sale = saleOn(date);
+    return `<button class="${cls.join(" ")}${hol ? " hol" : ""}" data-i="${i}" ${lk ? "disabled" : ""}><span class="d">${D.day(date)}${hol ? `<i class="tg">${T("holTag")}</i>` : sale ? `<i class="tg sale">${T("saleTag")}</i>` : ""}</span>${a ? spriteHTML(a.spr) : ""}<span class="a">${a ? esc(N(a.s || a)) : `<span class="muted">${T("empty")}</span>`}</span></button>`;
   };
   const wk = w => `<div class="cal">${(LANG === "en" ? WD_EN : WD_ZH).map(x=>`<span class="wd">${x}</span>`).join("")}${[0,1,2,3,4,5,6].map(j=>cells(w*7+j)).join("")}</div>`;
   $("#plan").innerHTML = topBar() + `
@@ -1686,6 +1848,7 @@ function renderPlan(){
     <h2>${T("plan2")}</h2><p class="muted" style="font-size:14px">${T("pickDay")}</p>
     <h3 class="px" style="font-size:14px;margin-top:8px">${T("week1")} · ${D.short(S.date)}</h3>${wk(0)}
     <h3 class="px" style="font-size:14px;margin-top:10px">${T("week2")} · ${D.short(blockDate(S,7))}</h3>${wk(1)}
+    ${planNotes()}
     <div class="tools"><button class="btn alt small" id="pCopy" ${S.lastPlan ? "" : "disabled"}>${T("copyLast")}</button><button class="btn alt small" id="pClear">${T("clear")}</button></div>
     <div class="preview"><div class="pv"><b>${fmt(pv.cost)}</b><span>${T("cost")}</span></div><div class="pv"><b>${fmt(pv.income)}</b><span>${T("income")}</span></div><div class="pv"><b>${Math.round(pv.stress)}</b><span>${T("estStress")}</span></div></div>
     <p class="muted" style="font-size:12px;margin-top:-6px">${T("livingCost")}：NT$${STAGE.living} ${T("perDay")}</p>
@@ -1707,6 +1870,14 @@ function renderPlan(){
     });
   };
 }
+/* what's special in these two weeks: days off and sale days */
+function planNotes(){
+  const out = [];
+  for(let i=0;i<14;i++){ const d = blockDate(S, i), h = holidayOn(d); if(h) out.push(`${D.short(d)} ${N(h)}`); }
+  const sl = SALES.find(x=>x.from <= blockDate(S, 13) && x.to >= S.date);
+  if(sl) out.push(`${N(sl)} ${D.short(sl.from)}–${sl.from.slice(0,7) === sl.to.slice(0,7) && LANG === "en" ? +sl.to.slice(8) : D.short(sl.to)}`);
+  return out.length ? `<p class="muted pnotes">${esc(out.join(" · "))}</p>` : "";
+}
 function copyLast(){
   S.plan = new Array(14).fill(null);
   for(let i=0;i<14;i++){ const id = S.lastPlan[i]; if(!id || id === "khh2" || !ACTS[id]) continue; if(canPlace(S, id, i).ok && !S.plan[i]) setPlan(S, i, id); }
@@ -1716,16 +1887,21 @@ function whyText(r, a){
   if(r.why === "need") return `${T("needs")} ${statName(r.k)} ${r.v}`;
   if(r.why === "flag") return T("notYet");
   if(r.why === "span") return T("twoDays");
+  if(r.why === "holiday") return T("classHoliday");
+  if(r.why === "pets") return T("petsTrip");
+  if(r.why === "done") return T("licenseDone");
   return T("locked");
 }
 function openSheet(keepTab){
   const a0 = S.plan[selDay] && actOf(S.plan[selDay]); if(!keepTab && a0 && a0.menu) menuTab = a0.menu;   /* open on the day's own menu, but let the player switch tabs */
   const date = blockDate(S, selDay);
-  const list = Object.entries(ACTS).filter(([id,a])=>a.menu === menuTab);   /* same order every day, so rows never jump */
+  const list = Object.entries(ACTS).filter(([id,a])=>a.menu === menuTab && (a.open || 0) <= S.blk);   /* same order every day, so rows never jump; activities appear as the story opens them */
   const fx = a => {
     const parts = [];
     if(a.cost) parts.push(`−NT$${a.cost}`); if(a.est) parts.push(`≈ −NT$${a.est.toLocaleString("en-US")}`);
-    if(a.pay) parts.push(`+NT$${a.pay}${a.wkBonus ? "+" : ""}`);
+    if(a.pay === "dept") parts.push(`+NT$${(wageOn(date) * 8).toLocaleString("en-US")}${T("plusComm")}`);
+    else if(a.pay === "cafe") parts.push(`+NT$${payFor(S, "cafe", date, true).amt.toLocaleString("en-US")}`);
+    else if(a.pay) parts.push(`+NT$${a.pay.toLocaleString("en-US")}`);
     Object.keys(a.g || {}).forEach(k=>parts.push(`${statName(k)}+`));
     Object.keys(a.h || {}).forEach(k=>parts.push(`♥${N(CAST[k]).split("（")[0].split(" (")[0]}`));
     if(a.st) parts.push(`${T("stress")}${a.st > 0 ? "+" : "−"}${Math.abs(a.st)}`);
@@ -1735,7 +1911,7 @@ function openSheet(keepTab){
   sh.innerHTML = `<div class="hd"><b>${D.long(date)}</b><button class="ib" id="shX" aria-label="${T("close")}">${ICON.x}</button></div>
     <div class="tabs">${MENUS.map(m=>`<button class="tab m-${m}${m === menuTab ? " on" : ""}" data-m="${m}">${T("m_"+m)}</button>`).join("")}</div>
     <div class="acts">${list.map(([id,a])=>{ const r = canPlace(S, id, selDay);
-      return `<button class="act" data-a="${id}" ${r.ok ? "" : "disabled"}>${spriteHTML(a.spr)}<div><div class="t">${esc(N(a))}${S.plan[selDay] === id ? `<span class="tag">✓</span>` : ""}${a.cls && S.sessions[id] ? `<span class="tag">${T("r"+rankOf(S.sessions[id]))}</span>` : ""}</div>
+      return `<button class="act" data-a="${id}" ${r.ok ? "" : "disabled"}>${spriteHTML(a.spr)}<div><div class="t">${esc(N(a))}${S.plan[selDay] === id ? `<span class="tag">✓</span>` : ""}${a.open && a.open === S.blk ? `<span class="tag new">${T("newTag")}</span>` : ""}${a.cls && S.sessions[id] ? `<span class="tag">${T("r"+rankOf(S.sessions[id]))}</span>` : ""}</div>
         ${a.sub ? `<div class="s">${esc(N(a.sub))}</div>` : ""}<div class="fx">${esc(fx(a))}</div>${r.ok ? "" : `<div class="why">${esc(whyText(r, a))}</div>`}</div></button>`; }).join("")}
       ${S.plan[selDay] ? `<button class="btn alt small" id="shDel">${T("removeDay")}</button>` : ""}
       ${S.plan[selDay] && ACTS[S.plan[selDay]] && ACTS[S.plan[selDay]].span !== 2 ? `<button class="btn alt small" id="shFill">${T("fillRest")}</button>` : ""}</div>`;
@@ -1822,7 +1998,8 @@ function dayScene(id){
 }
 function dayCardEls(out){
   const sc = dayScene(out.id), a = actOf(out.id);
-  const extra = out.later ? `<span class="muted">${T("pendingPay")} ${fmt(out.later.amt)} → ${D.short(out.later.date)}</span>` : out.cash ? `<span class="up">+${fmt(out.cash)}</span>` : "";
+  const extra = (out.later ? `<span class="muted">${T("pendingPay")} ${fmt(out.later.amt)} → ${D.short(out.later.date)}</span>` : out.cash ? `<span class="up">+${fmt(out.cash)}</span>` : "")
+    + (out.comm ? `<span class="muted">${T("commIn")} ${fmt(out.comm)}</span>` : "");
   const el = document.createElement("div"); el.className = "day"; el.dataset.i = out.i;
   el.innerHTML = `<canvas width="56" height="56" style="background:${sc.bg}" data-spr="${sc.spr}"></canvas><div style="flex:1">
     <div class="dh">${D.long(out.date)} · ${esc(N(a))}${out.ok === false ? " · 😅" : ""}</div>
@@ -1864,8 +2041,7 @@ function addDayCard(out){
 function showLog(log, back){
   show("info");
   const a = log.date, b = D.add(log.date, 13);
-  $("#info").innerHTML = `<div style="padding-top:12px"><button class="btn alt small back" id="lBack">${ICON.back} ${back ? T("backSum") : T("back")}</button>
-    <h2>${T("lastLog")}</h2><p class="muted">${D.short(a)} – ${D.short(b)}</p><div class="feed" id="logFeed"></div>
+  $("#info").innerHTML = `<div class="top infobar"><div class="r1"><button class="btn alt small" id="lBack">${ICON.back} ${back ? T("backSum") : T("back")}</button><b class="ttl">${T("lastLog")}</b></div></div><div><p class="muted">${D.short(a)} – ${D.short(b)}</p><div class="feed" id="logFeed"></div>
     <button class="btn" id="lBack2" style="width:100%;margin-top:12px">${back ? T("backSum") : T("back")}</button></div>`;
   log.feed.forEach(o=>dayCardEls(o).forEach(e=>$("#logFeed").appendChild(e)));
   const go = ()=>{ if(back) back(); else renderHome(); };
@@ -1911,8 +2087,8 @@ function endScreen(){
     <div class="hero"><canvas id="endBust"></canvas><div><div class="who">Mia</div><div class="sub">${fmt(S.money)} · ${T("stress")} ${Math.round(S.stress)}</div>
     ${S.payQ.length ? `<div class="sub">${T("pendingPay")}：${fmt(S.payQ.reduce((t,p)=>t+p.amt,0))}</div>` : ""}<div class="sub">${statName(top2[0])} ${Math.floor(S.st[top2[0]])} · ${statName(top2[1])} ${Math.floor(S.st[top2[1]])}</div></div></div>
     <div class="diary" style="margin-top:12px">${LANG === "en"
-      ? "<p>That's July and August. In the full game, Stage 1 runs to the Mid-Autumn Festival on October 6, 2025, and closes with the Mid-Autumn Night Market Stall. Then Mia's working-holiday dream begins.</p>"
-      : "<p>七月和八月結束了。完整版的第一階段會一直玩到 2025 年 10 月 6 日中秋節，以中秋夜市擺攤收尾。接著，Mia 的打工度假夢就要開始了。</p>"}</div>
+      ? "<p>That's July to December 2026. Still to come in Stage 1: the Mid-Autumn Night Market Stall, the moment Mia decides to go, and a finale at Christmasland and the Taipei 101 countdown.</p>"
+      : "<p>2026 年 7 月到 12 月結束了。第一階段還在製作中的有：中秋夜市擺攤、Mia 下定決心的那一刻，以及最後的歡樂耶誕城和 101 跨年倒數。</p>"}</div>
     <div class="menu"><button class="btn alt" data-go="album">${T("album")}</button><button class="btn alt" data-go="notebook">${T("notebook")}</button>
     <button class="btn" id="eNew" style="grid-column:1/-1">${T("newGame")}</button></div></div>`;
   paintSprites($("#info")); Room.drawBust($("#endBust"), false);
@@ -1926,18 +2102,19 @@ function info(page){
   const from = screens.find(s=>$("#"+s).classList.contains("on"));
   if(from !== "info") infoBack = from;
   show("info"); closeSheet();
-  let h = `<div style="padding-top:12px"><button class="btn alt small back" id="iBack">${ICON.back} ${T("back")}</button>`;
+  const titles = {friends:T("friends"), notebook:T("notebook"), album:T("album"), settings:T("settings")};
+  let h = `<div class="top infobar"><div class="r1"><button class="btn alt small" id="iBack">${ICON.back} ${T("back")}</button><b class="ttl">${titles[page] || ""}</b></div></div><div>`;
   if(page === "friends"){
-    h += `<h2>${T("friends")}</h2><div class="hearts">${Object.keys(CAST).map(k=>{ const n = Math.floor(S.hearts[k]/20), part = S.hearts[k] % 20;
+    h += `<div class="hearts">${Object.keys(CAST).map(k=>{ const n = Math.floor(S.hearts[k]/20), part = S.hearts[k] % 20;
       return `<div class="card fr">${spriteHTML(CAST[k].spr)}<div><b>${esc(N(CAST[k]))}</b><div class="h">${"♥".repeat(n)}${"♡".repeat(5-n)}</div><div class="muted" style="font-size:13px">${esc(N(CAST[k].d))}</div></div></div>`; }).join("")}</div>`;
   } else if(page === "notebook"){
-    h += `<h2>${T("notebook")}</h2>` + (S.notes.length ? `<div class="nb">${S.notes.map(k=>GLOSS[k] ? `<div class="it"><span><b>${esc(GLOSS[k].w || k)}</b> <span class="muted">${esc(GLOSS[k].kk || "")}</span></span><span>${esc(GLOSS[k].zh)}</span></div>` : "").join("")}</div>` : `<p class="muted">${T("notebookEmpty")}</p>`);
+    h += (S.notes.length ? `<div class="nb">${S.notes.map(k=>GLOSS[k] ? `<div class="it"><span><b>${esc(GLOSS[k].w || k)}</b> <span class="muted">${esc(GLOSS[k].kk || "")}</span></span><span>${esc(GLOSS[k].zh)}</span></div>` : "").join("")}</div>` : `<p class="muted">${T("notebookEmpty")}</p>`);
   } else if(page === "album"){
     const cards = TRIPS.khh.cards;
-    h += `<h2>${T("album")}</h2>` + (S.album.length ? `<div class="album">${S.album.map(c=>`<div class="post"><canvas width="150" height="100" data-card="${c}"></canvas><div class="pt">${esc(N(cards[c] || {zh:c, en:c}))}</div></div>`).join("")}</div>` : `<p class="muted">${T("albumEmpty")}</p>`);
+    h += (S.album.length ? `<div class="album">${S.album.map(c=>`<div class="post"><canvas width="150" height="100" data-card="${c}"></canvas><span class="stamp">${c === "window" ? "TAIPEI → KAOHSIUNG" : "KAOHSIUNG"}</span><div class="pt">${esc(N(cards[c] || {zh:c, en:c}))}</div></div>`).join("")}</div>` : `<p class="muted">${T("albumEmpty")}</p>`);
   } else if(page === "settings"){
     const th = store.get("theme", "auto");
-    h += `<h2>${T("settings")}</h2><div class="set">
+    h += `<div class="set">
       <div class="rowi"><span>${T("langSet")}</span><span class="row"><button class="btn small ${LANG === "zh" ? "on" : "alt"}" data-l="zh">中文</button><button class="btn small ${LANG === "en" ? "on" : "alt"}" data-l="en">English</button></span></div>
       <div class="rowi"><span>${T("musicSet")}</span><button class="btn small alt" data-music>♪ ${T("music")}</button></div>
       <div class="rowi"><span>${T("themeSet")}</span><span class="row">${["auto","light","dark"].map(t=>`<button class="btn small ${th === t ? "on" : "alt"}" data-th="${t}">${T(t)}</button>`).join("")}</span></div>
@@ -1955,7 +2132,7 @@ function info(page){
   const cl = $("#cLoad"); if(cl) cl.onclick = ()=>{ const s = importCode($("#codeIn").value.trim()); if(!s) return toast(T("badCode")); clearTimeout(playTimer); S = s; save(); toast(T("loaded")); enter(); };
 }
 function exportCode(){ try{ return btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }catch(e){ return ""; } }
-function importCode(c){ try{ const s = JSON.parse(decodeURIComponent(escape(atob(c)))); return s && s.v === 1 && s.st ? s : null; }catch(e){ return null; } }
+function importCode(c){ try{ const s = JSON.parse(decodeURIComponent(escape(atob(c)))); return s && s.v === 2 && s.st ? s : null; }catch(e){ return null; } }
 function applyTheme(){ const t = store.get("theme", "auto"); if(t === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t); }
 
 /* postcards: little painted scenes */
@@ -1970,7 +2147,6 @@ function drawCard(cv, id){
   if(id === "beach"){ c.fillStyle = "#2E2A2A"; c.fillRect(0, H*.8, W, H*.2); c.fillStyle = "#fff"; c.fillRect(0, H*.78, W, 3); }
   const spr = {sunset:"lighthouse", nightlight:"lighthouse", window:"train", fort:"fort", temple:"temple", beach:"wave", rainbow:"rainbow", pier2:"robot"}[id];
   if(spr && SPR[spr]){ const t = document.createElement("canvas"); drawSprite(t, SPR[spr], 4); c.drawImage(t, W*.62 - 24, H*.62 - 44); }
-  c.fillStyle = "rgba(255,255,255,.85)"; c.fillRect(0, H-14, W, 14); c.fillStyle = "#2B2536"; c.font = "10px monospace"; c.fillText(id === "window" ? "TAIPEI → KAOHSIUNG" : "KAOHSIUNG · 2025", 6, H-4);
 }
 
 /* ==== engine/trip.js ==== */
@@ -2246,7 +2422,8 @@ function walkScene(){
 function tripEnd(){
   const W = TS.TR.walk;
   if(!TS.cards.includes("pier2")) TS.cards.push("pier2");
-  spend(TS.TR.costs.ticket);   /* the train home */
+  spend(TS.TR.costs.mrt);   /* the light rail back to Kaohsiung Station */
+  spend(TS.train && TS.train.slow ? TS.TR.costs.ticketSlow : TS.TR.costs.ticket);   /* the train home: the same kind as the train down, for now (the choice comes with the high-speed rail) */
   const g = {}; Object.keys(TS.g).forEach(k=>{ g[k] = Math.round(TS.g[k]*10)/10; });
   const line = TS.sunsetOK === true ? "Kaohsiung! Train, ferry, island, and a sunset at the lighthouse."
              : TS.sunsetOK === false ? "Kaohsiung! Train, ferry, island, and the lighthouse at night."
@@ -2255,7 +2432,7 @@ function tripEnd(){
   $("#trip").innerHTML = tripHead(LANG === "en" ? "Home again" : "回家了") + sceneHTML(W.done) + `<div style="margin-top:8px">${sceneHTML(W.home)}</div>
     <h3 style="margin-top:12px">${LANG === "en" ? "Trip results" : "旅行成果"}</h3>
     <div class="ticks" style="display:flex;flex-wrap:wrap;gap:6px 10px;font-size:15px">${ticksHTML({money:-res.spent, stress:res.stress, st:g})}</div>
-    <div class="album" style="margin-top:10px">${res.cards.map(c=>`<div class="post"><canvas width="150" height="100" data-card="${c}"></canvas><div class="pt">${esc(N(TS.TR.cards[c]))}</div></div>`).join("")}</div>
+    <div class="album" style="margin-top:10px">${res.cards.map(c=>`<div class="post"><canvas width="150" height="100" data-card="${c}"></canvas><span class="stamp">${c === "window" ? "TAIPEI → KAOHSIUNG" : "KAOHSIUNG"}</span><div class="pt">${esc(N(TS.TR.cards[c]))}</div></div>`).join("")}</div>
     <button class="btn" id="tDone" style="width:100%;margin-top:12px">${LANG === "en" ? "Back to Taipei" : "回到台北"}</button>`;
   $$("#trip canvas[data-card]").forEach(cv=>drawCard(cv, cv.dataset.card)); Music.ui();
   $("#tDone").onclick = ()=>{ const d = TS.done; TS = null; d(res); };
