@@ -613,6 +613,10 @@ const BOOK = {
   blurbZh:"十篇課文，每課 12 個單字、3 個文法重點、對話和口說題。跟著 Mia 抽籤、存錢、寫 email、練面試，一路走到登機。",
   version:"1.0・2026 年 9 月",
   hi:/B/,
+  /* read-aloud: Camille says her name the French way, as in the game; her Chinese words are read by a Chinese voice.
+     好吃 is sent to the voice as 郝吃: the Taiwan voice misreads 好吃 as hào chī, and 郝 is always hǎo */
+  sayAs:{"Camille":"Kah-mee","Lyon":"Lee-on"},
+  foreign:{"謝謝":["zh-TW","shyeh shyeh","謝謝"],"好吃":["zh-TW","how chir","郝吃"],"Bon voyage":["fr-FR","bon voy-ahzh","Bon voyage"]},
   gradBadge:"準備出發",
   about:`<h4>關於這本《Window Seat・Departures》</h4>
         <p>第二冊從百貨公司的櫃位出發。法國同事 Camille 的一張明信片，讓 Mia 開始認真想去英國打工度假。抽籤、說服媽媽、存錢、寫第一封英文 email、模擬面試，她一步一步走到飛機上的靠窗座位。</p>
