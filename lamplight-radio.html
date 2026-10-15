@@ -1,0 +1,542 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style></head><body><title>Lamplight Radio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Yellowtail&display=swap">
+<style>
+/* Layout: one tabletop FM set, walnut cabinet with a lit glass dial, centred on the wall; the station list sits under it like a printed station card. */
+:root{
+  --wall:#D5DADD; --wall-2:#C7CDD1; --ink:#1D2329; --muted:#56606A; --card:#EEF0F1; --rule:#B8C0C6; --focus:#2F6FA3;
+  /* the radio itself is an object: same in both themes */
+  --walnut:#6A4128; --walnut-2:#4A2C1A; --walnut-3:#81553A; --cloth:#CBB990; --cloth-2:#A8966E;
+  --brass:#D2AE62; --brass-2:#8E6E2F; --glass:#16130F; --amber:#FFB54A; --amber-dim:#A8834A; --eye:#5CF29A; --key:#F2EBDD; --key-2:#CFC5B2;
+  --f-badge:"Yellowtail", "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive;
+  --f-ui:"Atkinson Hyperlegible", "Noto Sans TC", "PingFang TC", system-ui, sans-serif;
+  --f-num:"Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --wall:#12161A; --wall-2:#191E23; --ink:#E7E3DA; --muted:#9AA3AB; --card:#1C2227; --rule:#2E363D; --focus:#7FB4E0; color-scheme:dark; } }
+:root[data-theme="dark"]{ --wall:#12161A; --wall-2:#191E23; --ink:#E7E3DA; --muted:#9AA3AB; --card:#1C2227; --rule:#2E363D; --focus:#7FB4E0; color-scheme:dark; }
+
+html,body{min-height:100%;}
+body{background:radial-gradient(120% 70% at 50% 0%, var(--wall-2), var(--wall) 70%) var(--wall); color:var(--ink); font-family:var(--f-ui); font-size:16px; line-height:1.45;
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:20px 40px;}
+.wrap{max-width:540px; margin:0 auto; display:grid; gap:22px;}
+button{font:inherit; color:inherit; background:none; border:0; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+:focus-visible{outline:3px solid var(--focus); outline-offset:2px; border-radius:6px;}
+.radio :focus-visible{outline-color:#FFE7A8;}
+
+/* ---------- cabinet ---------- */
+.radio{position:relative; border-radius:26px 26px 18px 18px; padding:16px 16px 18px;
+  background:
+    repeating-linear-gradient(92deg, rgba(255,255,255,.035) 0 2px, transparent 2px 9px, rgba(0,0,0,.05) 9px 11px, transparent 11px 23px),
+    linear-gradient(180deg, var(--walnut-3), var(--walnut) 40%, var(--walnut-2));
+  box-shadow:0 1px 0 rgba(255,255,255,.25) inset, 0 -3px 0 rgba(0,0,0,.25) inset, 0 22px 40px -18px rgba(0,0,0,.55), 0 4px 10px rgba(0,0,0,.18);
+  display:grid; gap:14px;}
+.radio::after{content:""; position:absolute; left:14%; right:14%; bottom:-10px; height:10px; border-radius:0 0 8px 8px; background:linear-gradient(var(--walnut-2), #2c1a0f); z-index:-1;}
+
+/* dial window */
+.dial{position:relative; height:118px; border-radius:12px; background:var(--glass); overflow:hidden;
+  box-shadow:0 0 0 3px var(--brass-2), 0 0 0 4px rgba(0,0,0,.4), inset 0 6px 14px rgba(0,0,0,.8);}
+.dial .lamp{position:absolute; inset:0; background:radial-gradient(90% 120% at 50% 110%, var(--amber) 0%, rgba(255,181,74,.35) 35%, transparent 70%); opacity:.12; transition:opacity .9s ease;}
+.on .dial .lamp{opacity:.42;}
+.dial canvas{position:absolute; left:0; top:0; width:100%; height:64px;}
+.needle{position:absolute; top:8px; height:58px; width:3px; margin-left:-1.5px; background:#E8402E; box-shadow:0 0 6px rgba(232,64,46,.7); border-radius:2px; left:10%; transition:left .9s cubic-bezier(.3,.7,.2,1);}
+.dial .now{position:absolute; left:14px; right:14px; bottom:22px; display:flex; justify-content:space-between; align-items:baseline; gap:10px; color:var(--amber); text-shadow:0 0 8px rgba(255,181,74,.45);}
+.dial .now b{font-weight:700; font-size:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;}
+.dial .now span{font-family:var(--f-num); font-size:13px; white-space:nowrap; font-variant-numeric:tabular-nums;}
+.off .dial .now{color:var(--amber-dim); text-shadow:none;}
+.seek{position:absolute; left:14px; right:14px; bottom:3px; height:24px; cursor:pointer; touch-action:none;}
+.seek::before{content:""; position:absolute; left:0; right:0; top:11px; height:2px; background:rgba(255,181,74,.22); border-radius:2px;}
+.seek i{position:absolute; left:0; top:10px; height:4px; border-radius:2px; background:var(--amber); box-shadow:0 0 6px rgba(255,181,74,.6); width:0;}
+.off .seek i{background:var(--amber-dim); box-shadow:none;}
+
+/* middle: speaker and the eye + volume */
+.mid{display:grid; grid-template-columns:1fr 116px; gap:14px; align-items:stretch;}
+.grille{position:relative; border-radius:10px; min-height:150px; overflow:hidden;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.09) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, var(--cloth), var(--cloth-2));
+  box-shadow:inset 0 0 0 3px var(--walnut-2), inset 0 4px 12px rgba(0,0,0,.35);}
+.grille::before{content:""; position:absolute; inset:14px; border-radius:50%; background:radial-gradient(closest-side, rgba(0,0,0,.08), transparent 70%); transform:scale(var(--thump,1)); transition:transform .08s linear;}
+.badge{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) rotate(-6deg); font-family:var(--f-badge); font-size:clamp(30px, 9vw, 40px); line-height:1.25; white-space:nowrap; padding:0 .35em 0 .25em;   /* room for the script's swashes, so the gradient doesn't clip the last letter */
+  background:linear-gradient(180deg, #FFF3C9, var(--brass) 45%, var(--brass-2)); -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter:drop-shadow(0 1px 0 rgba(0,0,0,.45));}
+.badge small{display:block; font-family:var(--f-ui); font-weight:700; font-size:10px; letter-spacing:.32em; text-align:right; margin-top:2px; -webkit-background-clip:text; background-clip:text;}
+.side{display:grid; grid-template-rows:auto 1fr; gap:10px; justify-items:center; align-items:center;}
+.eye{width:64px; height:64px; border-radius:50%; background:#0d0f0c; box-shadow:0 0 0 4px var(--brass-2), 0 0 0 5px rgba(0,0,0,.4), inset 0 2px 6px rgba(0,0,0,.9);}
+.knob{position:relative; width:84px; height:84px; border-radius:50%; touch-action:none;
+  background:radial-gradient(circle at 35% 30%, #FFF0C4, var(--brass) 38%, var(--brass-2) 100%);
+  box-shadow:0 6px 10px rgba(0,0,0,.45), inset 0 -3px 6px rgba(0,0,0,.35);}
+.knob::before{content:""; position:absolute; inset:9px; border-radius:50%; background:repeating-conic-gradient(rgba(0,0,0,.18) 0 4deg, transparent 4deg 10deg); -webkit-mask:radial-gradient(closest-side, transparent 78%, #000 80%); mask:radial-gradient(closest-side, transparent 78%, #000 80%);}
+.knob i{position:absolute; left:50%; top:8px; width:4px; height:18px; margin-left:-2px; border-radius:2px; background:var(--walnut-2); transform-origin:50% 34px;}
+.knob-l{font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:var(--key); opacity:.8; text-align:center; margin-top:-4px;}
+
+/* bottom: piano keys and the band switch */
+.bot{display:grid; gap:12px;}
+.keys{display:grid; grid-template-columns:1fr 1.4fr 1fr; gap:6px; padding:6px; border-radius:10px; background:#24160C; box-shadow:inset 0 3px 8px rgba(0,0,0,.7);}
+.key{height:54px; border-radius:4px 4px 8px 8px; background:linear-gradient(180deg, var(--key), var(--key-2)); color:#3B2A1C;
+  box-shadow:0 5px 0 #8C7F69, 0 6px 6px rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; gap:8px; font-weight:700; font-size:14px; letter-spacing:.04em; transition:transform .06s, box-shadow .06s;}
+.key svg{width:22px; height:22px; fill:currentColor;}
+.key:active, .key.down{transform:translateY(4px); box-shadow:0 1px 0 #8C7F69, 0 2px 3px rgba(0,0,0,.4);}
+.band{display:grid; gap:4px;}
+.band .track{position:relative; display:grid; grid-template-columns:repeat(4,1fr); height:34px; border-radius:17px; background:#24160C; box-shadow:inset 0 3px 8px rgba(0,0,0,.7);}
+.band .slider{position:absolute; top:3px; bottom:3px; width:calc(25% - 6px); left:3px; border-radius:14px; background:linear-gradient(180deg, #FFF0C4, var(--brass) 50%, var(--brass-2)); box-shadow:0 2px 4px rgba(0,0,0,.5); transition:left .25s cubic-bezier(.3,.7,.2,1);}
+.band button{position:relative; z-index:1; font-size:12px; font-weight:700; color:var(--key); opacity:.75; letter-spacing:.04em;}
+.band button[aria-checked="true"]{color:#3B2A1C; opacity:1;}
+.band .labels{display:grid; grid-template-columns:repeat(4,1fr); text-align:center; font-size:11px; color:var(--key); opacity:.75;}
+
+/* ---------- station card ---------- */
+.card{background:var(--card); border-radius:14px; padding:16px 16px 10px; box-shadow:0 1px 0 var(--rule);}
+.card h2{margin:0; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:700;}
+.card h2 span{letter-spacing:0; text-transform:none; font-weight:400;}
+.list{list-style:none; margin:10px 0 0; padding:0;}
+.st{display:grid; grid-template-columns:64px 1fr auto; gap:12px; align-items:center; width:100%; text-align:left; padding:10px 4px; border-top:1px solid var(--rule); border-radius:0;}
+.list li:first-child .st{border-top:0;}
+.st .fq{font-family:var(--f-num); font-size:15px; font-variant-numeric:tabular-nums; color:var(--muted);}
+.st .t{min-width:0;}
+.st .t b{display:block; font-size:16px;}
+.st .t small{display:block; color:var(--muted); font-size:13px;}
+.st .d{font-family:var(--f-num); font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums;}
+.st[aria-current="true"] .fq, .st[aria-current="true"] b{color:var(--ink);}
+.st[aria-current="true"] .fq::before{content:"● "; color:#E8402E;}
+.foot{font-size:13px; color:var(--muted); text-align:center; margin:0;}
+.toast{position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%); background:var(--ink); color:var(--wall); padding:8px 14px; border-radius:10px; font-size:14px; opacity:0; transition:opacity .3s; pointer-events:none; max-width:calc(100% - 32px);}
+.toast.on{opacity:1;}
+@media (max-width:480px){ .dial .now .nz{display:none;} }
+@media (max-width:380px){ .mid{grid-template-columns:1fr 100px;} .knob{width:74px; height:74px;} .knob i{transform-origin:50% 29px;} }
+@media (prefers-reduced-motion: reduce){ .needle, .band .slider, .dial .lamp{transition:none;} .grille::before{display:none;} }
+</style>
+
+<main class="wrap">
+  <section class="radio off" id="radio" aria-label="Lamplight Radio">
+    <div class="dial">
+      <div class="lamp"></div>
+      <canvas id="scale" width="1000" height="128" aria-hidden="true"></canvas>
+      <div class="needle" id="needle"></div>
+      <div class="now"><b id="nowName">Lamplight Radio</b><span id="nowTime">FM 88–108</span></div>
+      <div class="seek" id="seek" role="slider" tabindex="0" aria-label="Position in song" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="seekBar"></i></div>
+    </div>
+    <div class="mid">
+      <div class="grille" id="grille"><div class="badge">Lamplight<small>RADIO</small></div></div>
+      <div class="side">
+        <canvas class="eye" id="eye" width="128" height="128" aria-hidden="true"></canvas>
+        <div>
+          <div class="knob" id="vol" role="slider" tabindex="0" aria-label="Volume 音量" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60"><i></i></div>
+          <div class="knob-l">Volume</div>
+        </div>
+      </div>
+    </div>
+    <div class="bot">
+      <div class="keys">
+        <button class="key" id="prev" aria-label="Previous song 上一首"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM9.5 12 19 5v14z"/></svg></button>
+        <button class="key" id="play" aria-label="Play 播放"><svg viewBox="0 0 24 24" id="playIco"><path d="M7 5v14l12-7z"/></svg><span id="playTxt">PLAY</span></button>
+        <button class="key" id="next" aria-label="Next song 下一首"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM14.5 12 5 19V5z"/></svg></button>
+      </div>
+      <div class="band" role="radiogroup" aria-label="Play mode 播放模式">
+        <div class="track" id="modes"><span class="slider" id="modeSlider"></span>
+          <button role="radio" data-m="seq" aria-label="Sequential 順序播放">SEQ</button><button role="radio" data-m="shuffle" aria-label="Shuffle 隨機播放">SHUF</button><button role="radio" data-m="one" aria-label="Repeat one 單曲循環">ONE</button><button role="radio" data-m="all" aria-label="Repeat all 全部循環">ALL</button>
+        </div>
+        <div class="labels"><span>順序播放</span><span>隨機播放</span><span>單曲循環</span><span>全部循環</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-label="Stations">
+    <h2>Lamplight Readers · Level 1 <span>第一級</span></h2>
+    <ul class="list" id="list"></ul>
+  </section>
+  <p class="foot">FM synthesis, played live in your browser. 歌曲在瀏覽器裡即時合成播放。</p>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* Lamplight Radio — full-length songs.
+   Notation (same as the Lamplight Readers and the Window Seat game): one token per eighth note.
+   "C4" a note, "C4+E4+G4" a chord, "_" holds the note before, "-" is silence, "|" marks a bar (ignored).
+   A song is a list of sections played in order; every part of a section must be the same length. */
+
+const hold = (ch, n = 8) => [ch].concat(Array(n - 1).fill("_")).join(" ");
+const rest = (n = 8) => Array(n).fill("-").join(" ");
+const bars = list => list.join(" | ");
+const restrike = ch => { const up = ch.split("+").slice(1).join("+"); return `${ch} _ _ _ ${up} _ _ _`; };
+
+/* ---------- 1. Lamplight (C major / F lydian colour, 72 bpm) ---------- */
+const LP = ["F3+A3+C4+E4", "E3+G3+B3+D4", "D3+F3+A3+C4", "C3+E3+G3+B3", "F3+A3+C4+E4", "E3+G3+B3+D4", "D3+F3+A3+E4", "G3+C4+D4+F4"];
+const LP_ep = bars(LP.map(c => hold(c)));
+const LP_epR = bars(LP.map((c, i) => i === 7 ? hold(c) : restrike(c)));
+const LP_bass = "F2 _ _ _ C3 _ _ _ | E2 _ _ _ B2 _ _ _ | D2 _ _ _ A2 _ _ _ | C2 _ _ _ G2 _ _ _ | F2 _ _ _ C3 _ _ _ | E2 _ _ _ B2 _ _ _ | D2 _ _ _ A2 _ _ _ | G2 _ _ _ D3 _ _ _";
+const LP_bass2 = "F2 _ _ _ C3 _ A2 _ | E2 _ _ _ B2 _ G2 _ | D2 _ _ _ A2 _ F2 _ | C2 _ _ _ G2 _ E2 _ | F2 _ _ _ C3 _ A2 _ | E2 _ _ _ B2 _ G2 _ | D2 _ _ _ A2 _ F2 _ | G2 _ _ _ D3 _ G2 _";
+const LP_bell = "- - A5 _ G5 _ E5 _ | - - G5 _ _ _ D5 _ | - - F5 _ E5 _ C5 _ | E5 _ _ _ _ _ - - | - - A5 _ C6 _ A5 _ | G5 _ _ _ E5 _ - - | F5 _ E5 _ D5 _ C5 _ | D5 _ _ _ _ _ - -";
+const LP_bell2 = "- - A5 _ G5 _ E5 _ | - - G5 _ _ _ D5 _ | - - F5 _ E5 _ C5 _ | E5 _ _ _ D5 _ E5 _ | - - A5 _ C6 _ D6 _ | E6 _ _ _ D6 _ B5 _ | A5 _ G5 _ E5 _ D5 _ | C5 _ _ _ _ _ - -";
+const LP_pad = bars(["F3+C4+E4", "E3+B3+D4", "D3+A3+C4", "C3+G3+B3", "F3+C4+E4", "E3+B3+D4", "D3+A3+D4", "G3+C4+F4"].map(c => hold(c)));
+const LP_bridge = ["A2+E3+G3+C4", "D3+F3+A3+C4", "G2+F3+B3+D4", "C3+E3+G3+B3", "A2+E3+G3+C4", "D3+F3+A3+C4", "F3+A3+C4+E4", "G3+C4+D4+F4"];
+
+/* ---------- 2. Rain on Glass (A minor, 66 bpm) ---------- */
+const RG = ["A2+E3+G3+B3+C4", "F2+C3+E3+A3", "C3+G3+B3+E4", "G2+D3+E3+B3", "A2+E3+G3+B3+C4", "F2+C3+E3+A3", "C3+G3+B3+E4", "E3+G#3+B3+D4"];
+const RG_pad = bars(RG.map(c => hold(c)));
+const RG_bell = "E5 A5 B5 C6 B5 A5 E5 C5 | C5 F5 A5 E6 A5 F5 C5 A4 | E5 G5 B5 D6 B5 G5 E5 D5 | D5 G5 B5 E6 B5 G5 D5 B4 | E5 A5 B5 C6 B5 A5 E5 C5 | C5 F5 A5 E6 A5 F5 C5 A4 | E5 G5 B5 D6 B5 G5 E5 D5 | E5 G#5 B5 D6 B5 G#5 E5 D5";
+const RG_bass = "A1 _ _ _ _ _ _ _ | F1 _ _ _ _ _ _ _ | C2 _ _ _ _ _ _ _ | G1 _ _ _ _ _ _ _ | A1 _ _ _ _ _ _ _ | F1 _ _ _ _ _ _ _ | C2 _ _ _ _ _ _ _ | E2 _ _ _ _ _ _ _";
+const RG_mel = "E5 _ _ _ _ _ D5 C5 | C5 _ _ _ _ _ A4 _ | G4 _ _ _ B4 _ C5 _ | D5 _ _ _ _ _ - - | E5 _ _ _ G5 _ A5 _ | A5 _ _ _ G5 _ F5 _ | E5 _ _ _ D5 _ C5 _ | B4 _ _ _ _ _ G#4 _";
+const RG_bridge = ["D3+F3+A3+C4", "A2+E3+G3+C4", "F2+C3+E3+A3", "G2+D3+G3+B3", "D3+F3+A3+C4", "A2+E3+G3+C4", "A#2+F3+A3+D4", "E3+G#3+B3+D4"];
+
+/* ---------- 3. Library Clock (D major, 92 bpm) ---------- */
+const LC_mar = "D4 A4 F#5 A4 C#5 A4 F#5 A4 | B3 F#4 D5 F#4 A4 F#4 D5 F#4 | G3 D4 B4 D4 F#4 D4 B4 D4 | A3 E4 D5 E4 G4 E4 D5 E4 | D4 A4 F#5 A4 C#5 A4 F#5 A4 | B3 F#4 D5 F#4 A4 F#4 D5 F#4 | G3 D4 B4 D4 F#4 D4 B4 D4 | A3 E4 C#5 E4 G4 E4 C#5 E4";
+const LC_bass = "D2 _ _ _ D2 _ A2 _ | B1 _ _ _ B1 _ F#2 _ | G1 _ _ _ G1 _ D2 _ | A1 _ _ _ A1 _ E2 _ | D2 _ _ _ D2 _ A2 _ | B1 _ _ _ B1 _ F#2 _ | G1 _ _ _ G1 _ D2 _ | A1 _ _ _ A1 _ C#2 _";
+const LC_ep = "- - - - F#5 _ E5 _ | D5 _ _ _ - - - - | - - - - B5 _ A5 _ | A5 _ _ _ - - - - | - - - - F#5 _ A5 _ | B5 _ A5 _ F#5 _ - - | - - - - D5 _ E5 _ | C#5 _ _ _ - - - -";
+const LC_ep2 = "F#5 _ A5 _ F#5 _ E5 _ | D5 _ _ _ F#5 _ B5 _ | B5 _ A5 _ G5 _ B5 _ | A5 _ _ _ E5 _ _ _ | F#5 _ A5 _ D6 _ A5 _ | B5 _ A5 _ F#5 _ D5 _ | E5 _ D5 _ B4 _ D5 _ | E5 _ _ _ C#5 _ _ _";
+const LC_spark = bars(["D6 _ _ _ - - - -", rest(), "D6 _ _ _ - - - -", rest(), "F#6 _ _ _ - - - -", rest(), "D6 _ _ _ - - - -", rest()]);
+const LC_marB = bars(["E4 B4 G5 B4 D5 B4 G5 B4", "F#4 C#5 A5 C#5 E5 C#5 A5 C#5", "G4 D5 B5 D5 F#5 D5 B5 D5", "A4 E5 C#6 E5 G5 E5 C#6 E5"].concat(["E4 B4 G5 B4 D5 B4 G5 B4", "F#4 C#5 A5 C#5 E5 C#5 A5 C#5", "G4 D5 B5 D5 F#5 D5 B5 D5", "A4 E5 C#6 E5 G5 E5 C#5 A4"]));
+const LC_bassB = bars(["E2 _ _ _ E2 _ B2 _", "F#2 _ _ _ F#2 _ C#3 _", "G2 _ _ _ G2 _ D3 _", "A2 _ _ _ A2 _ E3 _", "E2 _ _ _ E2 _ B2 _", "F#2 _ _ _ F#2 _ C#3 _", "G2 _ _ _ G2 _ D3 _", "A2 _ _ _ A2 _ E3 _"]);
+const LC_epB = "G5 _ _ _ F#5 _ E5 _ | A5 _ _ _ _ _ - - | B5 _ A5 _ G5 _ F#5 _ | E5 _ _ _ _ _ - - | G5 _ _ _ A5 _ B5 _ | C#6 _ _ _ A5 _ _ _ | D6 _ _ _ B5 _ G5 _ | A5 _ _ _ _ _ C#5 _";
+const LC_padB = bars(["E3+G3+B3+D4", "F#3+A3+C#4+E4", "G3+B3+D4+F#4", "A3+C#4+E4+G4", "E3+G3+B3+D4", "F#3+A3+C#4+E4", "G3+B3+D4+F#4", "A3+C#4+E4+G4"].map(c => hold(c)));
+
+const SONGS = [
+  {id: "lamplight", n: "Lamplight", z: "燈下", inst: "電鋼琴與鐘聲 · electric piano and bells", from: "Lamplight Readers · Level 1",
+   fm: 88.7, bpm: 72, swing: .12, sections: [
+    {name: "intro", parts: [
+      {p: "ep", s: bars([LP[0], LP[1], LP[2], LP[7]].map(c => hold(c))), strum: .04, vel: .8},
+      {p: "bell", s: "- - - - E6 _ _ _ | - - - - D6 _ _ _ | - - - - C6 _ _ _ | - - - - - - - -", vel: .6}]},
+    {name: "verse", parts: [
+      {p: "ep", s: LP_ep, strum: .028}, {p: "bass", s: LP_bass}, {p: "bell", s: LP_bell}]},
+    {name: "verse 2", parts: [
+      {p: "ep", s: LP_epR, strum: .028}, {p: "bass", s: LP_bass2}, {p: "bell", s: LP_bell2}, {p: "pad", s: LP_pad, vel: .7}]},
+    {name: "bridge", parts: [
+      {p: "pad", s: bars(LP_bridge.map(c => hold(c))), vel: .9},
+      {p: "bass", s: "A1 _ _ _ E2 _ _ _ | D2 _ _ _ A2 _ _ _ | G1 _ _ _ D2 _ _ _ | C2 _ _ _ G2 _ _ _ | A1 _ _ _ E2 _ _ _ | D2 _ _ _ A2 _ _ _ | F2 _ _ _ C3 _ _ _ | G2 _ _ _ D3 _ _ _"},
+      {p: "ep", s: "E5 _ _ _ D5 _ C5 _ | D5 _ _ _ _ _ A4 _ | B4 _ C5 _ D5 _ F5 _ | E5 _ _ _ _ _ - - | E5 _ _ _ G5 _ A5 _ | F5 _ _ _ E5 _ D5 _ | C5 _ _ _ A4 _ C5 _ | D5 _ _ _ _ _ - -", vel: .75},
+      {p: "bell", s: "- - - - - - - - | - - - - C6 _ A5 _ | - - - - - - - - | - - - - G5 _ B5 _ | - - - - - - - - | - - - - A5 _ F5 _ | - - - - - - - - | - - - - C6 _ _ _", vel: .7}]},
+    {name: "verse 3", parts: [
+      {p: "ep", s: LP_epR, strum: .028}, {p: "bass", s: LP_bass2}, {p: "bell", s: LP_bell}, {p: "pad", s: LP_pad, vel: .7}]},
+    {name: "verse 4", parts: [
+      {p: "ep", s: LP_epR, strum: .028}, {p: "bass", s: LP_bass2}, {p: "bell", s: LP_bell2}, {p: "pad", s: LP_pad, vel: .7}]},
+    {name: "outro", parts: [
+      {p: "ep", s: bars([LP[0], LP[1], LP[2], LP[3]].map(c => hold(c))) + " | " + hold("F3+A3+C4+E4+G4", 16), strum: .04},
+      {p: "bass", s: "F2 _ _ _ C3 _ _ _ | E2 _ _ _ B2 _ _ _ | D2 _ _ _ A2 _ _ _ | C2 _ _ _ G2 _ _ _ | " + hold("F2", 16)},
+      {p: "bell", s: "- - A5 _ G5 _ E5 _ | - - G5 _ _ _ D5 _ | - - F5 _ E5 _ C5 _ | E5 _ _ _ _ _ - - | - - - - C6 _ _ _ | - - - - - - - -", vel: .8}]}
+  ]},
+
+  {id: "rain", n: "Rain on Glass", z: "窗上的雨", inst: "鋪底與鐘聲琶音 · pad and bell arpeggios", from: "Lamplight Readers · Level 1",
+   fm: 93.1, bpm: 66, swing: 0, sections: [
+    {name: "intro", parts: [
+      {p: "pad", s: bars([RG[0], RG[1], RG[2], RG[7]].map(c => hold(c)))},
+      {p: "bell", s: "- - - - - - B5 _ | - - - - - - A5 _ | - - - - - - G5 _ | - - - - - - G#5 _", vel: .5}]},
+    {name: "verse", parts: [
+      {p: "pad", s: RG_pad}, {p: "bell", s: RG_bell, vel: .55}, {p: "bass", s: RG_bass, vel: .8}]},
+    {name: "verse 2", parts: [
+      {p: "pad", s: RG_pad}, {p: "bell", s: RG_bell, vel: .45}, {p: "bass", s: RG_bass, vel: .8}, {p: "ep", s: RG_mel, vel: .6}]},
+    {name: "bridge", parts: [
+      {p: "pad", s: bars(RG_bridge.map(c => hold(c)))},
+      {p: "bell", s: "D5 _ A5 _ E6 _ A5 _ | C5 _ G5 _ E6 _ G5 _ | C5 _ A5 _ E6 _ A5 _ | B4 _ G5 _ D6 _ G5 _ | D5 _ A5 _ E6 _ A5 _ | C5 _ G5 _ E6 _ G5 _ | D5 _ A5 _ F6 _ A5 _ | B4 _ G#5 _ D6 _ G#5 _", vel: .5},
+      {p: "bass", s: "D2 _ _ _ _ _ _ _ | A1 _ _ _ _ _ _ _ | F1 _ _ _ _ _ _ _ | G1 _ _ _ _ _ _ _ | D2 _ _ _ _ _ _ _ | A1 _ _ _ _ _ _ _ | A#1 _ _ _ _ _ _ _ | E2 _ _ _ _ _ _ _", vel: .8},
+      {p: "ep", s: "F5 _ _ _ E5 _ D5 _ | C5 _ _ _ _ _ - - | A4 _ _ _ C5 _ E5 _ | D5 _ _ _ _ _ - - | F5 _ _ _ A5 _ G5 _ | E5 _ _ _ _ _ C5 _ | D5 _ _ _ F5 _ _ _ | E5 _ _ _ _ _ - -", vel: .6}]},
+    {name: "verse 3", parts: [
+      {p: "pad", s: RG_pad}, {p: "bell", s: RG_bell, vel: .45}, {p: "bass", s: RG_bass, vel: .8}, {p: "ep", s: RG_mel, vel: .6}]},
+    {name: "verse 4", parts: [
+      {p: "pad", s: RG_pad}, {p: "bell", s: RG_bell, vel: .5}, {p: "bass", s: RG_bass, vel: .7}]},
+    {name: "outro", parts: [
+      {p: "pad", s: bars([RG[0], RG[1], RG[2], RG[3]].map(c => hold(c))) + " | " + hold("A2+E3+G3+B3+C4", 16)},
+      {p: "bell", s: "E5 A5 B5 C6 B5 A5 E5 C5 | C5 F5 A5 E6 A5 F5 C5 A4 | - - - - G5 _ _ _ | - - - - D6 _ _ _ | E6 _ _ _ _ _ _ _ | - - - - - - - -", vel: .5},
+      {p: "bass", s: "A1 _ _ _ _ _ _ _ | F1 _ _ _ _ _ _ _ | C2 _ _ _ _ _ _ _ | G1 _ _ _ _ _ _ _ | " + hold("A1", 16), vel: .8}]}
+  ]},
+
+  {id: "clock", n: "Library Clock", z: "圖書館的時鐘", inst: "木琴 · marimba", from: "Lamplight Readers · Level 1",
+   fm: 97.5, bpm: 92, swing: .1, sections: [
+    {name: "intro", parts: [
+      {p: "mar", s: "D4 A4 D5 A4 D4 A4 D5 A4 | B3 F#4 D5 F#4 B3 F#4 D5 F#4 | G3 D4 B4 D4 G3 D4 B4 D4 | A3 E4 C#5 E4 A3 E4 C#5 E4", vel: .85},
+      {p: "pad", s: "D3+F#3+A3 _ _ _ _ _ _ _ | B2+D3+F#3 _ _ _ _ _ _ _ | G2+B2+D3 _ _ _ _ _ _ _ | A2+C#3+E3 _ _ _ _ _ _ _", vel: .6}]},
+    {name: "verse", parts: [
+      {p: "mar", s: LC_mar, vel: .8}, {p: "bass", s: LC_bass}, {p: "ep", s: LC_ep, vel: .7}]},
+    {name: "verse 2", parts: [
+      {p: "mar", s: LC_mar, vel: .7}, {p: "bass", s: LC_bass}, {p: "ep", s: LC_ep2, vel: .7}, {p: "bell", s: LC_spark, vel: .5}]},
+    {name: "bridge", parts: [
+      {p: "mar", s: LC_marB, vel: .65}, {p: "bass", s: LC_bassB}, {p: "ep", s: LC_epB, vel: .7}]},
+    {name: "verse 3", parts: [
+      {p: "mar", s: LC_mar, vel: .8}, {p: "bass", s: LC_bass}, {p: "ep", s: LC_ep, vel: .7}, {p: "bell", s: LC_spark, vel: .5}]},
+    {name: "verse 4", parts: [
+      {p: "mar", s: LC_mar, vel: .7}, {p: "bass", s: LC_bass}, {p: "ep", s: LC_ep2, vel: .7}]},
+    {name: "bridge 2", parts: [
+      {p: "mar", s: LC_marB, vel: .6}, {p: "bass", s: LC_bassB}, {p: "ep", s: LC_epB, vel: .7}, {p: "pad", s: LC_padB, vel: .6}]},
+    {name: "verse 5", parts: [
+      {p: "mar", s: LC_mar, vel: .8}, {p: "bass", s: LC_bass}, {p: "ep", s: LC_ep2, vel: .7}, {p: "bell", s: LC_spark, vel: .5}]},
+    {name: "outro", parts: [
+      {p: "mar", s: "D4 A4 F#5 A4 C#5 A4 F#5 A4 | G3 D4 B4 D4 F#4 D4 B4 D4 | A3 E4 C#5 E4 G4 E4 C#5 E4 | D4 A4 D5 _ _ _ _ _ | A4 _ D5 _ A4 _ D5 _ | D5 _ _ _ _ _ - -", vel: .75},
+      {p: "bass", s: "D2 _ _ _ D2 _ A2 _ | G1 _ _ _ G1 _ D2 _ | A1 _ _ _ A1 _ E2 _ | D2 _ _ _ _ _ _ _ | - - - - - - - - | - - - - - - - -"},
+      {p: "ep", s: "- - - - F#5 _ E5 _ | D5 _ _ _ - - - - | - - - - E5 _ C#5 _ | D5 _ _ _ _ _ _ _ | - - - - - - - - | - - - - - - - -", vel: .7},
+      {p: "bell", s: "- - - - - - - - | - - - - - - - - | - - - - - - - - | - - - - - - - - | - - - - - - - - | D6 _ _ _ _ _ _ _", vel: .6}]}
+  ]}
+];
+if (typeof module !== "undefined") module.exports = {SONGS};
+
+</script>
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const store = { get(k, d){ try{ const v = localStorage.getItem("lr:"+k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+                set(k, v){ try{ localStorage.setItem("lr:"+k, JSON.stringify(v)); }catch(e){} } };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const mmss = s => { s = Math.max(0, Math.floor(s)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; };
+let toastT = 0; function toast(t){ const el = $("#toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(()=>el.classList.remove("on"), 2600); }
+
+/* ---------- songs: flatten sections into one timeline of note events ---------- */
+const midi = n => { const m = /^([A-G])(#?)(\d)$/.exec(n); return 12*(+m[3]+1) + {C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]] + (m[2] ? 1 : 0); };
+const TAIL = 3.4;   /* seconds of ring-out after the last step */
+SONGS.forEach(s => {
+  s.ev = []; let off = 0;
+  s.sections.forEach(sec => {
+    let len = 0;
+    sec.parts.forEach(pt => {
+      const t = pt.s.split(/\s+/).filter(z => z && z !== "|"); let last = null; len = t.length;
+      t.forEach((k, i) => {
+        if(k === "-"){ last = null; return; }
+        if(k === "_"){ if(last) last.len++; return; }
+        last = {ms:k.split("+").map(midi), len:1, p:pt.p, vel:pt.vel || 1, strum:pt.strum || 0};
+        (s.ev[off + i] = s.ev[off + i] || []).push(last);
+      });
+    });
+    off += len;
+  });
+  s.steps = off; s.sd = 60 / s.bpm / 2; s.dur = s.steps * s.sd + TAIL;
+});
+
+/* ---------- the FM engine (the same voices as the Lamplight Readers) ---------- */
+const P = {
+  ep:   {mods:[{r:1,i:1.6,d:.9},{r:14,i:.5,d:.07}], a:.004, dec:2.2, sus:0, g:.16, lp:3200},
+  bell: {mods:[{r:3.5,i:2.6,d:1.6}], a:.002, dec:2.6, sus:0, g:.10, lp:6000},
+  bass: {mods:[{r:1,i:2.2,d:.22}], a:.005, dec:.9, sus:.35, g:.24, lp:900},
+  pad:  {mods:[{r:2,i:.7,d:9}], a:.9, dec:4, sus:.8, g:.07, lp:2400, det:6},
+  mar:  {mods:[{r:4,i:2.4,d:.09}], a:.002, dec:.55, sus:0, g:.13, lp:4200}
+};
+const hz = m => 440 * Math.pow(2, (m - 69) / 12);
+let ctx = null, master, bus, an, songGain = null, keeper = null;
+function silentWav(){
+  const n = 4000, buf = new ArrayBuffer(44+n), v = new DataView(buf), w = (o,s)=>{ for(let i=0;i<s.length;i++) v.setUint8(o+i, s.charCodeAt(i)); };
+  w(0,"RIFF"); v.setUint32(4,36+n,true); w(8,"WAVE"); w(12,"fmt "); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+  v.setUint32(24,8000,true); v.setUint32(28,8000,true); v.setUint16(32,1,true); v.setUint16(34,8,true); w(36,"data"); v.setUint32(40,n,true);
+  for(let i=0;i<n;i++) v.setUint8(44+i,128);
+  let s = ""; new Uint8Array(buf).forEach(b => s += String.fromCharCode(b)); return "data:audio/wav;base64," + btoa(s);
+}
+/* iOS: play through the silent switch, and keep the audio session alive */
+function unlockIOS(){
+  try{ if(navigator.audioSession) navigator.audioSession.type = "playback"; }catch(e){}
+  try{ if(!keeper){ keeper = new Audio(silentWav()); keeper.loop = true; keeper.setAttribute("playsinline",""); keeper.volume = .01; }
+    const pr = keeper.play(); if(pr && pr.catch) pr.catch(()=>{}); }catch(e){}
+}
+function impulse(sec){ const n = ctx.sampleRate*sec, b = ctx.createBuffer(2, n, ctx.sampleRate);
+  for(let c=0;c<2;c++){ const ch = b.getChannelData(c); for(let i=0;i<n;i++) ch[i] = (Math.random()*2-1) * Math.pow(1-i/n, 3.2); } return b; }
+function init(){
+  const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return false;
+  ctx = new AC(); master = ctx.createGain(); bus = ctx.createGain(); an = ctx.createAnalyser(); an.fftSize = 512;
+  const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 3;
+  const rev = ctx.createConvolver(); rev.buffer = impulse(3); const rg = ctx.createGain(); rg.gain.value = .32;
+  const dly = ctx.createDelay(1); dly.delayTime.value = .42; const fb = ctx.createGain(); fb.gain.value = .28;
+  const dlp = ctx.createBiquadFilter(); dlp.type = "lowpass"; dlp.frequency.value = 1800; const dg = ctx.createGain(); dg.gain.value = .18;
+  bus.connect(comp); bus.connect(rev); rev.connect(rg); rg.connect(comp);
+  bus.connect(dly); dly.connect(dlp); dlp.connect(fb); fb.connect(dly); dlp.connect(dg); dg.connect(comp);
+  comp.connect(master); master.connect(an); an.connect(ctx.destination); master.gain.value = vol * vol;
+  return true;
+}
+function voice(dest, t, m, dur, p, vel){
+  const f = hz(m), amp = ctx.createGain(), lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = p.lp;
+  const carriers = [f]; if(p.det) carriers.push(f * Math.pow(2, p.det/1200));
+  const stopAt = t + Math.max(p.a, dur) + (p.sus ? 3.2 : p.dec + .4);   /* long enough for the release to reach silence: no click */
+  carriers.forEach(cf => {
+    const c = ctx.createOscillator(); c.frequency.value = cf;
+    p.mods.forEach(md => { const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = cf*md.r;
+      const idx = cf*md.i; g.gain.setValueAtTime(idx, t); g.gain.setTargetAtTime(idx*.15, t+.005, md.d/3);
+      o.connect(g); g.connect(c.frequency); o.start(t); o.stop(stopAt); });
+    c.connect(lp); c.start(t); c.stop(stopAt);
+  });
+  const pk = p.g * (vel || 1) / carriers.length;
+  amp.gain.setValueAtTime(0, t); amp.gain.linearRampToValueAtTime(pk, t + p.a);
+  amp.gain.setTargetAtTime(pk * p.sus, t + p.a, p.dec/3);
+  amp.gain.setTargetAtTime(0, t + Math.max(p.a, dur), p.sus ? .5 : .25);
+  lp.connect(amp); amp.connect(dest);
+}
+/* a short burst of FM static between stations */
+function staticBurst(){
+  const n = Math.floor(ctx.sampleRate * .45), b = ctx.createBuffer(1, n, ctx.sampleRate), d = b.getChannelData(0);
+  for(let i=0;i<n;i++) d[i] = (Math.random()*2-1) * (1 - i/n);
+  const src = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), g = ctx.createGain();
+  src.buffer = b; bp.type = "bandpass"; bp.frequency.value = 2600; bp.Q.value = .7; g.gain.value = .05;
+  src.connect(bp); bp.connect(g); g.connect(master); src.start(); noise = src;
+}
+let noise = null;
+
+/* ---------- the player ---------- */
+let cur = store.get("cur", 0), mode = store.get("mode", "all"), vol = store.get("vol", .6);
+if(!(cur >= 0 && cur < SONGS.length)) cur = 0;
+let playing = false, step = 0, nextT = 0, t0 = 0, endAt = 0, timer = null, history = [];
+const song = () => SONGS[cur];
+
+function tick(){
+  if(!playing) return;
+  const s = song(), ahead = document.hidden ? 40 : .3;
+  /* the timer stalled (a locked phone, a busy page): skip the missed notes instead of playing them all at once */
+  if(step < s.steps && nextT < ctx.currentTime - .05){ step = Math.min(s.steps, Math.ceil((ctx.currentTime - t0) / s.sd)); nextT = t0 + step * s.sd; }
+  while(step < s.steps && nextT < ctx.currentTime + ahead){
+    const sw = step % 2 ? s.sd * s.swing : 0, evs = s.ev[step];
+    if(evs) evs.forEach(e => e.ms.forEach((m,k) => voice(songGain, nextT + sw + e.strum*k, m, e.len*s.sd*.96, P[e.p], e.vel)));
+    nextT += s.sd; step++;
+  }
+  if(step >= s.steps && !endAt) endAt = nextT + TAIL;
+  if(endAt && ctx.currentTime >= endAt) finished();
+}
+function start(i, at){
+  if(!ctx && !init()){ toast("This browser can't play the radio. 這個瀏覽器無法播放。"); return; }
+  unlockIOS();
+  const r = ctx.resume(); if(r && r.catch) r.catch(()=>{});
+  const changed = i !== cur || !playing;
+  if(songGain){ const g = songGain; g.gain.setTargetAtTime(0, ctx.currentTime, .06); setTimeout(()=>g.disconnect(), 600); }
+  if(i !== cur && playing) staticBurst();
+  if(i !== cur) history = history.filter(h => h !== i);
+  cur = i; store.set("cur", cur);
+  songGain = ctx.createGain(); songGain.connect(bus);
+  const s = song(); step = Math.min(s.steps, Math.max(0, Math.floor((at || 0) / s.sd)));
+  nextT = ctx.currentTime + (changed ? .35 : .08); t0 = nextT - step * s.sd; endAt = 0;
+  if(step >= s.steps) endAt = nextT + Math.max(.3, s.dur - (at || 0));   /* resumed in the ring-out: finish it, don't add a second one */
+  playing = true; clearInterval(timer); timer = setInterval(tick, 40); tick();
+  setTimeout(()=>{ if(playing && ctx.state !== "running") toast("Tap ▶ again, and check the phone isn't on silent. 再按一次播放，並確認手機沒有開靜音。"); }, 800);
+  ui(); media();
+}
+function pause(){
+  if(!playing) return;
+  playing = false; clearInterval(timer);
+  pausedAt = Math.max(0, ctx.currentTime - t0);
+  if(songGain){ const g = songGain; g.gain.setTargetAtTime(0, ctx.currentTime, .05); setTimeout(()=>g.disconnect(), 500); songGain = null; }
+  if(noise){ try{ noise.stop(); }catch(e){} noise = null; }
+  if(keeper) keeper.pause();
+  ui(); media();
+}
+let pausedAt = 0;
+function toggle(){ if(playing) pause(); else start(cur, pausedAt); }
+function pickNext(dir){
+  const n = SONGS.length;
+  if(mode === "shuffle" && dir > 0){ if(n < 2) return cur; let j; do{ j = Math.floor(Math.random()*n); }while(j === cur); return j; }
+  if(mode === "shuffle" && dir < 0){ while(history.length){ const h = history.pop(); if(h !== cur) return h; } }
+  return (cur + dir + n) % n;
+}
+function go(dir){
+  const j = pickNext(dir); if(dir > 0) history.push(cur);
+  pausedAt = 0;
+  if(playing) start(j, 0); else { cur = j; store.set("cur", cur); ui(); media(); }
+}
+function finished(){
+  const n = SONGS.length; pausedAt = 0;
+  if(mode === "one") return start(cur, 0);
+  if(mode === "seq" && cur === n - 1){ playing = false; clearInterval(timer); cur = 0; store.set("cur", 0); if(keeper) keeper.pause(); ui(); media(); return; }
+  history.push(cur); start(pickNext(1), 0);
+}
+function elapsed(){ if(!ctx) return pausedAt; return playing ? Math.min(song().dur, Math.max(0, ctx.currentTime - t0)) : pausedAt; }
+function seekTo(frac){
+  const s = song(), at = Math.min(s.steps * s.sd - .01, Math.max(0, frac) * s.dur);
+  if(playing) start(cur, at); else { pausedAt = at; ui(); media(); }
+}
+
+/* ---------- drawing ---------- */
+const FM_LO = 87.5, FM_HI = 108.5, fmX = f => (f - FM_LO) / (FM_HI - FM_LO);
+function drawScale(){
+  const cv = $("#scale"), w = cv.clientWidth || 300, h = 64, dpr = Math.min(3, window.devicePixelRatio || 1);
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const g = cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
+  const pad = 14, x = f => pad + fmX(f) * (w - pad*2), lit = playing;
+  g.strokeStyle = lit ? "rgba(255,206,140,.85)" : "rgba(160,130,90,.6)"; g.fillStyle = g.strokeStyle; g.lineWidth = 1;
+  for(let f = 88; f <= 108; f += .5){ const big = f % 2 === 0, X = Math.round(x(f)) + .5; g.beginPath(); g.moveTo(X, 14); g.lineTo(X, big ? 30 : 22); g.stroke(); }
+  g.font = `600 ${w < 360 ? 10 : 12}px "Atkinson Hyperlegible Mono", ui-monospace, monospace`; g.textAlign = "center"; g.textBaseline = "top";
+  for(let f = 88; f <= 108; f += 4) g.fillText(String(f), x(f), 34);
+  g.textAlign = "left"; g.fillText("FM", 6, 2); g.textAlign = "right"; g.fillText("MHz", w - 6, 2);
+  SONGS.forEach((s,i) => { g.beginPath(); g.arc(x(s.fm), 52, i === cur ? 3.2 : 2.2, 0, Math.PI*2); g.fillStyle = i === cur && lit ? "#E8402E" : g.strokeStyle; g.fill(); g.fillStyle = g.strokeStyle; });
+  const nd = $("#needle"); nd.style.left = (x(song().fm) / w * 100) + "%";
+}
+function drawEye(level){
+  const cv = $("#eye"), g = cv.getContext("2d"), r = 64; g.clearRect(0,0,128,128);
+  const open = Math.PI * (playing ? (.62 - Math.min(.55, level * 3.2)) : .9);   /* the dark wedge closes as the sound gets louder */
+  const grad = g.createRadialGradient(r, r, 8, r, r, 60); grad.addColorStop(0, playing ? "#B9FFD6" : "#2A4A35"); grad.addColorStop(1, playing ? "#2FBF6C" : "#16301F");
+  g.fillStyle = grad; g.beginPath(); g.moveTo(r, r); g.arc(r, r, 58, -Math.PI/2 + open/2, -Math.PI/2 - open/2 + Math.PI*2); g.closePath(); g.fill();
+  g.fillStyle = "#0d0f0c"; g.beginPath(); g.arc(r, r, 16, 0, Math.PI*2); g.fill();
+}
+let lastSec = -1, raf = 0; const buf = new Uint8Array(512);
+function frame(){
+  let lvl = 0;
+  if(an && playing){ an.getByteTimeDomainData(buf); let s = 0; for(let i=0;i<buf.length;i++){ const v = (buf[i]-128)/128; s += v*v; } lvl = Math.sqrt(s/buf.length); }
+  drawEye(lvl);
+  $("#grille").style.setProperty("--thump", 1 + Math.min(.04, lvl * .25));
+  const s = song(), e = elapsed();
+  $("#nowTime").textContent = `${mmss(e)} / ${mmss(s.dur)}`;
+  $("#seekBar").style.width = (Math.min(1, e / s.dur) * 100) + "%";
+  const sec = Math.floor(e); if(sec !== lastSec){ lastSec = sec; const sk = $("#seek"); sk.setAttribute("aria-valuenow", Math.round(e / s.dur * 100)); sk.setAttribute("aria-valuetext", `${mmss(e)} of ${mmss(s.dur)}`); }
+  raf = requestAnimationFrame(frame);
+}
+
+/* ---------- UI ---------- */
+function ui(){
+  $("#radio").classList.toggle("on", playing); $("#radio").classList.toggle("off", !playing);
+  const s = song();
+  $("#nowName").innerHTML = `${esc(s.n)}<span class="nz"> · ${esc(s.z)}</span>`;
+  $("#playIco").innerHTML = playing ? '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>' : '<path d="M7 5v14l12-7z"/>';
+  $("#playTxt").textContent = playing ? "PAUSE" : "PLAY"; $("#play").setAttribute("aria-label", playing ? "Pause 暫停" : "Play 播放");
+  $$(".st").forEach((b,i) => b.setAttribute("aria-current", i === cur ? "true" : "false"));
+  const mi = ["seq","shuffle","one","all"].indexOf(mode);
+  $("#modeSlider").style.left = `calc(${mi * 25}% + 3px)`;
+  $$("#modes button").forEach(b => { const on = b.dataset.m === mode; b.setAttribute("aria-checked", on ? "true" : "false"); b.tabIndex = on ? 0 : -1; });
+  drawScale();
+}
+function setVol(v){ vol = Math.max(0, Math.min(1, v)); store.set("vol", vol); if(master) master.gain.setTargetAtTime(vol*vol, ctx.currentTime, .05);
+  $("#vol i").style.transform = `rotate(${-135 + vol*270}deg)`; $("#vol").setAttribute("aria-valuenow", Math.round(vol*100)); $("#vol").setAttribute("aria-valuetext", `${Math.round(vol*100)}%`); }
+function media(){
+  if(!("mediaSession" in navigator)) return;
+  try{ const s = song(); navigator.mediaSession.metadata = new MediaMetadata({title:s.n, artist:"Lamplight Radio", album:s.from});
+    navigator.mediaSession.playbackState = playing ? "playing" : "paused";
+    if(navigator.mediaSession.setPositionState) navigator.mediaSession.setPositionState({duration:s.dur, position:Math.min(s.dur, elapsed()), playbackRate:1}); }catch(e){}
+}
+try{ if("mediaSession" in navigator){
+  navigator.mediaSession.setActionHandler("play", ()=>{ if(!playing) toggle(); });
+  navigator.mediaSession.setActionHandler("pause", ()=>{ if(playing) toggle(); });
+  navigator.mediaSession.setActionHandler("nexttrack", ()=>go(1));
+  navigator.mediaSession.setActionHandler("previoustrack", ()=>prev());
+  navigator.mediaSession.setActionHandler("seekto", d => { if(d && d.seekTime != null) seekTo(d.seekTime / song().dur); });
+} }catch(e){}
+
+$("#list").innerHTML = SONGS.map((s,i) => `<li><button class="st" data-i="${i}"><span class="fq">${s.fm.toFixed(1)}</span>
+  <span class="t"><b>${esc(s.n)} <span style="font-weight:400">${esc(s.z)}</span></b><small>${esc(s.inst)}</small></span><span class="d">${mmss(s.dur)}</span></button></li>`).join("");
+$("#list").onclick = e => { const b = e.target.closest(".st"); if(!b) return; const i = +b.dataset.i;
+  if(i === cur) return toggle(); history.push(cur); pausedAt = 0; start(i, 0); };
+$("#play").onclick = toggle;
+/* Previous: back to the start of this song first, as on any player */
+function prev(){ if(elapsed() > 4){ if(playing) return start(cur, 0); pausedAt = 0; return ui(); } go(-1); }
+$("#prev").onclick = prev;
+$("#next").onclick = () => go(1);
+function setMode(m){ mode = m; history = []; store.set("mode", mode); ui(); }
+$("#modes").addEventListener("keydown", e => { const d = {ArrowRight:1, ArrowDown:1, ArrowLeft:-1, ArrowUp:-1}[e.key]; if(!d) return; e.preventDefault();
+  const ms = ["seq","shuffle","one","all"], m = ms[(ms.indexOf(mode) + d + 4) % 4]; setMode(m); $(`#modes [data-m="${m}"]`).focus(); });
+$("#modes").onclick = e => { const b = e.target.closest("button"); if(!b) return; setMode(b.dataset.m);
+  toast({seq:"Sequential 順序播放", shuffle:"Shuffle 隨機播放", one:"Repeat one 單曲循環", all:"Repeat all 全部循環"}[mode]); };
+
+/* volume knob: turn it clockwise or counterclockwise around its centre; scrolling and the arrow keys work too */
+(()=>{ const k = $("#vol"); let last = null;
+  const ang = e => { const r = k.getBoundingClientRect(); return Math.atan2(e.clientY - (r.top + r.height/2), e.clientX - (r.left + r.width/2)) * 180 / Math.PI; };
+  k.addEventListener("pointerdown", e => { e.preventDefault(); last = ang(e); k.setPointerCapture(e.pointerId); });
+  k.addEventListener("pointermove", e => { if(last === null) return; const a = ang(e); let d = a - last; if(d > 180) d -= 360; if(d < -180) d += 360; last = a; setVol(vol + d / 270); });
+  ["pointerup","pointercancel"].forEach(t => k.addEventListener(t, () => { last = null; }));
+  k.addEventListener("wheel", e => { e.preventDefault(); setVol(vol - e.deltaY / 800); }, {passive:false});
+  k.addEventListener("keydown", e => { if(e.key === "Home"){ e.preventDefault(); return setVol(0); } if(e.key === "End"){ e.preventDefault(); return setVol(1); }
+    const d = {ArrowUp:.05, ArrowRight:.05, ArrowDown:-.05, ArrowLeft:-.05, PageUp:.2, PageDown:-.2}[e.key]; if(d){ e.preventDefault(); setVol(vol + d); } });
+})();
+/* seek along the dial's bottom line */
+(()=>{ const sk = $("#seek"); let on = false;
+  const at = e => { const r = sk.getBoundingClientRect(); return (e.clientX - r.left) / r.width; };
+  sk.addEventListener("pointerdown", e => { on = true; sk.setPointerCapture(e.pointerId); });
+  sk.addEventListener("pointerup", e => { if(on) seekTo(at(e)); on = false; });
+  sk.addEventListener("pointercancel", () => { on = false; });
+  sk.addEventListener("keydown", e => { const s = song();
+    if(e.key === "Home"){ e.preventDefault(); return seekTo(0); } if(e.key === "End"){ e.preventDefault(); return seekTo(.97); }
+    const d = {ArrowRight:10, ArrowLeft:-10, PageUp:30, PageDown:-30}[e.key]; if(d){ e.preventDefault(); seekTo((elapsed() + d) / s.dur); } });
+})();
+["touchend","click"].forEach(t => document.addEventListener(t, () => { if(ctx && playing && ctx.state !== "running"){ unlockIOS(); ctx.resume(); } }, true));
+/* back from the background: carry on from where the clock is */
+document.addEventListener("visibilitychange", () => { if(!document.hidden && ctx && playing){ ctx.resume(); tick(); } });
+addEventListener("resize", drawScale);
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(drawScale);
+
+setVol(vol); ui(); frame();
+</script>
+</body></html>
