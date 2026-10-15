@@ -174,8 +174,18 @@ body.sheet-on #plan{padding-bottom:58vh;}
 #modal .choices{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
 #trip .btn{white-space:normal;}
 #modal .choices .btn,.choices .btn{width:100%;text-align:left;justify-content:flex-start;white-space:normal;flex-wrap:wrap;}
-.diary{font-family:var(--f-disp);font-size:18px;line-height:28px;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:14px 16px;background-image:repeating-linear-gradient(to bottom,transparent 0 21px,var(--rule) 21px 22px,transparent 22px 28px);background-origin:content-box;}   /* each line of text sits on a rule: 28px lines, the rule just under the baseline */
+.diary{font-family:var(--f-disp);font-size:18px;line-height:28px;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:14px 16px;background-image:repeating-linear-gradient(to bottom,transparent 0 21px,var(--rule) 21px 22px,transparent 22px 28px),linear-gradient(var(--surface),var(--surface));background-origin:content-box,border-box;background-clip:content-box,border-box;}   /* each line of text sits on a rule: 28px lines, the rule just under the baseline */
 .diary p{margin:0;}
+.de+.de{margin-top:28px;}
+.de::after{content:"";display:block;clear:both;}
+.de .dd{color:var(--muted);font-size:15px;height:28px;display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.de .dpic{float:right;width:48px;height:48px;margin:0 0 0 10px;border-radius:8px;}
+.dtools{display:inline-flex;gap:4px;align-items:center;}
+.dtools .ib{width:24px;height:24px;}
+.dtools .zhb{line-height:20px;}
+.dnav{display:flex;align-items:center;justify-content:space-between;margin:4px 0 12px;}
+.dnav b{font-family:var(--f-disp);font-size:20px;}
+.dnav .btn[disabled]{opacity:.35;}
 
 /* glossary words */
 .g{border-bottom:2px dotted var(--accent);cursor:pointer;}
@@ -254,7 +264,7 @@ textarea{width:100%;min-height:80px;font:13px ui-monospace,monospace;border-radi
 /* ==== engine/i18n.js ==== */
 /* UI strings: Chinese first, English on the toggle. Story text stays in English. */
 const UI = {
-  start:{zh:"開始新遊戲", en:"New game"}, cont:{zh:"繼續", en:"Continue"}, music:{zh:"音樂", en:"Music"},
+  start:{zh:"開始新遊戲", en:"New game"}, music:{zh:"音樂", en:"Music"},
   langBtn:{zh:"English", en:"中文"}, kicker:{zh:"INKQUEST · 遊戲版 · 第一階段", en:"INKQUEST · THE GAME · STAGE 1"},
   titleZh:{zh:"靠窗的位子：遊戲版", en:"靠窗的位子：遊戲版"},
   blurb:{zh:"幫 Mia 規劃台北的每一天：上課、打工、和朋友出去，或是搭火車去冒險。第一階段：2026 年 7 月到 2027 年 1 月（製作中）。", en:"Plan Mia's days in Taipei: classes, work, friends, or a train trip south. Stage 1 runs from July 2026 to January 2027 (still being built)."},
@@ -289,6 +299,11 @@ const UI = {
   langSet:{zh:"選單語言", en:"Menu language"}, musicSet:{zh:"音樂", en:"Music"}, themeSet:{zh:"外觀", en:"Theme"},
   saveCode:{zh:"存檔代碼", en:"Save code"}, saveHelp:{zh:"複製這段代碼，就能在別的裝置繼續玩。", en:"Copy this code to continue on another device."},
   load:{zh:"讀取代碼", en:"Load code"}, loaded:{zh:"讀取成功！", en:"Loaded!"}, badCode:{zh:"代碼不正確", en:"That code doesn't work"},
+  diaryBtn:{zh:"日記", en:"Diary"}, diaryEmpty:{zh:"日記還是空白的。", en:"The diary is still empty."}, cont:{zh:"繼續", en:"Continue"},
+  monthEnd:{zh:"月底", en:"End of"}, prevM:{zh:"上個月", en:"Previous month"}, nextM:{zh:"下個月", en:"Next month"},
+  saveFile:{zh:"存檔", en:"Save file"}, saveFileHelp:{zh:"把存檔下載成一個檔案，之後可以用它在任何裝置繼續玩。", en:"Download your game as a file. Load it later, on any device, to carry on."},
+  dlSave:{zh:"下載存檔", en:"Download save"}, loadFile:{zh:"讀取存檔檔案", en:"Load a save file"}, badFile:{zh:"這個檔案不是存檔", en:"That file isn't a save"},
+  dlFail:{zh:"無法下載，請改用下方的存檔代碼。", en:"The download didn't work. Use the save code below instead."}, codeOld:{zh:"或使用存檔代碼", en:"Or use a save code"},
   copy:{zh:"複製", en:"Copy"}, copied:{zh:"已複製", en:"Copied"}, newGame:{zh:"重新開始", en:"Restart"},
   auto:{zh:"自動", en:"Auto"}, light:{zh:"淺色", en:"Light"}, dark:{zh:"深色", en:"Dark"},
   on:{zh:"開", en:"On"}, off:{zh:"關", en:"Off"},
@@ -570,9 +585,9 @@ const SPECIAL = {
   midautumn:{s:{zh:"中秋", en:"Moon"}, zh:"中秋節", en:"Mid-Autumn Festival", spr:"moon", st:-12, g:{cr:0.4}, h:{family:6},
     ok:["Mid-Autumn! Dad grills meat on the street with the neighbors. We eat [[mooncakes|mooncake]] and look at the big, round moon."]},
   tingcall:{s:{zh:"視訊", en:"Call"}, zh:"婷打來了", en:"Ting calls", spr:"phone", st:-6, g:{en:0.4}, h:{ting:10},
-    ok:["Ting calls on Saturday night. “Finally! Are you hiding from me?” We laugh and talk for two hours."]},
+    story:"tingcall", ok:["Ting calls from Vancouver."]},
   tellmom:{s:{zh:"告訴媽媽", en:"Tell Mom"}, zh:"告訴媽媽", en:"Telling Mom", spr:"mom", st:-4, g:{co:1.0}, h:{family:10},
-    ok:["After dinner, I wash the dishes. Then I tell Mom about the ballot. She asks question after question. At last she says, “Your grandma took a boat to Japan when she was twenty. Nobody could stop her either.”"]},
+    story:"tellmom", ok:["I tell Mom about London."]},
   khh2:{s:{zh:"高雄②", en:"Trip ②"}, zh:"高雄（第二天）", en:"Kaohsiung, day 2", spr:"train", st:0, g:{}}
 };
 const MENUS = ["class","work","social","explore","rest"];
@@ -634,8 +649,7 @@ const EVENTS = [
   {id:"intro", at:"start", when:S=>S.blk === 0,
     msgs:[["family","Mia! Don't be late for dinner on Sunday. Dad is cooking fish.","Mia！星期天晚餐別遲到喔，爸爸要煮魚。"],
           ["ben","The summer sale is over, but [[weekends|weekend]] are still busy. The store needs people!","夏季特賣結束了，不過週末還是很忙，店裡很缺人喔！"],
-          ["ting","Hi from Vancouver! I am here on a [[working holiday]]. Call me sometime!","從溫哥華跟妳打招呼！我在這裡打工度假。有空打給我！"],
-          ["mia","At three o'clock, the woman from the bakery downstairs comes to my counter with a warm [[croissant]]. I know her face, but not her name. “Hi! I'm Camille. You look tired,” she says. She is right.","三點，樓下麵包店的那個女生拿著一個熱可頌來到我的櫃位。我認得她的臉，可是不知道她的名字。「嗨！我是 Camille。妳看起來好累。」她說。她說得沒錯。"]]},
+          ["ting","Hi from Vancouver! I am here on a [[working holiday]]. Call me sometime!","從溫哥華跟妳打招呼！我在這裡打工度假。有空打給我！"]]},
   {id:"khhHint", at:"start", when:S=>S.blk === 1,
     msgs:[["leo","You need a trip, [[Jie|jie]]. Take the train to Kaohsiung! Cijin has the best [[seafood]].","姊，妳需要出去走走。坐火車去高雄啦！旗津的海鮮最好吃。"],
           ["flyer","A [[flyer]] at the MRT station: “English [[tutor]]. One-on-one lessons. Any day, any time.”","捷運站的傳單：「英文家教，一對一上課，哪天、幾點都可以。」"],
@@ -683,31 +697,29 @@ const EVENTS = [
     msgs:[["photo","You pose well now! A [[styling]] class can help you more. There is one on Sundays.","妳現在很會擺姿勢了！上造型課會更有幫助，星期天有一班。"]]},
   {id:"open4b", at:"start", when:S=>S.blk === 4 && !S.portfolio,
     msgs:[["flyer","A new [[styling]] and photo class starts on Sundays. “Find your colors. Learn to pose.”","星期天新開一班造型攝影課。「找到妳的顏色，學會擺姿勢。」"]]},
-  {id:"letter", at:"start", when:S=>S.blk === 4,
-    msgs:[["mia","Yesterday I walked past our old school, and I thought of Ting. Tonight I write her a [[letter]], on real paper. “We are far apart, but I think about you a lot.”","昨天我經過我們以前的學校，想起了婷。今晚我寫了一封信給她，用真的信紙。「我們離得很遠，可是我常常想到妳。」"]]},
   {id:"open4", at:"start", when:S=>S.blk === 4,
     msgs:[["flyer","An ad on my phone: “Ride with us! Deliver food by [[scooter]]. Work when you want.”","手機上的廣告：「加入我們！騎機車送外送，想什麼時候工作都可以。」"]]},
-  {id:"letterBack", at:"start", when:S=>S.blk === 5,
+  {id:"letterBack", at:"start", when:S=>S.blk === 5 && !!S.seen.letter,
     msgs:[["ting","Your letter came! Real paper! I read it three times. And yes, I still hate green peppers. Call me soon?","妳的信到了！真的信紙！我讀了三遍。對，我還是討厭青椒。快打給我？"]]},
   {id:"postcard", at:"start", when:S=>S.blk === 5,
     msgs:[["camille","Look! My sister sent this [[postcard]] home from London. She studies there. My mom took a photo of it for me. A red bus on a rainy street!","妳看！我妹妹從倫敦寄了這張明信片回家，她在那裡念書。我媽拍照傳給我。下雨的街上，一台紅色巴士！"],
           ["camille","She says young people from Taiwan can go on a working holiday in the UK. French people can't. Lucky you! Why don't you try?","她說台灣的年輕人可以去英國打工度假，法國人不行。妳真幸運！妳何不試試看？"],
-          ["mia","I don't answer. I look at my handbags and the escalator, up and down, all day long. That night, I can't sleep. I keep thinking about a red bus in the rain.","我沒有回答。我看著我的包包，還有整天上上下下的電扶梯。那天晚上，我睡不著，一直想著雨中的那台紅色巴士。"]],
+          ["mia","Me? In London? I don't know…","我？去倫敦？我不知道耶……"]],
     fx:S=>{ S.flags.postcard = true; }},
   {id:"midautumn", at:"start", when:S=>S.blk === 5,
     msgs:[["family","Mid-Autumn is on Friday the 25th. Take the day off! Dad wants to grill meat on the street with the neighbors.","中秋節是 25 號星期五，那天請個假吧！爸爸想跟鄰居在門口烤肉。"]],
     fx:S=>{ S.locks["2026-09-25"] = "midautumn"; }},
   {id:"ballot", at:"start", when:S=>S.blk === 6 && S.flags.decided,
-    msgs:[["mia","I have found the UK government's website. Young people from Taiwan can live and work in the UK for up to two years. But first, I have to enter a [[ballot]] in February. And I must have £2,530 in the bank. February is four months away. I can do this.","我找到英國政府的網站了。台灣的年輕人可以在英國生活、工作最多兩年。可是我得先參加二月的抽籤，而且銀行裡至少要有 2,530 英鎊。離二月還有四個月。我做得到。"],
-          ["leo","What are you reading? The UK? Are you moving to London?","妳在看什麼？英國？妳要搬去倫敦喔？"],
-          ["mia","Maybe. Can you not tell Mom yet? I will tell her on Sunday.","也許吧。你可以先不要跟媽說嗎？我星期天會跟她說。"],
+    msgs:[["leo","[[Jie|jie]], you sent me a UK government website. By mistake? Are you moving to London?","姊，妳傳了一個英國政府的網站給我。傳錯人了嗎？妳要搬去倫敦喔？"],
+          ["mia","Oops! Maybe. Young people from Taiwan can live and work in the UK for up to two years. But first, there is a [[ballot]] in February. And I must have £2,530 in the bank.","糟糕！也許吧。台灣的年輕人可以在英國生活、工作最多兩年。可是要先參加二月的抽籤，而且銀行裡至少要有 2,530 英鎊。"],
+          ["mia","February is four months away. I can do this. Can you not tell Mom yet? I will tell her on Sunday.","離二月還有四個月，我做得到。你可以先不要跟媽說嗎？我星期天會跟她說。"],
           ["leo","My lips are sealed. For one bubble tea.","我嘴巴很緊。一杯珍奶就好。"]],
     fx:S=>{ S.locks[D.add(S.date, 6)] = "tellmom"; }},
   {id:"open6", at:"start", when:S=>S.blk === 6,
     msgs:[["leo","Jie, my friends play a [[TTRPG]] on Friday nights. Dragons, dice, snacks. Come play!","姊，我朋友星期五晚上都在跑團。有龍、有骰子、有零食。來玩嘛！"],
           ["flyer","Three new classes near the station: driving lessons on Mondays and Wednesdays, a barista course on Saturdays, and an English [[interview]] and [[CV]] workshop.","車站附近開了三種新課：週一、週三的汽車駕訓班，週六的咖啡師課程，還有英文面試與履歷工作坊。"]]},
   {id:"camilleAsks", at:"start", when:S=>S.blk === 7 && S.flags.decided,
-    msgs:[["camille","So? Have you told your mom? And how much is £2,530 in Taiwan dollars?","怎麼樣？妳跟媽媽說了嗎？還有，2,530 英鎊是多少台幣？"],
+    msgs:[["camille","Quick question: how much is £2,530 in Taiwan dollars?","問一下：2,530 英鎊是多少台幣？"],
           ["mia","About NT$109,000. That's a lot of handbags. But I have started saving.","大約十萬九千台幣，要賣好多包包。不過我已經開始存錢了。"]]},
   {id:"sale", at:"start", when:S=>S.blk === 8,
     msgs:[["ben","The [[anniversary sale]] starts on Thursday, November 5. Twelve crazy days! More sales, more [[commission]]. Rest before it starts!","週年慶 11 月 5 日星期四開始，瘋狂十二天！賣得多、抽成就多。開始前先休息一下！"]]},
@@ -722,7 +734,15 @@ const EVENTS = [
     fx:S=>{ S.money += 5000; S.flags.momLoan = true; S.stress += 5; }},
 
   /* small surprises during the two weeks */
-  {id:"tingPlan", at:"day", when:(S,c)=>S.flags.toldMom && c.date >= "2026-10-05",
+  /* story moments: the days stop and a card opens; each one is also a page in Mia's diary (STORY below) */
+  {id:"camilleMeet", at:"day", story:"camilleMeet", when:(S,c)=>S.blk === 0 && c.id === "dept",
+    fx:S=>{ S.hearts.camille += 3; }},
+  {id:"camilleMeet2", at:"day", story:"camilleMeet2", when:(S,c)=>S.blk === 0 && !S.seen.camilleMeet && c.date === D.add(S.date, 13) && !["sick","khh","khh2"].includes(c.id),
+    fx:S=>{ S.seen.camilleMeet = true; S.hearts.camille += 3; }},
+  {id:"letter", at:"day", story:"letter", when:(S,c)=>S.blk === 4 && !c.lock && !["khh","khh2","sick"].includes(c.id),
+    fx:S=>{ S.hearts.ting += 4; }},
+  {id:"redBus", at:"day", story:"redBus", when:(S,c)=>S.blk === 5 && S.flags.postcard && c.id !== "khh" && c.id !== "khh2" && c.date < "2026-09-25"},
+  {id:"tingPlan", at:"start", when:S=>!!S.flags.toldMom,
     msgs:[["ting","So? Did you tell your mom?","怎麼樣？妳跟媽媽說了嗎？"],
           ["mia","Yes. She asked a hundred questions.","說了。她問了一百個問題。"],
           ["ting","Ha! My mom asked two hundred. Make a plan, Mia. A real one, on paper: money, rent, jobs, and what you will do if things go wrong. And call her every Sunday. Especially from London.","哈！我媽問了兩百個。Mia，做個計畫吧，真的計畫，寫在紙上：錢、房租、工作，還有出狀況時要怎麼辦。還有，每個星期天打給她，在倫敦更要打。"]],
@@ -756,6 +776,31 @@ const RANKUP = {
   driving:["You can park now. Really park! Good job.","妳現在會停車了，是真的會停！做得好。"],
   barista:["Your milk is smooth now. The café will pay you more, NT$20 an hour!","妳打的奶泡現在很綿密了。咖啡館會幫妳加薪，時薪多 NT$20！"],
   cvwork:["Your CV is clear and short. Any boss can read it in one minute.","妳的履歷清楚又簡短，任何老闆一分鐘就能看完。"]
+};
+
+/* Mia's story pages: shown as a card on the day, then kept in her diary */
+const STORY = {
+  camilleMeet:{spr:"croissant",
+    en:"At three o'clock, the woman from the bakery downstairs comes to my counter with a warm [[croissant]]. I know her face, but not her name. “Hi! I'm Camille. You look tired,” she says. She is right. We add each other on LINE.",
+    zh:"三點，樓下麵包店的那個女生拿著一個熱可頌來到我的櫃位。我認得她的臉，可是不知道她的名字。「嗨！我是 Camille。妳看起來好累。」她說。她說得沒錯。我們互加了 LINE。"},
+  camilleMeet2:{spr:"croissant",
+    en:"On Sunday, I buy bread at the bakery under the store. The woman there gives me a free [[croissant]]. “Hi! I'm Camille. You look tired,” she says. She is right. We add each other on LINE.",
+    zh:"星期天，我去店裡樓下的麵包店買麵包。店裡的女生送我一個可頌。「嗨！我是 Camille。妳看起來好累。」她說。她說得沒錯。我們互加了 LINE。"},
+  tingcall:{spr:"phone",
+    en:"Ting calls on Saturday night. “Finally! Are you hiding from me?” We laugh and talk for two hours.",
+    zh:"星期六晚上，婷打來了。「終於接了！妳在躲我嗎？」我們笑著聊了兩個小時。"},
+  letter:{spr:"letter",
+    en:"Today I walk past our old school, and I think of Ting. Tonight I write her a [[letter]], on real paper. “We are far apart, but I think about you a lot.”",
+    zh:"今天我經過我們以前的學校，想起了婷。今晚我寫了一封信給她，用真的信紙。「我們離得很遠，可是我常常想到妳。」"},
+  redBus:{spr:"bus",
+    en:"I can't stop thinking about Camille's postcard. At night, I lie in bed and see a red bus in the rain.",
+    zh:"我一直想著 Camille 的明信片。晚上躺在床上，眼前都是雨中那台紅色巴士。"},
+  moon:{spr:"moon",
+    en:"Late at night, I look up at the big, round moon. I think about the red bus in the rain, and I make up my mind. I want to try. A [[working holiday]] in London. Me!",
+    zh:"深夜，我抬頭看著又大又圓的月亮，想著雨中的紅色巴士，終於下定決心了。我想試試看。去倫敦打工度假。我！"},
+  tellmom:{spr:"mom",
+    en:"After dinner, I wash the dishes. Then I tell Mom about the ballot. She asks question after question. At last she says, “Your grandma took a boat to Japan when she was twenty. Nobody could stop her either.”",
+    zh:"晚飯後，我洗好碗，然後跟媽媽說了抽籤的事。她問了一個又一個問題。最後她說：「妳阿嬤二十歲的時候坐船去日本，也沒人攔得住她。」"}
 };
 
 /* ==== content/book1/trip-khh.js ==== */
@@ -949,6 +994,8 @@ const SPR = {
   /* Phase B: Camille and her croissant */
   camille:["...nnnnnn...", "..nnnnnnnn..", ".nnssssssnn.", ".nskssssksn.", ".nnssssssnn.", ".nnrsssssrn.", ".n..skks..n.", ".n..ssss..n.", "...cccccc...", "..ccwwwwcc..", "..cccccccc..", "..cccccccc.."],
   croissant:["............", "............", "............", "....tttt....", "..tto..ott..", ".totttttot..", "totoootoott.", "tot......tot", "to........ot", "............", "............", "............"],
+  letter:["............","............",".kkkkkkkkkk.",".kwwwwwwwwk.",".kkwwwwwwkk.",".kwkwwwwkwk.",".kwwkkkkwwk.",".kwwwwwwwwk.",".kwwwwwwrrk.",".kkkkkkkkkk.","............","............"],
+  bus:["............",".kkkkkkkkkk.",".krrrrrrrrk.",".krllrllrlk.",".krrrrrrrrk.",".kkkkkkkkkk.",".krllrllrlk.",".krrrrrrrrk.",".krrrrrrrrk.",".kkkkkkkkkk.","..kk....kk..","............"],
 };
 
 /* ==== engine/core.js ==== */
@@ -1577,7 +1624,7 @@ function newGame(){
     hearts:{family:20, leo:20, ben:10, ting:30, chen:10, camille:10}, flags:{}, locks:{}, seen:{},
     plan:new Array(14).fill(null), lastPlan:null, sessions:{}, payQ:[], sickLeft:0,
     workRun:0, lastCls:null, clsRun:0, portfolio:0, rk:Object.fromEntries(Object.entries(STAGE.stats).map(([k,v])=>[k, statRank(v)])),
-    notes:[], album:[], diary:[], mlog:{}, thread:[], feed:[], snap:null, done:false, trips:0};
+    dv:2, notes:[], album:[], diary:[], mlog:{}, thread:[], feed:[], snap:null, done:false, trips:0};
 }
 function save(){ if(S) store.set("save", S); }
 function load(){ const s = store.get("save", null); return s && s.v === 2 ? migrate(s) : null; }
@@ -1587,6 +1634,20 @@ function migrate(s){
   /* a save from before the London story began past block 5 still gets the postcard and the moon decision */
   if(s.blk >= 5 && !s.seen.postcard){ s.seen.postcard = true; s.flags.postcard = true; }
   if(s.flags.postcard && !s.flags.decided && s.date > "2026-09-25") s.flags.decided = "2026-09-25";
+  /* saves from before the diary held story pages: fill in the moments already passed */
+  if(s.opened == null) s.opened = s.blk;
+  if(!s.dv){ s.dv = 2;
+    const past = d => d && d < D.add(s.date, s.phase === "play" ? s.day : 0);
+    const add = (id, date)=>{ if(past(date)) s.diary.push({kind:"story", id, date}); };
+    if(s.blk >= 1){ add("camilleMeet", "2026-07-06"); s.seen.camilleMeet = true; }
+    Object.entries(s.locks).forEach(([d,v])=>{ if(v === "tingcall") add("tingcall", d); });
+    if(s.blk >= 5){ add("letter", "2026-08-31"); s.seen.letter = true; }
+    else if(s.blk === 4) delete s.seen.letter;   /* the old letter was a message at the block's start: let the new one play */
+    if(s.blk >= 6){ add("redBus", "2026-09-14"); s.seen.redBus = true; }
+    if(s.flags.decided) add("moon", s.flags.decided);
+    if(s.flags.toldMom) add("tellmom", s.flags.toldMom);
+    s.diary.sort((a,b)=>(a.date || a.month + "-99") < (b.date || b.month + "-99") ? -1 : 1);
+  }
   return s;
 }
 
@@ -1649,6 +1710,7 @@ const rankOf = n => n >= RANKS[2] ? 2 : n >= RANKS[1] ? 1 : 0;
 
 /* ---------------- a block opens: messages, choices, locks ---------------- */
 function openBlock(S){
+  S.opened = S.blk;   /* a reload at the summary still opens the next block */
   S.thread = []; S.pending = [];
   S.snap = {money:S.money, stress:S.stress, st:Object.assign({}, S.st), hearts:Object.assign({}, S.hearts), notes:S.notes.length, album:S.album.length};
   EVENTS.filter(e=>e.at === "start").forEach(e=>{
@@ -1728,7 +1790,7 @@ function runDay(S, i){
   if(id === "tingcall") S.flags.calledTing = true;
   if(id === "tellmom") S.flags.toldMom = date;
   if(id === "midautumn" && S.flags.postcard && !S.flags.decided){ S.flags.decided = date;
-    out.msgs.push(["mia","Late at night, I look up at the big, round moon. I think about the red bus in the rain, and I make up my mind. I want to try. A [[working holiday]] in London. Me!","深夜，我抬頭看著又大又圓的月亮，想著雨中的紅色巴士，終於下定決心了。我想試試看。去倫敦打工度假。我！"]); }
+    storyPage(S, out, "moon", date); }
   if(id === "khh"){ out.trip = "khh"; ml.acts[id] = (ml.acts[id]||0)+1; return finishDay(S, out, before); }
   if(id === "khh2"){ out.line = "Pier-2 Art Center, then the long train ride home."; ml.acts.khh2 = (ml.acts.khh2||0)+1; S.workRun = 0; return finishDay(S, out, before); }
 
@@ -1768,15 +1830,25 @@ function runDay(S, i){
   if(id === "free" || id === "rest" || id === "sick" || id === "typhoon") S.workRun = 0;
   ml.acts[id] = (ml.acts[id]||0)+1;
   out.line = good ? pick(a.ok) : pick(a.slip || a.ok);
+  if(a.story) storyPage(S, out, a.story, date);
   if(a.rain && rainyOn(date)){ out.line = pick(a.rain); out.ok = false; }
 
   /* small surprises */
   for(const e of EVENTS.filter(e=>e.at === "day")){
     if(e.once !== false && S.seen[e.id]) continue;
     if(!e.when(S, {date, id, lock:!!lockOf(S,i)})) continue;
-    S.seen[e.id] = true; e.msgs.forEach(m=>out.msgs.push(m)); if(e.fx) e.fx(S); break;
+    S.seen[e.id] = true;
+    if(e.story) storyPage(S, out, e.story, date);
+    else (e.msgs || []).forEach(m=>out.msgs.push(m));
+    if(e.fx) e.fx(S); break;
   }
   return finishDay(S, out, before);
+}
+/* a story moment: the play screen shows it as a card (S.storyQ until the player taps Continue), and it stays in the diary */
+function storyPage(S, out, id, date){
+  if(out.story) return;
+  const pg = {kind:"story", id, date};
+  S.diary.push(pg); S.storyQ = pg; out.story = pg;
 }
 const STAT_NAME = {en:["English","英文"], co:["Confidence","自信"], fi:["Fitness","體力"], cr:["Craft","手藝"], sty:["Style","風格"], kh:["Know-how","生活力"]};
 /* a stat that climbs into a new rank gets a line in the log, even if a trip or an event raised it */
@@ -1907,7 +1979,7 @@ function askConfirm(msg, yes){
   });
 }
 document.addEventListener("click", e=>{
-  const z = e.target.closest("[data-zh]"); if(z){ const t = z.closest(".msg,.scene").querySelector(".zht"); if(t) t.hidden = !t.hidden; return; }
+  const z = e.target.closest("[data-zh]"); if(z){ const t = z.closest(".msg,.scene,.de").querySelector(".zht"); if(t) t.hidden = !t.hidden; return; }
   const mu = e.target.closest("[data-music]"); if(mu){ if(Music.cur >= 0) Music.stop(); else Music.play(musicFor()); return; }
   const go = e.target.closest("[data-go]"); if(go){ info(go.dataset.go); return; }
 });
@@ -1940,6 +2012,7 @@ function enter(){
   Music.want(STAGE.music.home);
   if(S.done) return endScreen();
   if(S.phase === "play") return resumePlay();   /* a half-played block carries on where it stopped */
+  if(S.opened !== S.blk){ openBlock(S); save(); }   /* closed at the summary, but the next block never opened */
   renderHome();
 }
 
@@ -1960,7 +2033,7 @@ function renderHome(){
     ${S.thread.length ? `<h3 style="margin-top:14px">${T("messages")}</h3><p class="muted" style="font-size:13px">${T("tapWord")}</p><div class="thread">${S.thread.map(msgHTML).join("")}</div>` : ""}
     <div class="menu"><button class="btn" id="hPlan" style="grid-column:1/-1">${T("plan2")}</button>
       <button class="btn alt" data-go="friends">${T("friends")}</button><button class="btn alt" data-go="notebook">${T("notebook")}</button>
-      <button class="btn alt" data-go="album">${T("album")}</button><button class="btn alt" data-go="settings">${T("settings")}</button>
+      <button class="btn alt" data-go="album">${T("album")}</button><button class="btn alt" data-go="diary">${T("diaryBtn")}</button>
       ${S.lastLog ? `<button class="btn alt" id="hLog" style="grid-column:1/-1">${T("lastLog")}</button>` : ""}</div>`;
   paintSprites($("#home")); Room.draw($("#roomCv"), S); Music.ui();
   if(S.lastLog) $("#hLog").onclick = ()=>showLog(S.lastLog, null);
@@ -2109,8 +2182,11 @@ function playShell(){
     <div class="playbar"><div class="in"><button class="btn alt small" id="spd">${T("speed")} ×${playSpeed}</button><button class="btn alt small" id="pau">${T("pause")}</button><button class="btn small" id="skip">${T("skip")} ⏩</button></div></div>`;
   Music.ui(); paused = false; tripPending = false; follow = true; holds.clear();
   $("#spd").onclick = ()=>{ playSpeed = {0.5:1, 1:2, 2:4, 4:0.5}[playSpeed] || 1; store.set("speed", playSpeed); $("#spd").textContent = `${T("speed")} ×${playSpeed}`; };
+  let pauWas = null;   /* tapping Resume also closes an open tooltip, which releases its hold first: decide from the moment of the tap */
+  $("#pau").onpointerdown = ()=>{ pauWas = paused || holds.size > 0; };
   $("#pau").onclick = ()=>{
-    if(paused || holds.size){ paused = false; holds.clear(); follow = true; autoAt = Date.now(); toLogEnd(true); clearTimeout(playTimer); playTimer = setTimeout(nextDay, 300); }
+    const was = pauWas == null ? (paused || holds.size > 0) : pauWas; pauWas = null;
+    if(was){ paused = false; holds.clear(); follow = true; autoAt = Date.now(); toLogEnd(true); clearTimeout(playTimer); playTimer = setTimeout(nextDay, 300); }
     else { paused = true; clearTimeout(playTimer); }
     pauUI(); };
   $("#skip").onclick = ()=>{ paused = false; holds.clear(); pauUI(); playSpeed = 99; clearTimeout(playTimer); playTimer = setTimeout(nextDay, 30); };
@@ -2121,6 +2197,7 @@ function resumePlay(){
   const last = S.feed[S.feed.length-1];
   if(last && last.trip && !last.tripRes){ S.feed.pop(); S.day = last.i;   /* a trip cut short starts again */
     const out = runDay(S, S.day); save(); addDayCard(out); return goTrip(out); }
+  if(S.storyQ) return storyCard(S.storyQ, ()=>{ playTimer = setTimeout(nextDay, 600); });   /* a story card left open */
   playTimer = setTimeout(nextDay, 500);
 }
 let tripPending = false;   /* while a trip is open, the days wait for it */
@@ -2133,13 +2210,46 @@ function goTrip(out){
 function nextDay(){
   clearTimeout(playTimer);
   if(holds.size || paused) return;   /* waiting for the player: a tooltip, a voice, or a hand on the log */
-  if(tripPending) return;
+  if(tripPending || S.storyQ) return;
   if(S.day >= 14) return endBlock();
   const out = runDay(S, S.day); save();
   addDayCard(out);
   if(out.trip) return goTrip(out);
+  if(out.story) return storyCard(out.story, ()=>{ playTimer = setTimeout(nextDay, playSpeed >= 99 ? 30 : 600 / Math.min(playSpeed, 2)); });
   const wait = out.msgs.length ? 2500 : 1500;   /* normal speed: 1.5 s a day, longer when messages arrive */
   if(!paused) playTimer = setTimeout(nextDay, playSpeed >= 99 ? 30 : wait / playSpeed);
+}
+/* ---------------- story cards and the diary ---------------- */
+/* a story moment stops the days: a diary page opens over the log and waits for Continue, at any speed */
+function storyCard(pg, then){
+  clearTimeout(playTimer);
+  modal(`<h2>${T("diary")}</h2><div class="diary">${diaryEntryHTML(pg, true)}</div>
+    <button class="btn" id="stCont" style="width:100%;margin-top:14px">${T("cont")}</button>`, box=>{
+    box.querySelector("#stCont").onclick = ()=>{ S.storyQ = null; save(); closeModal(); then(); };
+  });
+}
+function diaryEntryHTML(pg, pic){
+  const tools = (en, zh)=>`<span class="dtools">${zh ? `<button class="zhb" data-zh>${T("showZh")}</button>` : ""}<button class="ib" data-say="${esc(plain(en))}" aria-label="speak">${ICON.spk}</button></span>`;
+  if(pg.kind === "story"){
+    const st = STORY[pg.id]; if(!st) return "";
+    return `<div class="de">${pic ? `<canvas class="dpic" width="48" height="48" data-spr="${st.spr}"></canvas>` : ""}<p class="dd">${esc(D.long(pg.date))} ${tools(st.en, st.zh)}</p>
+      <p>${mk(st.en)}</p><p class="zht" hidden>${esc(st.zh)}</p></div>`;
+  }
+  const m = +pg.month.slice(5) - 1, all = pg.lines.map(plain).join(" ");
+  return `<div class="de"><p class="dd">${LANG === "en" ? `${T("monthEnd")} ${MON_FULL[m]}` : `${m+1} ${T("monthEnd")}`} ${tools(all, "")}</p>${pg.lines.map(l=>`<p>${mk(l)}</p>`).join("")}</div>`;
+}
+const pgMonth = pg => pg.kind === "story" ? pg.date.slice(0,7) : pg.month;
+let diaryPg = -1;
+function diaryHTML(){
+  const months = [...new Set(S.diary.map(pgMonth))].sort();
+  if(!months.length) return `<p class="muted">${T("diaryEmpty")}</p>`;
+  if(diaryPg < 0 || diaryPg >= months.length) diaryPg = months.length - 1;
+  const mk_ = months[diaryPg], y = mk_.slice(0,4), m = +mk_.slice(5) - 1;
+  const pages = S.diary.filter(p=>pgMonth(p) === mk_).sort((a,b)=>(a.date || "9") < (b.date || "9") ? -1 : 1);
+  return `<div class="dnav"><button class="btn alt small" id="dPrev" aria-label="${T("prevM")}" ${diaryPg ? "" : "disabled"}>‹</button>
+    <b>${LANG === "en" ? `${MON_FULL[m]} ${y}` : `${y} 年 ${m+1} 月`}</b>
+    <button class="btn alt small" id="dNextM" aria-label="${T("nextM")}" ${diaryPg < months.length - 1 ? "" : "disabled"}>›</button></div>
+    <div class="diary">${pages.map(p=>diaryEntryHTML(p, true)).join("")}</div>`;
 }
 function dayScene(id){
   const a = actOf(id) || SPECIAL.free;
@@ -2171,7 +2281,7 @@ const atBottom = ()=>{ const l = $("#feed") && $("#feed").lastElementChild, bar 
    bottom carries on too, for logs too short to scroll. The Pause button still works on its own. */
 const holds = new Set();
 let leftBottom = false;
-const playingNow = ()=> !!S && $("#play").classList.contains("on") && S.phase === "play" && S.day < 14 && !tripPending && playSpeed < 99;
+const playingNow = ()=> !!S && $("#play").classList.contains("on") && S.phase === "play" && S.day < 14 && !tripPending && !S.storyQ && playSpeed < 99;
 function pauUI(){ const b = $("#pau"); if(!b) return; const on = paused || holds.size > 0; b.textContent = on ? T("resume") : T("pause"); b.classList.toggle("on", on); }
 function hold(r){ if(!playingNow()) return; if(r === "hand" && !holds.has("hand")) leftBottom = !atBottom(); holds.add(r); clearTimeout(playTimer); follow = false; pauUI(); }
 function release(r){
@@ -2280,6 +2390,7 @@ function endScreen(){
       ? "<p>That's July to December 2026. Still to come in Stage 1: the Mid-Autumn Night Market Stall, the moment Mia decides to go, and a finale at Christmasland and the Taipei 101 countdown.</p>"
       : "<p>2026 年 7 月到 12 月結束了。第一階段還在製作中的有：中秋夜市擺攤、Mia 下定決心的那一刻，以及最後的歡樂耶誕城和 101 跨年倒數。</p>"}</div>
     <div class="menu"><button class="btn alt" data-go="album">${T("album")}</button><button class="btn alt" data-go="notebook">${T("notebook")}</button>
+    <button class="btn alt" data-go="diary">${T("diaryBtn")}</button><button class="btn alt" data-go="settings">${T("settings")}</button>
     <button class="btn" id="eNew" style="grid-column:1/-1">${T("newGame")}</button></div></div>`;
   paintSprites($("#info")); Room.drawBust($("#endBust"), false);
   $("#eNew").onclick = ()=>askConfirm(T("confirmNew"), ()=>{ S = newGame(); openBlock(S); enter(); });
@@ -2292,13 +2403,16 @@ function info(page){
   const from = screens.find(s=>$("#"+s).classList.contains("on"));
   if(from !== "info") infoBack = from;
   show("info"); closeSheet();
-  const titles = {friends:T("friends"), notebook:T("notebook"), album:T("album"), settings:T("settings")};
+  const titles = {friends:T("friends"), notebook:T("notebook"), album:T("album"), settings:T("settings"), diary:T("diary")};
+  if(page === "diary" && from !== "info") diaryPg = -1;   /* the diary opens on its newest page */
   let h = `<div class="top infobar"><div class="r1"><button class="btn alt small" id="iBack">${ICON.back} ${T("back")}</button><b class="ttl">${titles[page] || ""}</b></div></div><div>`;
   if(page === "friends"){
     h += `<div class="hearts">${Object.keys(CAST).map(k=>{ const n = Math.floor(S.hearts[k]/20), part = S.hearts[k] % 20;
       return `<div class="card fr">${spriteHTML(CAST[k].spr)}<div><b>${esc(N(CAST[k]))}</b><div class="h">${"♥".repeat(n)}${"♡".repeat(5-n)}</div><div class="muted" style="font-size:13px">${esc(N(CAST[k].d))}</div></div></div>`; }).join("")}</div>`;
   } else if(page === "notebook"){
     h += (S.notes.length ? `<div class="nb">${S.notes.map(k=>GLOSS[k] ? `<div class="it"><span><b>${esc(GLOSS[k].w || k)}</b> <span class="muted">${esc(GLOSS[k].kk || "")}</span></span><span>${esc(GLOSS[k].zh)}</span></div>` : "").join("")}</div>` : `<p class="muted">${T("notebookEmpty")}</p>`);
+  } else if(page === "diary"){
+    h += diaryHTML();
   } else if(page === "album"){
     const cards = TRIPS.khh.cards;
     h += (S.album.length ? `<div class="album">${S.album.map(c=>`<div class="post"><canvas width="150" height="100" data-card="${c}"></canvas><span class="stamp">${c === "window" ? "TAIPEI → KAOHSIUNG" : "KAOHSIUNG"}</span><div class="pt">${esc(N(cards[c] || {zh:c, en:c}))}</div></div>`).join("")}</div>` : `<p class="muted">${T("albumEmpty")}</p>`);
@@ -2308,9 +2422,13 @@ function info(page){
       <div class="rowi"><span>${T("langSet")}</span><span class="row"><button class="btn small ${LANG === "zh" ? "on" : "alt"}" data-l="zh">中文</button><button class="btn small ${LANG === "en" ? "on" : "alt"}" data-l="en">English</button></span></div>
       <div class="rowi"><span>${T("musicSet")}</span><button class="btn small alt" data-music>♪ ${T("music")}</button></div>
       <div class="rowi"><span>${T("themeSet")}</span><span class="row">${["auto","light","dark"].map(t=>`<button class="btn small ${th === t ? "on" : "alt"}" data-th="${t}">${T(t)}</button>`).join("")}</span></div>
+      <div style="padding:10px 0"><b>${T("saveFile")}</b><p class="muted" style="font-size:13px">${T("saveFileHelp")}</p>
+        <div class="row" style="margin-top:6px;flex-wrap:wrap">${S ? `<button class="btn small" id="fSave">${T("dlSave")}</button>` : ""}<button class="btn small alt" id="fLoad">${T("loadFile")}</button>
+        <input type="file" id="fIn" accept=".json,application/json" hidden></div></div>
+      <details style="padding:10px 0"><summary class="muted">${T("codeOld")}</summary>
       ${S ? `<div style="padding:10px 0"><b>${T("saveCode")}</b><p class="muted" style="font-size:13px">${T("saveHelp")}</p><textarea id="code" readonly>${esc(exportCode())}</textarea>
         <div class="row" style="margin-top:6px"><button class="btn small alt" id="cCopy">${T("copy")}</button></div></div>` : ""}
-      <div style="padding:10px 0"><b>${T("load")}</b><textarea id="codeIn" placeholder="…"></textarea><div class="row" style="margin-top:6px"><button class="btn small alt" id="cLoad">${T("load")}</button></div></div></div>`;
+      <div style="padding:10px 0"><b>${T("load")}</b><textarea id="codeIn" placeholder="…"></textarea><div class="row" style="margin-top:6px"><button class="btn small alt" id="cLoad">${T("load")}</button></div></div></details></div>`;
   }
   $("#info").innerHTML = h + `</div>`;
   paintSprites($("#info")); Music.ui();
@@ -2319,10 +2437,39 @@ function info(page){
   $$("#info [data-l]").forEach(b=> b.onclick = ()=>{ setLang(b.dataset.l); info(page); });
   $$("#info [data-th]").forEach(b=> b.onclick = ()=>{ store.set("theme", b.dataset.th); applyTheme(); info(page); });
   const cc = $("#cCopy"); if(cc) cc.onclick = ()=>{ const t = $("#code"); t.select(); try{ navigator.clipboard.writeText(t.value); }catch(e){ document.execCommand("copy"); } toast(T("copied")); };
-  const cl = $("#cLoad"); if(cl) cl.onclick = ()=>{ const s = importCode($("#codeIn").value.trim()); if(!s) return toast(T("badCode")); clearTimeout(playTimer); S = s; save(); toast(T("loaded")); enter(); };
+  const cl = $("#cLoad"); if(cl) cl.onclick = ()=>{ const s = importCode($("#codeIn").value.trim()); if(!s) return toast(T("badCode")); useSave(s); };
+  const fs = $("#fSave"); if(fs) fs.onclick = ()=>downloadSave();
+  const fl = $("#fLoad"); if(fl) fl.onclick = ()=>$("#fIn").click();
+  const fi = $("#fIn"); if(fi) fi.onchange = ()=>{ const f = fi.files && fi.files[0]; if(!f) return;
+    f.text().then(t=>{ const s = readSave(t); if(!s) return toast(T("badFile")); useSave(s); }).catch(()=>toast(T("badFile"))); fi.value = ""; };
+  if(page === "diary"){
+    const go = d=>{ diaryPg += d; info("diary"); };
+    const p = $("#dPrev"), n = $("#dNextM"); if(p) p.onclick = ()=>go(-1); if(n) n.onclick = ()=>go(1);
+  }
 }
 function exportCode(){ try{ return btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }catch(e){ return ""; } }
-function importCode(c){ try{ const s = JSON.parse(decodeURIComponent(escape(atob(c)))); return s && s.v === 2 && s.st ? s : null; }catch(e){ return null; } }
+/* save files: plain JSON, named for the game date */
+const okSave = s => !!s && s.v === 2 && typeof s.date === "string" && Number.isInteger(s.blk) && Array.isArray(s.plan) && s.plan.length === 14
+  && ["thread","diary","notes","album","payQ","feed"].every(k=>Array.isArray(s[k])) && ["st","hearts","flags","locks","seen","mlog","sessions"].every(k=>s[k] && typeof s[k] === "object")
+  && STATS.every(k=>typeof s.st[k] === "number");
+function readSave(t){ try{ const s = JSON.parse(t); return okSave(s) ? migrate(s) : null; }catch(e){ return null; } }
+/* a loaded save replaces the current one only if the game opens with it */
+function useSave(s){
+  clearTimeout(playTimer); closeModal();
+  const was = S; S = migrate(s);
+  try{ enter(); save(); toast(T("loaded")); }
+  catch(e){ S = was; if(S) save(); toast(T("badFile")); if(S) enter(); else { renderTitle(); show("title"); } }
+}
+async function downloadSave(){
+  const name = `window-seat-save-${S.date}.json`, data = JSON.stringify(S);
+  let dl = null;
+  try{ if(window.claude && window.claude.use) dl = await window.claude.use("downloads"); }catch(e){ dl = null; }
+  if(dl){ try{ await dl.save({filename:name, data}); }catch(e){ if(!e || e.code !== "declined") toast(T("dlFail")); } return; }
+  try{ const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], {type:"application/json"})); a.download = name;
+    document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000); }
+  catch(e){ toast(T("dlFail")); }
+}
+function importCode(c){ try{ const s = JSON.parse(decodeURIComponent(escape(atob(c)))); return okSave(s) ? migrate(s) : null; }catch(e){ return null; } }
 function applyTheme(){ const t = store.get("theme", "auto"); if(t === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t); }
 
 /* postcards: little painted scenes */
