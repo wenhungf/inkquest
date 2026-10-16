@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>The Villainess Has Read the Book</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=VT323&display=swap" rel="stylesheet">
+<style>
+/* Layout: one column, the 320×200 stage on top and the dialogue box below, like a handheld visual novel.
+   A single committed night look: lamplight gold on plum ink; the System speaks in cool cyan pixels. */
+:root{
+  --ink:#130D18; --panel:#1F1526; --panel2:#2A1D33; --line:#4A3552; --text:#F4EAEF; --dim:#B5A2B6;
+  --gold:#E2BC62; --gold2:#F6DD8E; --rose:#E06C8C; --sys:#7FE3FF; --sysbg:#0A1824; --sysline:#2A6E8A;
+  --f-disp:'IM Fell English SC','IM Fell English',Georgia,'Times New Roman',serif;
+  --f-tale:'IM Fell English',Georgia,'Noto Serif TC','PingFang TC',serif;
+  --f-body:'Atkinson Hyperlegible','PingFang TC','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;
+  --f-px:'VT323',ui-monospace,'Courier New',monospace;
+  color-scheme:dark;
+}
+html,body{height:100%;}
+body{background:var(--ink);color:var(--text);font-family:var(--f-body);font-size:17px;line-height:1.5;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+*{box-sizing:border-box;}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
+button:focus-visible,.g:focus-visible,input:focus-visible{outline:2px solid var(--gold2);outline-offset:2px;}
+canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block;width:100%;height:auto;aspect-ratio:320/200;max-width:100%;}
+.scr{height:100%;max-width:560px;margin:0 auto;display:flex;flex-direction:column;padding-left:max(0px, env(safe-area-inset-left, 0px));padding-right:max(0px, env(safe-area-inset-right, 0px));}
+.ib{width:40px;height:40px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;flex:none;}
+.ib svg{width:22px;height:22px;fill:currentColor;}
+.ib.sm{width:30px;height:30px;} .ib.sm svg{width:18px;height:18px;}
+[data-music].on{color:var(--gold2);}
+.btn{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;min-height:46px;padding:10px 18px;border-radius:6px;
+  background:linear-gradient(var(--gold2),var(--gold));color:#2A1A0E;font-weight:700;border:1px solid #8C6A2A;box-shadow:0 2px 0 #6E521F;}
+.btn small{font-weight:400;font-size:13px;opacity:.8;}
+.btn.alt{background:var(--panel2);color:var(--text);border:1px solid var(--line);box-shadow:none;}
+.btn.sm{min-height:38px;padding:6px 14px;font-size:15px;}
+.btn:disabled{opacity:.4;cursor:default;}
+.row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;} .row.end{justify-content:flex-end;}
+.col{display:flex;flex-direction:column;gap:8px;}
+.dim{color:var(--dim);font-size:14px;}
+
+/* ---------- title ---------- */
+#title{justify-content:center;overflow-y:auto;}
+#title .art{position:relative;}
+#title .art::after{content:"";position:absolute;inset:auto 0 0 0;height:30%;background:linear-gradient(transparent,var(--ink));pointer-events:none;}
+#title .tt{text-align:center;padding:4px max(16px, env(safe-area-inset-left, 0px)) 20px;margin-top:-28px;position:relative;z-index:1;display:flex;flex-direction:column;gap:14px;align-items:center;}
+#title .kick{font-family:var(--f-px);font-size:18px;letter-spacing:.14em;color:var(--sys);margin:0;}
+#title h1{font-family:var(--f-disp);font-weight:400;font-size:clamp(30px,8.4vw,42px);line-height:1.02;margin:0;color:var(--gold2);text-wrap:balance;text-shadow:0 2px 0 #3A2340, 0 0 18px rgba(226,188,98,.25);}
+#title h1 i{font-family:var(--f-tale);font-style:italic;font-size:.62em;display:block;color:var(--rose);letter-spacing:.02em;}
+#tbtns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;}
+#tbtns > .btn{width:100%;}
+#title .foot{font-size:12px;color:var(--dim);margin:6px 0 0;}
+
+/* ---------- game ---------- */
+#game{position:relative;}
+.hud{display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--ink);}
+#epl{flex:1;min-width:0;font-family:var(--f-tale);font-size:15px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#doom{display:flex;align-items:center;gap:6px;font-family:var(--f-px);font-size:19px;color:var(--sys);padding:2px 8px;border:1px solid var(--sysline);border-radius:4px;background:var(--sysbg);min-height:34px;}
+#doom .bar{width:64px;height:8px;background:#06121B;border:1px solid var(--sysline);}
+#doom i{display:block;height:100%;background:linear-gradient(90deg,#FFB35A,#FF5A6E);transition:width .7s ease-out;}
+#doom.cool i{background:linear-gradient(90deg,#7FE3FF,#B8F5A0);}
+#doom b{font-weight:400;min-width:3ch;text-align:right;}
+#doom.bump-up{animation:dup .6s;} #doom.bump-down{animation:ddn .6s;}
+@keyframes dup{30%{box-shadow:0 0 0 3px rgba(255,90,110,.6);transform:scale(1.06);}}
+@keyframes ddn{30%{box-shadow:0 0 0 3px rgba(127,227,255,.6);transform:scale(1.06);}}
+.stagew{position:relative;background:#0E0A14;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+#cv{cursor:pointer;}
+.box{flex:1;min-height:0;position:relative;display:flex;flex-direction:column;padding:14px max(16px, env(safe-area-inset-left, 0px)) 12px;
+  background:linear-gradient(var(--panel),var(--ink) 60%);cursor:pointer;overflow-y:auto;box-shadow:inset 0 3px 0 -1px rgba(226,188,98,.35);}
+#tag{align-self:flex-start;font-family:var(--f-disp);font-size:18px;line-height:1;color:var(--tc,var(--gold));padding:5px 10px 4px;margin:-2px 0 8px -2px;border:1px solid currentColor;border-radius:3px;background:rgba(0,0,0,.25);}
+#txt{font-size:19.5px;line-height:1.55;max-width:62ch;margin:0;}
+.box.narr #txt{color:#E9DDE4;}
+.box.talk #txt{color:var(--text);}
+.box.sys{background:linear-gradient(var(--sysbg),#06101A);}
+.box.sys #txt{font-family:var(--f-px);font-size:26px;line-height:1.2;color:var(--sys);text-shadow:0 0 8px rgba(127,227,255,.35);}
+.box.sys #tag{font-family:var(--f-px);font-size:20px;letter-spacing:.08em;}
+#txt em{font-family:var(--f-tale);font-style:italic;}
+#zh{font-size:15px;line-height:1.55;color:#9C8A9F;margin:8px 0 0;max-width:62ch;}
+#zh.wait{visibility:hidden;}
+.box.sys #zh{color:#5A93AA;}
+.ozh{display:block;font-size:14px;line-height:1.45;color:#9C8A9F;margin-top:3px;}
+.opt .ozh::before{content:none;}
+.lzh{font-size:14px;color:#9C8A9F;margin:2px 0 0;}
+.sr .sub{display:block;font-size:13px;}
+.vz{padding:10px 0;border-bottom:1px solid var(--line);}
+.vz summary{cursor:pointer;} .vz > p{margin:6px 0 8px;}
+.vr{display:flex;flex-direction:column;gap:2px;padding:6px 0;}
+.vrow{display:flex;gap:6px;align-items:center;}
+.vr select{flex:1;min-width:0;font:inherit;font-size:15px;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:6px 8px;}
+.vr .now{font-size:12px;}
+.tools{display:flex;align-items:center;gap:4px;padding-top:10px;max-width:62ch;}
+.tools .sp{flex:1;}
+#more{font-size:14px;color:var(--gold);opacity:0;transition:opacity .2s;}
+.box.ready #more{opacity:1;animation:bob 1.1s infinite;}
+@keyframes bob{50%{transform:translateY(3px);}}
+#ctx{font-size:15px;color:var(--dim);margin:0 0 10px;font-style:italic;}
+#choices{display:flex;flex-direction:column;gap:8px;}
+.opt{text-align:left;padding:12px 14px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);font-size:17px;line-height:1.4;}
+.opt:hover,.opt:focus-visible{border-color:var(--gold);background:#352540;}
+.opt::before{content:"❧ ";color:var(--gold);}
+.box.choose{cursor:default;}
+.g{border-bottom:2px dotted var(--gold);cursor:pointer;}
+.g.seen{border-bottom-style:solid;border-bottom-color:rgba(226,188,98,.5);}
+.box.sys .g{border-bottom-color:var(--sys);}
+
+/* ---------- popover, toast, windows ---------- */
+#pop{position:fixed;z-index:70;left:max(16px, env(safe-area-inset-left, 0px));right:max(16px, env(safe-area-inset-right, 0px));max-width:420px;margin:0 auto;background:#F4EAEF;color:#24161E;border-radius:8px;padding:12px 44px 12px 14px;box-shadow:0 8px 24px rgba(0,0,0,.5);display:none;}
+#pop.on{display:block;}
+#pop .pw{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+#pop .w{font-weight:700;font-size:19px;} #pop .k{color:#6E5A6A;font-size:14px;}
+#pop .z{color:#9A2E4E;font-size:17px;margin-top:2px;} #pop .d{font-size:14px;color:#4A3A46;margin-top:4px;}
+#pop .x{position:absolute;top:4px;right:4px;}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);background:var(--sysbg);color:var(--sys);border:1px solid var(--sysline);font-family:var(--f-px);font-size:20px;padding:6px 14px;border-radius:4px;z-index:80;opacity:0;transition:opacity .3s;pointer-events:none;max-width:88vw;text-align:center;}
+#toast.on{opacity:1;}
+#modal{position:fixed;inset:0;z-index:60;background:rgba(8,5,12,.72);display:flex;align-items:center;justify-content:center;padding:max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));}
+#modal .box{flex:none;width:100%;max-width:440px;max-height:88vh;overflow-y:auto;cursor:default;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;display:block;box-shadow:0 10px 40px rgba(0,0,0,.6);}
+#modal .box.small{max-width:360px;}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.mh h2,.endc h2{font-family:var(--f-disp);font-weight:400;font-size:26px;margin:0;color:var(--gold2);}
+.msg{font-size:17px;margin:4px 0 14px;}
+.slot{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:1px;padding:10px 14px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);}
+.slot b{font-family:var(--f-disp);font-weight:400;font-size:18px;color:var(--gold);}
+.slot small{color:var(--dim);font-family:var(--f-px);font-size:17px;}
+.slot:disabled{opacity:.45;}
+.sysw{font-family:var(--f-px);font-size:21px;line-height:1.2;color:var(--sys);background:var(--sysbg);border:1px solid var(--sysline);border-radius:4px;padding:10px 12px;margin:0 0 14px;box-shadow:0 0 16px rgba(127,227,255,.12) inset;}
+.sysw p{margin:6px 0;} .sysw .sh{color:#B8F0FF;letter-spacing:.06em;margin-top:6px;}
+.sysw .dim{color:#5FA2BC;font-size:19px;}
+.dm{display:flex;align-items:center;gap:8px;margin:6px 0;} .dm .bar{flex:1;height:10px;background:#06121B;border:1px solid var(--sysline);}
+.dm i{display:block;height:100%;background:linear-gradient(90deg,#FFB35A,#FF5A6E);} .dm.big .bar{height:14px;}
+.tl{margin:4px 0;padding-left:20px;} .tl small{color:#5FA2BC;}
+.ttl{color:var(--gold2);}
+h3{font-family:var(--f-disp);font-weight:400;color:var(--gold);font-size:20px;margin:6px 0;}
+.nb{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;}
+.nb li{display:flex;justify-content:space-between;gap:10px;padding:6px 10px;background:var(--panel2);border-radius:4px;}
+.lg{max-height:64vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
+.le{position:relative;padding-right:34px;} .le p{margin:2px 0 0;} .le .ib{position:absolute;right:0;top:0;}
+.le.sys p{font-family:var(--f-px);font-size:21px;color:var(--sys);line-height:1.2;}
+#modal .box.tall{max-width:480px;}
+.endc{text-align:center;} .endc .kick{font-family:var(--f-px);color:var(--sys);font-size:20px;letter-spacing:.1em;margin:0;}
+.endc h2{margin:0 0 12px;} .endc .sysw{text-align:left;} .endc .col{margin-top:6px;}
+.set{display:flex;flex-direction:column;gap:2px;}
+.sr{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.sr.col2{flex-direction:column;align-items:flex-start;} .sr.col2 p{margin:0;}
+.sr input[type=range]{flex:1;min-width:120px;max-width:200px;accent-color:var(--gold);}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;}
+.seg button{padding:6px 10px;font-size:14px;background:var(--panel2);} .seg button.on{background:var(--gold);color:#2A1A0E;font-weight:700;}
+@media (prefers-reduced-motion: reduce){ .box.ready #more{animation:none;} #doom.bump-up,#doom.bump-down{animation:none;} }
+@media (min-height:760px) and (min-width:500px){ #txt{font-size:19.5px;} }
+</style>
+<style>[hidden]{display:none!important;} :root{padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);} body{margin:0;}</style>
+</head>
+<body>
+
+<section id="title" class="scr">
+  <div class="art"><canvas id="tcv" width="320" height="200"></canvas></div>
+  <div class="tt">
+    <p class="kick">INKQUEST · SEASON 1</p>
+    <h1>The Villainess<i>has read the book</i></h1>
+    <div id="tbtns"></div>
+    <p class="foot">© 2026 Wen-Hung Fang. All rights reserved.</p>
+  </div>
+</section>
+<section id="game" class="scr" hidden>
+  <div class="hud">
+    <button class="ib" id="menuBtn" aria-label="Menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg></button>
+    <span id="epl"></span>
+    <button id="doom" hidden aria-label="Doom meter"><span>DOOM</span><span class="bar"><i></i></span><b>87%</b></button>
+    <button class="ib" data-music aria-label="Music"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg></button>
+  </div>
+  <div class="stagew"><canvas id="cv" width="320" height="200" aria-label="Story scene"></canvas></div>
+  <div class="box" id="box">
+    <span id="tag" hidden></span>
+    <p id="ctx" hidden></p>
+    <p id="txt"></p>
+    <p id="zh" hidden></p>
+    <div id="choices" hidden></div>
+    <div class="tools"><button class="ib sm" id="rd" data-say="" aria-label="Read this line aloud"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button><span class="sp"></span><span id="more">▼</span></div>
+  </div>
+</section>
+<div id="modal" hidden><div class="box"></div></div>
+<div id="pop" role="dialog"></div>
+<div id="toast" role="status"></div>
+<script>
+/* ==== story (compiled from content/s1/*.vn) ==== */
+const STORY = {"episodes":[{"n":1,"title":"Chapter One, Again","nodes":[{"t":"bg","v":"bedroom"},{"t":"music","v":"manor"},{"t":"line","who":"","text":"Silk.","zh":"絲綢。"},{"t":"line","who":"","text":"That's the first thing I notice. Silk under my cheek, silk over my legs, and a smell like roses and money.","zh":"這是我注意到的第一件事。臉頰下是絲綢，腿上蓋的也是絲綢，空氣裡有玫瑰和金錢的味道。"},{"t":"line","who":"","text":"I open my eyes. Above me hangs a [[canopy]] of pale gold cloth with little [[tassels|tassel]]. My apartment has a ceiling fan with one dead light bulb.","zh":"我睜開眼睛。頭頂垂著淡金色的床帳，綴著小小的流蘇。我的公寓只有一台吊扇，上面還有一顆燒壞的燈泡。"},{"t":"line","who":"","text":"This is not my apartment.","zh":"這不是我的公寓。"},{"t":"sfx","v":"knock"},{"t":"line","who":"","text":"Someone knocks. Three small taps, very careful.","zh":"有人敲門。輕輕的三下，小心翼翼。"},{"t":"show","who":"pip","ex":"nervous"},{"t":"gesture","who":"pip","g":"tremble"},{"t":"line","who":"pip","ex":"nervous","text":"Good morning, my lady. I brought your tea.","zh":"小姐早安。我把您的茶端來了。"},{"t":"line","who":"","text":"A girl in a black-and-white maid's dress stands in the doorway. The cups on her tray [[rattle]].","zh":"一個穿著黑白女僕裝的女孩站在門口。她托盤上的茶杯喀啦喀啦地響。"},{"t":"line","who":"","text":"She isn't scared of the tray. She's scared of me.","zh":"她怕的不是托盤。她怕的是我。"},{"t":"line","who":"","text":"Her name pops into my head: Pip. I've never seen her before in my life, but I know it like my own phone number.","zh":"她的名字突然冒進我腦中：琵普。我這輩子從沒見過她，卻熟得像自己的電話號碼。"},{"t":"choice","opts":[{"text":"\"Thank you, Pip. That smells wonderful.\"","tone":"sweet","fx":[{"k":"pip","d":1}],"to":"pip_sweet","zh":"「謝謝妳，琵普。好香啊。」"},{"text":"\"You're shaking. Sit down and drink it yourself.\"","tone":"bold","fx":[{"k":"pip","d":1}],"to":"pip_bold","zh":"「妳在發抖。坐下來，自己喝吧。」"},{"text":"\"Remind me. What day is it today?\"","tone":"sly","fx":[],"to":"pip_sly","zh":"「提醒我一下，今天是什麼日子？」"}]},{"t":"line","who":"pip","ex":"shocked","text":"Thank you… my lady?","zh":"謝謝……小姐？"},{"t":"line","who":"","text":"She says it like a question. She puts the tray down and steps back, fast.","zh":"她說得像在問問題。她放下托盤，飛快地往後退。"},{"t":"line","who":"pip","ex":"worried","text":"Is my lady feeling well?","zh":"小姐，您身體還好嗎？"},{"t":"goto","to":"mirror"},{"t":"line","who":"pip","ex":"shocked","text":"Sit? On… on your bed, my lady?","zh":"坐？坐……坐在您的床上嗎，小姐？"},{"t":"line","who":"eve","ex":null,"text":"In a chair. Anywhere. You look like you need it more than I do.","zh":"坐椅子上。坐哪都行。妳看起來比我更需要這杯茶。"},{"t":"line","who":"","text":"She sits on the very edge of a chair, like it might bite her. She doesn't touch the tea.","zh":"她只坐在椅子最邊邊，好像椅子會咬人似的。茶，她一口也沒碰。"},{"t":"line","who":"","text":"Still. It's a start.","zh":"不過，總算是個開始。"},{"t":"goto","to":"mirror"},{"t":"line","who":"pip","ex":"nervous","text":"It's the day of the Queen's garden party, my lady. You've talked about it for a month.","zh":"小姐，今天是王后的花園派對。您已經念了一整個月了。"},{"t":"line","who":"eve","ex":null,"text":"Have I?","zh":"是嗎？"},{"t":"line","who":"pip","ex":"deadpan","text":"You said, and I quote, \"I will make that little country mouse cry in front of the whole court.\"","zh":"您的原話是：「我要讓那隻鄉下小老鼠當著全宮廷的面哭出來。」"},{"t":"line","who":"","text":"Oh no.","zh":"糟了。"},{"t":"goto","to":"mirror"},{"t":"hide","who":"pip"},{"t":"line","who":"","text":"Pip hurries out to get my dress. I walk to the tall mirror by the window.","zh":"琵普匆匆出去拿我的禮服。我走到窗邊那面高高的鏡子前。"},{"t":"show","who":"eve","ex":"shocked"},{"t":"line","who":"","text":"Pale gold hair in perfect curls. Sharp violet eyes. A face that looks expensive and a little bit mean.","zh":"一頭淡金色的完美捲髮。銳利的紫羅蘭色眼睛。一張看起來很貴、又有點壞心眼的臉。"},{"t":"line","who":"","text":"I know this face. I {{read|red}} about it last night, in bed, at two in the morning.","zh":"我認得這張臉。昨晚凌晨兩點，我躺在床上讀過她。"},{"t":"line","who":"","text":"*The Rose of Ellery*, Chapter One: \"Lady Evangeline Ashcroft was beautiful, and cold as a winter blade.\"","zh":"《艾勒里的玫瑰》第一章：「伊凡潔琳・艾許克羅夫特小姐美麗動人，卻冷得像一把寒冬的刀。」"},{"t":"line","who":"","text":"I'm the [[villainess]]. In Chapter Thirty, they send her to the Frost Isles forever. Her last line in the whole book is, \"No one ever spoke her name again.\"","zh":"我是惡役千金。第三十章，她被永遠流放到霜島。整本書寫到她的最後一句是：「從此再也沒有人提起她的名字。」"},{"t":"gesture","who":"eve","g":"shake"},{"t":"line","who":"eve","ex":"shocked","text":"No. No, no, no.","zh":"不。不不不不。"},{"t":"sfx","v":"ding"},{"t":"line","who":"system","ex":null,"text":"Ding! Hello, Lady Evangeline!","zh":"叮！伊凡潔琳小姐，您好！"},{"t":"line","who":"system","ex":null,"text":"Welcome to the Doom Prevention System, version {{2.3|two point three}} ({{Beta|bay-tuh}}).","zh":"歡迎使用「防止毀滅系統」2.3 版（測試版）。"},{"t":"doom","set":87},{"t":"line","who":"system","ex":null,"text":"Your current [[Doom|doom]]: 87%.","zh":"您目前的毀滅指數：87%。"},{"t":"line","who":"system","ex":null,"text":"Please accept the [[Terms and Conditions|terms]] to continue.","zh":"請同意使用條款以繼續。"},{"t":"choice","opts":[{"text":"\"Accept. Just help me.\"","tone":"bold","fx":[],"to":"sys_bold","zh":"「同意。快幫我就對了。」"},{"text":"\"Can I read the terms first?\"","tone":"sly","fx":[],"to":"sys_sly","zh":"「我可以先看一下條款嗎？」"},{"text":"\"Is this a dream?\"","tone":"sweet","fx":[],"to":"sys_sweet","zh":"「這是夢嗎？」"}]},{"t":"line","who":"system","ex":null,"text":"Great choice! You are a fast reader.","zh":"很棒的選擇！您讀得真快。"},{"t":"goto","to":"rules"},{"t":"line","who":"system","ex":null,"text":"Of course! Terms: 1. Don't get [[exiled|exile]]. 2. See Term 1.","zh":"當然可以！條款：一、不要被流放。二、請見第一條。"},{"t":"line","who":"system","ex":null,"text":"Thank you for reading!","zh":"感謝您的閱讀！"},{"t":"goto","to":"rules"},{"t":"line","who":"system","ex":null,"text":"No! Dreams don't have a customer service team. I do.","zh":"不是喔！夢可沒有客服團隊。我有。"},{"t":"goto","to":"rules"},{"t":"line","who":"system","ex":null,"text":"Here's how it works. Act like the old Evangeline, and your Doom goes up. Surprise the story, and it goes down.","zh":"規則是這樣的：表現得像原本的伊凡潔琳，毀滅指數就會上升；讓故事出乎意料，指數就會下降。"},{"t":"line","who":"system","ex":null,"text":"If your Doom is still high at the Winter Ball…","zh":"如果到了冬季舞會，您的毀滅指數還很高……"},{"t":"line","who":"system","ex":null,"text":"Well! Let's stay positive!","zh":"嗯！我們保持正面思考吧！"},{"t":"sfx","v":"ding"},{"t":"line","who":"system","ex":null,"text":"New [[quest]]: Survive Chapter One.","zh":"新任務：活過第一章。"},{"t":"show","who":"eve","ex":"worried"},{"t":"line","who":"","text":"Chapter One. The garden party. The fountain.","zh":"第一章。花園派對。噴泉。"},{"t":"line","who":"","text":"In the book, Evangeline pushes Lily into the fountain in front of everyone. Lily comes up wet and crying, and Prince Cedric runs to save her. That's where their love story starts. And that's where mine starts to end.","zh":"書裡，伊凡潔琳當著所有人的面把莉莉推進噴泉。莉莉渾身濕透、哭著爬起來，賽德瑞克王子衝過去救她。他們的愛情故事從這裡開始。我的結局，也從這裡開始。"},{"t":"line","who":"eve","ex":"smug","text":"Easy. I just won't push anybody.","zh":"簡單。我不要推任何人就好了。"},{"t":"line","who":"system","ex":null,"text":"That's the spirit!","zh":"就是這種精神！"},{"t":"line","who":"","text":"The System doesn't sound sure.","zh":"系統聽起來不太有把握。"},{"t":"hide","who":"eve"},{"t":"bg","v":"garden"},{"t":"music","v":"waltz"},{"t":"line","who":"","text":"The Queen's garden is a sea of hats. A string quartet plays under the roses, and everyone holds a teacup and a secret.","zh":"王后的花園是一片帽子的海洋。弦樂四重奏在玫瑰下演奏，每個人手裡都端著一杯茶，心裡都藏著一個祕密。"},{"t":"line","who":"","text":"In the middle of it all stands the fountain. White stone, three levels, a stone swan on top. It looks innocent. It is not.","zh":"正中央立著那座噴泉。白色的石頭，三層，頂端一隻石天鵝。它看起來很無辜。它才不是。"},{"t":"line","who":"","text":"People step out of my way. A woman whispers my name, like a warning.","zh":"人們紛紛讓路給我。一位女士低聲念著我的名字，像在發出警告。"},{"t":"show","who":"lily","ex":"smile"},{"t":"gesture","who":"lily","g":"hop"},{"t":"line","who":"","text":"Then a girl in a pink dress walks right up to me. Brown hair, a simple ribbon, a nervous smile.","zh":"接著，一個穿粉紅洋裝的女孩直直走向我。棕色頭髮，一條簡單的緞帶，一抹緊張的微笑。"},{"t":"line","who":"","text":"Lily Bell. The [[heroine]]. By Chapter Three, everyone in this book loves her.","zh":"莉莉・貝爾。女主角。到了第三章，書裡每個人都愛她。"},{"t":"line","who":"lily","ex":"smile","text":"Lady Evangeline! I'm Lily. I just wanted to say hello. Your dress is so beautiful.","zh":"伊凡潔琳小姐！我是莉莉。我只是想來打聲招呼。您的禮服好美。"},{"t":"line","who":"","text":"In the book, Evangeline looks her up and down and says, \"Who let the country mouse in?\"","zh":"書裡，伊凡潔琳上下打量她，說：「誰把這隻鄉下老鼠放進來的？」"},{"t":"show","who":"eve","ex":"neutral"},{"t":"choice","opts":[{"text":"\"Thank you. Yours is lovely too. Pink really suits you.\"","tone":"sweet","fx":[{"k":"lily","d":1},{"k":"doom","d":-2}],"to":"lily_sweet","zh":"「謝謝妳。妳的也很漂亮，粉紅色真的很適合妳。」"},{"text":"\"Lily, listen to me. Stay away from that fountain today.\"","tone":"bold","fx":[{"k":"doom","d":-1}],"to":"lily_bold","zh":"「莉莉，聽我說。今天離那座噴泉遠一點。」"},{"text":"\"Walk with me? The roses on the other side are better.\"","tone":"sly","fx":[{"k":"doom","d":-1}],"to":"lily_sly","zh":"「陪我走走？另一邊的玫瑰更好看。」"}]},{"t":"gesture","who":"lily","g":"hop"},{"t":"line","who":"lily","ex":"smile","text":"Really? I made it myself!","zh":"真的嗎？這是我自己做的！"},{"t":"line","who":"eve","ex":"smile","text":"You made this? Lily, that's amazing.","zh":"這是妳做的？莉莉，太厲害了吧。"},{"t":"line","who":"","text":"She turns pink, the same color as her dress. Somewhere behind us, someone drops a teacup.","zh":"她的臉紅了，跟她的洋裝一樣粉。我們身後不知哪裡，有人摔了一個茶杯。"},{"t":"goto","to":"plot"},{"t":"line","who":"lily","ex":"shocked","text":"The… fountain?","zh":"那……噴泉？"},{"t":"line","who":"eve","ex":null,"text":"Just trust me.","zh":"相信我就對了。"},{"t":"line","who":"","text":"Lily looks at the fountain. Then she looks at me, like I have two heads.","zh":"莉莉看看噴泉，再看看我，好像我多長了一顆頭。"},{"t":"line","who":"lily","ex":"worried","text":"Okay…?","zh":"好……喔？"},{"t":"goto","to":"plot"},{"t":"line","who":"lily","ex":"smile","text":"Oh! I'd love to.","zh":"喔！我很樂意。"},{"t":"line","who":"","text":"I take her arm and walk her away from the fountain, slow and easy, like a sheepdog. Every step feels like a win.","zh":"我挽著她的手臂，帶她慢慢遠離噴泉，像一隻牧羊犬。每走一步都像打了一場勝仗。"},{"t":"goto","to":"plot"},{"t":"hide","who":"eve"},{"t":"line","who":"","text":"For ten whole minutes, nothing happens. Nobody pushes anybody. I start to breathe again.","zh":"整整十分鐘，什麼事都沒發生。沒有人推任何人。我終於又能呼吸了。"},{"t":"line","who":"","text":"But the garden paths curve and turn, and somehow every one of them leads back to the fountain.","zh":"可是花園的小徑彎來繞去，不知怎麼的，每一條都通回那座噴泉。"},{"t":"sfx","v":"crash"},{"t":"shake"},{"t":"line","who":"","text":"Then a little white dog [[shoots]] across the lawn. A lady screams. A waiter spins, and his tray of lemon cakes flies into the air.","zh":"接著，一隻小白狗一溜煙衝過草地。一位女士尖叫。一個侍者轉了一圈，他那盤檸檬蛋糕飛上了天。"},{"t":"line","who":"","text":"Lily steps back to get out of the way. One step. Two.","zh":"莉莉往後退，想讓開。一步。兩步。"},{"t":"line","who":"","text":"Her heel catches a cracked stone. Her arms fly up like wings.","zh":"她的鞋跟卡到一塊裂開的石頭。她的雙臂像翅膀一樣往上一揮。"},{"t":"line","who":"","text":"Behind her, the fountain. Of course it's the fountain.","zh":"她身後，就是噴泉。當然是噴泉。"},{"t":"sfx","v":"splash"},{"t":"hide","who":"lily"},{"t":"line","who":"","text":"SPLASH.","zh":"嘩啦！"},{"t":"music","v":"none"},{"t":"line","who":"","text":"The music stops. Two hundred heads turn.","zh":"音樂停了。兩百顆頭轉了過來。"},{"t":"line","who":"","text":"Not to Lily. To me.","zh":"不是看莉莉。是看我。"},{"t":"show","who":"eve","ex":"shocked"},{"t":"line","who":"","text":"I know that look. In the book, everyone wears it just before everything goes wrong.","zh":"我認得那種眼神。書裡，一切出錯之前，每個人臉上都是這種表情。"},{"t":"choice","opts":[{"text":"Jump in after her.","tone":"sweet","fx":[{"k":"doom","d":-8},{"k":"lily","d":1},{"flag":"fountain","v":"jump"}],"to":"f_jump","zh":"跟著跳下去。"},{"text":"Pull her out, then make the crowd laugh with her, not at her.","tone":"bold","fx":[{"k":"doom","d":-6},{"k":"lily","d":1},{"flag":"fountain","v":"joke"}],"to":"f_joke","zh":"把她拉出來，再讓大家跟她一起笑，而不是笑她。"},{"text":"Point at the cracked stone before anyone can blame you.","tone":"sly","fx":[{"k":"doom","d":-4},{"flag":"fountain","v":"stone"}],"to":"f_stone","zh":"趁還沒人怪到妳頭上，先指著那塊裂開的石頭。"}]},{"t":"sfx","v":"splash"},{"t":"hide","who":"eve"},{"t":"line","who":"","text":"I don't think. I jump.","zh":"我沒多想。我跳了下去。"},{"t":"line","who":"","text":"The water is cold, and it smells like old coins. My shoes fill up. My perfect curls go flat.","zh":"水好冰，有一股舊銅板的味道。我的鞋子灌滿了水。我完美的捲髮全塌了。"},{"t":"line","who":"","text":"I grab Lily under the arms and pull her up. She coughs. A wet rose petal sits on her nose.","zh":"我從腋下抱住莉莉，把她拉起來。她咳了幾聲。一片濕答答的玫瑰花瓣黏在她鼻子上。"},{"t":"show","who":"lily","ex":"teary"},{"t":"line","who":"lily","ex":"teary","text":"You… you jumped in?","zh":"妳……妳跳下來了？"},{"t":"line","who":"eve","ex":null,"text":"You looked like you needed company.","zh":"妳看起來需要有人陪。"},{"t":"line","who":"","text":"Two hundred people stare at two wet girls in a fountain. Nobody knows what to say. This never happened in the book.","zh":"兩百個人盯著噴泉裡兩個濕透的女孩，誰也不知道該說什麼。書裡從來沒有這一段。"},{"t":"sfx","v":"down"},{"t":"line","who":"system","ex":null,"text":"Ding! Unexpected action! Doom down 8%.","zh":"叮！出乎意料的行動！毀滅指數下降 8%。"},{"t":"goto","to":"cliff"},{"t":"hide","who":"eve"},{"t":"line","who":"","text":"I march to the fountain, reach in, and pull her out by both hands. She stands there, dripping, red to the ears.","zh":"我大步走到噴泉邊，伸手抓住她的雙手，把她拉了出來。她站在那裡，全身滴著水，紅到耳根。"},{"t":"line","who":"","text":"Somebody giggles. Then somebody else.","zh":"有人咯咯笑了。接著又有一個人。"},{"t":"line","who":"","text":"So I turn to the crowd and lift my chin.","zh":"於是我轉向人群，抬起下巴。"},{"t":"show","who":"eve","ex":"smug"},{"t":"line","who":"eve","ex":"smug","text":"Wet silk. It's very big this season. You'll all be wearing it by spring.","zh":"濕絲綢，是這一季最流行的。到了春天，你們每個人都會穿。"},{"t":"line","who":"","text":"One second. Two. Then the Queen laughs, a real laugh, and the whole garden laughs with her. With Lily. Not at her.","zh":"一秒。兩秒。接著王后笑了，是真心的笑，整座花園也跟著她一起笑。是跟莉莉一起笑，不是笑她。"},{"t":"show","who":"lily","ex":"teary"},{"t":"line","who":"lily","ex":"teary","text":"Thank you.","zh":"謝謝妳。"},{"t":"sfx","v":"down"},{"t":"line","who":"system","ex":null,"text":"Ding! Bold move! Doom down 6%.","zh":"叮！大膽的一步！毀滅指數下降 6%。"},{"t":"goto","to":"cliff"},{"t":"show","who":"eve","ex":"smug"},{"t":"line","who":"eve","ex":"smug","text":"Careful, everyone! This stone is cracked. Someone could get hurt!","zh":"大家小心！這塊石頭裂開了，會有人受傷的！"},{"t":"line","who":"","text":"I point at the crack. Two hundred heads turn, like birds on a wire.","zh":"我指著那道裂縫。兩百顆頭轉了過去，像電線上的一排鳥。"},{"t":"line","who":"","text":"A servant runs for the gardener. A lady cries, \"Shocking! In the Queen's own garden!\"","zh":"一個僕人跑去找園丁。一位女士驚呼：「太不像話了！竟然是在王后自己的花園裡！」"},{"t":"line","who":"","text":"Nobody looks at me now. Nobody looks at Lily either. She climbs out alone, dripping, and sits on the edge of the fountain.","zh":"現在沒人看我了。也沒人看莉莉。她獨自爬出來，全身滴著水，坐在噴泉邊上。"},{"t":"sfx","v":"down"},{"t":"line","who":"system","ex":null,"text":"Ding! Clever. Doom down 4%.","zh":"叮！聰明。毀滅指數下降 4%。"},{"t":"goto","to":"cliff"},{"t":"sfx","v":"ding"},{"t":"line","who":"system","ex":null,"text":"Chapter One event complete. Story [[pressure]] +3%.","zh":"第一章事件完成。故事壓力 +3%。"},{"t":"doom","d":3},{"t":"line","who":"eve","ex":"worried","text":"Story pressure? What does that—","zh":"故事壓力？那是什麼——"},{"t":"music","v":"tension"},{"t":"hide","who":"lily"},{"t":"hide","who":"eve"},{"t":"line","who":"","text":"Across the lawn, the crowd opens like a curtain.","zh":"草地另一頭，人群像布幕一樣向兩側分開。"},{"t":"show","who":"cedric","ex":"angry"},{"t":"gesture","who":"cedric","g":"enter"},{"t":"line","who":"","text":"A tall young man in a blue coat walks straight toward me. Golden hair, a face from the cover of a romance novel.","zh":"一個穿藍色外套的高個子年輕男人直直朝我走來。金色頭髮，一張從言情小說封面走出來的臉。"},{"t":"line","who":"","text":"Prince Cedric. My [[fiancé]].","zh":"賽德瑞克王子。我的未婚夫。"},{"t":"line","who":"","text":"He looks at the fountain. He looks at wet Lily. Then he looks at me.","zh":"他看看噴泉，看看濕透的莉莉，然後看向我。"},{"t":"line","who":"cedric","ex":"angry","text":"Evangeline!","zh":"伊凡潔琳！"},{"t":"gesture","who":"cedric","g":"shake"},{"t":"line","who":"cedric","ex":"angry","text":"What have you *done*?","zh":"妳做了什麼好事？"},{"t":"title","flag":"fountain","val":"jump","name":"Soggy Savior"},{"t":"title","flag":"fountain","val":"joke","name":"Trendsetter (Wet)"},{"t":"title","flag":"fountain","val":"stone","name":"Stone Inspector"},{"t":"end"}],"labels":{"pip_sweet":15,"pip_bold":19,"pip_sly":24,"mirror":29,"sys_bold":45,"sys_sly":47,"sys_sweet":50,"rules":52,"party":63,"lily_sweet":77,"lily_bold":82,"lily_sly":87,"plot":90,"f_jump":108,"f_joke":120,"f_stone":132,"cliff":140}}]};
+/* ==== content/cast.js ==== */
+/* Who speaks: the name tag, its color, and the read-aloud voice.
+   g: f or m picks a voice from the device; p and r are pitch and rate.
+   Eve and the narration (her thoughts) use the main voice. */
+const CAST = {
+  eve:{name:"Eve", color:"#E2BC62", main:true, p:1, r:1},
+  pip:{name:"Pip", color:"#B9D3C2", g:"f", p:1.08, r:1.02},
+  lily:{name:"Lily", color:"#F2A3BC", g:"f", p:1.14, r:.98},
+  cedric:{name:"Prince Cedric", color:"#8FB4F0", g:"m", p:.98, r:.95},
+  rowan:{name:"Duke Rowan", color:"#B7A6D9", g:"m", p:.86, r:.88},
+  system:{name:"SYSTEM", color:"#7FE3FF", g:"f", p:1.18, r:1.08}
+};
+
+/* names the English voice gets wrong, respelled for the voice only.
+   Check each one on the iPhone before shipping. */
+const SAY_AS = {"Cedric":"Sedrick"};
+
+/* words in another language: [language, English respelling, native spelling] */
+const FOREIGN = {};
+
+/* ==== content/gloss.js ==== */
+/* tooltips for [[marked]] words: the word, KK phonetics, Chinese, and a short note */
+const GLOSS = {
+  "canopy":{w:"canopy", kk:"[ˋkænəpɪ]", zh:"床頂的帳幔", d:"四柱床上方垂掛的布篷。"},
+  "tassel":{w:"tassel", kk:"[ˋtæsḷ]", zh:"流蘇", d:"複數是 tassels。"},
+  "rattle":{w:"rattle", kk:"[ˋrætḷ]", zh:"喀啦喀啦地響", d:"東西互相碰撞、抖動時發出的聲音。"},
+  "villainess":{w:"villainess", kk:"[ˋvɪlənɪs]", zh:"女反派；惡役千金", d:"villain（反派）的女性形。網路小說裡的「惡役千金」就是 the villainess。"},
+  "doom":{w:"doom", kk:"[dum]", zh:"厄運；毀滅", d:"這裡是 System 的「毀滅指數」：越高越危險。"},
+  "terms":{w:"Terms and Conditions", kk:"[tɝmz ən kənˋdɪʃənz]", zh:"使用條款", d:"註冊 App 時那一大段沒人會讀的文字。"},
+  "exile":{w:"exile", kk:"[ˋɛgzaɪl]", zh:"流放；放逐", d:"get exiled = 被流放。"},
+  "quest":{w:"quest", kk:"[kwɛst]", zh:"任務", d:"遊戲裡的「任務」。也有「追尋」的意思。"},
+  "heroine":{w:"heroine", kk:"[ˋhɛroɪn]", zh:"女主角；女英雄", d:"發音和 heroin（海洛因）一樣，拼法多一個 e。"},
+  "shoots":{w:"shoot", kk:"[ʃut]", zh:"飛快地衝過", d:"這裡不是「射擊」。shoot across the lawn = 從草地上一溜煙衝過去。"},
+  "pressure":{w:"pressure", kk:"[ˋprɛʃɚ]", zh:"壓力", d:"under pressure = 承受壓力。"},
+  "fiancé":{w:"fiancé", kk:"[ˏfiənˋse]", zh:"未婚夫", d:"未婚妻是 fiancée，多一個 e，發音一樣。來自法文。"}
+};
+
+/* ==== content/tracks.js ==== */
+/* Songs for Season 1, in the Lamplight FM voices. One token = one eighth note:
+   a note (C4, F#5), a chord (C4+E4+G4), "_" holds the last note, "-" rests, "|" is just a bar line. */
+const TRACKS = {
+  /* the title screen: "The Rose of Ellery", a stately theme in D */
+  title:{n:"The Rose of Ellery", bpm:80, swing:0, parts:[
+    {p:"ep", s:"D3+F#3+A3+D4 _ _ _ _ _ _ _ | B2+D3+F#3+A3 _ _ _ _ _ _ _ | G2+B2+D3+F#3 _ _ _ _ _ _ _ | A2+C#3+E3+G3 _ _ _ _ _ _ _ | D3+F#3+A3+E4 _ _ _ _ _ _ _ | F#2+A2+C#3+E3 _ _ _ _ _ _ _ | G2+B2+D3+A3 _ _ _ _ _ _ _ | A2+C#3+E3+A3 _ _ _ _ _ _ _", strum:.03, vel:.85},
+    {p:"bass", s:"D2 _ _ _ A2 _ _ _ | B1 _ _ _ F#2 _ _ _ | G1 _ _ _ D2 _ _ _ | A1 _ _ _ E2 _ _ _ | D2 _ _ _ A2 _ _ _ | F#1 _ _ _ C#2 _ _ _ | G1 _ _ _ D2 _ _ _ | A1 _ _ _ E2 _ _ _"},
+    {p:"bell", s:"F#5 _ _ _ A5 _ D6 _ | D6 _ C#6 _ B5 _ _ _ | B5 _ A5 _ G5 _ F#5 _ | E5 _ _ _ _ _ - - | F#5 _ A5 _ D6 _ E6 _ | C#6 _ _ _ A5 _ _ _ | B5 _ D6 _ C#6 _ B5 _ | A5 _ _ _ _ _ - -"}]},
+  /* cozy manor mornings: electric piano and bells in F */
+  manor:{n:"Morning at Ashcroft Hall", bpm:76, swing:.12, parts:[
+    {p:"ep", s:"F3+A3+C4+E4 _ _ _ _ _ _ _ | A3+C4+E4+G4 _ _ _ _ _ _ _ | A#2+D3+F3+A3 _ _ _ _ _ _ _ | C3+E3+G3+D4 _ _ _ _ _ _ _ | F3+A3+C4+E4 _ _ _ _ _ _ _ | D3+F3+A3+C4 _ _ _ _ _ _ _ | G3+A#3+D4+F4 _ _ _ _ _ _ _ | C3+E3+A#3+D4 _ _ _ _ _ _ _", strum:.028},
+    {p:"bass", s:"F2 _ _ _ C3 _ _ _ | A2 _ _ _ E2 _ _ _ | A#1 _ _ _ F2 _ _ _ | C2 _ _ _ G2 _ _ _ | F2 _ _ _ C3 _ _ _ | D2 _ _ _ A2 _ _ _ | G2 _ _ _ D2 _ _ _ | C2 _ _ _ G2 _ _ _"},
+    {p:"bell", s:"- - C5 _ F5 _ A5 _ | G5 _ E5 _ C5 _ - - | - - D5 _ F5 _ A5 _ | G5 _ _ _ _ _ - - | - - C5 _ F5 _ A5 _ | C6 _ A5 _ F5 _ - - | A#5 _ A5 _ G5 _ F5 _ | E5 _ _ _ G5 _ - -"}]},
+  /* the Queen's garden party: a waltz in G, six eighths to a bar */
+  waltz:{n:"The Queen's Garden", bpm:138, swing:0, parts:[
+    {p:"bass", s:"G2 _ - - - - | E2 _ - - - - | A2 _ - - - - | D2 _ - - - - | G2 _ - - - - | B1 _ - - - - | C2 _ - - - - | D2 _ - - - -"},
+    {p:"ep", s:"- - B3+D4+G4 _ B3+D4+G4 _ | - - B3+E4+G4 _ B3+E4+G4 _ | - - A3+C4+E4 _ A3+C4+E4 _ | - - A3+C4+F#4 _ A3+C4+F#4 _ | - - B3+D4+G4 _ B3+D4+G4 _ | - - B3+D4+F#4 _ B3+D4+F#4 _ | - - C4+E4+G4 _ C4+E4+G4 _ | - - A3+C4+F#4 _ A3+C4+F#4 _", vel:.7},
+    {p:"harp", s:"D5 _ _ _ G5 _ | B5 _ _ _ G5 _ | C6 _ _ _ A5 _ | F#5 _ _ _ D5 _ | D5 _ G5 _ B5 _ | D6 _ _ _ B5 _ | C6 _ B5 _ A5 _ | A5 _ _ _ _ _", vel:1.1}]},
+  /* a canon event bearing down: A minor, a pulse that won't stop */
+  tension:{n:"Story Pressure", bpm:96, swing:0, parts:[
+    {p:"pad", s:"A2+E3+A3+C4 _ _ _ _ _ _ _ | F2+C3+F3+A3 _ _ _ _ _ _ _ | D3+F3+A3+D4 _ _ _ _ _ _ _ | E3+G#3+B3+D4 _ _ _ _ _ _ _"},
+    {p:"bass", s:"A1 A1 A1 A1 A1 A1 A1 A1 | F1 F1 F1 F1 F1 F1 F1 F1 | D2 D2 D2 D2 D2 D2 D2 D2 | E2 E2 E2 E2 E2 E2 E2 E2", vel:.7},
+    {p:"mar", s:"A4 C5 E5 C5 A4 C5 E5 C5 | A4 C5 F5 C5 A4 C5 F5 C5 | A4 D5 F5 D5 A4 D5 F5 D5 | G#4 B4 E5 B4 G#4 B4 E5 B4", vel:.5}]}
+};
+
+/* ==== content/season.js ==== */
+/* Season 1 episode titles. An episode shows its title once it unlocks. */
+const SEASONS = [
+  {n:1, title:"Season 1", eps:["Chapter One, Again","Not My Type","The Cake Incident","Two Systems","Operation: Dump the Prince","The Duke of the North","The Night Before","The Winter Ball"]}
+];
+
+/* ==== engine/core.js ==== */
+/* =========================================================
+   THE VILLAINESS HAS READ THE BOOK — core helpers
+   Storage, markup, glossary popovers and read-aloud.
+   Ported from Window Seat: The Game (store, mk, openGloss) and the
+   Window Seat textbooks' engine (voices, speakParts, nativeVoice, prosody).
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const PREFIX = "vil-";
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(PREFIX+k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(PREFIX+k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(PREFIX+k); }catch(e){} }
+};
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------------- story markup ----------------
+   [[shown|key]] opens a gloss; *word* is italic. */
+const RX = /\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]/g;
+const SPOKEN = /\{\{([^|}]+)\|([^}]+)\}\}/g;   /* {{shown|spoken}}: the voice says the second word */
+const plain = s => String(s).replace(SPOKEN, "$1").replace(RX, "$1").replace(/\*([^*]+)\*/g, "$1");
+function mk(s){
+  return esc(s).replace(SPOKEN, "$1").replace(RX, (m, disp, key)=>{
+    key = key || disp.toLowerCase();
+    const seen = (typeof S !== "undefined" && S && S.notes && S.notes.includes(key)) ? " seen" : "";
+    return `<span class="g${seen}" role="button" tabindex="0" data-k="${esc(key)}">${disp}</span>`;
+  }).replace(/\*([^*]+)\*/g, "<em>$1</em>");
+}
+function toast(t){ const el = $("#toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(()=>el.classList.remove("on"), 2400); }
+
+const ICON = {
+  spk:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg>',
+  music:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>',
+  menu:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>',
+  x:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6L19 6.4 17.6 5 12 10.6z"/></svg>',
+  log:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v2H4zm0 4h10v2H4zm0 4h16v2H4zm0 4h10v2H4z"/></svg>'
+};
+
+/* ---------------- glossary popover ---------------- */
+function openGloss(k, anchor){
+  const g = GLOSS[k]; if(!g) return;
+  if(typeof S !== "undefined" && S && !S.notes.includes(k)){ S.notes.push(k); if(typeof autosave === "function") autosave(); }
+  const p = $("#pop");
+  p.innerHTML = `<button class="ib x" data-close aria-label="Close">${ICON.x}</button>
+    <div class="pw"><span class="w">${esc(g.w || k)}</span>${g.kk ? `<span class="k">${esc(g.kk)}</span>` : ""}
+    <button class="ib" data-say="${esc(g.w || k)}" aria-label="Say it">${ICON.spk}</button></div>
+    <div class="z">${esc(g.zh)}</div>${g.d ? `<div class="d">${esc(g.d)}</div>` : ""}`;
+  const r = anchor.getBoundingClientRect();
+  p.classList.add("on");
+  const h = p.offsetHeight;
+  p.style.top = (r.bottom + 8 + h > innerHeight ? Math.max(8, r.top - h - 8) : r.bottom + 8) + "px";
+  anchor.classList.add("seen");
+}
+document.addEventListener("click", e=>{
+  const g = e.target.closest(".g"); if(g){ e.stopPropagation(); e.preventDefault(); openGloss(g.dataset.k, g); return; }
+  const sp = e.target.closest("[data-say]"); if(sp){ e.stopPropagation(); Voice.say(sp.dataset.say, sp.dataset.who || ""); return; }
+  if((e.target.closest("[data-close]") || !e.target.closest("#pop")) && $("#pop").classList.contains("on")){ $("#pop").classList.remove("on"); e.stopPropagation(); }
+}, true);
+
+/* ---------------- read-aloud ----------------
+   One voice per character, picked from the device's English voices by gender, with
+   each character's pitch and rate. Names the voice gets wrong go in SAY_AS (respellings);
+   words in another language go in FOREIGN and use that language's voice when the device has one. */
+const Voice = (()=>{
+  const SYN = window.speechSynthesis || null;
+  let rate = store.get("rate", .9);
+  const POOL = {all:[], f:[], m:[], main:null};
+  const FEM = /Samantha|Martha|Catherine|Stephanie|Matilda|Ava|Allison|Susan|Zira|Aria|Jenny|Michelle|Emma|Joanna|Salli|Kendra|Kimberly|Ivy|Karen|Moira|Tessa|Victoria|Serena|Kate|Fiona|Veena|Libby|Sonia|Natasha|Nicky|Sara|Female|Google US English/i;
+  const MAL = /Alex|Daniel|Tom|Aaron|Arthur|Rishi|David|Mark|Guy|Ryan|Eric|Christopher|Matthew|Joey|Justin|Brian|Oliver|Gordon|Lee|Evan|Nathan|Male/i;
+  const NOVELTY = /Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Deranged|Good News|Hysterical|Jester|Junior|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Ralph|Fred|Kathy|Princess|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley/i;
+  /* 0 normal, 1 enhanced, 2 premium: iPhone gives enhanced voices the same name, so read the voiceURI too */
+  const vq = v => { const s = (v.voiceURI || "") + " " + v.name; return /premium|高品質|優質/i.test(s) ? 2 : /enhanced|增強|加強|Natural|Neural|Online/i.test(s) ? 1 : 0; };
+  function pick(){
+    if(!SYN) return;
+    /* American, British and Australian English first (the UK and Australian voices suit the court); other English last */
+    const us = v => /^en[-_]US/i.test(v.lang) ? 0 : /^en[-_]GB/i.test(v.lang) ? 1 : /^en[-_]AU/i.test(v.lang) ? 2 : 3;
+    const vs = SYN.getVoices().filter(v=>/^en/i.test(v.lang) && !NOVELTY.test(v.name)).sort((a,b)=>us(a)-us(b) || vq(b)-vq(a));
+    POOL.all = vs;
+    /* characters get US, UK or Australian voices. With too few on the device, characters share a voice
+       and differ by pitch. Other English voices only if none of those three are installed. */
+    const usv = vs.filter(v=>us(v) <= 2), base = usv.length ? usv : vs;
+    POOL.f = base.filter(v=>FEM.test(v.name)); POOL.m = base.filter(v=>!FEM.test(v.name) && MAL.test(v.name));
+    if(!POOL.m.length) POOL.m = base.filter(v=>!FEM.test(v.name));
+    POOL.main = vs.find(v=>us(v)===0 && /Samantha|Google US English|Aria|Jenny|Ava|Allison/i.test(v.name)) || POOL.f[0] || vs[0] || null;
+  }
+  if(SYN){ pick(); SYN.onvoiceschanged = pick; }
+  function voiceFor(who){
+    const own = store.get("voice-" + who, "");   /* the player picked this voice in Settings */
+    if(own){ const v = POOL.all.find(x=>x.voiceURI === own); if(v) return v; }
+    const c = CAST[who];
+    if(!c || c.main || !c.g) return POOL.main;
+    const pool = (c.g === "f" ? POOL.f : POOL.m).filter(v=>v !== POOL.main);
+    if(!pool.length) return POOL.main;
+    const same = Object.keys(CAST).filter(n=>!CAST[n].main && CAST[n].g === c.g);
+    return pool[same.indexOf(who) % pool.length];
+  }
+  const sayAs = t => Object.entries(SAY_AS).reduce((x,[w,r])=>x.split(w).join(r), t);
+  const FOR = {}; Object.entries(FOREIGN).forEach(([k,v])=>{ FOR[k.toLowerCase()] = {lang:v[0], en:v[1], nat:v[2] || k}; });
+  const FRX = Object.keys(FOR).length ? new RegExp("(^|[^\\p{L}])(" + Object.keys(FOR).sort((a,b)=>b.length-a.length)
+    .map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|") + ")(?![\\p{L}])", "giu") : null;
+  function nativeVoice(lang){
+    if(!SYN || !lang) return null; const L = lang.toLowerCase(), base = L.split("-")[0];
+    const vs = SYN.getVoices().filter(v=>!NOVELTY.test(v.name)), nm = v => String(v.lang).replace("_","-").toLowerCase();
+    const best = a => a.slice().sort((x,y)=>vq(y)-vq(x))[0];
+    return best(vs.filter(v=>nm(v) === L)) || best(vs.filter(v=>nm(v).split("-")[0] === base)) || null;
+  }
+  function speakParts(s){
+    const raw = [];
+    if(FRX){ let i = 0, m; FRX.lastIndex = 0;
+      while((m = FRX.exec(s))){ const st = m.index + m[1].length;
+        if(st > i) raw.push({t:s.slice(i, st)}); raw.push({t:m[2], f:FOR[m[2].toLowerCase()]}); i = st + m[2].length; FRX.lastIndex = i; }
+      if(i < s.length) raw.push({t:s.slice(i)});
+    } else raw.push({t:s});
+    const parts = [];
+    raw.forEach(p=>{ const nv = p.f && nativeVoice(p.f.lang);
+      if(nv){ parts.push({t:p.f.nat, nv}); return; }
+      const t = p.f ? p.f.en : sayAs(p.t), last = parts[parts.length-1];
+      if(last && !last.nv) last.t += t; else parts.push({t}); });
+    return parts.filter(p=>p.nv || /[\p{L}\p{N}]/u.test(p.t));
+  }
+  const speakable = t => plain(String(t).replace(SPOKEN, "$2")).replace(/[“”]/g,'"').replace(/[’‘]/g,"'").replace(/…/g,"...").replace(/—/g,", ");
+  function sentences(t){ const s = speakable(t); return (s.match(/[^.!?]+(?:[.!?]+["']?|$)/g) || [s]).map(x=>x.trim()).filter(Boolean); }
+  function prosody(sent, who){
+    const c = CAST[who] || {p:1, r:1};
+    let r = rate * (c.r || 1), p = c.p || 1;
+    if(/!["']?$/.test(sent)){ r *= 1.05; p += .06; } else if(/\?["']?$/.test(sent)) p += .06;
+    return {rate:clamp(r, .5, 1.5), pitch:clamp(p, .8, 1.25)};   /* compact voices turn cartoonish outside ~0.8–1.25 */
+  }
+  let qid = 0, onDone = null;
+  function stop(){ qid++; if(SYN) SYN.cancel(); Audio2.duck(false); const f = onDone; onDone = null; if(f) f(); }
+  /* speak a line, sentence by sentence, then call done() */
+  function say(text, who, done){
+    if(!SYN){ if(done) done(); return; }
+    stop(); const id = ++qid; onDone = done || null;
+    const q = [];
+    sentences(text).forEach(s=>{ const pr = prosody(s, who), v = voiceFor(who);
+      speakParts(s).forEach(p=>q.push({t:p.t, v:p.nv || v, lang:p.nv ? p.nv.lang : (v ? v.lang : "en-US"), pr})); });
+    Audio2.duck(true);
+    const next = () => {
+      if(id !== qid) return;
+      const it = q.shift();
+      if(!it){ Audio2.duck(false); const f = onDone; onDone = null; if(f) f(); return; }
+      const u = new SpeechSynthesisUtterance(it.t);
+      if(it.v) u.voice = it.v; u.lang = it.lang; u.rate = it.pr.rate; u.pitch = it.pr.pitch;
+      u.onend = u.onerror = next;
+      SYN.speak(u);
+    };
+    next();
+  }
+  /* iOS needs one spoken utterance from a tap before later ones play */
+  ["touchend","click"].forEach(t=>document.addEventListener(t, ()=>{ if(SYN && !window.__spk){ window.__spk = 1; try{ const u = new SpeechSynthesisUtterance(" "); u.volume = 0; SYN.speak(u); }catch(e){} } }, true));
+  /* for Settings: the English voices on this device, US first, and who uses which */
+  const label = v => `${v.name} (${String(v.lang).replace("_","-")})${vq(v) === 2 ? " · Premium" : vq(v) === 1 ? " · Enhanced" : ""}`;
+  function voices(){ return POOL.all.map(v=>({uri:v.voiceURI, label:label(v)})); }
+  function current(who){ const v = voiceFor(who); return v ? v.voiceURI : ""; }
+  function setVoice(who, uri){ if(uri) store.set("voice-" + who, uri); else store.del("voice-" + who); }
+  return { say, stop, voices, current, setVoice, get rate(){ return rate; }, setRate(r){ rate = r; store.set("rate", r); }, get ok(){ return !!SYN; } };
+})();
+
+/* ==== engine/audio.js ==== */
+/* =========================================================
+   Sound: the Lamplight FM music player (from Window Seat: The Game)
+   plus short synthesized sound effects. One AudioContext for both.
+   Music starts only after a tap, as browsers require.
+   ========================================================= */
+const Audio2 = (()=>{
+  let ctx=null, bus, out, sfxOut, timer=null, cur=null, step=0, nextT=0, keeper=null, ducked=false, want=null;
+  let vol = store.get("vol", 55) / 100, musicOn = store.get("music", false), sfxOn = store.get("sfx", true);
+  const midi = n=>{ const m=/^([A-G])(#?)(\d)$/.exec(n); return 12*(+m[3]+1)+{C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+(m[2]?1:0); };
+  const hz = m=>440*Math.pow(2,(m-69)/12);
+  const P = {
+    ep:   {mods:[{r:1,i:1.6,d:.9},{r:14,i:.5,d:.07}], a:.004, dec:2.2, sus:0, g:.16, lp:3200},
+    bell: {mods:[{r:3.5,i:2.6,d:1.6}], a:.002, dec:2.6, sus:0, g:.10, lp:6000},
+    bass: {mods:[{r:1,i:2.2,d:.22}], a:.005, dec:.9, sus:.35, g:.24, lp:900},
+    pad:  {mods:[{r:2,i:.7,d:9}], a:.9, dec:4, sus:.8, g:.07, lp:2400, det:6},
+    mar:  {mods:[{r:4,i:2.4,d:.09}], a:.002, dec:.55, sus:0, g:.13, lp:4200},
+    harp: {mods:[{r:2,i:1.2,d:.3}], a:.002, dec:1.4, sus:0, g:.11, lp:5200}
+  };
+  function parse(str){ const t=str.split(/\s+/).filter(z=>z&&z!=="|"), ev={}; let last=null;
+    t.forEach((k,i)=>{ if(k==="-"){last=null;return;} if(k==="_"){ if(last) last.len++; return; } last={ms:k.split("+").map(midi),len:1}; ev[i]=last; });
+    return {n:t.length, ev}; }
+  Object.values(TRACKS).forEach(t=>t.parts.forEach(p=>p.q=parse(p.s)));
+  function silentWav(){
+    const n = 4000, buf = new ArrayBuffer(44+n), v = new DataView(buf), w = (o,s)=>{ for(let i=0;i<s.length;i++) v.setUint8(o+i,s.charCodeAt(i)); };
+    w(0,"RIFF"); v.setUint32(4,36+n,true); w(8,"WAVE"); w(12,"fmt "); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+    v.setUint32(24,8000,true); v.setUint32(28,8000,true); v.setUint16(32,1,true); v.setUint16(34,8,true); w(36,"data"); v.setUint32(40,n,true);
+    for(let i=0;i<n;i++) v.setUint8(44+i,128);
+    let s = ""; new Uint8Array(buf).forEach(b=> s += String.fromCharCode(b));
+    return "data:audio/wav;base64," + btoa(s);
+  }
+  /* iOS: play through the silent switch, and keep the session alive */
+  function unlockIOS(){
+    try{ if(navigator.audioSession) navigator.audioSession.type = "playback"; }catch(e){}
+    try{ if(!keeper){ keeper = new Audio(silentWav()); keeper.loop = true; keeper.setAttribute("playsinline",""); keeper.volume = 0.01; }
+      const pr = keeper.play(); if(pr && pr.catch) pr.catch(()=>{}); }catch(e){}
+  }
+  function impulse(sec){ const n=ctx.sampleRate*sec, b=ctx.createBuffer(2,n,ctx.sampleRate);
+    for(let c=0;c<2;c++){ const ch=b.getChannelData(c); for(let i=0;i<n;i++) ch[i]=(Math.random()*2-1)*Math.pow(1-i/n,3.2); } return b; }
+  function init(){
+    if(ctx) return true;
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false;
+    ctx=new AC(); out=ctx.createGain(); bus=ctx.createGain(); sfxOut=ctx.createGain();
+    const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-18; comp.ratio.value=3;
+    const rev=ctx.createConvolver(); rev.buffer=impulse(3); const rg=ctx.createGain(); rg.gain.value=.32;
+    const dly=ctx.createDelay(1); dly.delayTime.value=.42; const fb=ctx.createGain(); fb.gain.value=.28;
+    const dlp=ctx.createBiquadFilter(); dlp.type="lowpass"; dlp.frequency.value=1800; const dg=ctx.createGain(); dg.gain.value=.18;
+    bus.connect(comp); bus.connect(rev); rev.connect(rg); rg.connect(comp);
+    bus.connect(dly); dly.connect(dlp); dlp.connect(fb); fb.connect(dly); dlp.connect(dg); dg.connect(comp);
+    comp.connect(out); out.connect(ctx.destination); out.gain.value=0;
+    sfxOut.connect(ctx.destination); sfxOut.gain.value = .5 + vol*.5;
+    sfxRev = ctx.createConvolver(); sfxRev.buffer = impulse(1.6); const sr = ctx.createGain(); sr.gain.value = .25; sfxRev.connect(sr); sr.connect(sfxOut);
+    return true;
+  }
+  let sfxRev = null;
+  function applyVol(){ if(out) out.gain.setTargetAtTime(cur ? vol*(ducked?.35:1) : 0, ctx.currentTime, .08); if(sfxOut) sfxOut.gain.setTargetAtTime(.5 + vol*.5, ctx.currentTime, .05); }
+  function voice(t, m, dur, p, vel, dest){
+    const f=hz(m), amp=ctx.createGain(), lp=ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=p.lp;
+    const carriers=[f]; if(p.det) carriers.push(f*Math.pow(2,p.det/1200));
+    const stopAt=t+dur+p.dec+.2;
+    carriers.forEach(cf=>{
+      const c=ctx.createOscillator(); c.frequency.value=cf;
+      p.mods.forEach(md=>{ const o=ctx.createOscillator(), g=ctx.createGain(); o.frequency.value=cf*md.r;
+        const idx=cf*md.i; g.gain.setValueAtTime(idx,t); g.gain.setTargetAtTime(idx*.15,t+.005,md.d/3);
+        o.connect(g); g.connect(c.frequency); o.start(t); o.stop(stopAt); });
+      c.connect(lp); c.start(t); c.stop(stopAt);
+    });
+    const pk=p.g*(vel||1)/carriers.length;
+    amp.gain.setValueAtTime(0,t); amp.gain.linearRampToValueAtTime(pk,t+p.a);
+    amp.gain.setTargetAtTime(pk*p.sus,t+p.a,p.dec/3);
+    amp.gain.setTargetAtTime(0,t+Math.max(p.a,dur),p.sus?.5:.25);
+    lp.connect(amp); amp.connect(dest || bus);
+  }
+  function tick(){
+    const T=TRACKS[cur]; if(!T) return; const sd=60/T.bpm/2;
+    while(nextT < ctx.currentTime+.25){
+      const sw = step%2 ? sd*(T.swing||0) : 0;
+      T.parts.forEach(pt=>{ const e=pt.q.ev[step%pt.q.n]; if(!e) return;
+        e.ms.forEach((m,k)=>voice(nextT+sw+(pt.strum||0)*k, m, e.len*sd*.96, P[pt.p], pt.vel)); });
+      nextT += sd; step++;
+    }
+  }
+  function start(name){
+    clearInterval(timer); timer=null;
+    if(!name || !TRACKS[name]){ cur=null; if(ctx) applyVol(); return; }
+    if(!init()) return;
+    unlockIOS(); const r = ctx.resume(); if(r && r.catch) r.catch(()=>{});
+    if(cur === name && timer) return;
+    cur=name; step=0; nextT=ctx.currentTime+.12; applyVol(); tick(); timer=setInterval(tick,40);
+  }
+  /* the scene asks for a song; it plays only while music is on */
+  function music(name){ want = name; if(musicOn) start(name); else if(cur) start(null); ui(); }
+  function toggle(){ musicOn = !musicOn; store.set("music", musicOn); if(musicOn) start(want); else { start(null); if(keeper) keeper.pause(); } ui(); return musicOn; }
+  function ui(){ $$("[data-music]").forEach(b=>{ b.classList.toggle("on", musicOn); b.setAttribute("aria-pressed", musicOn); }); }
+  document.addEventListener("visibilitychange", ()=>{
+    if(!ctx) return;
+    if(document.hidden){ clearInterval(timer); timer=null; ctx.suspend(); }
+    else ctx.resume().then(()=>{ if(cur){ nextT = ctx.currentTime + .05; timer = setInterval(tick,40); } }).catch(()=>{});
+  });
+  /* a tap brings sound back after a call or the lock screen */
+  ["touchend","click"].forEach(t=>document.addEventListener(t, ()=>{ if(ctx && ctx.state !== "running"){ unlockIOS(); ctx.resume().catch(()=>{}); } }, true));
+
+  /* ---------------- sound effects ---------------- */
+  function noise(t, dur, type, freq, q, gain, decay){
+    const n = Math.max(1, Math.floor(ctx.sampleRate*dur)), b = ctx.createBuffer(1, n, ctx.sampleRate), d = b.getChannelData(0);
+    for(let i=0;i<n;i++) d[i] = (Math.random()*2-1);
+    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    s.buffer = b; f.type = type; f.frequency.value = freq; f.Q.value = q || 1;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t+.006); g.gain.setTargetAtTime(0, t+.01, decay);
+    s.connect(f); f.connect(g); g.connect(sfxOut); g.connect(sfxRev); s.start(t); s.stop(t+dur);
+    return f;
+  }
+  const FX = {
+    ding(t){ voice(t, midi("E6"), .25, P.bell, 1.6, sfxOut); voice(t+.12, midi("B6"), .5, P.bell, 1.5, sfxOut); },
+    down(t){ ["C6","E6","G6","C7"].forEach((n,i)=>voice(t+i*.07, midi(n), .2, P.bell, 1.1, sfxOut)); },
+    up(t){ ["A3","E3"].forEach((n,i)=>voice(t+i*.16, midi(n), .35, P.bass, 1.2, sfxOut)); },
+    knock(t){ [0,.2,.4].forEach(k=>{ noise(t+k, .12, "lowpass", 320, 1, .9, .03); voice(t+k, midi("A2"), .05, P.bass, .8, sfxOut); }); },
+    crash(t){ noise(t, .6, "highpass", 2500, .7, .7, .12); ["D7","G#6","C7","F#7"].forEach((n,i)=>voice(t+.03+i*.05, midi(n), .1, P.bell, 1, sfxOut)); noise(t+.25, .4, "bandpass", 1800, 2, .35, .08); },
+    splash(t){ const f = noise(t, 1.2, "bandpass", 900, .6, 1.1, .28); f.frequency.setValueAtTime(1600, t); f.frequency.exponentialRampToValueAtTime(400, t+1); noise(t+.05, .6, "highpass", 4000, .5, .3, .2); },
+    page(t){ noise(t, .25, "bandpass", 3000, .8, .35, .06); },
+    choose(t){ voice(t, midi("A5"), .08, P.harp, .9, sfxOut); voice(t+.06, midi("E6"), .12, P.harp, .7, sfxOut); },
+    fan(t){ noise(t, .08, "highpass", 3000, 1, .8, .015); },
+    title(t){ ["D5","F#5","A5","D6"].forEach((n,i)=>voice(t+i*.09, midi(n), .4, P.harp, 1, sfxOut)); }
+  };
+  function sfx(name){
+    if(!sfxOn || !FX[name]) return;
+    if(!init()) return; unlockIOS();
+    const go = ()=>FX[name](ctx.currentTime + .02);
+    if(ctx.state !== "running") ctx.resume().then(go).catch(()=>{}); else go();
+  }
+  return { music, toggle, sfx, ui,
+    get musicOn(){ return musicOn; }, get sfxOn(){ return sfxOn; },
+    setSfx(on){ sfxOn = on; store.set("sfx", on); },
+    get vol(){ return vol; }, setVol(v){ vol = v; store.set("vol", Math.round(v*100)); if(ctx) applyVol(); },
+    duck(on){ ducked = on; if(ctx) applyVol(); } };
+})();
+
+/* ==== engine/art.js ==== */
+/* =========================================================
+   Art: dithered VGA-style portraits and backgrounds, drawn in code.
+   The stage is 320×200, like VGA mode 13h. Portraits grow from Window
+   Seat's bust method: shapes on a design grid, Bayer dithering at the
+   edges of light and shade, features drawn at the final pixel size.
+   ========================================================= */
+const Art = (()=>{
+  const B4 = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+  const bay = (x,y) => (B4[y&3][x&3]+.5)/16;
+  const hexC = {};
+  const hex = h => hexC[h] || (hexC[h] = [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]);
+  const mkCanvas = (w,h) => { const c = document.createElement("canvas"); c.width = w; c.height = h; return c; };
+
+  /* a pixel painter over an ImageData */
+  function painter(w,h){
+    const cv = mkCanvas(w,h), x = cv.getContext("2d"), img = x.createImageData(w,h), d = img.data;
+    const P = {cv, w, h, d,
+      put(px,py,c){ px|=0; py|=0; if(px<0||py<0||px>=w||py>=h) return; if(typeof c === "string") c = hex(c); const i=(py*w+px)*4; d[i]=c[0]; d[i+1]=c[1]; d[i+2]=c[2]; d[i+3]=255; },
+      rect(x0,y0,ww,hh,c){ c = hex(c); for(let yy=Math.max(0,y0|0);yy<Math.min(h,y0+hh);yy++) for(let xx=Math.max(0,x0|0);xx<Math.min(w,x0+ww);xx++) P.put(xx,yy,c); },
+      vgrad(x0,y0,ww,hh,cols){ const cs = cols.map(hex), n = cs.length-1;
+        for(let yy=0;yy<hh;yy++){ const t = yy/Math.max(1,hh-1)*n, k = Math.min(n-1,Math.floor(t)), f = t-k;
+          for(let xx=0;xx<ww;xx++) P.put(x0+xx, y0+yy, f > bay(x0+xx,y0+yy) ? cs[k+1] : cs[k]); } },
+      ell(cx,cy,rx,ry,c,c2,split){ const a = hex(c), b = c2 ? hex(c2) : a;
+        for(let yy=Math.floor(cy-ry);yy<=cy+ry;yy++) for(let xx=Math.floor(cx-rx);xx<=cx+rx;xx++){
+          const e = ((xx+.5-cx)/rx)**2 + ((yy+.5-cy)/ry)**2; if(e > 1) continue;
+          P.put(xx, yy, c2 && (yy-cy)/ry > (split == null ? .2 : split) - bay(xx,yy)*.35 ? b : a); } },
+      mix(px,py,c,a){ if(px<0||py<0||px>=w||py>=h) return; c = hex(c); const i=(py*w+px)*4; d[i]+=(c[0]-d[i])*a; d[i+1]+=(c[1]-d[i+1])*a; d[i+2]+=(c[2]-d[i+2])*a; },
+      glow(cx,cy,r,col,str){ for(let yy=Math.floor(cy-r);yy<=cy+r;yy++) for(let xx=Math.floor(cx-r);xx<=cx+r;xx++){
+          const dd = Math.hypot(xx-cx,(yy-cy)*1.1)/r; if(dd > 1) continue;
+          const t = (1-dd)*(1-dd)*str, b = bay(xx,yy), a = t > b ? .5 : t > b*.5 ? .22 : 0; if(a) P.mix(xx,yy,col,a); } },
+      done(){ x.putImageData(img,0,0); return cv; }
+    };
+    return P;
+  }
+
+  /* ---------------- portraits ---------------- */
+  const SK = {s:"#F6D3B8", S:"#E3AF92", T:"#C88E73", L:"#FDE6D2"};
+  const INK = "#22141C", LASH = "#2A1A22", WHITE = "#F9F4EF", MOUTH = "#B44A5C", LIP = "#DE8A92", BLUSH = "#F29BB0", NOSE = "#CF9278", TEAR = "#9FD6F2";
+  const PEOPLE = {
+    eve:{hs:"ringlets", hair:["#93692A","#C49A46","#E8C77A","#FAE8B4"], iris:["#5A3A8E","#9472CC"],
+      cloth:{hi:"#B8395E", a:"#8E1F3F", b:"#6E1631", c:"#4E0F23", trim:"#E2BC62"}, neck:"square", acc:"rose"},
+    lily:{hs:"long", hair:["#55301F","#7B4930","#A26843","#C98D5E"], iris:["#6B4426","#A0703F"],
+      cloth:{hi:"#FBC9D8", a:"#F2A3BC", b:"#DB86A2", c:"#BF6A88", trim:"#FFFFFF"}, neck:"lace", acc:"bow"},
+    pip:{hs:"bob", hair:["#2B1E18","#45322A","#63503F","#86705A"], iris:["#3D5E4B","#6E937B"],
+      cloth:{hi:"#4A4450", a:"#2E2A33", b:"#231F28", c:"#18151C", trim:"#F4F1EC"}, neck:"maid", acc:"headband"},
+    cedric:{hs:"short", male:true, hair:["#A2742A","#D6AA4C","#F0CF7A","#FCEBB8"], iris:["#2E5DA6","#6293DA"],
+      cloth:{hi:"#5482D2", a:"#2F57A8", b:"#244690", c:"#1A3570", trim:"#E2BC62"}, neck:"coat", acc:"circlet"}
+  };
+  const EX = {
+    neutral:{b:"n", e:"open", m:"neutral"},
+    smile:{b:"n", e:"open", m:"smile", blush:1},
+    shocked:{b:"up", e:"wide", m:"o"},
+    worried:{b:"worry", e:"open", m:"frown"},
+    nervous:{b:"worry", e:"open", m:"wavy", sweat:1, blush:1},
+    angry:{b:"angry", e:"narrow", m:"shout"},
+    smug:{b:"smug", e:"narrow", m:"smirk"},
+    teary:{b:"worry", e:"teary", m:"smile", blush:1},
+    deadpan:{b:"flat", e:"half", m:"line"}
+  };
+  const KP = 1.9, GW = 60, GH = 84, CX = 30;
+
+  function bust(id, exName, blink){
+    const C = PEOPLE[id], X0 = EX[exName] || EX.neutral, K = KP, male = !!C.male;
+    const BW = Math.round(GW*K), BH = Math.round(GH*K);
+    const g = Array.from({length:BH}, ()=>Array(BW).fill(null));
+    const set = (x,y,c)=>{ if(x>=0 && y>=0 && x<BW && y<BH) g[y][x] = c; };
+    const at = (x,y)=> (x>=0 && y>=0 && x<BW && y<BH) ? g[y][x] : null;
+    const H = C.hair, D = C.cloth, cx = CX;
+    const side = X => cx - X;                       /* > 0 on the lit side (light from the left) */
+    const hairAt = (X, Y, half, b)=>{
+      const sd = side(X)/Math.max(8, half);
+      let c = sd > .62 ? H[2] : sd > -.38 ? H[1] : H[0];
+      if(sd > .5 && sd <= .62 && b < .5) c = H[2];
+      if(sd <= -.38 && sd > -.52 && b < .5) c = H[1];
+      if(K > 1.2 && sd < .55 && Math.abs(Math.sin(X*2.1 + Y*.21)) < .06) c = H[0];
+      return c;
+    };
+    const tipShort = [23,20,22,19,24,21,20,23,21,22,19,23,21,24,22];
+    for(let y=0;y<BH;y++) for(let x=0;x<BW;x++){
+      const X = (x+.5)/K, Y = (y+.5)/K, dx = X - cx, adx = Math.abs(dx), b = bay(x,y);
+      let c = null;
+      /* hair behind the head */
+      let half = 0;
+      if(C.hs === "ringlets" && Y >= 8 && Y < 80) half = Y < 30 ? Math.sqrt(Math.max(0, 1 - ((30-Y)/22)**2))*19.5 : 19.5 + Math.sin(Y*.8)*1.6 + Math.max(0, Y-60)*.1;
+      if(C.hs === "long" && Y >= 8 && Y < 82) half = Y < 30 ? Math.sqrt(Math.max(0, 1 - ((30-Y)/22)**2))*18 : 18 + Math.sin(Y*.33)*.9 - Math.max(0, Y-66)*.35;
+      if(C.hs === "bob" && Y >= 8 && Y <= 52.5 + Math.sin(dx*.9)*.6) half = Y < 30 ? Math.sqrt(Math.max(0, 1 - ((30-Y)/22)**2))*18.5 : 18.5 + (Y-30)*.06;
+      if(C.hs === "short"){ if(Y >= 9 && Y < 42) half = Y < 30 ? Math.sqrt(Math.max(0, 1 - ((30-Y)/21)**2))*16.6 : 16.6 - (Y-30)*.28; if(Y >= 42 && Y < 48 && adx < 9) half = 9; }
+      if(half >= 2 && adx <= half){
+        c = hairAt(X, Y, half, b);
+        if(C.hs === "ringlets" && Y > 40){ const band = Math.sin(Y*.75 + adx*.85); if(band > .6 && b < .7) c = H[2]; else if(band < -.7) c = H[0]; }
+      }
+      /* shoulders and clothes */
+      const sy = 60;
+      if(Y >= sy){ const t = (Y-sy)/24, hw = (male ? 11 : 9.5) + Math.sqrt(t)*(male ? 21 : 18.5);
+        if(adx <= hw){ const sd = side(X)/hw;
+          c = sd > .5 ? D.hi : sd > -.3 ? D.a : sd > -.7 ? D.b : D.c;
+          if(sd > .38 && sd <= .5 && b < .5) c = D.hi;
+          if(sd <= -.3 && sd > -.45 && b < .5) c = D.a;
+          if(C.neck === "square"){
+            if(Y < 66 && adx < 9.2) c = side(X) < -4 ? SK.S : SK.s;
+            if((Y >= 66 && Y < 67.4 && adx < 10.6) || (Y < 66 && adx >= 9.2 && adx < 10.6)) c = D.trim;
+          }
+          if(C.neck === "lace"){
+            if(Y < 62 && adx < 4.6) c = side(X) < -2 ? SK.S : SK.s;
+            const lobe = Math.hypot(adx - 5.6, Y - 60);
+            if(Y >= 59.5 && Y < 66.6 && adx < 11.5 && lobe < 6.3 && !(Y < 62 && adx < 4.6)) c = lobe > 5.3 && b < .5 ? "#E6D8E0" : D.trim;
+            if(Y >= 65 && Y < 67.6 && adx < 1.6) c = "#E06C8C";
+          }
+          if(C.neck === "maid"){
+            if(Y < 60.6 && adx < 3.4) c = SK.S;
+            if(Y >= 58.5 && Y < 63.6 && adx < 8.6 - (Y-58.5)*.8 && adx > .5) c = side(X) < -3 && b < .5 ? "#DAD4CC" : D.trim;
+            if(Y >= 67 && adx < 7.6) c = side(X) < -3 && b < .4 ? "#DAD4CC" : D.trim;
+            if(Y >= 66 && adx >= 7.6 && adx < 8.6 && ((x + y) & 1)) c = D.trim;
+          }
+          if(C.neck === "coat"){
+            if(adx >= 3.4 && adx < 9 && Y < 74 && adx < 3.4 + (Y-sy)*.9) c = sd > 0 ? D.a : D.c;
+            if(Y < 71 && adx < 4.2 - Math.max(0, Y-64)*.45) c = side(X) < -1.5 && b < .5 ? "#D9D3CC" : "#F4F1EC";
+            if(Y >= 61 && Y < 65.6 && adx > hw - 8.5) c = b < .25 ? "#F6DD8E" : D.trim;
+            if(Y >= 65.6 && Y < 68 && adx > hw - 8.5 && (x & 1)) c = D.trim;
+            if(Y >= 71 && adx < .55) c = D.c;
+            if([73, 77.5, 82].some(v=>Math.abs(Y - v) < .9) && adx < 1.6 && adx > .55) c = D.trim;
+          }
+        } }
+      /* neck */
+      const nw = male ? 6.3 : 5;
+      if(Y >= 46 && Y < sy + .5 && adx <= nw) c = Y < 50.5 ? SK.T : side(X) < -1.2 ? SK.T : SK.S;
+      /* face */
+      const fy = 34;
+      if(Y >= 18 && Y <= 52.5){ const top = Y < fy, ry = top ? 16 : 18, dy = (Y-fy)/ry;
+        const rx = top ? 12.5 : 12.5 - Math.pow(Math.max(0, Y-fy)/ry, 1.7)*(male ? 6 : 8);
+        if(adx <= rx*Math.sqrt(Math.max(0, 1-dy*dy))){ const sd = side(X)/12.5;
+          c = SK.s; if(sd < -.6) c = SK.S; else if(sd < -.42 && b < .5) c = SK.S;
+          if(sd > .45 && Y > 27 && Y < 46 && b < .3) c = SK.L;
+          if(Y >= 50) c = sd < -.2 ? SK.T : SK.S; } }
+      /* ears, for short hair */
+      if(C.hs === "short" && adx >= 12 && adx < 14.2 && Y >= 31.5 && Y < 41){ const e = ((adx-12.9)/1.4)**2 + ((Y-36)/4.6)**2; if(e <= 1) c = e < .35 ? SK.T : SK.S; }
+      /* fringe */
+      if(adx <= 14 && Y >= 10){
+        let fr = false;
+        if(C.hs === "ringlets"){ const tip = 19 + (X-(cx-13))*.42 + Math.sin(X*1.3)*.8; fr = X >= cx-13.5 && Y <= tip; }
+        if(C.hs === "long") fr = Y <= 31 && adx >= 1.4 + (Y-10)*.6;
+        if(C.hs === "bob") fr = Y <= 25.5 + ((Math.floor(x/3) & 1) ? .45 : 0);
+        if(C.hs === "short"){ const f = (X-(cx-14))/28*(tipShort.length-1), i = clamp(Math.floor(f), 0, tipShort.length-2), t = f - i;
+          fr = Y <= tipShort[i] + (tipShort[i+1]-tipShort[i])*t; }
+        if(fr) c = side(X)/13 > .62 ? H[2] : side(X)/13 < -.55 ? H[0] : H[1];
+      }
+      /* locks beside the face */
+      if((C.hs === "ringlets" || C.hs === "long") && Y >= 24 && Y < (C.hs === "long" ? 56 : 52) && adx >= 11.6 && adx < 13.8) c = side(X) > 0 ? H[2] : H[0];
+      if(C.hs === "bob" && Y >= 22 && Y < 52 && adx >= 11.3 && adx <= 18.5 + (Y-22)*.02) c = hairAt(X, Y, 18.5, b);
+      if(C.hs === "short" && adx >= 12 && adx < 13 && Y >= 26 && Y < 35) c = H[1];
+      /* hair in front of the shoulders */
+      if(C.hs === "ringlets" && Y >= 44 && Y < 78){ const mid = 15.4 + Math.sin(Y*.42)*1.2, w = 2.4 + Math.abs(Math.sin(Y*.75))*1.6 - Math.max(0, Y-71)*.32;
+        if(Math.abs(adx - mid) < w){ const u = (adx - mid)/w; c = hairAt(X, Y, 19, b); const band = Math.sin(Y*.75 + u*1.9);
+          if(band > .55 && b < .75) c = H[2]; else if(band < -.6) c = H[0]; if(band > .9 && u < 0) c = H[3]; } }
+      if(C.hs === "long" && Y >= 40 && Y < 79 && adx >= 11.6 + Math.max(0, Y-70)*.35 && adx < 16.6 + Math.sin(Y*.33)*.9 - Math.max(0, Y-66)*.3){ c = hairAt(X, Y, 17, b); if(Math.abs(Math.sin(adx*1.6 + Y*.1)) < .12) c = H[0]; }
+      /* crown shine */
+      if(C.hs !== "short" || Y < 20){ if(adx <= 10){ const ay = 14 + (dx/10)**2*3, sd = side(X)/10;
+        if(sd >= -.5 && Y >= ay && Y < ay + 1.1 && (half || Y < 20)) c = sd > .1 && sd < .65 ? H[3] : H[2]; } }
+      /* accessories */
+      if(C.acc === "rose"){ const r = Math.hypot(X-(cx+11.5), Y-15.5); if(r < 2.9) c = r < 1.1 || (Math.abs(Math.sin(Math.atan2(Y-15.5, X-(cx+11.5))*2 + r*2.2)) < .3) ? "#8E1F3F" : "#D23B5C";
+        if(Math.hypot(X-(cx+14.6), Y-18) < 1.3) c = "#3E7A4A"; }
+      if(C.acc === "bow"){ if(Math.hypot((X-(cx-12))/2.8, (Y-12.5)/1.9) < 1 || Math.hypot((X-(cx-6.8))/2.8, (Y-12.5)/1.9) < 1) c = b < .3 ? "#F59AB4" : "#E06C8C";
+        if(Math.hypot(X-(cx-9.4), Y-12.6) < 1.3) c = "#BF4F72"; }
+      if(C.acc === "headband" && adx <= 15.5){ const yb = 13.6 + (dx/15)**2*4.2; if(Y >= yb && Y < yb + 2.3) c = side(X) < -6 ? "#D8D2CA" : "#F6F3EE"; if(Y >= yb - 1 && Y < yb && ((x+y)&1)) c = "#F6F3EE"; }
+      if(C.acc === "circlet" && adx <= 15){ const yc = 15.5 + (dx/15)**2*3.2; if(Y >= yc && Y < yc + 1.1) c = b < .3 ? "#F6DD8E" : "#E2BC62"; if(Math.hypot(dx, Y-15.9) < 1.1) c = "#3E8BD6"; }
+      if(c) g[y][x] = c;
+    }
+    const U = v => Math.round(v*K);
+    /* necklace */
+    if(C.neck === "square"){ for(let x=0;x<BW;x++){ const dx = (x+.5)/K - cx; if(Math.abs(dx) > 6.4) continue; set(x, U(60.6 + dx*dx/38), "#E2BC62"); }
+      for(let yy=0;yy<3;yy++) for(let xx=-1;xx<=1;xx++) if(Math.abs(xx)+Math.abs(yy-1) < 2) set(U(cx)+xx, U(62.2)+yy, "#C8304E"); }
+    /* brows */
+    const bt = X0.b, thick = male ? 1.3 : .95;
+    for(const sg of [-1,1]){
+      let dy = 0, tilt = 0, arc = .9;
+      if(bt === "up") dy = -1.7; if(bt === "worry"){ tilt = -1.5; dy = -.3; } if(bt === "angry"){ tilt = 1.6; dy = .3; }
+      if(bt === "flat"){ arc = .25; dy = .3; } if(bt === "smug" && sg > 0) dy = -1.5;
+      if(male) arc *= .5;
+      for(let x=0;x<BW;x++){ const X = (x+.5)/K, ddx = (X - cx)*sg; if(ddx < 4.4 || ddx > 10.6) continue;
+        const f = (ddx - 4.4)/6.2, yc = 28.9 + dy - Math.sin(f*Math.PI)*arc + f*.3 + tilt*(1-f), th = (thick - f*.3);
+        for(let y=0;y<BH;y++){ const Y = (y+.5)/K; if(Math.abs(Y - yc) <= th/2 + .5/K) set(x, y, H[0]); } }
+    }
+    /* eyes */
+    const et = blink ? "closed" : X0.e;
+    const ew = Math.max(7, U(male ? 6.6 : 7)), eh0 = Math.max(4, Math.round((male ? 4 : 4.6)*K)), lid = Math.max(1, Math.round(K*.75));
+    for(const sg of [-1,1]){
+      const exL = U(cx-10), ex = sg < 0 ? exL : 2*U(cx) - exL - ew + 1;
+      const wide = et === "wide", eh = eh0 + (wide ? 1 : 0), ey = U(30.6) - (wide ? 1 : 0);
+      if(et === "closed"){ const my = ey + Math.round(eh*.6); for(let xx=0;xx<ew;xx++) set(ex+xx, my - (xx === 0 || xx === ew-1 ? 1 : 0), LASH); continue; }
+      const icx = ex + ew/2 + (sg < 0 ? .4 : -.4), icy = ey + lid + (eh-lid)*.5, ir = (eh - lid)*(wide ? .44 : .56);
+      for(let yy=0;yy<eh;yy++) for(let xx=0;xx<ew;xx++){
+        const u = (xx + .5)/ew - .5;
+        if(yy < lid){ if(Math.abs(u) < .5 - (yy === 0 && K < 1.4 ? .08 : 0)) set(ex+xx, ey+yy, LASH); continue; }
+        const v = (yy - lid + .5)/(eh - lid);
+        if(!wide && Math.abs(u) > .5 - Math.pow(Math.max(0, v-.35), 1.4)*.55) continue;
+        if(wide && Math.abs(u) > .5 - Math.pow(Math.max(0, v-.55), 1.4)*.7) continue;
+        const d = Math.hypot(ex+xx+.5 - icx, ey+yy+.5 - icy);
+        set(ex+xx, ey+yy, d <= ir ? (ey+yy+.5 > icy + ir*.15 ? C.iris[1] : C.iris[0]) : WHITE);
+      }
+      if(K >= 1.4 && !wide) set(Math.floor(icx), Math.floor(icy), "#1E1424");
+      const outer = sg < 0 ? ex : ex + ew - 1;
+      set(outer + (sg < 0 ? -1 : 1), ey, LASH); set(outer - sg, ey + lid, LASH);
+      if(!male){ set(outer + (sg < 0 ? -2 : 2), ey - 1, LASH); set(outer, ey + lid, LASH); }
+      const hx = Math.round(icx - ir*.45), hy = ey + lid + 1; set(hx, hy, "#FFFFFF"); set(hx+1, hy, "#FFFFFF");
+      if(et === "narrow" || et === "half"){ const cut = lid + Math.round((eh-lid)*(et === "half" ? .5 : .38));
+        for(let yy=0;yy<cut;yy++) for(let xx=-1;xx<=ew;xx++){ const p = at(ex+xx, ey+yy); if(p === LASH || p === WHITE || p === C.iris[0] || p === C.iris[1] || p === "#1E1424" || p === "#FFFFFF") set(ex+xx, ey+yy, SK.s); }
+        for(let xx=0;xx<ew;xx++) set(ex+xx, ey+cut, LASH); set(outer + (sg < 0 ? -1 : 1), ey + cut - (et === "half" ? 0 : 1), LASH); }
+      if(et === "teary"){ set(Math.round(icx + ir*.3), Math.round(icy + ir*.2), "#FFFFFF"); const tx = outer - sg; set(tx, ey+eh, TEAR); set(tx, ey+eh+1, TEAR); set(tx, ey+eh+2, TEAR); }
+    }
+    /* nose */
+    const nx = U(cx) + 1; set(nx, U(39.6), NOSE); set(nx, U(39.6)+1, NOSE); set(U(cx), U(41.2), NOSE);
+    /* blush */
+    if(X0.blush) for(const sg of [-1,1]) for(let yy=-3;yy<=3;yy++) for(let xx=-5;xx<=5;xx++){
+      const px = U(cx) + sg*(U(cx+8)-U(cx)) + xx, py = U(38.6) + yy; if((xx*xx)/((2.4*K)**2) + (yy*yy)/((1.1*K)**2) > 1) continue;
+      const p = at(px, py); if((p === SK.s || p === SK.S || p === SK.L) && bay(px,py) < .55) set(px, py, BLUSH); }
+    /* mouth */
+    const mt = X0.m, mw = Math.max(5, U(4.4)) | 1, mx0 = U(cx) - (mw >> 1), my = U(44.6);
+    if(mt === "smile"){ for(let xx=1;xx<mw-1;xx++) set(mx0+xx, my, MOUTH); set(mx0, my-1, MOUTH); set(mx0+mw-1, my-1, MOUTH); set(U(cx)-1, my+1, LIP); set(U(cx), my+1, LIP); set(U(cx)+1, my+1, LIP); }
+    if(mt === "neutral"){ for(let xx=1;xx<mw-1;xx++) set(mx0+xx, my, MOUTH); set(U(cx), my+1, LIP); }
+    if(mt === "line"){ for(let xx=1;xx<mw-1;xx++) set(mx0+xx, my, MOUTH); }
+    if(mt === "frown"){ for(let xx=1;xx<mw-1;xx++) set(mx0+xx, my-1, MOUTH); set(mx0, my, MOUTH); set(mx0+mw-1, my, MOUTH); }
+    if(mt === "wavy"){ for(let xx=0;xx<mw;xx++) set(mx0+xx, my - ((xx>>1)&1), MOUTH); }
+    if(mt === "smirk"){ for(let xx=1;xx<mw;xx++) set(mx0+xx, my - (xx > mw/2 ? 1 : 0), MOUTH); set(mx0+mw, my-2, MOUTH); set(U(cx)-1, my+1, LIP); }
+    if(mt === "o" || mt === "shout"){ const rw = (mt === "o" ? 1.4 : 2.3)*K, rh = (mt === "o" ? 1.25 : 1.6)*K, mcx = U(cx)+.5, mcy = my + (mt === "o" ? .5 : 1);
+      for(let yy=-4;yy<=5;yy++) for(let xx=-5;xx<=5;xx++){ const e = ((xx)/rw)**2 + ((yy)/rh)**2; const px = Math.floor(mcx + xx - .5), py = Math.floor(mcy + yy);
+        if(e <= 1) set(px, py, e > .55 ? MOUTH : "#5A1E2A"); }
+      if(mt === "shout") for(let xx=-2;xx<=2;xx++) set(U(cx)+xx, Math.floor(mcy - rh + 1.5), "#FFFFFF"); }
+    /* a drop of sweat */
+    if(X0.sweat){ const sx = U(cx+14.5), sy2 = U(23); set(sx, sy2, TEAR); set(sx, sy2+1, TEAR); set(sx-1, sy2+2, TEAR); set(sx, sy2+2, TEAR); set(sx+1, sy2+2, TEAR); set(sx, sy2+3, TEAR); set(sx-1, sy2+1, "#FFFFFF"); }
+    /* outline */
+    const out = g.map(r=>r.slice());
+    for(let y=0;y<BH;y++) for(let x=0;x<BW;x++){ if(g[y][x]) continue;
+      if([[1,0],[-1,0],[0,1],[0,-1]].some(([ax,ay])=>at(x+ax,y+ay))) out[y][x] = INK; }
+    const P = painter(BW, BH);
+    out.forEach((r,y)=>r.forEach((c,x)=>{ if(c) P.put(x, y, c); }));
+    return P.done();
+  }
+  const CACHE = {};
+  function portrait(id, ex, blink){ const k = id+"|"+ex+"|"+(blink?1:0); return CACHE[k] || (CACHE[k] = bust(id, EX[ex] ? ex : "neutral", blink)); }
+
+  /* ---------------- backgrounds (320×200) ---------------- */
+  const W = 320, H = 200;
+  const BG = {};
+  BG.bedroom = ()=>{
+    const P = painter(W, H);
+    /* rose wallpaper with a small damask pattern */
+    P.vgrad(0, 0, W, 132, ["#EAD5D2","#E3C8C6","#D5B5B6"]);
+    for(let y=8;y<124;y+=16) for(let x=(y/16 & 1)*12;x<W;x+=24){ [[0,-3],[-2,-1],[2,-1],[-3,1],[3,1],[0,0],[-1,2],[1,2],[0,3]].forEach(([a,b2])=>P.put(x+a, y+b2, "#C9A2A9")); }
+    /* panelled wainscot and the floor */
+    P.rect(0, 124, W, 3, "#6E4535"); P.vgrad(0, 127, W, 25, ["#8A5A47","#7A4C3C"]);
+    for(let x=6;x<W;x+=44){ P.rect(x, 131, 36, 1, "#A37360"); P.rect(x, 131, 1, 17, "#A37360"); P.rect(x, 147, 36, 1, "#5E3A2D"); P.rect(x+35, 131, 1, 17, "#5E3A2D"); }
+    P.vgrad(0, 152, W, 48, ["#6E4535","#5E3A2C","#4E2F23"]);
+    for(let y=156;y<H;y+=7) P.rect(0, y, W, 1, "#4A2C21");
+    P.ell(160, 182, 110, 16, "#9A3550", "#7E2A42", .1); P.ell(160, 182, 96, 12, "#B8485F", "#9A3550", .2);
+    /* the tall window, arched, with morning light */
+    const wx = 22, wy = 16, ww = 64, wh = 100;
+    for(let y=wy;y<wy+wh;y++) for(let x=wx;x<wx+ww;x++){ const ar = y < wy+30 && Math.hypot((x-(wx+ww/2))/(ww/2), (y-(wy+30))/30) > 1; if(!ar) P.put(x, y, "#F1E8DC"); }
+    for(let y=wy+3;y<wy+wh-3;y++) for(let x=wx+3;x<wx+ww-3;x++){ const ar = y < wy+30 && Math.hypot((x-(wx+ww/2))/(ww/2-3), (y-(wy+30))/27) > 1; if(ar) continue;
+      const t = (y-wy)/wh; P.put(x, y, t < .35 ? (t*3 > bay(x,y) ? "#CFE6F2" : "#B9DCF0") : t < .7 ? ((t-.35)*3 > bay(x,y) ? "#F6EAD2" : "#CFE6F2") : "#F6EAD2"); }
+    for(let x=wx+8;x<wx+ww-8;x+=9) P.rect(x, wy+72, 7, 26, "#9CC09A");
+    P.rect(wx+ww/2-1, wy+4, 3, wh-6, "#F1E8DC"); P.rect(wx+3, wy+52, ww-6, 3, "#F1E8DC");
+    /* curtains, tied back */
+    for(let y=8;y<126;y++){ const w2 = y < 70 ? 14 : 14 - Math.min(8, (y-70)*.4) + Math.max(0,(y-100))*.5;
+      for(let k=0;k<w2;k++){ const c = (k+Math.floor(y/12))%5 < 2 ? "#A9566A" : "#C46A7E"; P.put(wx-10+k, y, c); P.put(wx+ww+10-k, y, c); } }
+    P.rect(wx-10, 72, 12, 3, "#E2BC62"); P.rect(wx+ww-2, 72, 12, 3, "#E2BC62");
+    P.rect(wx-14, 6, ww+28, 4, "#C49A46");
+    /* morning light on the floor */
+    for(let y=126;y<200;y++){ const a = (y-126)/74; for(let x=Math.floor(40 + a*90); x<Math.floor(100 + a*130); x++){ if(bay(x,y) < .28) P.mix(x, y, "#FFF1D6", .35); } }
+    /* an oval mirror in a gold frame */
+    P.ell(122, 72, 17, 28, "#C49A46"); P.ell(122, 72, 14, 25, "#D6E4EA", "#B9CBD4", .1);
+    for(let y=52;y<92;y++) if(bay(118,y) < .3) P.put(118 + Math.floor((y-52)/10), y, "#F4FAFC");
+    P.rect(104, 98, 36, 3, "#C49A46");
+    /* the canopy bed */
+    P.rect(228, 18, 4, 140, "#5A3326"); P.rect(312, 18, 4, 140, "#5A3326");
+    P.vgrad(222, 10, 98, 12, ["#E8C77A","#C49A46"]);
+    for(let x=224;x<W;x+=5){ P.put(x, 22, "#C49A46"); P.put(x, 23, "#E8C77A"); P.put(x, 24, "#C49A46"); }
+    for(let y=22;y<150;y++){ const w2 = 12 + Math.sin(y/9)*2; for(let k=0;k<w2;k++){ const c = (k + (y>>3))%4 < 2 ? "#E6CB8E" : "#CDAA62"; P.put(232+k, y, c); P.put(312-k, y, c); } }
+    P.vgrad(244, 70, 68, 34, ["#8A5040","#6E3C30"]);
+    P.ell(278, 74, 34, 8, "#8A5040");
+    P.vgrad(236, 104, 84, 50, ["#F6EFE6","#E2D6CB"]); P.vgrad(236, 122, 84, 32, ["#D27C90","#B8607A"]);
+    P.ell(262, 106, 14, 6, "#FFFFFF", "#E6DCD2", .3);
+    return P.done();
+  };
+  BG.garden = ()=>{
+    const P = painter(W, H);
+    P.vgrad(0, 0, W, 96, ["#7FB6E6","#A9D0F0","#DCEDF2","#F4F1E2"]);
+    [[60,22,26],[210,14,34],[288,30,20]].forEach(([cx,cy,w])=>{ for(let yy=-6;yy<=4;yy++) for(let xx=-w;xx<=w;xx++){ const e = (xx/w)**2 + (yy/(yy<0?6:4))**2 - Math.sin((xx+cx)/4)*.12; if(e <= 1) P.put(cx+xx, cy+yy, yy > 1 || (yy > -1 && bay(cx+xx,cy+yy) < .4) ? "#DCE8F4" : "#FFFFFF"); } });
+    /* the palace far behind */
+    const pal = "#C3C4D8", pal2 = "#AEB0C8";
+    P.rect(96, 52, 128, 44, pal); P.rect(112, 34, 18, 62, pal); P.rect(190, 34, 18, 62, pal); P.rect(150, 26, 20, 70, pal);
+    [[112,34,18],[190,34,18],[150,26,20]].forEach(([x,y,w])=>{ for(let k=0;k<w/2+3;k++) P.rect(x+w/2-k, y-12+k*1.6|0, 2*k, 2, pal2); });
+    for(let x=100;x<224;x+=8) P.rect(x, 62, 3, 6, "#8E92B0");
+    for(let x=100;x<224;x+=8) P.rect(x, 76, 3, 6, "#8E92B0");
+    /* hedges with roses */
+    P.vgrad(0, 84, W, 34, ["#4E8256","#3E6E48","#2F5A3C"]);
+    for(let x=0;x<W;x++){ const t = 84 - Math.round(Math.abs(Math.sin(x/9))*4); P.rect(x, t, 1, 84-t+1, "#4E8256"); }
+    for(let i=0;i<90;i++){ const x = (i*37)%W, y = 88 + (i*13)%26; P.put(x, y, i%3 ? "#E0566E" : "#F59AB4"); P.put(x+1, y, "#C8304E"); }
+    /* the lawn */
+    P.vgrad(0, 116, W, 84, ["#86BF68","#74AE58","#62994A","#548A3F"]);
+    for(let y=120;y<H;y+=6) for(let x=(y&8);x<W;x+=16) if(bay(x,y) < .5) P.rect(x, y, 8, 1, "#6AA352");
+    P.ell(160, 168, 120, 26, "#D9CDB4", "#C6B897", .3);
+    /* the fountain: three tiers and a swan */
+    P.ell(160, 162, 74, 14, "#E9E5DD", "#C3BDB2", 0);
+    P.ell(160, 158, 66, 10, "#7EC2DC", "#5FA6C6", .2);
+    P.rect(152, 116, 16, 42, "#DDD8CE"); P.rect(152, 116, 4, 42, "#F2EEE6"); P.rect(164, 116, 4, 42, "#C3BDB2");
+    P.ell(160, 120, 32, 6, "#E9E5DD", "#C3BDB2", .1); P.ell(160, 118, 27, 4, "#7EC2DC");
+    P.rect(155, 96, 10, 22, "#DDD8CE");
+    P.ell(160, 98, 15, 4, "#E9E5DD", "#C3BDB2", .1); P.ell(160, 97, 12, 2.5, "#7EC2DC");
+    P.ell(160, 84, 8, 7, "#FAFAF6", "#E0DED8", .3); P.rect(161, 70, 3, 12, "#FAFAF6"); P.ell(163, 70, 3, 2.5, "#FAFAF6"); P.rect(166, 69, 3, 2, "#E58E3A"); P.put(163, 69, "#22141C");
+    /* the crowd: hats, parasols and teacups at both sides */
+    const people = [[14,110,"#B48FA6","#F4E7C8"],[38,104,"#8FA1C2","#E8B4C4"],[62,112,"#C9B48A","#F6F3EE"],[86,106,"#9A7FA8","#D9C27E"],[236,108,"#A7C08F","#F4E7C8"],[258,102,"#C99AA8","#FFFFFF"],[282,112,"#8F9EC0","#E0566E"],[306,104,"#B8A47A","#F6F3EE"]];
+    people.forEach(([x,y,dress,hat],i)=>{
+      for(let yy=0;yy<34;yy++){ const w2 = 5 + yy*.35; P.rect(x - w2|0, y+14+yy, 2*w2|0, 1, yy === 6 ? "#F6F3EE" : dress); }
+      P.ell(x, y+8, 5, 6, "#F2CFB4", "#DDAE90", .3);
+      P.ell(x, y+4, 11, 3, hat, null); P.ell(x, y+1, 6, 4, hat, null);
+      P.rect(x-11, y+4, 22, 1, i%2 ? "#E06C8C" : "#7E9ACF");
+    });
+    return P.done();
+  };
+  BG.title = ()=>{
+    const P = painter(W, H);
+    P.vgrad(0, 0, W, H, ["#0E0A1C","#1E1236","#3A1E48","#5A2A50"]);
+    for(let i=0;i<70;i++){ const x = (i*53)%W, y = (i*29)%120; P.put(x, y, i%4 ? "#B9A8D8" : "#FFFFFF"); }
+    P.glow(244, 52, 46, "#F6E3B4", .55); P.ell(244, 52, 22, 22, "#F6E9C8", "#E8D6A8", .5);
+    P.ell(236, 46, 4, 3, "#E3D2A2"); P.ell(252, 60, 3, 2.5, "#E3D2A2");
+    /* the castle on the hill */
+    P.ell(160, 214, 220, 60, "#160D22");
+    const cs = "#1B1028";
+    P.rect(186, 112, 70, 50, cs); P.rect(196, 88, 14, 30, cs); P.rect(232, 92, 12, 26, cs); P.rect(212, 76, 16, 40, cs);
+    [[196,88,14],[232,92,12],[212,76,16]].forEach(([x,y,w])=>{ for(let k=0;k<w/2+2;k++) P.rect(x+w/2-k, y-10+k*1.4|0, 2*k, 2, cs); });
+    [[200,100],[238,104],[218,90],[206,124],[226,128],[244,122]].forEach(([x,y])=>{ P.rect(x, y, 3, 4, "#F2C46B"); });
+    /* rose vines in the corner */
+    for(let i=0;i<120;i++){ const t = i/120, x = 8 + t*60 + Math.sin(t*14)*8, y = 200 - t*90; P.put(x, y, "#2E4A34"); P.put(x+1, y, "#3E6E48"); }
+    [[30,160],[52,140],[22,184],[66,122]].forEach(([x,y])=>{ P.ell(x, y, 5, 4.5, "#C8304E", "#8E1F3F", .2); P.put(x-1, y-1, "#F59AB4"); });
+    return P.done();
+  };
+  const BGC = {};
+  function bg(name){ return BGC[name] || (BGC[name] = BG[name] ? BG[name]() : null); }
+
+  /* ---------------- moving details, drawn over the background each frame ---------------- */
+  const motes = Array.from({length:14}, (_,i)=>({x:40 + (i*29)%140, y:130 + (i*17)%60, v:.08 + (i%5)*.03}));
+  const drops = Array.from({length:22}, (_,i)=>({k:i, t:(i*.13)%1}));
+  const petals = Array.from({length:12}, (_,i)=>({x:(i*41)%W, y:(i*23)%H, v:.3 + (i%4)*.12, s:(i%3)}));
+  function ambient(c, name, f){
+    if(name === "bedroom"){ c.fillStyle = "#FFF6E0";
+      motes.forEach(m=>{ m.y -= m.v; m.x += Math.sin(f*.05 + m.y)*.15; if(m.y < 100){ m.y = 196; } if(((f>>2) + m.x|0) % 3) c.fillRect(m.x|0, m.y|0, 1, 1); }); }
+    if(name === "garden"){
+      drops.forEach(d=>{ d.t = (d.t + .03) % 1; const tier = d.k % 3, sx = tier === 0 ? 160 + (d.k%2 ? 12 : -12) : tier === 1 ? 160 + (d.k%2 ? 27 : -27) : 160 + ((d.k*7)%40 - 20);
+        const y0 = tier === 0 ? 98 : tier === 1 ? 120 : 76, y1 = tier === 0 ? 118 : tier === 1 ? 156 : 96;
+        const y = y0 + (y1-y0)*d.t, x = sx + (tier === 2 ? 0 : (d.k%2 ? 1 : -1)*d.t*4);
+        c.fillStyle = d.t < .5 ? "#E8F6FC" : "#A9DCEE"; c.fillRect(x|0, y|0, 1, 2); });
+      c.fillStyle = "#FFFFFF"; for(let i=0;i<6;i++){ if((f + i*5) % 30 < 4) c.fillRect(110 + (i*19)%100, 155 + (i*3)%6, 2, 1); }
+    }
+    if(name === "title"){
+      petals.forEach(p=>{ p.y += p.v; p.x += Math.sin(f*.04 + p.y*.05)*.4 - .15; if(p.y > H){ p.y = -4; p.x = Math.random()*W; }
+        c.fillStyle = p.s ? "#E0566E" : "#F59AB4"; c.fillRect(p.x|0, p.y|0, 2, 1); if(p.s === 2) c.fillRect((p.x|0)+1, (p.y|0)+1, 1, 1); });
+    }
+  }
+  return { portrait, bg, ambient, W, H, people:Object.keys(PEOPLE), exprs:Object.keys(EX), backgrounds:Object.keys(BG) };
+})();
+
+/* ==== engine/vn.js ==== */
+/* =========================================================
+   The story runner and the stage.
+   S is the whole game state; it is autosaved after every line.
+   ========================================================= */
+let S = null;
+const EP = n => STORY.episodes.find(e=>e.n === n) || null;
+const VARS0 = {doom:87, sweet:0, bold:0, sly:0, lily:0, pip:0, rowan:0, cedric:0};
+function newState(){
+  const s = {v:1, ep:1, pc:0, vars:Object.assign({}, VARS0), sys:false, flags:{}, titles:[], done:[], stage:{bg:null, music:null, shown:[]},
+    log:[], notes:[], echo:null, epStart:{}, ts:Date.now()};
+  s.epStart[1] = snap(s);
+  return s;
+}
+function snap(s){ return JSON.parse(JSON.stringify({vars:s.vars, sys:s.sys, flags:s.flags, titles:s.titles})); }
+function autosave(){ if(S){ S.ts = Date.now(); store.set("auto", S); } }
+const okSave = s => !!s && s.v === 1 && Number.isInteger(s.ep) && Number.isInteger(s.pc) && s.vars && typeof s.vars.doom === "number"
+  && s.flags && typeof s.flags === "object" && Array.isArray(s.titles) && Array.isArray(s.done) && Array.isArray(s.log) && Array.isArray(s.notes) && s.stage && Array.isArray(s.stage.shown);
+
+/* ---------------- the stage ---------------- */
+const Stage = (()=>{
+  let cv = null, c = null, bgName = null, shown = [], shakeT = 0, flashT = 0, frame = 0, last = 0, running = false, titleMode = false;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const DUR = {hop:520, shake:480, tremble:1300, enter:520, nod:420};
+  function attach(canvas){ cv = canvas; c = cv.getContext("2d"); c.imageSmoothingEnabled = false; if(!running){ running = true; requestAnimationFrame(loop); } }
+  function setBg(name){ bgName = name; }
+  function find(who){ return shown.find(p=>p.who === who); }
+  function show(who, ex){ const p = find(who); if(p){ if(ex) p.ex = ex; return; }
+    shown.push({who, ex:ex || "neutral", t0:performance.now(), g:null, blinkAt:performance.now() + 1500 + Math.random()*2500, x:null}); }
+  function hide(who){ shown = shown.filter(p=>p.who !== who); }
+  function expr(who, ex){ const p = find(who); if(p && ex) p.ex = ex; }
+  function gesture(who, g){ const p = find(who); if(p) p.g = {name:g, t0:performance.now()}; }
+  function clear(){ shown = []; }
+  function shake(){ shakeT = performance.now(); }
+  function flash(){ flashT = performance.now(); }
+  function state(){ return shown.map(p=>[p.who, p.ex]); }
+  function restore(list){ shown = []; (list || []).forEach(([w,e])=>show(w,e)); shown.forEach(p=>p.t0 = 0); }
+  /* where portraits stand; in the garden a lone speaker steps aside so the fountain stays in view */
+  function slots(n){ if(n === 1) return [bgName === "garden" ? 236 : 160]; return n === 2 ? [92, 228] : [62, 160, 258]; }
+  function title(on){ titleMode = on; }
+  function draw(now){
+    if(!c) return;
+    const W = Art.W, H = Art.H;
+    let sx = 0, sy = 0;
+    if(shakeT && now - shakeT < 420 && !reduce){ const p = (now - shakeT)/420; sx = Math.round(Math.sin(p*40)*3*(1-p)); sy = Math.round(Math.cos(p*33)*2*(1-p)); }
+    c.setTransform(1,0,0,1,0,0); c.fillStyle = "#0E0A14"; c.fillRect(0,0,W,H);
+    c.setTransform(1,0,0,1,sx,sy);
+    const b = bgName && Art.bg(bgName); if(b) c.drawImage(b, 0, 0);
+    if(bgName && !reduce) Art.ambient(c, bgName, frame);
+    const xs = slots(shown.length);
+    shown.forEach((p,i)=>{
+      const blink = now > p.blinkAt && now < p.blinkAt + 130;
+      if(now > p.blinkAt + 130) p.blinkAt = now + 2200 + Math.random()*3200;
+      const img = Art.portrait(p.who, p.ex, blink && !reduce);
+      const target = xs[i]; p.x = p.x == null ? target : p.x + (target - p.x)*.35;
+      let ox = 0, oy = 0, alpha = p.t0 ? clamp((now - p.t0)/260, 0, 1) : 1;
+      if(p.g && !reduce){ const d = DUR[p.g.name] || 500, t = (now - p.g.t0)/d;
+        if(t >= 1) p.g = null;
+        else if(p.g.name === "hop") oy = -Math.abs(Math.sin(t*Math.PI*2))*6;
+        else if(p.g.name === "shake") ox = Math.sin(t*Math.PI*6)*4*(1-t);
+        else if(p.g.name === "tremble") ox = Math.sin(now*.09)*1.1;
+        else if(p.g.name === "nod") oy = Math.sin(t*Math.PI*2)*2;
+        else if(p.g.name === "enter"){ const e = 1 - Math.pow(1-t, 3); ox = (1-e)*70; alpha = Math.min(alpha, t*1.6); } }
+      c.globalAlpha = clamp(alpha, 0, 1);
+      c.drawImage(img, Math.round(p.x - img.width/2 + ox), Math.round(H - img.height + oy));
+      c.globalAlpha = 1;
+    });
+    if(flashT && now - flashT < 360){ c.globalAlpha = (1 - (now - flashT)/360)*.35; c.fillStyle = "#7FE3FF"; c.fillRect(0,0,W,H); c.globalAlpha = 1; }
+  }
+  function loop(now){ requestAnimationFrame(loop); if(now - last < 66) return; last = now; frame++; draw(now); }
+  return {attach, setBg, show, hide, expr, gesture, clear, shake, flash, state, restore, title, get bg(){ return bgName; }};
+})();
+
+/* ---------------- the runner ---------------- */
+const Run = (()=>{
+  let typing = null, waiting = false, lastLine = null;
+  const spd = () => ({slow:34, normal:20, fast:9, instant:0})[store.get("tspeed", "normal")];
+  function doomTo(v){ const was = S.vars.doom; S.vars.doom = clamp(Math.round(v), 0, 100); UI.doom(was, S.vars.doom); }
+  function apply(fx){ (fx || []).forEach(f=>{
+    if(f.flag) S.flags[f.flag] = f.v;
+    else if(f.k === "doom") doomTo(S.vars.doom + f.d);
+    else S.vars[f.k] = clamp((S.vars[f.k] || 0) + f.d, f.k in {lily:1, pip:1, rowan:1, cedric:1} ? 0 : -99, f.k in {lily:1, pip:1, rowan:1, cedric:1} ? 3 : 999);
+  }); }
+  function go(){
+    const ep = EP(S.ep);
+    if(S.echo) return line({who:"eve", text:S.echo.text, zh:S.echo.zh, echo:true});
+    for(let guard=0; guard<5000; guard++){
+      const n = ep.nodes[S.pc];
+      if(!n) return finish();
+      if(n.t === "bg"){ S.stage.bg = n.v; Stage.setBg(n.v); S.pc++; continue; }
+      if(n.t === "music"){ S.stage.music = n.v === "none" ? null : n.v; Audio2.music(S.stage.music); S.pc++; continue; }
+      if(n.t === "sfx"){ Audio2.sfx(n.v); S.pc++; continue; }
+      if(n.t === "show"){ Stage.show(n.who, n.ex); S.stage.shown = Stage.state(); S.pc++; continue; }
+      if(n.t === "hide"){ Stage.hide(n.who); S.stage.shown = Stage.state(); S.pc++; continue; }
+      if(n.t === "gesture"){ Stage.gesture(n.who, n.g); S.pc++; continue; }
+      if(n.t === "shake"){ Stage.shake(); S.pc++; continue; }
+      if(n.t === "doom"){ S.sys = true; doomTo(n.set != null ? n.set : S.vars.doom + n.d); S.pc++; continue; }
+      if(n.t === "goto"){ S.pc = ep.labels[n.to]; continue; }
+      if(n.t === "title"){ if(S.flags[n.flag] === n.val && !S.titles.some(t=>t.name === n.name)) S.titles.push({name:n.name, ep:S.ep}); S.pc++; continue; }
+      if(n.t === "line") return line(n);
+      if(n.t === "choice") return choice(n);
+      if(n.t === "end") return finish();
+      S.pc++;
+    }
+  }
+  function line(n){
+    if(n.ex && n.who) Stage.expr(n.who, n.ex), S.stage.shown = Stage.state();
+    if(n.who === "system") Stage.flash();
+    const key = S.ep + ":" + S.pc + (n.echo ? "e" : "");
+    if(S.logKey !== key){ S.logKey = key; S.log.push({who:n.who || "", text:n.text, zh:n.zh || ""}); if(S.log.length > 300) S.log.shift(); }
+    lastLine = n; autosave();
+    UI.line(n);
+    type($("#txt"));
+    if(store.get("autoread", false)) Voice.say(n.text, n.who || "eve");
+    waiting = true;
+  }
+  /* the typewriter reveals text nodes one character at a time, so tooltip words stay tappable */
+  function type(el){
+    if(typing){ clearInterval(typing.t); typing = null; }
+    const ms = spd(); if(!ms){ UI.typed(); return; }
+    const nodes = []; const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let nd;
+    while((nd = tw.nextNode())) nodes.push({n:nd, s:nd.nodeValue}), nd.nodeValue = "";
+    let i = 0, k = 0;
+    typing = {nodes, t:setInterval(()=>{
+      for(let step=0; step<2; step++){
+        if(i >= nodes.length){ clearInterval(typing.t); typing = null; UI.typed(); return; }
+        const o = nodes[i]; k++; o.n.nodeValue = o.s.slice(0, k);
+        if(k >= o.s.length){ i++; k = 0; }
+      } }, ms)};
+    UI.typing();
+  }
+  function finishTyping(){ if(!typing) return false; clearInterval(typing.t); typing.nodes.forEach(o=>o.n.nodeValue = o.s); typing = null; UI.typed(); return true; }
+  function next(){
+    if(!waiting) return;
+    if(finishTyping()) return;
+    waiting = false; Voice.stop();
+    if(S.echo){ const to = S.echo.to; S.echo = null; S.pc = EP(S.ep).labels[to]; }
+    else S.pc++;
+    Audio2.sfx("page");
+    go();
+  }
+  function choice(n){
+    waiting = false; autosave();
+    UI.choices(n, lastLine, k=>{
+      const o = n.opts[k];
+      Audio2.sfx("choose");
+      if(o.tone) S.vars[o.tone] = (S.vars[o.tone] || 0) + 1;
+      apply(o.fx);
+      const q = /^["“](.*)["”]$/.exec(o.text);
+      if(q){ S.echo = {text:q[1], to:o.to, zh:(o.zh || "").replace(/^「|」$/g, "")}; }
+      else { S.log.push({who:"", text:"→ " + o.text, zh:o.zh || ""}); S.pc = EP(S.ep).labels[o.to]; }
+      go();
+    });
+  }
+  function finish(){
+    waiting = false;
+    if(!S.done.includes(S.ep)) S.done.push(S.ep);
+    autosave(); UI.endCard();
+  }
+  function start(n, fresh){
+    const ep = EP(n); if(!ep) return;
+    S.ep = n; S.pc = 0; S.echo = null;
+    if(fresh) S.epStart[n] = snap(S);
+    S.stage = {bg:null, music:null, shown:[]}; Stage.clear(); Stage.setBg(null);
+    UI.game(); go();
+  }
+  /* pick up a saved game: rebuild the stage, then show the line it stopped on */
+  function resume(){
+    S.log = S.log.filter((l,i,a)=>!(i && a[i-1].text === l.text && a[i-1].who === l.who));
+    Stage.setBg(S.stage.bg); Stage.restore(S.stage.shown); Audio2.music(S.stage.music);
+    UI.game();
+    if(S.done.includes(S.ep) && !EP(S.ep).nodes[S.pc]) return UI.endCard();
+    go();
+  }
+  return {go, next, start, resume, get waiting(){ return waiting; }, get last(){ return lastLine; }};
+})();
+
+/* ==== engine/ui.js ==== */
+/* =========================================================
+   Screens and windows: title, the game screen, menus, saves,
+   settings, the status window and the end-of-episode card.
+   ========================================================= */
+const UI = (()=>{
+  const SLOTS = 3;
+  const zhOn = () => store.get("zh", false);   /* Chinese under each line: off unless the player turns it on */
+  const epTitle = n => SEASONS[0].eps[n-1] || "";
+  const unlocked = n => n === 1 || (S && S.done.includes(n-1)) || store.get("seen", []).includes(n);
+  const fmtDate = ts => { const d = new Date(ts); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`; };
+  function show(id){ ["title","game"].forEach(s=>$("#"+s).hidden = s !== id); }
+
+  /* ---------------- modal windows ---------------- */
+  function modal(html, ready, cls){
+    const m = $("#modal"); m.querySelector(".box").className = "box " + (cls || "");
+    m.querySelector(".box").innerHTML = html; m.hidden = false;
+    const x = m.querySelector("[data-x]"); if(x) x.onclick = closeModal;
+    if(ready) ready(m.querySelector(".box"));
+  }
+  function closeModal(){ $("#modal").hidden = true; }
+  const head = t => `<div class="mh"><h2>${esc(t)}</h2><button class="ib" data-x aria-label="Close">${ICON.x}</button></div>`;
+
+  /* ---------------- title ---------------- */
+  function title(){
+    show("title"); Stage.attach($("#tcv")); Stage.setBg("title"); Stage.restore([["eve","smug"]]);
+    const auto = store.get("auto", null), has = okSave(auto);
+    $("#tbtns").innerHTML = `${has ? `<button class="btn" id="tCont">Continue<small>Episode ${auto.ep} · ${esc(epTitle(auto.ep))}</small></button>` : ""}
+      <button class="btn ${has ? "alt" : ""}" id="tNew">New game</button>
+      <div class="row"><button class="btn alt sm" id="tLoad">Load</button><button class="btn alt sm" id="tEps">Episodes</button><button class="btn alt sm" id="tSet">Settings</button></div>`;
+    Audio2.music("title"); Audio2.ui();
+    if(has) $("#tCont").onclick = ()=>{ S = auto; Audio2.sfx("title"); Run.resume(); };
+    $("#tNew").onclick = ()=>{ const go = ()=>{ S = newState(); Audio2.sfx("title"); Run.start(1, false); };
+      if(has) confirmBox("Start a new game? Your autosave will be replaced. Saved slots stay.", "New game", go); else go(); };
+    $("#tLoad").onclick = ()=>slots("load");
+    $("#tEps").onclick = episodes;
+    $("#tSet").onclick = settings;
+  }
+  function confirmBox(msg, yes, fn){
+    modal(`<p class="msg">${esc(msg)}</p><div class="row end"><button class="btn alt" data-x>Cancel</button><button class="btn" id="cYes">${esc(yes)}</button></div>`,
+      box=>{ box.querySelector("#cYes").onclick = ()=>{ closeModal(); fn(); }; }, "small");
+  }
+
+  /* ---------------- the game screen ---------------- */
+  function game(){
+    show("game"); Stage.attach($("#cv"));
+    $("#epl").textContent = `Episode ${S.ep} · ${epTitle(S.ep)}`;
+    doom(null, S.vars.doom); Audio2.ui();
+  }
+  function line(n){
+    const box = $("#box"), c = CAST[n.who];
+    box.className = "box" + (n.who === "system" ? " sys" : n.who ? " talk" : " narr");
+    const tag = $("#tag");
+    if(n.who && c){ tag.hidden = false; tag.textContent = n.who === "system" ? "◆ SYSTEM" : c.name; tag.style.setProperty("--tc", c.color); } else tag.hidden = true;
+    $("#txt").innerHTML = mk(n.text);
+    const zh = $("#zh"); zh.textContent = n.zh || ""; zh.hidden = !(zhOn() && n.zh); zh.classList.add("wait");
+    $("#choices").hidden = true; $("#txt").hidden = false; $("#ctx").hidden = true;
+    $("#rd").dataset.say = n.text; $("#rd").dataset.who = n.who || "eve"; $("#rd").hidden = false;
+  }
+  function typing(){ $("#box").classList.remove("ready"); }
+  function typed(){ $("#box").classList.add("ready"); $("#zh").classList.remove("wait"); }
+  function choices(n, last, pick){
+    const box = $("#box"); box.className = "box choose"; $("#tag").hidden = true; $("#rd").hidden = true;
+    $("#txt").hidden = true; $("#zh").hidden = true;
+    const ctx = $("#ctx"); if(last){ ctx.hidden = false; ctx.innerHTML = mk(last.text); } else ctx.hidden = true;
+    const ch = $("#choices"); ch.hidden = false;
+    ch.innerHTML = n.opts.map((o,k)=>`<button class="opt" data-k="${k}">${mk(o.text)}${zhOn() && o.zh ? `<span class="ozh">${esc(o.zh)}</span>` : ""}</button>`).join("");
+    ch.querySelectorAll(".opt").forEach(b=>b.onclick = e=>{ if(e.target.closest(".g")) return; ch.querySelectorAll(".opt").forEach(x=>x.disabled = true); pick(+b.dataset.k); });
+  }
+  /* the Doom meter: hidden until the System first switches on */
+  let doomAnim = 0;
+  function doom(from, to){
+    const m = $("#doom"); if(!S || !S.sys){ m.hidden = true; return; }
+    m.hidden = false; const fill = m.querySelector("i"), num = m.querySelector("b");
+    fill.style.width = to + "%"; m.classList.toggle("hot", to >= 75); m.classList.toggle("cool", to < 40);
+    if(from == null || from === to){ num.textContent = to + "%"; return; }
+    m.classList.remove("bump-up","bump-down"); void m.offsetWidth; m.classList.add(to > from ? "bump-up" : "bump-down");
+    cancelAnimationFrame(doomAnim); const t0 = performance.now();
+    const step = now=>{ const p = Math.min(1, (now - t0)/700); num.textContent = Math.round(from + (to-from)*p) + "%"; if(p < 1) doomAnim = requestAnimationFrame(step); };
+    doomAnim = requestAnimationFrame(step);
+  }
+
+  /* ---------------- end of an episode ---------------- */
+  function endCard(){
+    const n = S.ep, next = EP(n+1), got = S.titles.filter(t=>t.ep === n);
+    if(next){ const seen = store.get("seen", []); if(!seen.includes(n+1)){ seen.push(n+1); store.set("seen", seen); } }
+    modal(`<div class="endc"><p class="kick">Episode ${n} complete</p><h2>${esc(epTitle(n))}</h2>
+      <div class="sysw"><div class="sh">◆ SYSTEM</div><p>Ding! Chapter survived.</p>
+      <div class="dm"><span>Doom</span><div class="bar"><i style="width:${S.vars.doom}%"></i></div><b>${S.vars.doom}%</b></div>
+      ${got.map(t=>`<p class="ttl">New title: <b>${esc(t.name)}</b></p>`).join("")}</div>
+      ${next ? "" : `<p class="msg">Episode ${n+1}, <i>${esc(epTitle(n+1))}</i>, is on its way.</p>`}
+      <div class="col">${next ? `<button class="btn" id="eNext">Continue to Episode ${n+1}</button>` : ""}
+      <button class="btn ${next ? "alt" : ""}" id="eSave">Save and exit</button></div></div>`, box=>{
+      if(next) box.querySelector("#eNext").onclick = ()=>{ closeModal(); Run.start(n+1, true); };
+      box.querySelector("#eSave").onclick = ()=>slots("save", ()=>{ closeModal(); Voice.stop(); title(); });
+    }, "end");
+    Audio2.sfx("ding");
+  }
+
+  /* ---------------- menu ---------------- */
+  function menu(){
+    modal(head("Menu") + `<div class="col">
+      <button class="btn alt" data-x>Resume</button>
+      <button class="btn alt" id="mStat">Status</button>
+      <button class="btn alt" id="mLog">Story log</button>
+      <button class="btn alt" id="mSave">Save game</button>
+      <button class="btn alt" id="mLoad">Load game</button>
+      <button class="btn alt" id="mSet">Settings</button>
+      <button class="btn alt" id="mTitle">Title screen</button></div>`, box=>{
+      box.querySelector("#mStat").onclick = status;
+      box.querySelector("#mLog").onclick = log;
+      box.querySelector("#mSave").onclick = ()=>slots("save");
+      box.querySelector("#mLoad").onclick = ()=>slots("load");
+      box.querySelector("#mSet").onclick = settings;
+      box.querySelector("#mTitle").onclick = ()=>{ autosave(); closeModal(); Voice.stop(); title(); };
+    });
+  }
+  function status(){
+    const d = S.vars.doom;
+    modal(head("Status") + `<div class="sysw"><div class="sh">◆ DOOM PREVENTION SYSTEM v2.3 (Beta)</div>
+      ${S.sys ? `<div class="dm big"><span>Doom</span><div class="bar"><i style="width:${d}%"></i></div><b>${d}%</b></div>
+      <p>${d >= 75 ? "Warning! Your story still ends in the Frost Isles. Surprise it!" : d >= 40 ? "The story is bending. Keep going!" : "The story barely knows you. Excellent!"}</p>` : `<p>System offline. (Have you looked in a mirror yet?)</p>`}
+      <div class="sh">TITLES</div>${S.titles.length ? `<ul class="tl">${S.titles.map(t=>`<li>${esc(t.name)} <small>Ep ${t.ep}</small></li>`).join("")}</ul>` : `<p class="dim">No titles yet.</p>`}</div>
+      <h3>Words you looked up</h3>${S.notes.length ? `<ul class="nb">${S.notes.map(k=>GLOSS[k] ? `<li><span class="g seen" role="button" tabindex="0" data-k="${esc(k)}">${esc(GLOSS[k].w)}</span><span>${esc(GLOSS[k].zh)}</span></li>` : "").join("")}</ul>` : `<p class="dim">Tap a dotted word in the story to see what it means. It will show up here.</p>`}`);
+  }
+  function log(){
+    modal(head("Story log") + `<div class="lg">${S.log.slice(-120).map(l=>{ const c = CAST[l.who];
+      return `<div class="le ${l.who === "system" ? "sys" : ""}">${c ? `<b style="color:${c.color}">${esc(l.who === "system" ? "SYSTEM" : c.name)}</b>` : ""}<p>${mk(l.text)}</p>${zhOn() && l.zh ? `<p class="lzh">${esc(l.zh)}</p>` : ""}${l.text.startsWith("→") ? "" : `<button class="ib sm" data-say="${esc(l.text)}" data-who="${esc(l.who || "eve")}" aria-label="Read aloud">${ICON.spk}</button>`}</div>`; }).join("")}</div>`,
+      box=>{ const lg = box.querySelector(".lg"); lg.scrollTop = lg.scrollHeight; }, "tall");
+  }
+
+  /* ---------------- saves ---------------- */
+  function slots(mode, after){
+    const list = [...Array(SLOTS).keys()].map(i=>store.get("slot"+(i+1), null));
+    modal(head(mode === "save" ? "Save game" : "Load game") + `<div class="col">${list.map((s,i)=>{ const ok = okSave(s);
+      return `<button class="slot" data-i="${i}" ${mode === "load" && !ok ? "disabled" : ""}><b>Slot ${i+1}</b>${ok ? `<span>Episode ${s.ep} · ${esc(epTitle(s.ep))}</span><small>Doom ${s.vars.doom}% · ${fmtDate(s.ts)}</small>` : `<span class="dim">Empty</span>`}</button>`; }).join("")}
+      ${mode === "load" ? `<button class="btn alt sm" id="sFile">Load a save file</button><input type="file" id="sIn" accept=".json,application/json" hidden>` : ""}</div>`, box=>{
+      box.querySelectorAll(".slot").forEach(b=>b.onclick = ()=>{
+        const i = +b.dataset.i, s = list[i];
+        if(mode === "save"){ const put = ()=>{ S.ts = Date.now(); store.set("slot"+(i+1), S); autosave(); toast(`Saved in slot ${i+1}`); closeModal(); if(after) after(); };
+          if(okSave(s)) confirmBox(`Replace the game in slot ${i+1}?`, "Replace", put); else put(); }
+        else { useSave(s); }
+      });
+      const f = box.querySelector("#sFile"); if(f){ const inp = box.querySelector("#sIn"); f.onclick = ()=>inp.click();
+        inp.onchange = ()=>{ const file = inp.files && inp.files[0]; if(!file) return;
+          file.text().then(t=>{ let s = null; try{ s = JSON.parse(t); }catch(e){} if(!okSave(s)) return toast("That file isn't a save from this game."); useSave(s); }).catch(()=>toast("That file couldn't be read.")); inp.value = ""; }; }
+    });
+  }
+  function useSave(s){ closeModal(); Voice.stop(); S = JSON.parse(JSON.stringify(s)); autosave(); Run.resume(); toast("Game loaded"); }
+  async function downloadSave(){
+    if(!S) return;
+    const name = `villainess-save-ep${S.ep}.json`, data = JSON.stringify(S);
+    let dl = null;
+    try{ if(window.claude && window.claude.use) dl = await window.claude.use("downloads"); }catch(e){ dl = null; }
+    if(dl){ try{ await dl.save({filename:name, data}); }catch(e){ if(!e || e.code !== "declined") toast("The download didn't work."); } return; }
+    try{ const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], {type:"application/json"})); a.download = name;
+      document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000); }catch(e){ toast("The download didn't work."); }
+  }
+
+  /* ---------------- episodes ---------------- */
+  function episodes(){
+    const eps = SEASONS[0].eps;
+    modal(head("Season 1") + `<div class="col">${eps.map((t,i)=>{ const n = i+1, ok = unlocked(n) && EP(n);
+      return `<button class="slot" data-n="${n}" ${ok ? "" : "disabled"}><b>Episode ${n}</b><span>${ok ? esc(t) : unlocked(n) ? "Coming soon" : "Locked"}</span></button>`; }).join("")}</div>`, box=>{
+      box.querySelectorAll(".slot").forEach(b=>b.onclick = ()=>{ const n = +b.dataset.n;
+        const go = ()=>{ closeModal(); if(!S) S = store.get("auto", null) || newState(); if(!okSave(S)) S = newState();
+          const st = S.epStart[n]; if(st){ S.vars = Object.assign({}, st.vars); S.sys = st.sys; S.flags = Object.assign({}, st.flags); S.titles = st.titles.slice(); }
+          Run.start(n, !st); };
+        confirmBox(`Play Episode ${n} from the start? Your choices from then on will replace the later ones.`, "Play", go); });
+    });
+  }
+
+  /* ---------------- settings ---------------- */
+  function settings(){
+    const ts = store.get("tspeed", "normal"), ar = store.get("autoread", false), r = Voice.rate;
+    const seg = (id, opts, cur) => `<div class="seg" id="${id}">${opts.map(([v,l])=>`<button data-v="${v}" class="${String(v) === String(cur) ? "on" : ""}">${l}</button>`).join("")}</div>`;
+    modal(head("Settings") + `<div class="set">
+      <div class="sr"><span>Music</span><button class="btn alt sm" data-music>♪ ${Audio2.musicOn ? "On" : "Off"}</button></div>
+      <div class="sr"><label for="vol">Volume</label><input type="range" id="vol" min="0" max="100" value="${Math.round(Audio2.vol*100)}"></div>
+      <div class="sr"><span>Sound effects</span>${seg("sSfx", [[1,"On"],[0,"Off"]], Audio2.sfxOn ? 1 : 0)}</div>
+      <div class="sr"><span>Text speed</span>${seg("sTs", [["slow","Slow"],["normal","Normal"],["fast","Fast"],["instant","Instant"]], ts)}</div>
+      <div class="sr"><span>Chinese translation<small class="dim sub">For players below B1</small></span>${seg("sZh", [[1,"On"],[0,"Off"]], store.get("zh", false) ? 1 : 0)}</div>
+      ${Voice.ok && Voice.voices().length ? `<details class="vz"><summary>Character voices</summary>
+        <p class="dim">American, British and Australian voices are listed first. If a character mispronounces a word, try another voice here.</p>
+        ${["eve","pip","lily","cedric","system"].map(w=>`<div class="vr"><label for="v-${w}">${esc(w === "eve" ? "Eve and the narration" : CAST[w].name === "SYSTEM" ? "The System" : CAST[w].name)}</label>
+          <div class="vrow"><select id="v-${w}" data-w="${w}"><option value="">Automatic</option>${Voice.voices().map(v=>`<option value="${esc(v.uri)}" ${store.get("voice-"+w, "") === v.uri ? "selected" : ""}>${esc(v.label)}</option>`).join("")}</select>
+          <button class="ib sm" data-try="${w}" aria-label="Try this voice">${ICON.spk}</button></div>
+          <small class="dim now" data-now="${w}"></small></div>`).join("")}</details>` : ""}
+      <div class="sr"><span>Read every line aloud</span>${seg("sAr", [[1,"On"],[0,"Off"]], ar ? 1 : 0)}</div>
+      <div class="sr"><span>Voice speed</span>${seg("sVr", [[.75,"Slow"],[.9,"Normal"],[1.05,"Fast"]], [.75,.9,1.05].reduce((a,b)=>Math.abs(b-r) < Math.abs(a-r) ? b : a))}</div>
+      ${S ? `<div class="sr col2"><span>Save file</span><p class="dim">Keep your game as a file, then load it on any device.</p><button class="btn alt sm" id="sDl">Download save</button></div>` : ""}
+      ${Voice.ok ? "" : `<p class="dim">This browser can't read aloud.</p>`}</div>`, box=>{
+      const segs = (id, fn)=>box.querySelectorAll(`#${id} button`).forEach(b=>b.onclick = ()=>{ box.querySelectorAll(`#${id} button`).forEach(x=>x.classList.toggle("on", x === b)); fn(b.dataset.v); });
+      segs("sSfx", v=>Audio2.setSfx(v === "1"));
+      segs("sTs", v=>store.set("tspeed", v));
+      segs("sAr", v=>store.set("autoread", v === "1"));
+      segs("sZh", v=>{ store.set("zh", v === "1"); refreshZh(); });
+      const SAMPLE = {eve:"I know this face. I read about it last night.", pip:"Good morning, my lady. I brought your tea.", lily:"Your dress is so beautiful.", cedric:"Evangeline! What have you done?", system:"Ding! Welcome to the Doom Prevention System."};
+      const nowLbl = w=>{ const el = box.querySelector(`[data-now="${w}"]`); if(!el) return; const u = Voice.current(w), v = Voice.voices().find(x=>x.uri === u); el.textContent = v ? "Now: " + v.label : ""; };
+      box.querySelectorAll("select[data-w]").forEach(s=>{ nowLbl(s.dataset.w); s.onchange = ()=>{ Voice.setVoice(s.dataset.w, s.value); nowLbl(s.dataset.w); Voice.say(SAMPLE[s.dataset.w], s.dataset.w); }; });
+      box.querySelectorAll("[data-try]").forEach(b=>b.onclick = ()=>Voice.say(SAMPLE[b.dataset.try], b.dataset.try));
+      segs("sVr", v=>{ Voice.setRate(+v); Voice.say("Ding! This is how I sound.", "system"); });
+      box.querySelector("#vol").oninput = e=>Audio2.setVol(e.target.value/100);
+      const dl = box.querySelector("#sDl"); if(dl) dl.onclick = downloadSave;
+      box.querySelector("[data-music]").addEventListener("click", ()=>setTimeout(()=>{ const b = box.querySelector("[data-music]"); if(b) b.textContent = "♪ " + (Audio2.musicOn ? "On" : "Off"); }, 0));
+    });
+  }
+
+  /* the setting takes effect on the line already on screen */
+  function refreshZh(){
+    const last = Run.last, zh = $("#zh");
+    if(last && !$("#txt").hidden){ zh.textContent = last.zh || ""; zh.hidden = !(zhOn() && last.zh); zh.classList.remove("wait"); }
+    $$("#choices .opt").forEach(b=>{ const s = b.querySelector(".ozh"); if(s) s.hidden = !zhOn(); });
+  }
+
+  /* ---------------- wiring ---------------- */
+  document.addEventListener("click", e=>{
+    const mu = e.target.closest("[data-music]"); if(mu){ Audio2.toggle(); return; }
+  });
+  function wire(){
+    $("#menuBtn").onclick = menu;
+    $("#doom").onclick = status;
+    const adv = e=>{ if(e.target.closest(".g,button,#pop")) return; if(!$("#modal").hidden) return; Run.next(); };
+    $("#cv").addEventListener("click", adv); $("#box").addEventListener("click", adv);
+    document.addEventListener("keydown", e=>{
+      if(!$("#modal").hidden){ if(e.key === "Escape") closeModal(); return; }
+      if($("#game").hidden) return;
+      if(e.key === " " || e.key === "Enter"){ if(document.activeElement && document.activeElement.closest(".opt,button")) return; e.preventDefault(); Run.next(); }
+    });
+    $("#modal").addEventListener("click", e=>{ if(e.target.id === "modal") closeModal(); });
+  }
+  return {title, game, line, typing, typed, choices, doom, endCard, wire, closeModal};
+})();
+
+/* ==== engine/main.js ==== */
+/* boot */
+UI.wire();
+UI.title();
+
+</script>
+</body>
+</html>
