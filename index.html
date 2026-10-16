@@ -11,10 +11,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   /* Layout: one walnut bookcase, a shelf per series. Books stand spine-out, with the first book of each
-     series face-out. Tapping a book pulls it forward and opens a drawer under its shelf. */
+     series face-out. Tapping a book pulls it forward and opens it in a small window under its shelf. */
   :root {
     --ink: #12141c;          /* deep ink blue-black */
-    --ink-raised: #1a1d28;   /* drawer surface */
     --parchment: #f0ead8;    /* headings */
     --mist: #b9b2a0;         /* body text */
     --faded: #7d7868;        /* captions, footer */
@@ -171,31 +170,40 @@
   .new { position: absolute; bottom: 34px; left: -4px; background: var(--parchment); color: var(--ink);
     font: 700 0.6rem/1 'Fraunces', Georgia, serif; letter-spacing: 0.14em; padding: 4px 7px 4px 8px; border-radius: 0 2px 2px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.45); }
 
-  /* the drawer under a shelf */
-  .drawer { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.28s ease; }
-  .drawer.open { grid-template-rows: 1fr; }
-  .drawer > div { overflow: hidden; }
-  .card {
-    margin: 14px 1.1rem 4px;
-    background: var(--ink-raised);
-    border: 1px solid rgba(240, 234, 216, 0.08);
-    border-left: 6px solid var(--a, var(--gold));
-    border-radius: 10px;
-    padding: 1.3rem 1.4rem 1.2rem 1.5rem;
+  /* the open book: a small window that floats under the shelf, over whatever is below.
+     It keeps a 10:7 spread (two 5:7 pages) at every screen size; everything inside is sized in cqw,
+     so the book scales like a picture and text that fits once fits everywhere. Keep blurbs short enough to fit. */
+  .pop {
+    position: absolute; z-index: 20; width: min(460px, calc(100% - 12px)); container-type: inline-size;
+    opacity: 0; transform: translateY(-6px) scale(0.98); transform-origin: var(--cx, 50%) 0;
+    transition: opacity 0.2s ease, transform 0.24s cubic-bezier(.2,.8,.3,1.1); pointer-events: none;
   }
-  .eyebrow { font-family: 'Fraunces', Georgia, serif; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--a, var(--gold)); margin-bottom: 0.3rem; }
-  .card h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 1.55rem; line-height: 1.2; color: var(--parchment); margin-bottom: 0.45rem; text-wrap: balance; }
-  .card p { font-size: 1.05rem; max-width: 60ch; }
-  .card .note { display: inline-block; margin-top: 0.7rem; font-family: 'Fraunces', Georgia, serif; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.04em;
-    color: var(--parchment); border: 1px solid var(--a, var(--gold)); border-radius: 6px; padding: 0.25rem 0.6rem; }
-  .card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; gap: 1rem; flex-wrap: wrap; }
-  .level { font-family: 'Fraunces', Georgia, serif; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.12em; color: var(--ink);
-    background: var(--a, var(--gold)); border-radius: 999px; padding: 0.2rem 0.75rem; white-space: nowrap; }
-  .start { font-family: 'Fraunces', Georgia, serif; font-size: 1rem; font-weight: 700; color: var(--ink); background: var(--a, var(--gold));
-    border-radius: 8px; padding: 0.55rem 1.1rem; text-decoration: none; white-space: nowrap; }
-  .start::after { content: " →"; }
-  .start:hover { filter: brightness(1.08); }
-  .start:focus-visible { outline: 2px solid var(--parchment); outline-offset: 3px; }
+  .pop.open { opacity: 1; transform: none; pointer-events: auto; }
+  .pop .caret { position: absolute; top: -7px; left: var(--cx, 50%); width: 14px; height: 14px; margin-left: -7px; transform: rotate(45deg);
+    background: var(--a); border-radius: 2px 0 0 0; }
+  .ob { /* the covers peek out around the pages */
+    position: relative; display: grid; grid-template-columns: 1fr 1fr; aspect-ratio: 10 / 7;
+    background: var(--a); padding: 1.4cqw 1.4cqw 1.8cqw; border-radius: 1.2cqw;
+    box-shadow: 0 18px 38px rgba(0,0,0,0.65), 0 2px 0 rgba(0,0,0,0.35);
+  }
+  .pg { position: relative; color: #2a2118; padding: 4cqw 3.6cqw 3.6cqw; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .pg.l { border-radius: 0.6cqw 0 0 0.6cqw; background: linear-gradient(90deg, #efe5cd, #f3ead5 12%, #f1e7d0 82%, #ddd0b3); padding-right: 4.4cqw; }
+  .pg.r { border-radius: 0 0.6cqw 0.6cqw 0; background: linear-gradient(90deg, #d8caab, #efe5cd 12%, #f3ead5 70%, #ece1c8); padding-left: 4.4cqw; padding-top: 6.4cqw; }
+  .pg .ser { font-family: 'Fraunces', Georgia, serif; font-size: 2.4cqw; font-weight: 500; letter-spacing: 0.16em; line-height: 1.4; text-transform: uppercase; color: #6b5d48; }
+  .pg .eyebrow { font-family: 'Fraunces', Georgia, serif; font-size: 3cqw; font-style: italic; color: var(--ad); margin-top: 1.8cqw; line-height: 1.35; }
+  .pg h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 5.6cqw; line-height: 1.1; color: #1d160f; margin-top: 1.2cqw; text-wrap: balance; }
+  .pg h3.long { font-size: 4.8cqw; } .pg h3 .nw { white-space: nowrap; }
+  .pg .orn { flex: none; width: 8cqw; height: 1px; background: #8f7f62; margin: 2.4cqw 0 2cqw; }
+  .pg .level { font-family: 'Fraunces', Georgia, serif; font-size: 3cqw; font-weight: 500; letter-spacing: 0.06em; color: #3a2f22; margin-top: auto; }
+  .pg .note { font-size: 3.3cqw; font-style: italic; color: var(--ad); line-height: 1.35; }
+  .pg p.blurb { font-size: 4.1cqw; line-height: 1.36; color: #2f261b; }
+  .pg .start { margin-top: auto; padding-top: 2cqw; align-self: flex-end; font-family: 'Fraunces', Georgia, serif; font-size: 3.8cqw; font-weight: 700;
+    color: var(--ad); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.6cqw; white-space: nowrap; }
+  .pg .start::after { content: " →"; }
+  .pg .start:hover { color: #1d160f; }
+  .pg .start:focus-visible { outline: 2px solid var(--ad); outline-offset: 3px; border-radius: 2px; }
+  .pg .x { position: absolute; top: 0.8cqw; right: 1.2cqw; width: 6cqw; height: 6cqw; min-width: 28px; min-height: 28px; font-size: 4cqw; line-height: 1; color: #8a7a60; display: grid; place-items: center; }
+  .pg .x:hover { color: #1d160f; }
   .shelf:last-child .board { height: 18px; }
 
   /* ---------- Footer ---------- */
@@ -214,11 +222,10 @@
     .spine .lv { font-size: 0.58rem; }
     .row { gap: 3px; }
     .shelf-label { padding: 0 0.6rem 0.7rem; } .shelf-label h2 { letter-spacing: 0.14em; } .row { padding-left: 0.5rem; padding-right: 0.5rem; }
-    .card { margin-left: 0.8rem; margin-right: 0.8rem; padding: 1.1rem 1.1rem 1rem 1.2rem; }
   }
   @media (prefers-reduced-motion: reduce) {
     .stroke path { animation: none; stroke-dashoffset: 0; }
-    .book, .drawer { transition: none; }
+    .book, .pop { transition: none; }
   }
 </style>
 </head>
@@ -248,55 +255,55 @@
 const SHELVES = [
   {name:"Window Seat", sub:"Textbooks and the game", mark:"Book 1", books:[
     {href:"window-seat.html", a:"--sky", eyebrow:"Book 1 · Home · Everyday Taiwan", title:"Window Seat", spine:"Window Seat", sub:"Book 1",
-     blurb:"An alarm at 7:15. A neighbor's cat who treats your sofa like a throne. Grandma's old yellow umbrella. Ten very short chapters from one young woman's ordinary, lovely life, with words, grammar and a dialogue in every lesson.",
+     blurb:"An alarm at 7:15. A cat who treats your sofa like a throne. Grandma's yellow umbrella. Ten short chapters from one young woman's ordinary, lovely life.",
      level:"A1 · 10 lessons", start:"Start reading", h:200},
     {href:"window-seat-departures.html", a:"--dusk", eyebrow:"Book 2 · Departures · Taipei to London", title:"Window Seat: Departures", spine:"Departures", sub:"Book 2",
-     blurb:"A French coworker shows Mia a postcard of London, and a quiet plan begins: a ballot, a worried mom, a savings spreadsheet, a first English email, and finally the window seat on a fourteen-hour flight.",
+     blurb:"A postcard of London starts a quiet plan: a ballot, a worried mom, a savings spreadsheet, a first English email, and the window seat on a long flight.",
      level:"A2 · 10 lessons", start:"Start reading", h:200},
     {href:"window-seat-arrivals.html", a:"--brick", eyebrow:"Book 3 · Arrivals · Six months in London", title:"Window Seat: Arrivals", spine:"Arrivals", sub:"Book 3",
-     blurb:"A top bunk in a hostel, a room with no view, nine pages of tenancy agreement, forty CVs and a café that finally says yes. Mia’s first six months in London, from “Mind the gap” to the rain in Edinburgh.",
+     blurb:"A top bunk, a room with no view, forty CVs and a café that finally says yes. Mia’s first six months in London, from “Mind the gap” to Edinburgh rain.",
      level:"B1 · 10 lessons", start:"Start reading", h:200},
     {href:"window-seat-homeward.html", a:"--dawn", eyebrow:"Book 4 · Homeward · London to Taipei", title:"Window Seat: Homeward", spine:"Homeward", sub:"Book 4",
-     blurb:"A job offer, a train to Lyon, a missed connection, a leaving do and thirteen hours above the clouds. Mia’s last six months abroad, all the way back to “The usual?”",
+     blurb:"A job offer, a train to Lyon, a missed connection and a leaving do. Mia’s last six months abroad, all the way back to “The usual?”",
      level:"B2 · 10 lessons", start:"Start reading", h:200},
     {href:"window-seat-game.html", a:"--sky", eyebrow:"The Game · Stage 1 · July 2026 – January 2027", title:"Window Seat: The Game", spine:"The Game", sub:"Stage 1",
-     blurb:"Plan Mia's days in Taipei two weeks at a time: classes, shifts, friends, rest. Sell handbags, sit out a typhoon, take the window seat south to Kaohsiung, and save every dollar you can after a postcard of London changes her plans.",
+     blurb:"Plan Mia's days in Taipei two weeks at a time. Sell handbags, sit out a typhoon, ride south to Kaohsiung, and save every dollar for London.",
      level:"A1–A2 · Stage 1 of 4", start:"Start playing", h:176, w:58}
   ]},
   {name:"Lamplight Readers", sub:"Graded stories", mark:"Level 1", books:[
     {href:"lamplight-1.html", a:"--lamp", eyebrow:"Level 1 · Ten stories by lamplight", title:"Lamplight Readers", spine:"Lamplight", sub:"Level 1",
-     blurb:"A goblin that laughs itself off its feet. A kitten haunting a night market. A hotel robot that takes every word literally. Ten short stories for grown-up readers, including Saki, Leacock and a dragon who would rather write poems.",
+     blurb:"A goblin that laughs itself off its feet. A kitten haunting a night market. A hotel robot that takes every word literally. Saki and Leacock, retold.",
      level:"A1 · 10 stories", start:"Start reading", h:180},
     {href:"lamplight-2.html", a:"--rose", eyebrow:"Level 2 · Ten stories at dusk", title:"Lamplight Readers", spine:"Lamplight", sub:"Level 2",
-     blurb:"Every phone on Cijin hisses at 3:33 a.m., and four friends hear a message underneath. A tea-shop detective, a band of moms, a coffee cart matchmaker, plus O. Henry, H. G. Wells and Tagore, retold.",
+     blurb:"Every phone on Cijin hisses at 3:33 a.m. A tea-shop detective, a coffee-cart matchmaker, and O. Henry, H. G. Wells and Tagore, retold.",
      level:"A2 · 10 stories", start:"Start reading", h:180},
     {href:"lamplight-3.html", a:"--sage", eyebrow:"Level 3 · Ten stories in the morning", title:"Lamplight Readers", spine:"Lamplight", sub:"Level 3",
-     blurb:"As Dagang Bridge turns, an old radio starts to speak. A young mapmaker bargains with a giant, a stationery-shop owner runs her first 5K, and Doyle, Wilde, Twain, Chopin and Gaskell are retold.",
+     blurb:"As Dagang Bridge turns, an old radio starts to speak. A mapmaker bargains with a giant, and Doyle, Wilde, Twain and Chopin are retold.",
      level:"B1 · 10 stories", start:"Start reading", h:180},
     {href:"lamplight-4.html", a:"--starlit", eyebrow:"Level 4 · Ten stories under the stars", title:"Lamplight Readers", spine:"Lamplight", sub:"Level 4",
-     blurb:"On a moonless night, four friends carry an old radio up to the Cijin lighthouse, and a voice from 1986 answers. A retired teacher becomes a dungeon master, a train seat in Portugal starts a love story, and Chesterton, Stevenson, Fitzgerald, Austen and Doyle are retold.",
+     blurb:"At the Cijin lighthouse, a voice from 1986 answers an old radio. A retired teacher becomes a dungeon master, and Chesterton, Austen and Doyle are retold.",
      level:"B2 · 10 stories", start:"Start reading", h:180},
     {href:"lamplight-radio.html", a:"--lamp", eyebrow:"Music for reading · FM 88–108", title:"Lamplight Radio", spine:"Radio", sub:"FM",
-     blurb:"Turn the little walnut radio on and let it play while you read, here or in any book of your own. Lamplight, Rain on Glass and Library Clock, the songs from Level 1, in full versions about three minutes long.",
+     blurb:"Turn on the little walnut radio and let it play while you read: Lamplight, Rain on Glass and Library Clock, about three minutes each.",
      level:"3 songs · from Level 1", start:"Turn it on", h:140, w:62}
   ]},
   {name:"Tabletop adventure · Kettlebrook", sub:"5E, for one or two heroes", mark:"Kettlebrook", books:[
     {href:"hero-workshop.html", a:"--dragon", eyebrow:"Character builder · EN + 中文", title:"Hero Workshop", spine:"Hero Workshop",
-     blurb:"Build a hero for a 5E tabletop game, step by step: choose a class, roll your scores, pick your spells, and level up as the story goes on. Every rule is explained in English and Chinese.",
+     blurb:"Build a hero for a 5E game, step by step: choose a class, roll your scores, pick spells and level up. Every rule is explained in English and Chinese.",
      level:"Levels 1–5", start:"Make a hero", h:186},
     {href:"kettlebrook-player.html", a:"--copper", eyebrow:"For players · Puzzles", title:"Kettlebrook: Player’s Book", spine:"Player’s Book", sub:"Kettlebrook",
-     blurb:"Ring the five bells in the right order. Pair the odd socks. Find the king’s lost marbles. Handouts, puzzles and word lists for your table, opened one at a time when your DM says so.",
+     blurb:"Ring five bells in the right order. Pair the odd socks. Find the king’s lost marbles. Handouts and puzzles, opened when your DM says so.",
      level:"A2–B1 · 5 chapters", start:"Open the book", h:194},
     {href:"kettlebrook.html", a:"--copper", eyebrow:"Cozy fantasy · DM’s guide", title:"The Lost-and-Found of Kettlebrook", spine:"DM’s Guide", sub:"Kettlebrook", teacher:true,
-     blurb:"A sleepy river town, five stolen bells, and a grumpy voice behind a brass door. A five-chapter campaign for one or two heroes, with read-aloud text, maps, monsters and every secret.",
+     blurb:"A sleepy river town, five stolen bells and a grumpy voice behind a brass door. A five-chapter campaign for one or two heroes, with every secret.",
      note:"For teachers and DMs only. Players, please use the Player’s Book.", level:"A2–B1 · Levels 1–5", start:"Open the guide", h:204, w:58}
   ]},
   {name:"The Villainess Has Read the Book", sub:"Visual novel", mark:"Season 1", books:[
     {href:"villainess.html", a:"--villain", eyebrow:"Visual novel · Season 1 · Romance comedy", title:"The Villainess Has Read the Book", spine:"The Villainess", sub:"Season 1", new:true,
-     blurb:"You fall asleep reading a cheesy romance novel and wake up inside it as the villainess, the one who gets sent away forever in Chapter Thirty. A cheerful System counts your Doom. Every choice changes how each scene plays out.",
+     blurb:"You wake up inside a cheesy romance novel as the villainess, the one exiled in Chapter Thirty. A cheerful System counts your Doom. Choose well.",
      level:"B1+ · Episodes 1–2 of 8", start:"Start playing", h:192},
     {href:"villainess-coach.html", a:"--villain-gold", eyebrow:"For teachers · Episode notes", title:"Coach's Companion", spine:"Coach's Companion", teacher:true, new:true,
-     blurb:"Words, phrases, grammar patterns, tone and register comparisons, and discussion questions for each episode. Tick the ones you want and show them large in class view after you play an episode together.",
+     blurb:"Words, phrases, grammar, tone and discussion questions for each episode. Tick the ones you want and show them large in class.",
      note:"For teachers only. Players, please use the game.", level:"Episodes 1–2", lvs:"Ep. 1–2", start:"Open the companion", h:170, w:52}
   ]},
   {name:"Serial stories", sub:"Come back for the next chapter", mark:"A serial", books:[
@@ -334,36 +341,50 @@ caseEl.innerHTML = SHELVES.map((s, si) => `
       const ribbon = b.new && face ? `<span class="new">NEW</span>` : "";
       const label = `${b.title}. ${b.level}.${b.teacher ? " For teachers." : ""}`;
       return face
-        ? `<button class="book cover" id="${id}" data-s="${si}" data-b="${bi}" style="${style}" aria-expanded="false" aria-controls="dr${si}" aria-label="${esc(label)}">${ribbon}
+        ? `<button class="book cover" id="${id}" data-s="${si}" data-b="${bi}" style="${style}" aria-expanded="false" aria-controls="pop" aria-label="${esc(label)}">${ribbon}
              <span class="eb">${esc(s.mark)}</span><span class="t${b.title.length > 22 ? " long" : ""}">${esc(b.title)}</span><span class="orn"></span><span class="lv">${esc(b.lvs || short(b.level))}</span></button>`
-        : `<button class="book spine" id="${id}" data-s="${si}" data-b="${bi}" style="${style}" aria-expanded="false" aria-controls="dr${si}" aria-label="${esc(label)}">${ribbon}
+        : `<button class="book spine" id="${id}" data-s="${si}" data-b="${bi}" style="${style}" aria-expanded="false" aria-controls="pop" aria-label="${esc(label)}">${ribbon}
              ${b.teacher ? `<span class="tch" aria-hidden="true" title="For teachers">T</span>` : ""}
              <span class="t">${esc(b.spine)}${b.sub ? ` <small>${esc(b.sub)}</small>` : ""}</span><span class="lv">${esc(b.lvs || short(b.level))}</span></button>`;
     }).join("")}</div>
     <div class="board" aria-hidden="true"></div>
-    <div class="drawer" id="dr${si}" role="region" aria-live="polite"><div></div></div>
   </section>`).join("");
 
+caseEl.insertAdjacentHTML("beforeend", `<div class="pop" id="pop" role="dialog" aria-label="Book details"></div>`);
+const pop = document.getElementById("pop");
 let open = null;
 function close(){
   if(!open) return;
-  const btn = document.getElementById(open), dr = document.getElementById("dr" + btn.dataset.s);
-  btn.setAttribute("aria-expanded", "false"); dr.classList.remove("open");
-  open = null;
+  document.getElementById(open).setAttribute("aria-expanded", "false");
+  pop.classList.remove("open"); open = null;
+}
+/* lay the open book under the shelf, centered on the book that was tapped, kept inside the bookcase */
+function place(btn){
+  const c = caseEl.getBoundingClientRect(), sh = btn.closest(".shelf"), bd = sh.querySelector(".board").getBoundingClientRect(), r = btn.getBoundingClientRect();
+  const inner = caseEl.clientWidth, w = pop.offsetWidth, mid = r.left + r.width/2 - c.left - caseEl.clientLeft;
+  const left = Math.max(6, Math.min(inner - w - 6, mid - w/2));
+  pop.style.left = left + "px"; pop.style.top = (bd.bottom - c.top - caseEl.clientTop + 10) + "px";
+  pop.style.setProperty("--cx", Math.max(18, Math.min(w - 18, mid - left)) + "px");
 }
 function show(btn){
-  const s = +btn.dataset.s, b = SHELVES[s].books[+btn.dataset.b], dr = document.getElementById("dr" + s);
+  const s = +btn.dataset.s, sh = SHELVES[s], b = sh.books[+btn.dataset.b];
   if(open === btn.id){ close(); return; }
-  if(open && document.getElementById(open).dataset.s !== String(s)) close();
-  else if(open) document.getElementById(open).setAttribute("aria-expanded", "false");
-  dr.firstElementChild.innerHTML = `<article class="card" style="--a: var(${b.a});">
-    <p class="eyebrow">${esc(b.eyebrow)}</p><h3>${esc(b.title)}</h3><p>${b.blurb}</p>
-    ${b.note ? `<span class="note">${esc(b.note)}</span>` : ""}
-    <div class="card-foot"><span class="level">${esc(b.level)}</span><a class="start" href="${esc(b.href)}">${esc(b.start)}</a></div></article>`;
-  btn.setAttribute("aria-expanded", "true"); dr.classList.add("open"); open = btn.id;
-  const card = dr.querySelector(".card");
-  setTimeout(()=>{ const r = card.getBoundingClientRect(); if(r.bottom > innerHeight) card.scrollIntoView({block:"nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"}); }, 300);
+  if(open) document.getElementById(open).setAttribute("aria-expanded", "false");
+  pop.style.setProperty("--a", `var(${b.a})`);
+  pop.style.setProperty("--ad", `color-mix(in srgb, var(${b.a}) 45%, #2a1a10)`);
+  pop.innerHTML = `<span class="caret"></span><div class="ob">
+    <div class="pg l"><p class="ser">${esc(sh.name)}</p><p class="eyebrow">${esc(b.eyebrow)}</p><h3${b.title.length > 24 ? ' class="long"' : ""}>${esc(b.title).replace(/(\S+-\S+)/g, '<span class="nw">$1</span>')}</h3><span class="orn"></span>
+      ${b.note ? `<p class="note">${esc(b.note)}</p>` : ""}<p class="level">${esc(b.level)}</p></div>
+    <div class="pg r"><button class="x" aria-label="Close">×</button><p class="blurb">${b.blurb}</p>
+      <a class="start" href="${esc(b.href)}">${esc(b.start)}</a></div></div>`;
+  pop.querySelector(".x").onclick = () => { const id = open; close(); document.getElementById(id).focus(); };
+  btn.setAttribute("aria-expanded", "true"); open = btn.id;
+  place(btn);
+  requestAnimationFrame(() => pop.classList.add("open"));
+  setTimeout(() => { const r = pop.getBoundingClientRect(); if(r.bottom > innerHeight) pop.scrollIntoView({block:"nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"}); }, 260);
 }
+addEventListener("resize", () => { if(open) place(document.getElementById(open)); });
+document.addEventListener("click", e => { if(open && !e.target.closest(".pop, .book")) close(); });
 caseEl.addEventListener("click", e => { const btn = e.target.closest(".book"); if(btn) show(btn); });
 document.addEventListener("keydown", e => { if(e.key === "Escape" && open){ const id = open; close(); document.getElementById(id).focus(); } });
 </script>
