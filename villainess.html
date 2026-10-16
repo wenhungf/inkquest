@@ -192,15 +192,21 @@ const STORY = {"episodes":[{"n":1,"title":"Chapter One, Again","nodes":[{"t":"bg
 const CAST = {
   eve:{name:"Eve", color:"#E2BC62", main:true, p:1, r:1},
   pip:{name:"Pip", color:"#B9D3C2", g:"f", p:1.08, r:1.02},
-  lily:{name:"Lily", color:"#F2A3BC", g:"f", p:1.14, r:.98},
+  lily:{name:"Lily", color:"#F2A3BC", g:"f", p:1.14, r:.98, prefer:"en-AU"},
   cedric:{name:"Prince Cedric", color:"#8FB4F0", g:"m", p:.98, r:.95},
   rowan:{name:"Duke Rowan", color:"#B7A6D9", g:"m", p:.86, r:.88},
-  system:{name:"SYSTEM", color:"#7FE3FF", g:"f", p:1.18, r:1.08}
+  system:{name:"SYSTEM", color:"#7FE3FF", g:"f", p:1.18, r:1.08, prefer:"en-IE"}
 };
 
 /* names the English voice gets wrong, respelled for the voice only.
    Check each one on the iPhone before shipping. */
-const SAY_AS = {"Cedric":"Sedrick"};
+const SAY_AS = {"Cedric":"Sedrick",
+  /* tested on iOS (2026-10-16): Samantha, Karen, Daniel and Moira all say ih-VAN-juh-leen; the Windows Chrome voices do too. */
+  "Evangeline":"Evangeleen"};
+
+/* respellings for one voice only, by the voice's name, e.g. {"Daniel":{"Evangeline":"…"}}.
+   Use only when the shared respelling above fails for one voice (check with tools/say-test.html). */
+const SAY_AS_VOICE = {};
 
 /* words in another language: [language, English respelling, native spelling] */
 const FOREIGN = {};
@@ -331,13 +337,13 @@ const Voice = (()=>{
   const vq = v => { const s = (v.voiceURI || "") + " " + v.name; return /premium|高品質|優質/i.test(s) ? 2 : /enhanced|增強|加強|Natural|Neural|Online/i.test(s) ? 1 : 0; };
   function pick(){
     if(!SYN) return;
-    /* American, British and Australian English first (the UK and Australian voices suit the court); other English last */
-    const us = v => /^en[-_]US/i.test(v.lang) ? 0 : /^en[-_]GB/i.test(v.lang) ? 1 : /^en[-_]AU/i.test(v.lang) ? 2 : 3;
+    /* American, British, Australian and Irish English first (the UK, Australian and Irish voices suit the court); other English last */
+    const us = v => /^en[-_]US/i.test(v.lang) ? 0 : /^en[-_]GB/i.test(v.lang) ? 1 : /^en[-_]AU/i.test(v.lang) ? 2 : /^en[-_]IE/i.test(v.lang) ? 3 : 4;
     const vs = SYN.getVoices().filter(v=>/^en/i.test(v.lang) && !NOVELTY.test(v.name)).sort((a,b)=>us(a)-us(b) || vq(b)-vq(a));
     POOL.all = vs;
-    /* characters get US, UK or Australian voices. With too few on the device, characters share a voice
-       and differ by pitch. Other English voices only if none of those three are installed. */
-    const usv = vs.filter(v=>us(v) <= 2), base = usv.length ? usv : vs;
+    /* characters get US, UK, Australian or Irish voices. With too few on the device, characters share a voice
+       and differ by pitch. Other English voices only if none of those four are installed. */
+    const usv = vs.filter(v=>us(v) <= 3), base = usv.length ? usv : vs;
     POOL.f = base.filter(v=>FEM.test(v.name)); POOL.m = base.filter(v=>!FEM.test(v.name) && MAL.test(v.name));
     if(!POOL.m.length) POOL.m = base.filter(v=>!FEM.test(v.name));
     POOL.main = vs.find(v=>us(v)===0 && /Samantha|Google US English|Aria|Jenny|Ava|Allison/i.test(v.name)) || POOL.f[0] || vs[0] || null;
@@ -350,10 +356,14 @@ const Voice = (()=>{
     if(!c || c.main || !c.g) return POOL.main;
     const pool = (c.g === "f" ? POOL.f : POOL.m).filter(v=>v !== POOL.main);
     if(!pool.length) return POOL.main;
+    /* a character can ask for an accent first (CAST.prefer); without it, characters take turns through the pool */
+    if(c.prefer){ const v = pool.find(x=>String(x.lang).replace("_","-").toLowerCase().startsWith(c.prefer.toLowerCase())); if(v) return v; }
     const same = Object.keys(CAST).filter(n=>!CAST[n].main && CAST[n].g === c.g);
     return pool[same.indexOf(who) % pool.length];
   }
-  const sayAs = t => Object.entries(SAY_AS).reduce((x,[w,r])=>x.split(w).join(r), t);
+  /* respellings for every voice, then any for this voice alone (each voice has its own dictionary, so a name one says right another says wrong) */
+  const sayAs = (t, v) => { const own = v && SAY_AS_VOICE[v.name] || {};
+    return Object.entries(Object.assign({}, SAY_AS, own)).reduce((x,[w,r])=>x.split(w).join(r), t); };
   const FOR = {}; Object.entries(FOREIGN).forEach(([k,v])=>{ FOR[k.toLowerCase()] = {lang:v[0], en:v[1], nat:v[2] || k}; });
   const FRX = Object.keys(FOR).length ? new RegExp("(^|[^\\p{L}])(" + Object.keys(FOR).sort((a,b)=>b.length-a.length)
     .map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|") + ")(?![\\p{L}])", "giu") : null;
@@ -363,7 +373,7 @@ const Voice = (()=>{
     const best = a => a.slice().sort((x,y)=>vq(y)-vq(x))[0];
     return best(vs.filter(v=>nm(v) === L)) || best(vs.filter(v=>nm(v).split("-")[0] === base)) || null;
   }
-  function speakParts(s){
+  function speakParts(s, v){
     const raw = [];
     if(FRX){ let i = 0, m; FRX.lastIndex = 0;
       while((m = FRX.exec(s))){ const st = m.index + m[1].length;
@@ -373,7 +383,7 @@ const Voice = (()=>{
     const parts = [];
     raw.forEach(p=>{ const nv = p.f && nativeVoice(p.f.lang);
       if(nv){ parts.push({t:p.f.nat, nv}); return; }
-      const t = p.f ? p.f.en : sayAs(p.t), last = parts[parts.length-1];
+      const t = p.f ? p.f.en : sayAs(p.t, v), last = parts[parts.length-1];
       if(last && !last.nv) last.t += t; else parts.push({t}); });
     return parts.filter(p=>p.nv || /[\p{L}\p{N}]/u.test(p.t));
   }
@@ -393,7 +403,7 @@ const Voice = (()=>{
     stop(); const id = ++qid; onDone = done || null;
     const q = [];
     sentences(text).forEach(s=>{ const pr = prosody(s, who), v = voiceFor(who);
-      speakParts(s).forEach(p=>q.push({t:p.t, v:p.nv || v, lang:p.nv ? p.nv.lang : (v ? v.lang : "en-US"), pr})); });
+      speakParts(s, v).forEach(p=>q.push({t:p.t, v:p.nv || v, lang:p.nv ? p.nv.lang : (v ? v.lang : "en-US"), pr})); });
     Audio2.duck(true);
     const next = () => {
       if(id !== qid) return;
@@ -1275,7 +1285,7 @@ const UI = (()=>{
       <div class="sr"><span>Text speed</span>${seg("sTs", [["slow","Slow"],["normal","Normal"],["fast","Fast"],["instant","Instant"]], ts)}</div>
       <div class="sr"><span>Chinese translation<small class="dim sub">For players below B1</small></span>${seg("sZh", [[1,"On"],[0,"Off"]], store.get("zh", false) ? 1 : 0)}</div>
       ${Voice.ok && Voice.voices().length ? `<details class="vz"><summary>Character voices</summary>
-        <p class="dim">American, British and Australian voices are listed first. If a character mispronounces a word, try another voice here.</p>
+        <p class="dim">American, British, Australian and Irish voices are listed first. If a character mispronounces a word, try another voice here.</p>
         ${["eve","pip","lily","cedric","system"].map(w=>`<div class="vr"><label for="v-${w}">${esc(w === "eve" ? "Eve and the narration" : CAST[w].name === "SYSTEM" ? "The System" : CAST[w].name)}</label>
           <div class="vrow"><select id="v-${w}" data-w="${w}"><option value="">Automatic</option>${Voice.voices().map(v=>`<option value="${esc(v.uri)}" ${store.get("voice-"+w, "") === v.uri ? "selected" : ""}>${esc(v.label)}</option>`).join("")}</select>
           <button class="ib sm" data-try="${w}" aria-label="Try this voice">${ICON.spk}</button></div>
