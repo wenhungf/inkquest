@@ -2,43 +2,48 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <title>InkQuest — Every quest begins with a story</title>
-<meta name="description" content="Textbooks, serial stories and interactive gamebooks for English learners. Read in the browser, graded to CEFR levels, with a tap-for-help glossary.">
+<meta name="description" content="Textbooks, graded readers, serial stories, visual novels and interactive gamebooks for English learners. Read in the browser, graded to CEFR levels, with a tap-for-help glossary.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
+  /* Layout: one walnut bookcase, a shelf per series. Books stand spine-out, with the first book of each
+     series face-out. Tapping a book pulls it forward and opens a drawer under its shelf. */
   :root {
     --ink: #12141c;          /* deep ink blue-black */
-    --ink-raised: #1a1d28;   /* card surface */
+    --ink-raised: #1a1d28;   /* drawer surface */
     --parchment: #f0ead8;    /* headings */
     --mist: #b9b2a0;         /* body text */
     --faded: #7d7868;        /* captions, footer */
     --gold: #c9a554;         /* brand accent */
+    --walnut: #4a2f1d;       /* shelf boards */
+    --walnut-hi: #6e4a30;
+    --walnut-lo: #2b1a10;
+    --back: #17120f;         /* the bookcase's back panel */
     --lantern: #c25b3c;      /* Night Train accent */
     --coffee: #c87d2a;       /* Lost Phone accent */
     --pixel: #7ec850;        /* Achievement Unlocked accent */
+    --jade: #67d9a6;         /* Keep Out accent */
+    --camino: #6f93d6;       /* Buen Camino accent */
     --clay: #d4784f;         /* The Leisure Project accent */
     --sky: #8fcbe3;          /* Window Seat Book 1 accent */
     --dusk: #b3a3e6;         /* Window Seat Book 2 accent */
     --brick: #e08a74;        /* Window Seat Book 3 accent */
+    --dawn: #e9a27e;         /* Window Seat Book 4 accent */
     --lamp: #e3a95c;         /* Lamplight Readers Level 1 accent */
     --rose: #db97a2;         /* Lamplight Readers Level 2 accent */
     --sage: #93b79b;         /* Lamplight Readers Level 3 accent */
-    --dawn: #e9a27e;         /* Window Seat Book 4 accent */
     --starlit: #98a8d6;      /* Lamplight Readers Level 4 accent */
     --copper: #d98a4e;       /* Kettlebrook accent */
     --dragon: #e0604f;       /* Hero Workshop accent */
+    --villain: #d4607e;      /* The Villainess accent */
+    --villain-gold: #e2bc62; /* The Villainess companion accent */
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  html, body {
-    background: var(--ink) !important;
-  }
-
+  html, body { background: var(--ink) !important; }
   body {
     font-family: 'Crimson Pro', Georgia, serif;
     color: var(--mist);
@@ -47,16 +52,15 @@
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
   }
-
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
   .wrap {
-    max-width: 680px;
+    max-width: 920px;
     margin: 0 auto;
-    padding: 4rem 1.25rem 3rem;
+    padding: 4rem max(16px, env(safe-area-inset-right, 0px)) 3rem max(16px, env(safe-area-inset-left, 0px));
   }
 
   /* ---------- Header ---------- */
-  header { text-align: center; margin-bottom: 3.5rem; }
-
+  header { text-align: center; margin-bottom: 3rem; }
   .wordmark {
     font-family: 'Fraunces', Georgia, serif;
     font-weight: 700;
@@ -65,142 +69,158 @@
     color: var(--parchment);
   }
   .wordmark .q { color: var(--gold); }
-
-  /* signature: an ink stroke that draws itself beneath the wordmark */
   .stroke { width: min(240px, 60vw); margin: 0.4rem auto 1rem; display: block; }
   .stroke path {
-    stroke: var(--gold);
-    stroke-width: 3;
-    fill: none;
-    stroke-linecap: round;
-    stroke-dasharray: 260;
-    stroke-dashoffset: 260;
+    stroke: var(--gold); stroke-width: 3; fill: none; stroke-linecap: round;
+    stroke-dasharray: 260; stroke-dashoffset: 260;
     animation: draw 1.1s ease-out 0.2s forwards;
   }
   @keyframes draw { to { stroke-dashoffset: 0; } }
+  .tagline { font-style: italic; font-size: 1.2rem; }
+  .intro { margin: 2rem auto 0; max-width: 54ch; }
+  .hint { margin-top: 0.9rem; font-size: 0.98rem; color: var(--faded); font-style: italic; }
 
-  .tagline {
-    font-style: italic;
-    font-size: 1.2rem;
-    color: var(--mist);
-  }
-
-  .intro {
-    margin: 2.25rem auto 0;
-    max-width: 52ch;
-    text-align: center;
-    color: var(--mist);
-  }
-
-  /* ---------- Story cards ---------- */
-  .shelf-label {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--faded);
-    text-align: center;
-    margin: 3rem 0 1.5rem;
-  }
-
-  .stories { display: flex; flex-direction: column; gap: 1.25rem; list-style: none; }
-
-  .card {
-    display: block;
+  /* ---------- The bookcase ---------- */
+  .case {
     position: relative;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 3px, rgba(0,0,0,0.05) 3px 7px, rgba(255,255,255,0.008) 7px 11px),
+      linear-gradient(180deg, #1d1612, var(--back) 40%, #120d0a);
+    border: 12px solid var(--walnut);
+    border-top-width: 16px;
+    border-radius: 6px;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.65), 0 18px 40px rgba(0,0,0,0.45);
+    border-image: linear-gradient(90deg, var(--walnut-lo), var(--walnut-hi) 18%, var(--walnut) 50%, var(--walnut-hi) 82%, var(--walnut-lo)) 1;
+  }
+  .shelf { position: relative; padding: 1.4rem 0 0; min-width: 0; display: flex; flex-direction: column; }
+  .shelf .row { flex: 1; }
+  @media (min-width: 780px) {
+    .case { display: grid; grid-template-columns: 1fr 1fr; }
+    .shelf:nth-child(odd) { border-right: 12px solid var(--walnut); box-shadow: inset -6px 0 10px -6px rgba(0,0,0,0.6); }
+  }
+  .shelf-label {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 0.2rem 1rem; flex-wrap: wrap;
+    padding: 0 1.1rem 0.8rem;
+    font-family: 'Fraunces', Georgia, serif;
+  }
+  .shelf-label h2 {
+    font-size: 0.82rem; text-wrap: balance; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--parchment);
+  }
+  .shelf-label span { font-size: 0.78rem; letter-spacing: 0.08em; color: var(--faded); white-space: nowrap; }
+  .row {
+    display: flex; align-items: flex-end; gap: 4px;
+    padding: 18px 1.1rem 0;
+    overflow: hidden;
+  }
+  .board {
+    height: 16px;
+    background: linear-gradient(180deg, var(--walnut-hi) 0 2px, var(--walnut) 2px 11px, var(--walnut-lo) 11px);
+    box-shadow: 0 6px 10px rgba(0,0,0,0.5);
+    position: relative; z-index: 1;
+  }
+
+  /* a book: a spine, or a cover when it stands face-out */
+  .book {
+    --a: var(--gold);
+    flex: 0 1 auto; position: relative;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    color: #15151c; text-align: center;
+    border-radius: 3px 3px 1px 1px;
+    transition: transform 0.22s cubic-bezier(.2,.8,.3,1.2), box-shadow 0.22s ease;
+    box-shadow: 2px 0 0 rgba(0,0,0,0.35), inset 0 -3px 0 rgba(0,0,0,0.18);
+  }
+  .book:focus-visible { outline: 2px solid var(--parchment); outline-offset: 3px; }
+  .book:hover { transform: translateY(-5px); }
+  .book[aria-expanded="true"] { transform: translateY(-16px); box-shadow: 0 10px 18px rgba(0,0,0,0.55); }
+  .spine {
+    --H: var(--h, 184px);
+    width: var(--w, 50px); height: var(--H); min-width: 34px;
+    padding: 10px 0 9px;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,0.28), rgba(0,0,0,0) 22%, rgba(255,255,255,0.16) 46%, rgba(0,0,0,0) 70%, rgba(0,0,0,0.32)),
+      var(--a);
+  }
+  .spine::before, .spine::after {
+    content: ""; position: absolute; left: 6px; right: 6px; height: 4px;
+    border-top: 1px solid rgba(21,21,28,0.55); border-bottom: 1px solid rgba(21,21,28,0.55);
+  }
+  .spine::before { top: 22px; } .spine::after { bottom: 30px; }
+  .spine .t {
+    writing-mode: vertical-rl;
+    font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 0.92rem; line-height: 1.05;
+    max-height: calc(var(--H) - 70px); overflow: hidden;
+    margin-top: 22px; letter-spacing: 0.01em;
+  }
+  .spine .t small { white-space: nowrap; font-weight: 500; font-size: 0.72rem; opacity: 0.8; }
+  .spine .lv { white-space: nowrap; font-family: 'Fraunces', Georgia, serif; font-size: 0.66rem; font-weight: 500; letter-spacing: 0.04em; line-height: 1.1; }
+  .spine .tch { position: absolute; top: -9px; right: -5px; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--parchment); color: var(--ink); font: 700 0.62rem/20px 'Fraunces', Georgia, serif; box-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+  .cover {
+    width: 136px; height: 196px; margin-right: 6px;
+    padding: 14px 12px 12px;
+    background:
+      radial-gradient(120% 80% at 30% 0%, rgba(255,255,255,0.28), rgba(255,255,255,0) 60%),
+      linear-gradient(90deg, rgba(0,0,0,0.3) 0 6px, rgba(255,255,255,0.18) 6px 7px, rgba(0,0,0,0) 7px),
+      var(--a);
+    justify-content: flex-start; gap: 6px;
+  }
+  .cover::after { content: ""; position: absolute; inset: 7px 7px 7px 13px; border: 1px solid rgba(21,21,28,0.5); border-radius: 2px; pointer-events: none; }
+  .cover .eb { font-family: 'Fraunces', Georgia, serif; font-size: 0.6rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.8; padding-left: 6px; }
+  .cover .t.long { font-size: 0.98rem; }
+  .cover .t { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 1.12rem; line-height: 1.1; padding: 0 2px 0 8px; text-wrap: balance; margin-top: auto; }
+  .cover .orn { width: 46px; height: 1px; background: rgba(21,21,28,0.55); margin: 4px auto 0; }
+  .cover .lv { font-family: 'Fraunces', Georgia, serif; font-size: 0.7rem; font-weight: 500; margin-top: auto; padding-left: 6px; }
+  .new { position: absolute; bottom: 34px; left: -4px; background: var(--parchment); color: var(--ink);
+    font: 700 0.6rem/1 'Fraunces', Georgia, serif; letter-spacing: 0.14em; padding: 4px 7px 4px 8px; border-radius: 0 2px 2px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.45); }
+
+  /* the drawer under a shelf */
+  .drawer { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.28s ease; }
+  .drawer.open { grid-template-rows: 1fr; }
+  .drawer > div { overflow: hidden; }
+  .card {
+    margin: 14px 1.1rem 4px;
     background: var(--ink-raised);
     border: 1px solid rgba(240, 234, 216, 0.08);
-    border-left: 6px solid var(--accent, var(--gold));
+    border-left: 6px solid var(--a, var(--gold));
     border-radius: 10px;
-    padding: 1.5rem 1.5rem 1.4rem 1.75rem;
-    text-decoration: none;
-    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    padding: 1.3rem 1.4rem 1.2rem 1.5rem;
   }
-  .card:hover, .card:focus-visible {
-    transform: translateX(4px);
-    background: #1f2330;
-    border-color: rgba(240, 234, 216, 0.18);
-    border-left-color: var(--accent, var(--gold));
-  }
-  .card:focus-visible { outline: 2px solid var(--accent, var(--gold)); outline-offset: 3px; }
-
-  .eyebrow {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--accent, var(--gold));
-    margin-bottom: 0.35rem;
-  }
-
-  .card h2 {
-    font-family: 'Fraunces', Georgia, serif;
-    font-weight: 700;
-    font-size: 1.6rem;
-    line-height: 1.2;
-    color: var(--parchment);
-    margin-bottom: 0.45rem;
-  }
-
-  .card p { color: var(--mist); font-size: 1.05rem; max-width: 48ch; }
-
-  .card-foot {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 1rem;
-    gap: 1rem;
-  }
-
-  .level {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    color: var(--ink);
-    background: var(--accent, var(--gold));
-    border-radius: 999px;
-    padding: 0.2rem 0.75rem;
-    white-space: nowrap;
-  }
-
-  .start {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--accent, var(--gold));
-    white-space: nowrap;
-  }
-  .start::after { content: " →"; transition: margin-left 0.18s ease; }
-
-  .note {
-    display: inline-block;
-    margin-top: 0.7rem;
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: 0.82rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    color: var(--parchment);
-    border: 1px solid var(--accent, var(--gold));
-    border-radius: 6px;
-    padding: 0.25rem 0.6rem;
-  }
-  .card:hover .start::after { margin-left: 4px; }
+  .eyebrow { font-family: 'Fraunces', Georgia, serif; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--a, var(--gold)); margin-bottom: 0.3rem; }
+  .card h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 1.55rem; line-height: 1.2; color: var(--parchment); margin-bottom: 0.45rem; text-wrap: balance; }
+  .card p { font-size: 1.05rem; max-width: 60ch; }
+  .card .note { display: inline-block; margin-top: 0.7rem; font-family: 'Fraunces', Georgia, serif; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.04em;
+    color: var(--parchment); border: 1px solid var(--a, var(--gold)); border-radius: 6px; padding: 0.25rem 0.6rem; }
+  .card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; gap: 1rem; flex-wrap: wrap; }
+  .level { font-family: 'Fraunces', Georgia, serif; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.12em; color: var(--ink);
+    background: var(--a, var(--gold)); border-radius: 999px; padding: 0.2rem 0.75rem; white-space: nowrap; }
+  .start { font-family: 'Fraunces', Georgia, serif; font-size: 1rem; font-weight: 700; color: var(--ink); background: var(--a, var(--gold));
+    border-radius: 8px; padding: 0.55rem 1.1rem; text-decoration: none; white-space: nowrap; }
+  .start::after { content: " →"; }
+  .start:hover { filter: brightness(1.08); }
+  .start:focus-visible { outline: 2px solid var(--parchment); outline-offset: 3px; }
+  .shelf:last-child .board { height: 18px; }
 
   /* ---------- Footer ---------- */
-  footer {
-    margin-top: 4rem;
-    text-align: center;
-    font-size: 0.95rem;
-    color: var(--faded);
-    line-height: 1.8;
-  }
+  footer { margin-top: 3.5rem; text-align: center; font-size: 0.95rem; color: var(--faded); line-height: 1.8; }
 
+  @media (max-width: 520px) {
+    .case { border-width: 6px; border-top-width: 10px; }
+    /* five books fit across a phone: a smaller cover, narrower and shorter spines */
+    .cover { width: 96px; height: 152px; min-width: 84px; padding: 11px 8px 9px; gap: 4px; }
+    .cover::after { inset: 5px 5px 5px 10px; }
+    .cover .t { font-size: 0.9rem; padding-left: 6px; } .cover .t.long { font-size: 0.8rem; }
+    .cover .eb { font-size: 0.52rem; letter-spacing: 0.12em; } .cover .lv { font-size: 0.62rem; }
+    .spine { --H: calc(var(--h, 184px) * 0.8); width: calc(var(--w, 50px) * 0.86); padding: 8px 0 7px; }
+    .spine::before { top: 16px; } .spine::after { bottom: 24px; }
+    .spine .t { font-size: 0.82rem; margin-top: 16px; } .spine .t small { font-size: 0.64rem; }
+    .spine .lv { font-size: 0.58rem; }
+    .row { gap: 3px; }
+    .shelf-label { padding: 0 0.6rem 0.7rem; } .shelf-label h2 { letter-spacing: 0.14em; } .row { padding-left: 0.5rem; padding-right: 0.5rem; }
+    .card { margin-left: 0.8rem; margin-right: 0.8rem; padding: 1.1rem 1.1rem 1rem 1.2rem; }
+  }
   @media (prefers-reduced-motion: reduce) {
     .stroke path { animation: none; stroke-dashoffset: 0; }
-    .card, .start::after { transition: none; }
+    .book, .drawer { transition: none; }
   }
 </style>
 </head>
@@ -214,304 +234,14 @@
     </svg>
     <p class="tagline">Every quest begins with a story.</p>
     <p class="intro">
-      Textbooks, serial stories, interactive gamebooks and a tabletop adventure
-      for English learners. In the gamebooks, you decide what happens next. In the
-      serials, you come back to find out. Tap any word for help.
+      Textbooks, graded readers, serial stories, a visual novel, interactive gamebooks
+      and a tabletop adventure for English learners. In the gamebooks, you decide what
+      happens next. In the serials, you come back to find out. Tap any word for help.
     </p>
+    <p class="hint">Tap a book to take it off the shelf.</p>
   </header>
 
-  <p class="shelf-label">Window Seat · Textbooks</p>
-
-  <ul class="stories">
-
-    <li>
-      <a class="card" href="window-seat.html" style="--accent: var(--sky);">
-        <p class="eyebrow">Book 1 · Home · Everyday Taiwan</p>
-        <h2>Window Seat</h2>
-        <p>An alarm at 7:15. A neighbor's cat who treats your sofa like a throne.
-        Grandma's old yellow umbrella. Ten very short chapters from one young
-        woman's ordinary, lovely life, with words, grammar and a dialogue in every lesson.</p>
-        <div class="card-foot">
-          <span class="level">A1 · 10 lessons</span>
-          <span class="start">Start reading</span>
-        </div>
-      </a>
-    </li>
-
-    <li>
-      <a class="card" href="window-seat-departures.html" style="--accent: var(--dusk);">
-        <p class="eyebrow">Book 2 · Departures · Taipei to London</p>
-        <h2>Window Seat: Departures</h2>
-        <p>A French coworker shows Mia a postcard of London, and a quiet plan begins:
-        a ballot, a worried mom, a savings spreadsheet, a first English email, and
-        finally the window seat on a fourteen-hour flight.</p>
-        <div class="card-foot">
-          <span class="level">A2 · 10 lessons</span>
-          <span class="start">Start reading</span>
-        </div>
-      </a>
-    </li>
-
-    <li>
-      <a class="card" href="window-seat-arrivals.html" style="--accent: var(--brick);">
-        <p class="eyebrow">Book 3 · Arrivals · Six months in London</p>
-        <h2>Window Seat: Arrivals</h2>
-        <p>A top bunk in a hostel, a room with no view, nine pages of tenancy agreement,
-        forty CVs and a café that finally says yes. Mia’s first six months in London,
-        from “Mind the gap” to the rain in Edinburgh.</p>
-        <div class="card-foot">
-          <span class="level">B1 · 10 lessons</span>
-          <span class="start">Start reading</span>
-        </div>
-      </a>
-    </li>
-
-    <li>
-      <a class="card" href="window-seat-homeward.html" style="--accent: var(--dawn);">
-        <p class="eyebrow">Book 4 · Homeward · London to Taipei</p>
-        <h2>Window Seat: Homeward</h2>
-        <p>A job offer, a train to Lyon, a missed connection, a leaving do and
-        thirteen hours above the clouds. Mia’s last six months abroad, all the way
-        back to “The usual?”</p>
-        <div class="card-foot">
-          <span class="level">B2 · 10 lessons</span>
-          <span class="start">Start reading</span>
-        </div>
-      </a>
-    </li>
-
-    <li>
-      <a class="card" href="window-seat-game.html" style="--accent: var(--sky);">
-        <p class="eyebrow">The Game · Stage 1 · July 2026 – January 2027</p>
-        <h2>Window Seat: The Game</h2>
-        <p>Plan Mia's days in Taipei two weeks at a time: classes, shifts, friends,
-        rest. Sell handbags, sit out a typhoon, take the window seat south to
-        Kaohsiung, and save every dollar you can after a postcard of London
-        changes her plans.</p>
-        <div class="card-foot">
-          <span class="level">A1–A2 · Stage 1 of 4</span>
-          <span class="start">Start playing</span>
-        </div>
-      </a>
-    </li>
-
-
-  </ul>
-
-  <p class="shelf-label">Lamplight Readers · Graded stories</p>
-
-  <ul class="stories">
-
-    <li>
-      <a class="card" href="lamplight-1.html" style="--accent: var(--lamp);">
-        <p class="eyebrow">Level 1 · Ten stories by lamplight</p>
-        <h2>Lamplight Readers</h2>
-        <p>A goblin that laughs itself off its feet. A kitten haunting a night market.
-        A hotel robot that takes every word literally. Ten short stories for grown-up
-        readers, including Saki, Leacock and a dragon who would rather write poems.</p>
-        <div class="card-foot">
-          <span class="level">A1 · 10 stories</span>
-          <span class="start">Start reading</span>
-        </div>
-      </a>
-    </li>
-
-    <li>
-      <a class="card" href="lamplight-2.html" style="--accent: var(--rose);">
-        <p class="eyebrow">Level 2 · Ten stories at dusk</p>
-        <h2>Lamplight Readers</h2>
-        <p>Every phone on Cijin hisses at 3:33 a.m., and four friends hear a message
-        underneath. A tea-shop detective, a band of moms, a coffee cart matchmaker,
-        plus O. Henry, H. G. Wells and Tagore, retold.</p>
-        <div class="card-foot">
-          <span class="level">A2 · 10 stories</span>
-          <span class="start">Start reading</span>
-        </div>
-      </a>
-    </li>
-
-    <li>
-      <a class="card" href="lamplight-3.html" style="--accent: var(--sage);">
-        <p class="eyebrow">Level 3 · Ten stories in the morning</p>
-        <h2>Lamplight Readers</h2>
-        <p>As Dagang Bridge turns, an old radio starts to speak. A young mapmaker
-        bargains with a giant, a stationery-shop owner runs her first 5K, and Doyle,
-        Wilde, Twain, Chopin and Gaskell are retold.</p>
-        <div class="card-foot">
-          <span class="level">B1 · 10 stories</span>
-          <span class="start">Start reading</span>
-        </div>
-      </a>
-    </li>
-
-    <li>
-      <a class="card" href="lamplight-4.html" style="--accent: var(--starlit);">
-        <p class="eyebrow">Level 4 · Ten stories under the stars</p>
-        <h2>Lamplight Readers</h2>
-        <p>On a moonless night, four friends carry an old radio up to the Cijin
-        lighthouse, and a voice from 1986 answers. A retired teacher becomes a dungeon
-        master, a train seat in Portugal starts a love story, and Chesterton,
-        Stevenson, Fitzgerald, Austen and Doyle are retold.</p>
-        <div class="card-foot">
-          <span class="level">B2 · 10 stories</span>
-          <span class="start">Start reading</span>
-        </div>
-      </a>
-    </li>
-
-    <li>
-      <a class="card" href="lamplight-radio.html" style="--accent: var(--lamp);">
-        <p class="eyebrow">Music for reading · FM 88–108</p>
-        <h2>Lamplight Radio</h2>
-        <p>Turn the little walnut radio on and let it play while you read, here or
-        in any book of your own. Lamplight, Rain on Glass and Library Clock, the
-        songs from Level 1, in full versions about three minutes long.</p>
-        <div class="card-foot">
-          <span class="level">3 songs · from Level 1</span>
-          <span class="start">Turn it on</span>
-        </div>
-      </a>
-    </li>
-
-  </ul>
-
-  <p class="shelf-label">Serial stories</p>
-
-  <ul class="stories">
-
-    <li>
-      <a class="card" href="leisure-project.html" style="--accent: var(--clay);">
-        <p class="eyebrow">Slow Life · Taitung</p>
-        <h2>The Leisure Project</h2>
-        <p>Two weeks in Taitung, no plan, no return ticket. Then the auntie
-        downstairs slips on a wet step, and somebody has to open the shop at five.</p>
-        <div class="card-foot">
-          <span class="level">B1–B2</span>
-          <span class="start">Start reading</span>
-        </div>
-      </a>
-    </li>
-
-  </ul>
-
-  <p class="shelf-label">Tabletop adventure · Kettlebrook</p>
-
-  <ul class="stories">
-
-    <li>
-      <a class="card" href="hero-workshop.html" style="--accent: var(--dragon);">
-        <p class="eyebrow">Character builder · EN + 中文</p>
-        <h2>Hero Workshop</h2>
-        <p>Build a hero for a 5E tabletop game, step by step: choose a class,
-        roll your scores, pick your spells, and level up as the story goes on.
-        Every rule is explained in English and Chinese.</p>
-        <div class="card-foot">
-          <span class="level">Levels 1–5</span>
-          <span class="start">Make a hero</span>
-        </div>
-      </a>
-    </li>
-
-    <li>
-      <a class="card" href="kettlebrook-player.html" style="--accent: var(--copper);">
-        <p class="eyebrow">For players · Puzzles</p>
-        <h2>Kettlebrook: Player’s Book</h2>
-        <p>Ring the five bells in the right order. Pair the odd socks. Find the
-        king’s lost marbles. Handouts, puzzles and word lists for your table,
-        opened one at a time when your DM says so.</p>
-        <div class="card-foot">
-          <span class="level">A2–B1 · 5 chapters</span>
-          <span class="start">Open the book</span>
-        </div>
-      </a>
-    </li>
-
-    <li>
-      <a class="card" href="kettlebrook.html" style="--accent: var(--copper);">
-        <p class="eyebrow">Cozy fantasy · DM’s guide</p>
-        <h2>The Lost-and-Found of Kettlebrook</h2>
-        <p>A sleepy river town, five stolen bells, and a grumpy voice behind a brass
-        door. A five-chapter campaign for one or two heroes, with read-aloud text,
-        maps, monsters and every secret.</p>
-        <span class="note">For teachers and DMs only. Players, please use the Player’s Book.</span>
-        <div class="card-foot">
-          <span class="level">A2–B1 · Levels 1–5</span>
-          <span class="start">Open the guide</span>
-        </div>
-      </a>
-    </li>
-
-  </ul>
-
-  <p class="shelf-label">Interactive gamebooks</p>
-
-  <ul class="stories">
-
-    <li>
-      <a class="card" href="achievement-unlocked.html" style="--accent: var(--pixel);">
-        <p class="eyebrow">Progression Fantasy · Kaohsiung</p>
-        <h2>Achievement Unlocked</h2>
-        <p>You wake up. Words float in the air: <em>Welcome, Player.</em>
-        Your life is a game now — and every choice scores points.</p>
-        <div class="card-foot">
-          <span class="level">A2–B1</span>
-          <span class="start">Start reading</span>
-        </div>
-      </a>
-    </li>
-
-    <li>
-      <a class="card" href="keep-out.html" style="--accent: #67d9a6;">
-        <p class="eyebrow">Progression Fantasy · Taipei</p>
-        <h2>Keep Out</h2>
-        <p>Three hundred years of training. Nine bolts of heaven's lightning.
-        And now you're standing in a back lane in Taipei looking at a sign that says <em>Cheap Room.</em></p>
-        <div class="card-foot">
-          <span class="level">A2–B1</span>
-          <span class="start">Start reading</span>
-        </div>
-      </a>
-    </li>
-
-    <li>
-      <a class="card" href="buen-camino.html" style="--accent: #6f93d6;">
-        <p class="eyebrow">Bilingual · English + Spanish</p>
-        <h2>Buen Camino</h2>
-        <p>Six hundred kilometers of road through Portugal and Spain. One traveler who doesn't speak the language. Every step teaches you something new.</p>
-        <div class="card-foot">
-          <span class="level">EN A2–B1 · ES A1</span>
-          <span class="start">Start reading</span>
-        </div>
-      </a>
-    </li>
-
-    <li>
-      <a class="card" href="the-lost-phone.html" style="--accent: var(--coffee);">
-        <p class="eyebrow">Modern Mystery · A Café</p>
-        <h2>The Lost Phone</h2>
-        <p>Someone left a phone on the table next to yours. The screen is
-        locked. The owner is gone. What do you do?</p>
-        <div class="card-foot">
-          <span class="level">A1–A2</span>
-          <span class="start">Start reading</span>
-        </div>
-      </a>
-    </li>
-
-    <li>
-      <a class="card" href="night-train-to-kyufun.html" style="--accent: var(--lantern);">
-        <p class="eyebrow">Mystery · 1930s Taiwan</p>
-        <h2>Night Train to Kyūfun</h2>
-        <p>A night train climbs into the mountains. A passenger is not who
-        he says he is. By morning, you must know the truth.</p>
-        <div class="card-foot">
-          <span class="level">A2–B1</span>
-          <span class="start">Start reading</span>
-        </div>
-      </a>
-    </li>
-
-  </ul>
+  <main class="case" id="case" aria-label="The InkQuest bookcase"></main>
 
   <footer>
     <p>© 2026 Wen-Hung Fang. All rights reserved.</p>
@@ -519,5 +249,131 @@
   </footer>
 
 </div>
+<script>
+/* Every book on the bookcase. The first book on each shelf stands face-out.
+   A shelf with more than five books shows spines only. To add a book: add an entry to its shelf. h and w set the spine's size; new:true adds a ribbon;
+   teacher:true marks a book that is only for teachers and DMs. */
+const SHELVES = [
+  {name:"Window Seat", sub:"Textbooks and the game", mark:"Book 1", books:[
+    {href:"window-seat.html", a:"--sky", eyebrow:"Book 1 · Home · Everyday Taiwan", title:"Window Seat", spine:"Window Seat", sub:"Book 1",
+     blurb:"An alarm at 7:15. A neighbor's cat who treats your sofa like a throne. Grandma's old yellow umbrella. Ten very short chapters from one young woman's ordinary, lovely life, with words, grammar and a dialogue in every lesson.",
+     level:"A1 · 10 lessons", start:"Start reading", h:200},
+    {href:"window-seat-departures.html", a:"--dusk", eyebrow:"Book 2 · Departures · Taipei to London", title:"Window Seat: Departures", spine:"Departures", sub:"Book 2",
+     blurb:"A French coworker shows Mia a postcard of London, and a quiet plan begins: a ballot, a worried mom, a savings spreadsheet, a first English email, and finally the window seat on a fourteen-hour flight.",
+     level:"A2 · 10 lessons", start:"Start reading", h:200},
+    {href:"window-seat-arrivals.html", a:"--brick", eyebrow:"Book 3 · Arrivals · Six months in London", title:"Window Seat: Arrivals", spine:"Arrivals", sub:"Book 3",
+     blurb:"A top bunk in a hostel, a room with no view, nine pages of tenancy agreement, forty CVs and a café that finally says yes. Mia’s first six months in London, from “Mind the gap” to the rain in Edinburgh.",
+     level:"B1 · 10 lessons", start:"Start reading", h:200},
+    {href:"window-seat-homeward.html", a:"--dawn", eyebrow:"Book 4 · Homeward · London to Taipei", title:"Window Seat: Homeward", spine:"Homeward", sub:"Book 4",
+     blurb:"A job offer, a train to Lyon, a missed connection, a leaving do and thirteen hours above the clouds. Mia’s last six months abroad, all the way back to “The usual?”",
+     level:"B2 · 10 lessons", start:"Start reading", h:200},
+    {href:"window-seat-game.html", a:"--sky", eyebrow:"The Game · Stage 1 · July 2026 – January 2027", title:"Window Seat: The Game", spine:"The Game", sub:"Stage 1",
+     blurb:"Plan Mia's days in Taipei two weeks at a time: classes, shifts, friends, rest. Sell handbags, sit out a typhoon, take the window seat south to Kaohsiung, and save every dollar you can after a postcard of London changes her plans.",
+     level:"A1–A2 · Stage 1 of 4", start:"Start playing", h:176, w:58}
+  ]},
+  {name:"Lamplight Readers", sub:"Graded stories", mark:"Level 1", books:[
+    {href:"lamplight-1.html", a:"--lamp", eyebrow:"Level 1 · Ten stories by lamplight", title:"Lamplight Readers", spine:"Lamplight", sub:"Level 1",
+     blurb:"A goblin that laughs itself off its feet. A kitten haunting a night market. A hotel robot that takes every word literally. Ten short stories for grown-up readers, including Saki, Leacock and a dragon who would rather write poems.",
+     level:"A1 · 10 stories", start:"Start reading", h:180},
+    {href:"lamplight-2.html", a:"--rose", eyebrow:"Level 2 · Ten stories at dusk", title:"Lamplight Readers", spine:"Lamplight", sub:"Level 2",
+     blurb:"Every phone on Cijin hisses at 3:33 a.m., and four friends hear a message underneath. A tea-shop detective, a band of moms, a coffee cart matchmaker, plus O. Henry, H. G. Wells and Tagore, retold.",
+     level:"A2 · 10 stories", start:"Start reading", h:180},
+    {href:"lamplight-3.html", a:"--sage", eyebrow:"Level 3 · Ten stories in the morning", title:"Lamplight Readers", spine:"Lamplight", sub:"Level 3",
+     blurb:"As Dagang Bridge turns, an old radio starts to speak. A young mapmaker bargains with a giant, a stationery-shop owner runs her first 5K, and Doyle, Wilde, Twain, Chopin and Gaskell are retold.",
+     level:"B1 · 10 stories", start:"Start reading", h:180},
+    {href:"lamplight-4.html", a:"--starlit", eyebrow:"Level 4 · Ten stories under the stars", title:"Lamplight Readers", spine:"Lamplight", sub:"Level 4",
+     blurb:"On a moonless night, four friends carry an old radio up to the Cijin lighthouse, and a voice from 1986 answers. A retired teacher becomes a dungeon master, a train seat in Portugal starts a love story, and Chesterton, Stevenson, Fitzgerald, Austen and Doyle are retold.",
+     level:"B2 · 10 stories", start:"Start reading", h:180},
+    {href:"lamplight-radio.html", a:"--lamp", eyebrow:"Music for reading · FM 88–108", title:"Lamplight Radio", spine:"Radio", sub:"FM",
+     blurb:"Turn the little walnut radio on and let it play while you read, here or in any book of your own. Lamplight, Rain on Glass and Library Clock, the songs from Level 1, in full versions about three minutes long.",
+     level:"3 songs · from Level 1", start:"Turn it on", h:140, w:62}
+  ]},
+  {name:"Tabletop adventure · Kettlebrook", sub:"5E, for one or two heroes", mark:"Kettlebrook", books:[
+    {href:"hero-workshop.html", a:"--dragon", eyebrow:"Character builder · EN + 中文", title:"Hero Workshop", spine:"Hero Workshop",
+     blurb:"Build a hero for a 5E tabletop game, step by step: choose a class, roll your scores, pick your spells, and level up as the story goes on. Every rule is explained in English and Chinese.",
+     level:"Levels 1–5", start:"Make a hero", h:186},
+    {href:"kettlebrook-player.html", a:"--copper", eyebrow:"For players · Puzzles", title:"Kettlebrook: Player’s Book", spine:"Player’s Book", sub:"Kettlebrook",
+     blurb:"Ring the five bells in the right order. Pair the odd socks. Find the king’s lost marbles. Handouts, puzzles and word lists for your table, opened one at a time when your DM says so.",
+     level:"A2–B1 · 5 chapters", start:"Open the book", h:194},
+    {href:"kettlebrook.html", a:"--copper", eyebrow:"Cozy fantasy · DM’s guide", title:"The Lost-and-Found of Kettlebrook", spine:"DM’s Guide", sub:"Kettlebrook", teacher:true,
+     blurb:"A sleepy river town, five stolen bells, and a grumpy voice behind a brass door. A five-chapter campaign for one or two heroes, with read-aloud text, maps, monsters and every secret.",
+     note:"For teachers and DMs only. Players, please use the Player’s Book.", level:"A2–B1 · Levels 1–5", start:"Open the guide", h:204, w:58}
+  ]},
+  {name:"The Villainess Has Read the Book", sub:"Visual novel", mark:"Season 1", books:[
+    {href:"villainess.html", a:"--villain", eyebrow:"Visual novel · Season 1 · Romance comedy", title:"The Villainess Has Read the Book", spine:"The Villainess", sub:"Season 1", new:true,
+     blurb:"You fall asleep reading a cheesy romance novel and wake up inside it as the villainess, the one who gets sent away forever in Chapter Thirty. A cheerful System counts your Doom. Every choice changes how each scene plays out.",
+     level:"B1+ · Episode 1 of 8", start:"Start playing", h:192},
+    {href:"villainess-coach.html", a:"--villain-gold", eyebrow:"For teachers · Episode notes", title:"Coach's Companion", spine:"Coach's Companion", teacher:true, new:true,
+     blurb:"Words, phrases, grammar patterns, tone and register comparisons, and discussion questions for each episode. Tick the ones you want and show them large in class view after you play an episode together.",
+     note:"For teachers only. Players, please use the game.", level:"Episode 1", start:"Open the companion", h:170, w:52}
+  ]},
+  {name:"Serial stories", sub:"Come back for the next chapter", mark:"A serial", books:[
+    {href:"leisure-project.html", a:"--clay", eyebrow:"Slow Life · Taitung", title:"The Leisure Project", spine:"The Leisure Project",
+     blurb:"Two weeks in Taitung, no plan, no return ticket. Then the auntie downstairs slips on a wet step, and somebody has to open the shop at five.",
+     level:"B1–B2", start:"Start reading", h:190}
+  ]},
+  {name:"Interactive gamebooks", sub:"You decide what happens next", mark:"Gamebook", books:[
+    {href:"achievement-unlocked.html", a:"--pixel", eyebrow:"Progression Fantasy · Kaohsiung", title:"Achievement Unlocked", spine:"Achievement Unlocked",
+     blurb:"You wake up. Words float in the air: <em>Welcome, Player.</em> Your life is a game now — and every choice scores points.",
+     level:"A2–B1", start:"Start reading", h:188},
+    {href:"keep-out.html", a:"--jade", eyebrow:"Progression Fantasy · Taipei", title:"Keep Out", spine:"Keep Out",
+     blurb:"Three hundred years of training. Nine bolts of heaven's lightning. And now you're standing in a back lane in Taipei looking at a sign that says <em>Cheap Room.</em>",
+     level:"A2–B1", start:"Start reading", h:178},
+    {href:"buen-camino.html", a:"--camino", eyebrow:"Bilingual · English + Spanish", title:"Buen Camino", spine:"Buen Camino",
+     blurb:"Six hundred kilometers of road through Portugal and Spain. One traveler who doesn't speak the language. Every step teaches you something new.",
+     level:"EN A2–B1 · ES A1", start:"Start reading", h:192},
+    {href:"the-lost-phone.html", a:"--coffee", eyebrow:"Modern Mystery · A Café", title:"The Lost Phone", spine:"The Lost Phone",
+     blurb:"Someone left a phone on the table next to yours. The screen is locked. The owner is gone. What do you do?",
+     level:"A1–A2", start:"Start reading", h:168},
+    {href:"night-train-to-kyufun.html", a:"--lantern", eyebrow:"Mystery · 1930s Taiwan", title:"Night Train to Kyūfun", spine:"Night Train to Kyūfun",
+     blurb:"A night train climbs into the mountains. A passenger is not who he says he is. By morning, you must know the truth.",
+     level:"A2–B1", start:"Start reading", h:196}
+  ]}
+];
+
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const short = lv => lv.split("·")[0].trim();
+const caseEl = document.getElementById("case");
+caseEl.innerHTML = SHELVES.map((s, si) => `
+  <section class="shelf" aria-labelledby="sh${si}">
+    <div class="shelf-label"><h2 id="sh${si}">${esc(s.name)}</h2><span>${esc(s.sub)}</span></div>
+    <div class="row">${s.books.map((b, bi) => {
+      const id = `b${si}-${bi}`, face = bi === 0 && s.books.length <= 5, style = `--a: var(${b.a});${b.h && !face ? ` --h:${b.h}px;` : ""}${b.w && !face ? ` --w:${b.w}px;` : ""}`;
+      const ribbon = b.new && face ? `<span class="new">NEW</span>` : "";
+      const label = `${b.title}. ${b.level}.${b.teacher ? " For teachers." : ""}`;
+      return face
+        ? `<button class="book cover" id="${id}" data-s="${si}" data-b="${bi}" style="${style}" aria-expanded="false" aria-controls="dr${si}" aria-label="${esc(label)}">${ribbon}
+             <span class="eb">${esc(s.mark)}</span><span class="t${b.title.length > 22 ? " long" : ""}">${esc(b.title)}</span><span class="orn"></span><span class="lv">${esc(short(b.level))}</span></button>`
+        : `<button class="book spine" id="${id}" data-s="${si}" data-b="${bi}" style="${style}" aria-expanded="false" aria-controls="dr${si}" aria-label="${esc(label)}">${ribbon}
+             ${b.teacher ? `<span class="tch" aria-hidden="true" title="For teachers">T</span>` : ""}
+             <span class="t">${esc(b.spine)}${b.sub ? ` <small>${esc(b.sub)}</small>` : ""}</span><span class="lv">${esc(short(b.level))}</span></button>`;
+    }).join("")}</div>
+    <div class="board" aria-hidden="true"></div>
+    <div class="drawer" id="dr${si}" role="region" aria-live="polite"><div></div></div>
+  </section>`).join("");
+
+let open = null;
+function close(){
+  if(!open) return;
+  const btn = document.getElementById(open), dr = document.getElementById("dr" + btn.dataset.s);
+  btn.setAttribute("aria-expanded", "false"); dr.classList.remove("open");
+  open = null;
+}
+function show(btn){
+  const s = +btn.dataset.s, b = SHELVES[s].books[+btn.dataset.b], dr = document.getElementById("dr" + s);
+  if(open === btn.id){ close(); return; }
+  if(open && document.getElementById(open).dataset.s !== String(s)) close();
+  else if(open) document.getElementById(open).setAttribute("aria-expanded", "false");
+  dr.firstElementChild.innerHTML = `<article class="card" style="--a: var(${b.a});">
+    <p class="eyebrow">${esc(b.eyebrow)}</p><h3>${esc(b.title)}</h3><p>${b.blurb}</p>
+    ${b.note ? `<span class="note">${esc(b.note)}</span>` : ""}
+    <div class="card-foot"><span class="level">${esc(b.level)}</span><a class="start" href="${esc(b.href)}">${esc(b.start)}</a></div></article>`;
+  btn.setAttribute("aria-expanded", "true"); dr.classList.add("open"); open = btn.id;
+  const card = dr.querySelector(".card");
+  setTimeout(()=>{ const r = card.getBoundingClientRect(); if(r.bottom > innerHeight) card.scrollIntoView({block:"nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"}); }, 300);
+}
+caseEl.addEventListener("click", e => { const btn = e.target.closest(".book"); if(btn) show(btn); });
+document.addEventListener("keydown", e => { if(e.key === "Escape" && open){ const id = open; close(); document.getElementById(id).focus(); } });
+</script>
 </body>
 </html>
