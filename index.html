@@ -294,10 +294,10 @@ const SHELVES = [
   {name:"The Villainess Has Read the Book", sub:"Visual novel", mark:"Season 1", books:[
     {href:"villainess.html", a:"--villain", eyebrow:"Visual novel · Season 1 · Romance comedy", title:"The Villainess Has Read the Book", spine:"The Villainess", sub:"Season 1", new:true,
      blurb:"You fall asleep reading a cheesy romance novel and wake up inside it as the villainess, the one who gets sent away forever in Chapter Thirty. A cheerful System counts your Doom. Every choice changes how each scene plays out.",
-     level:"B1+ · Episode 1 of 8", start:"Start playing", h:192},
+     level:"B1+ · Episodes 1–2 of 8", start:"Start playing", h:192},
     {href:"villainess-coach.html", a:"--villain-gold", eyebrow:"For teachers · Episode notes", title:"Coach's Companion", spine:"Coach's Companion", teacher:true, new:true,
      blurb:"Words, phrases, grammar patterns, tone and register comparisons, and discussion questions for each episode. Tick the ones you want and show them large in class view after you play an episode together.",
-     note:"For teachers only. Players, please use the game.", level:"Episode 1", start:"Open the companion", h:170, w:52}
+     note:"For teachers only. Players, please use the game.", level:"Episodes 1–2", lvs:"Ep. 1–2", start:"Open the companion", h:170, w:52}
   ]},
   {name:"Serial stories", sub:"Come back for the next chapter", mark:"A serial", books:[
     {href:"leisure-project.html", a:"--clay", eyebrow:"Slow Life · Taitung", title:"The Leisure Project", spine:"The Leisure Project",
@@ -335,10 +335,10 @@ caseEl.innerHTML = SHELVES.map((s, si) => `
       const label = `${b.title}. ${b.level}.${b.teacher ? " For teachers." : ""}`;
       return face
         ? `<button class="book cover" id="${id}" data-s="${si}" data-b="${bi}" style="${style}" aria-expanded="false" aria-controls="dr${si}" aria-label="${esc(label)}">${ribbon}
-             <span class="eb">${esc(s.mark)}</span><span class="t${b.title.length > 22 ? " long" : ""}">${esc(b.title)}</span><span class="orn"></span><span class="lv">${esc(short(b.level))}</span></button>`
+             <span class="eb">${esc(s.mark)}</span><span class="t${b.title.length > 22 ? " long" : ""}">${esc(b.title)}</span><span class="orn"></span><span class="lv">${esc(b.lvs || short(b.level))}</span></button>`
         : `<button class="book spine" id="${id}" data-s="${si}" data-b="${bi}" style="${style}" aria-expanded="false" aria-controls="dr${si}" aria-label="${esc(label)}">${ribbon}
              ${b.teacher ? `<span class="tch" aria-hidden="true" title="For teachers">T</span>` : ""}
-             <span class="t">${esc(b.spine)}${b.sub ? ` <small>${esc(b.sub)}</small>` : ""}</span><span class="lv">${esc(short(b.level))}</span></button>`;
+             <span class="t">${esc(b.spine)}${b.sub ? ` <small>${esc(b.sub)}</small>` : ""}</span><span class="lv">${esc(b.lvs || short(b.level))}</span></button>`;
     }).join("")}</div>
     <div class="board" aria-hidden="true"></div>
     <div class="drawer" id="dr${si}" role="region" aria-live="polite"><div></div></div>
