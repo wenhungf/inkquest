@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Pronunciation Test</title>
+<style>
+:root{--bg:#130D18;--panel:#1F1526;--line:#4A3552;--text:#F4EAEF;--dim:#B5A2B6;--gold:#E2BC62;color-scheme:dark;}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.5 -apple-system,system-ui,sans-serif;padding:max(16px, env(safe-area-inset-top,0px)) max(16px, env(safe-area-inset-right,0px)) 40px max(16px, env(safe-area-inset-left,0px));}
+main{max-width:520px;margin:0 auto;}
+h1{font-size:22px;margin:4px 0 4px;color:var(--gold);}
+p{color:var(--dim);font-size:15px;margin:0 0 12px;}
+label{display:block;font-size:14px;color:var(--dim);margin:12px 0 4px;}
+select,input{width:100%;font:inherit;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 10px;}
+.rows{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+.row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--panel);border:1px solid var(--line);border-radius:8px;}
+.row code{flex:1;min-width:0;font-size:16px;overflow-wrap:anywhere;}
+.row small{display:block;color:var(--dim);font-size:13px;}
+button{font:inherit;border:0;border-radius:8px;padding:8px 14px;background:var(--gold);color:#2A1A0E;font-weight:700;cursor:pointer;flex:none;}
+button.alt{background:#2A1D33;color:var(--text);border:1px solid var(--line);}
+.own{display:flex;gap:8px;margin-top:6px;}
+.own input{flex:1;}
+</style>
+</head>
+<body>
+<main>
+<h1>Pronunciation Test</h1>
+<p>Pick a voice, then tap Play on each spelling. Tell Claude the voice name and the number of the spelling that sounds like ih-VAN-juh-leen.</p>
+<label for="voice">Voice</label>
+<select id="voice"></select>
+<label for="who">Speak like</label>
+<select id="who">
+  <option value="1|1">Plain voice</option>
+  <option value=".98|.95">Prince Cedric (pitch and speed in the game)</option>
+  <option value="1|1">Eve and the narration</option>
+  <option value="1.08|1.02">Pip</option>
+  <option value="1.14|.98">Lily</option>
+  <option value="1.18|1.08">The System</option>
+</select>
+<div class="rows" id="rows"></div>
+<label for="mine">Try your own spelling</label>
+<div class="own"><input id="mine" value="Evangeline! What have you done?"><button id="playMine">Play</button></div>
+</main>
+<script>
+const SYN = window.speechSynthesis;
+const TRIES = [
+  ["Evangeline", "as written"],
+  ["Evangeleen", ""],
+  ["Evanjeleen", ""],
+  ["Evangelene", ""],
+  ["Evan jeleen", ""],
+  ["Ih-van-juh-leen", ""],
+  ["Ivanjeleen", ""],
+  ["Uh-vanjuh-leen", ""],
+  ["Evangel-een", ""]
+];
+const rows = document.getElementById("rows"), vs = document.getElementById("voice");
+TRIES.forEach(([t, note], i)=>{
+  const r = document.createElement("div"); r.className = "row";
+  r.innerHTML = `<b>${i+1}</b><code>${t}<small>${note ? note + " · " : ""}“${t}! What have you done?”</small></code><button>Play</button>`;
+  r.querySelector("button").onclick = ()=>say(t + "! What have you done?");
+  rows.appendChild(r);
+});
+function fill(){
+  if(!SYN) return;
+  const keep = vs.value, list = SYN.getVoices().filter(v=>/^en/i.test(v.lang)).sort((a,b)=>a.lang.localeCompare(b.lang) || a.name.localeCompare(b.name));
+  vs.innerHTML = list.map(v=>`<option value="${v.voiceURI}">${v.name} (${v.lang})</option>`).join("");
+  if(keep) vs.value = keep; else { const d = list.find(v=>v.name === "Daniel"); if(d) vs.value = d.voiceURI; }
+}
+if(SYN){ fill(); SYN.onvoiceschanged = fill; } else document.querySelector("p").textContent = "This browser can't read aloud.";
+function say(t){
+  if(!SYN) return; SYN.cancel();
+  const u = new SpeechSynthesisUtterance(t), v = SYN.getVoices().find(x=>x.voiceURI === vs.value);
+  const [p, r] = document.getElementById("who").value.split("|").map(Number);
+  if(v){ u.voice = v; u.lang = v.lang; } u.pitch = p; u.rate = .9 * r;
+  SYN.speak(u);
+}
+document.getElementById("playMine").onclick = ()=>say(document.getElementById("mine").value);
+</script>
+</body>
+</html>
