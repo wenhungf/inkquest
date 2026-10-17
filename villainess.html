@@ -412,7 +412,10 @@ const Voice = (()=>{
     return {rate:clamp(r, .5, 1.5), pitch:clamp(p, .8, 1.25)};   /* compact voices turn cartoonish outside ~0.8–1.25 */
   }
   let qid = 0, onDone = null;
-  function stop(){ qid++; if(SYN) SYN.cancel(); Audio2.duck(false); const f = onDone; onDone = null; if(f) f(); }
+  /* cancel only when something is actually speaking: iOS Safari can misbehave when cancel() is called on an idle engine
+     and then speak() right after it, so a new line waits a moment after a real cancel */
+  let cancelledAt = 0;
+  function stop(){ qid++; if(SYN && (SYN.speaking || SYN.pending)){ SYN.cancel(); cancelledAt = performance.now(); } Audio2.duck(false); const f = onDone; onDone = null; if(f) f(); }
   /* speak a line, sentence by sentence, then call done() */
   function say(text, who, done){
     if(!SYN){ if(done) done(); return; }
@@ -421,6 +424,7 @@ const Voice = (()=>{
     sentences(text).forEach(s=>{ const pr = prosody(s, who), v = voiceFor(who);
       speakParts(s, v).forEach(p=>q.push({t:p.t, v:p.nv || v, lang:p.nv ? p.nv.lang : (v ? v.lang : "en-US"), pr})); });
     Audio2.duck(true);
+    const gap = Math.max(0, 120 - (performance.now() - cancelledAt));
     const next = () => {
       if(id !== qid) return;
       const it = q.shift();
@@ -430,7 +434,7 @@ const Voice = (()=>{
       u.onend = u.onerror = next;
       SYN.speak(u);
     };
-    next();
+    if(gap) setTimeout(next, gap); else next();
   }
   /* iOS needs one spoken utterance from a tap before later ones play */
   ["touchend","click"].forEach(t=>document.addEventListener(t, ()=>{ if(SYN && !window.__spk){ window.__spk = 1; try{ const u = new SpeechSynthesisUtterance(" "); u.volume = 0; SYN.speak(u); }catch(e){} } }, true));
@@ -1247,7 +1251,8 @@ const UI = (()=>{
   const epTitle = n => SEASONS[0].eps[n-1] || "";
   const unlocked = n => n === 1 || (S && S.done.includes(n-1)) || store.get("seen", []).includes(n);
   const fmtDate = ts => { const d = new Date(ts); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`; };
-  function show(id){ ["title","game"].forEach(s=>$("#"+s).hidden = s !== id); }
+  /* remember (for this tab only) whether the player is mid-scene, so a page reload drops them back into the scene */
+  function show(id){ ["title","game"].forEach(s=>$("#"+s).hidden = s !== id); try{ if(id === "game") sessionStorage.setItem("vil-live", "1"); else sessionStorage.removeItem("vil-live"); }catch(e){} }
 
   /* ---------------- modal windows ---------------- */
   function modal(html, ready, cls){
@@ -1471,9 +1476,19 @@ const UI = (()=>{
 })();
 
 /* ==== engine/main.js ==== */
-/* boot */
+/* boot. If iOS Safari reloads the tab mid-scene (it does this when the page's process is killed, e.g. for memory),
+   go straight back to the line the player was on instead of the title screen. */
 UI.wire();
-UI.title();
+(()=>{
+  /* only on a reload: arriving from the bookcase, a bookmark or a link always shows the title screen */
+  let live = false, reload = false;
+  try{ live = sessionStorage.getItem("vil-live") === "1"; }catch(e){}
+  try{ const nav = performance.getEntriesByType("navigation")[0]; reload = nav ? nav.type === "reload" : performance.navigation && performance.navigation.type === 1; }catch(e){}
+  live = live && reload;
+  const auto = store.get("auto", null);
+  if(live && okSave(auto) && EP(auto.ep)){ S = auto; Run.resume(); }
+  else UI.title();
+})();
 
 </script>
 </body>
