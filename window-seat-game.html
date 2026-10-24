@@ -14,7 +14,7 @@ html{-webkit-text-size-adjust:100%;}
 <style>
 :root{
   --bg:#F3EFE6; --surface:#FFFCF5; --ink:#24262E; --muted:#636774; --rule:#DDD6C7;
-  --accent:#2F6F8F; --accent-ink:#FFFFFF; --tint:#DCEAF0; --warm:#E07A5F; --gold:#E9B44C;
+  --accent:#2F6F8F; --accent-ink:#FFFFFF; --tint:#DCEAF0; --warm:#E07A5F; --gold:#E9B44C; --gold-soft:rgba(233,180,76,.22); --gold-ink:#9A6A12;
   --good:#3E8E5E; --bad:#C0533A; --stress:#D9644A;
   --pop-bg:#24262E; --pop-ink:#F1EEE6; --pop-muted:#B0B3BD; --pop-accent:#F2C35B;
   --shadow:rgba(36,38,46,.18);
@@ -26,12 +26,12 @@ html{-webkit-text-size-adjust:100%;}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
   --bg:#15171C; --surface:#1E2128; --ink:#ECEAE4; --muted:#A3A6B0; --rule:#30343D;
   --accent:#7CB8D6; --accent-ink:#10161A; --tint:#203038; --pop-bg:#ECEAE4; --pop-ink:#1B1D22; --pop-muted:#585C66; --pop-accent:#2F6F8F;
-  --shadow:rgba(0,0,0,.5);
+  --shadow:rgba(0,0,0,.5); --gold-soft:rgba(233,180,76,.18); --gold-ink:#F2C35B;
 }}
 :root[data-theme="dark"]{
   --bg:#15171C; --surface:#1E2128; --ink:#ECEAE4; --muted:#A3A6B0; --rule:#30343D;
   --accent:#7CB8D6; --accent-ink:#10161A; --tint:#203038; --pop-bg:#ECEAE4; --pop-ink:#1B1D22; --pop-muted:#585C66; --pop-accent:#2F6F8F;
-  --shadow:rgba(0,0,0,.5);
+  --shadow:rgba(0,0,0,.5); --gold-soft:rgba(233,180,76,.18); --gold-ink:#F2C35B;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.5;}
@@ -98,6 +98,8 @@ h3{font-size:18px;margin:2px 0 6px;}
 .stat .bar i{background:var(--accent);}
 .thread{margin-top:12px;display:flex;flex-direction:column;gap:8px;}
 .msg{background:var(--surface);border:1px solid var(--rule);border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:16px;}
+.msg.rank{border:2px solid var(--gold);box-shadow:0 0 0 3px var(--gold-soft);}
+.msg.rank .from span:first-child{color:var(--gold-ink);font-weight:700;}
 .msg .from{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:2px;display:flex;justify-content:space-between;align-items:center;}
 .msg .zht{font-size:14px;color:var(--muted);margin-top:4px;}
 .zhb{font-size:12px;border:1px solid var(--rule);border-radius:8px;padding:0 6px;color:var(--muted);}
@@ -174,8 +176,12 @@ body.sheet-on #plan{padding-bottom:58vh;}
 #modal .choices{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
 #trip .btn{white-space:normal;}
 #modal .choices .btn,.choices .btn{width:100%;text-align:left;justify-content:flex-start;white-space:normal;flex-wrap:wrap;}
+.choices .sopt{flex-direction:column;align-items:flex-start;gap:2px;padding-block:10px;}
+.st-ticks{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:15px;}
+.choices .sopt small{font-weight:400;color:var(--muted);font-size:13px;}
 .diary{font-family:var(--f-disp);font-size:18px;line-height:28px;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:14px 16px;background-image:repeating-linear-gradient(to bottom,transparent 0 21px,var(--rule) 21px 22px,transparent 22px 28px),linear-gradient(var(--surface),var(--surface));background-origin:content-box,border-box;background-clip:content-box,border-box;}   /* each line of text sits on a rule: 28px lines, the rule just under the baseline */
 .diary p{margin:0;}
+.diary .zht{color:var(--muted);margin:0;}
 .de+.de{margin-top:28px;}
 .de::after{content:"";display:block;clear:both;}
 .de .dd{color:var(--muted);font-size:15px;height:28px;display:flex;align-items:center;gap:6px;white-space:nowrap;}
@@ -214,7 +220,8 @@ body.sheet-on #plan{padding-bottom:58vh;}
 .node{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid var(--rule);background:var(--surface);text-align:left;width:100%;}
 .node .nm{font-weight:700;}
 .node .cost{font-size:13px;color:var(--muted);white-space:nowrap;}
-.node.done{opacity:.55;}
+.node.done{opacity:1;}
+.node.done .nm{font-weight:600;}
 .clues{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .clue{border:2px solid var(--rule);border-radius:12px;padding:6px;background:var(--surface);}
 .clue canvas{width:100%;aspect-ratio:1;border-radius:8px;}
@@ -304,6 +311,8 @@ const UI = {
   saveFile:{zh:"存檔", en:"Save file"}, saveFileHelp:{zh:"把存檔下載成一個檔案，之後可以用它在任何裝置繼續玩。", en:"Download your game as a file. Load it later, on any device, to carry on."},
   dlSave:{zh:"下載存檔", en:"Download save"}, loadFile:{zh:"讀取存檔檔案", en:"Load a save file"}, badFile:{zh:"這個檔案不是存檔", en:"That file isn't a save"},
   dlFail:{zh:"無法下載，請改用下方的存檔代碼。", en:"The download didn't work. Use the save code below instead."}, codeOld:{zh:"或使用存檔代碼", en:"Or use a save code"},
+  stallWarn:{zh:"9/23–9/25 晚上要去夜市擺攤，很累人。擺攤前把壓力降低一點，免得生病。", en:"Sep 23–25: three nights at the night market stall. They are tiring, so keep stress low before them, or Mia may get sick."},
+  stallVotes:{zh:"票數", en:"Votes"}, stallTotal:{zh:"總票數", en:"Total votes"}, stallPrize:{zh:"紅包", en:"Red envelope"},
   copy:{zh:"複製", en:"Copy"}, copied:{zh:"已複製", en:"Copied"}, newGame:{zh:"重新開始", en:"Restart"},
   auto:{zh:"自動", en:"Auto"}, light:{zh:"淺色", en:"Light"}, dark:{zh:"深色", en:"Dark"},
   on:{zh:"開", en:"On"}, off:{zh:"關", en:"Off"},
@@ -351,6 +360,37 @@ const TRACKS = [
 /* ==== content/book1/gloss.js ==== */
 /* ---------------- glosses for [[marked]] words: Chinese first, then a short note ---------------- */
 const GLOSS = {
+  "charcoal":{w:"charcoal", kk:"[ˋtʃɑrˏkol]", zh:"木炭、炭火"},
+  "apron":{w:"apron", kk:"[ˋeprən]", zh:"圍裙"},
+  "red envelope":{w:"red envelope", kk:"[rɛd ˋɛnvəˏlop]", zh:"紅包", d:"過年、結婚會包紅包；老闆想謝謝員工時，也常塞一個紅包。"},
+  "skewer":{w:"skewer", kk:"[ˋskjuɚ]", zh:"烤肉串、竹籤", d:"複數 skewers。"},
+  "marinate":{w:"marinate", kk:"[ˋmærəˏnet]", zh:"醃（肉）"},
+  "pomelo":{w:"pomelo", kk:"[ˋpɑmələˏo]", zh:"柚子", d:"中秋節吃柚子，小朋友還會把柚子皮戴在頭上當帽子。"},
+  /* rank words (Rank up! I feel …) */
+  "rk:fit":{w:"fit", kk:"[fɪt]", zh:"體態好、身體健康", d:"stay fit = 保持好身材。"},
+  "rk:strong":{w:"strong", kk:"[strɔŋ]", zh:"強壯的"},
+  "rk:athletic":{w:"athletic", kk:"[æθˋlɛtɪk]", zh:"運動能力好的、健美的"},
+  "rk:unstoppable":{w:"unstoppable", kk:"[ʌnˋstɑpəbl̩]", zh:"勢不可擋的", d:"un-（不）＋ stop（停）＋ -able（可以）：停不下來的。"},
+  "rk:open":{w:"open", kk:"[ˋopən]", zh:"坦率的、願意敞開心胸的"},
+  "rk:sociable":{w:"sociable", kk:"[ˋsoʃəbl̩]", zh:"喜歡交朋友的、好相處的"},
+  "rk:confident":{w:"confident", kk:"[ˋkɑnfədənt]", zh:"有自信的"},
+  "rk:charismatic":{w:"charismatic", kk:"[ˏkærɪzˋmætɪk]", zh:"很有魅力的", d:"讓人一見就想靠近、想聽他說話的那種魅力。"},
+  "rk:capable":{w:"capable", kk:"[ˋkepəbl̩]", zh:"能幹的、有能力的"},
+  "rk:skilled":{w:"skilled", kk:"[skɪld]", zh:"熟練的、有技術的"},
+  "rk:gifted":{w:"gifted", kk:"[ˋgɪftɪd]", zh:"有天分的", d:"gift 是禮物，也是天分。"},
+  "rk:master":{w:"master", kk:"[ˋmæstɚ]", zh:"大師、高手"},
+  "rk:stylish":{w:"stylish", kk:"[ˋstaɪlɪʃ]", zh:"有品味的、時髦的"},
+  "rk:chic":{w:"chic", kk:"[ʃik]", zh:"時髦俐落的", d:"來自法文，念 [ʃik]，不念 chick。"},
+  "rk:glamorous":{w:"glamorous", kk:"[ˋglæmərəs]", zh:"光彩奪目的、迷人的"},
+  "rk:iconic":{w:"icon", kk:"[ˋaɪkɑn]", zh:"代表人物、指標人物", d:"大家一看就認得、會被模仿的人。形容詞是 iconic。"},
+  "rk:resourceful":{w:"resourceful", kk:"[rɪˋsorsfəl]", zh:"足智多謀的、很會想辦法的"},
+  "rk:savvy":{w:"savvy", kk:"[ˋsævɪ]", zh:"精明的、懂門道的"},
+  "rk:seasoned":{w:"seasoned", kk:"[ˋsizn̩d]", zh:"經驗豐富的、老練的", d:"season 是季節，也是「調味」：調過味、經歷過很多季的人。"},
+  "rk:wise":{w:"wise", kk:"[waɪz]", zh:"有智慧的"},
+  "rk:A2":{w:"A2", zh:"英文程度 A2（初級）", d:"能聊自己、家人、工作和購物，聽得懂慢慢說的日常英文，能寫簡單的訊息和短信。"},
+  "rk:B1":{w:"B1", zh:"英文程度 B1（中級）", d:"旅行時大部分狀況都能應付，能說出自己的經驗、計畫和理由，看得懂熟悉主題的文章。"},
+  "rk:B2":{w:"B2", zh:"英文程度 B2（中高級）", d:"能和母語人士自然對話不卡住，能討論新聞和工作上的議題，清楚表達自己的看法。"},
+  "rk:C1":{w:"C1", zh:"英文程度 C1（高級）", d:"能流利地用英文工作和讀書，聽得懂言外之意，說話寫作都有條理、用字精準。"},
   "order":{w:"order", kk:"[ˋɔrdɚ]", zh:"點（餐）", d:"order food = 點餐"},
   "notebook":{w:"notebook", kk:"[ˋnotˏbʊk]", zh:"筆記本"},
   "silly":{w:"silly", kk:"[ˋsɪlɪ]", zh:"傻傻的、好笑的"},
@@ -397,7 +437,7 @@ const GLOSS = {
   "electric":{w:"electric", kk:"[ɪˋlɛktrɪk]", zh:"電動的", d:"electric bike = 電動腳踏車"},
   "harbor":{w:"harbor", kk:"[ˋhɑrbɚ]", zh:"港口", d:"英式拼法是 harbour。"},
   "ferry":{w:"ferry", kk:"[ˋfɛrɪ]", zh:"渡輪"},
-  "hostel":{w:"hostel", kk:"[ˋhɑstḷ]", zh:"青年旅館"},
+  "hostel":{w:"hostel", kk:"[ˋhɑstl̩]", zh:"青年旅館"},
   "pier-2":{w:"Pier-2", zh:"駁二藝術特區", d:"高雄港邊的老倉庫改成的藝術區。"},
   "warehouse":{w:"warehouse", kk:"[ˋwɛrˏhaʊs]", zh:"倉庫"},
   "metal":{w:"metal", kk:"[ˋmɛtḷ]", zh:"金屬"},
@@ -429,7 +469,16 @@ const GLOSS = {
 };
 
 /* words the English voice says the local way */
-const SAY_AS = {"Camille":"Kah-mee", "Kaohsiung":"Gow-shong", "Cijin":"Chee-jin", "Jie":"Jyeh", "Tze-Chiang":"Tsuh-chyahng", "Chu-Kuang":"Joo-gwahng", "Hualien":"Hwah-lyen", "Tianhou":"Tyen-ho", "Cihou":"Tsuh-ho", "Mazu":"Mah-tsoo", "Chiayi":"Jya-ee"};
+/* read-aloud respellings for names the English voice gets wrong (place and people names, read by the English voice) */
+const SAY_AS = {"Camille":"Kah-mee", "Lyon":"Lee-on", "Kaohsiung":"Gow-shong", "Cijin":"Chee-jin", "Tze-Chiang":"Tsuh-chyahng", "Chu-Kuang":"Joo-gwahng",
+  "Hualien":"Hwah-lyen", "Tianhou":"Tyen-ho", "Cihou":"Chee-ho", "Mazu":"Mah-tsoo", "Chiayi":"Jya-ee", "Taichung":"Tie-chung", "Tainan":"Tie-nahn",
+  "Banqiao":"Bahn-chyow", "Yilan":"Ee-lahn", "Keelung":"Jee-lung", "Taoyuan":"Tao-yuan", "Pingtung":"Ping-dong", "Songshan":"Sung-shahn",
+  "Nangang":"Nahn-gahng", "Hsin-yi":"Shin-yee", "Gushan":"Goo-shahn", "Hamasen":"Hah-mah-sen"};
+/* foreign words: [language, English-voice respelling, text for the native voice].
+   With a voice for that language on the device, the word is read by it mid-sentence; otherwise the respelling is read.
+   好吃 goes to the voice as 郝吃: the Taiwan voice misreads 好吃 as hào chī, and 郝 is always hǎo.
+   Any other Chinese characters in an English line are read by a Taiwan Mandarin voice automatically. */
+const FOREIGN_WORDS = {"Jie":["zh-TW","jyeh","姊"], "謝謝":["zh-TW","shyeh shyeh","謝謝"], "好吃":["zh-TW","how chir","郝吃"]};
 
 /* ==== content/book1/stage.js ==== */
 /* =========================================================
@@ -539,10 +588,10 @@ const ACTS = {
   /* modeling (checked with Wen-Hung, 2026-10-12): new models shoot on a mutual-benefit basis (互惠),
      no fee either way, sharing travel costs; experienced models earn about NT$2,500–6,000 for a 3-hour session */
   shoot:{menu:"work", open:2, s:{zh:"互惠外拍", en:"Shoot"}, zh:"互惠外拍", en:"Mutual-benefit photo shoot", spr:"model", days:[5,6], cost:100, pay:0, cash:true, st:6, g:{sty:2.0, co:1.2}, odds:"sty", need:{sty:15}, flag:"shoot", port:1,
-    sub:{zh:"週末・不收費，互相累積作品・分攤交通 NT$100・作品集 +1", en:"Weekend · no fee either way · share travel NT$100 · portfolio +1"},
+    sub:{zh:"週末・不收費，互相累積作品・分攤交通 NT$100・順利的話作品集 +1", en:"Weekend · no fee either way · share travel NT$100 · portfolio +1 if it goes well"},
     ok:["The photographer says, “Look at the light. Good!” I learn a new [[pose]].", "We shoot by the river. The photos look like a magazine!"], slip:["I [[blink]] in every photo. We try again and again."]},
   shootPaid:{menu:"work", open:2, s:{zh:"付費外拍", en:"Paid shoot"}, zh:"付費外拍", en:"Paid photo shoot", spr:"camera", days:[5,6], cost:0, pay:2800, cash:true, st:7, g:{sty:2.2, co:1.4}, odds:"sty", need:{sty:25}, flag:"paidShoot", port:1,
-    sub:{zh:"週末三小時・NT$2,800・當天付清", en:"3 hours on a weekend · NT$2,800 · paid the same day"},
+    sub:{zh:"週末三小時・NT$2,800・當天付清・順利的話作品集 +1", en:"3 hours on a weekend · NT$2,800 · paid the same day · portfolio +1 if it goes well"},
     ok:["Three hours of photos for a café's new menu. My smile is tired, but my wallet is happy.", "The client loves the photos. “Can we work together again?”"], slip:["The sun is too strong. We wait for clouds, and it takes four hours."]},
 
   /* social */
@@ -581,7 +630,14 @@ const SPECIAL = {
   free:{s:{zh:"自由", en:"Free"}, zh:"自由日", en:"Free day", spr:"sun", st:-6, g:{}, ok:["A free day. I clean my room and water my plants."]},
   sick:{s:{zh:"生病", en:"Sick"}, zh:"生病", en:"Sick", spr:"sick", st:-8, g:{}, ok:["I am sick in bed. Mom brings me soup."]},
   typhoon:{s:{zh:"颱風假", en:"Typhoon"}, zh:"颱風假", en:"Typhoon day", spr:"rain", st:-10, g:{}, ok:["Typhoon day! No work, no class. The rain is loud on my window."]},
-  /* a placeholder until the Mid-Autumn Night Market Stall is built (Phase C) */
+  /* the Mid-Autumn Night Market Stall (Phase C): three locked nights; the choice and its result come in a card (STALL in stall.js) */
+  stall1:{s:{zh:"擺攤", en:"Stall"}, zh:"夜市擺攤・第一晚", en:"Night market stall, night 1", spr:"lantern", st:6, g:{}, h:{chen:4},
+    ok:["Night 1 at Auntie Chen's stall. The grill is hot, and my apron is new."]},
+  stall2:{s:{zh:"擺攤", en:"Stall"}, zh:"夜市擺攤・第二晚", en:"Night market stall, night 2", spr:"lantern", st:7, g:{}, h:{chen:4},
+    ok:["Night 2 at the stall. The line is long tonight."]},
+  stall3:{s:{zh:"中秋", en:"Moon"}, zh:"中秋夜市・第三晚", en:"Mid-Autumn, the last night at the stall", spr:"moon", st:2, g:{}, h:{chen:4, family:6},
+    ok:["Mid-Autumn! The last night at the stall, then home to Dad's grill."]},
+  /* kept for saves from before Phase C that still have a Mid-Autumn day off */
   midautumn:{s:{zh:"中秋", en:"Moon"}, zh:"中秋節", en:"Mid-Autumn Festival", spr:"moon", st:-12, g:{cr:0.4}, h:{family:6},
     ok:["Mid-Autumn! Dad grills meat on the street with the neighbors. We eat [[mooncakes|mooncake]] and look at the big, round moon."]},
   tingcall:{s:{zh:"視訊", en:"Call"}, zh:"婷打來了", en:"Ting calls", spr:"phone", st:-6, g:{en:0.4}, h:{ting:10},
@@ -603,11 +659,26 @@ const DRIVE_DONE = 10;             /* lessons in a driving course */
 const RANK_AT = [0, 35, 90, 170, 280];
 const RANK_NAMES = {
   en:[["初試啼聲","A1"],["學以致用","A2"],["獨當一面","B1"],["侃侃而談","B2"],["游刃有餘","C1"]],
-  fi:[["精力充沛","Healthy"],["體態精實","Fit"],["銅筋鐵骨","Strong"],["傲視群雄","Athletic"],["勢不可擋","Unstoppable"]],
+  fi:[["精力充沛","Healthy"],["體態精實","Fit"],["銅筋鐵骨","Strong"],["矯健靈活","Athletic"],["勢不可擋","Unstoppable"]],
   co:[["和藹可親","Warm"],["坦率真誠","Open"],["廣結善緣","Sociable"],["落落大方","Confident"],["光芒四射","Charismatic"]],
   cr:[["謹慎細膩","Careful"],["小有心得","Capable"],["熟能生巧","Skilled"],["天賦異稟","Gifted"],["出神入化","Master"]],
   sty:[["清新可人","Pretty"],["品味出眾","Stylish"],["時髦俐落","Chic"],["光彩奪目","Glamorous"],["引領潮流","Iconic"]],
   kh:[["有條不紊","Organized"],["處變不驚","Resourceful"],["精明幹練","Savvy"],["身經百戰","Seasoned"],["睿智通達","Wise"]]
+};
+/* what Mia says when a stat moves up a rank (index = the new rank; rank 0 is where every stat starts) */
+const RANK_LINES = {
+  en:[null, ["Rank up! My English is [[A2|rk:A2]] now.","升級了！我的英文到 A2 了：學以致用！"], ["Rank up! My English is [[B1|rk:B1]] now.","升級了！我的英文到 B1 了：獨當一面！"],
+      ["Rank up! My English is [[B2|rk:B2]] now.","升級了！我的英文到 B2 了：侃侃而談！"], ["Rank up! My English is [[C1|rk:C1]] now.","升級了！我的英文到 C1 了：游刃有餘！"]],
+  fi:[null, ["Rank up! I feel [[fit|rk:fit]].","升級了！我覺得自己體態精實。"], ["Rank up! I feel [[strong|rk:strong]].","升級了！我覺得自己銅筋鐵骨。"],
+      ["Rank up! I feel [[athletic|rk:athletic]].","升級了！我覺得自己矯健靈活。"], ["Rank up! I feel [[unstoppable|rk:unstoppable]].","升級了！我覺得自己勢不可擋。"]],
+  co:[null, ["Rank up! I feel [[open|rk:open]].","升級了！我覺得自己坦率真誠。"], ["Rank up! I feel [[sociable|rk:sociable]].","升級了！我覺得自己廣結善緣。"],
+      ["Rank up! I feel [[confident|rk:confident]].","升級了！我覺得自己落落大方。"], ["Rank up! I feel [[charismatic|rk:charismatic]].","升級了！我覺得自己光芒四射。"]],
+  cr:[null, ["Rank up! I feel [[capable|rk:capable]].","升級了！我的手藝小有心得了。"], ["Rank up! I feel [[skilled|rk:skilled]].","升級了！我的手藝熟能生巧了。"],
+      ["Rank up! I feel [[gifted|rk:gifted]].","升級了！我的手藝天賦異稟。"], ["Rank up! I feel like a [[master|rk:master]].","升級了！我的手藝出神入化了。"]],
+  sty:[null, ["Rank up! I feel [[stylish|rk:stylish]].","升級了！我覺得自己品味出眾。"], ["Rank up! I feel [[chic|rk:chic]].","升級了！我覺得自己時髦俐落。"],
+      ["Rank up! I feel [[glamorous|rk:glamorous]].","升級了！我覺得自己光彩奪目。"], ["Rank up! I feel like an [[icon|rk:iconic]].","升級了！我覺得自己引領潮流。"]],
+  kh:[null, ["Rank up! I feel [[resourceful|rk:resourceful]].","升級了！我覺得自己處變不驚。"], ["Rank up! I feel [[savvy|rk:savvy]].","升級了！我覺得自己精明幹練。"],
+      ["Rank up! I am a [[seasoned|rk:seasoned]] pro now.","升級了！我已經身經百戰了。"], ["Rank up! I feel [[wise|rk:wise]].","升級了！我覺得自己睿智通達。"]]
 };
 const statRank = v => { let r = 0; RANK_AT.forEach((t,i)=>{ if(v >= t) r = i; }); return r; };
 const rankProgress = v => { const r = statRank(v); return r >= RANK_AT.length - 1 ? 1 : (v - RANK_AT[r]) / (RANK_AT[r+1] - RANK_AT[r]); };
@@ -707,8 +778,10 @@ const EVENTS = [
           ["mia","Me? In London? I don't know…","我？去倫敦？我不知道耶……"]],
     fx:S=>{ S.flags.postcard = true; }},
   {id:"midautumn", at:"start", when:S=>S.blk === 5,
-    msgs:[["family","Mid-Autumn is on Friday the 25th. Take the day off! Dad wants to grill meat on the street with the neighbors.","中秋節是 25 號星期五，那天請個假吧！爸爸想跟鄰居在門口烤肉。"]],
-    fx:S=>{ S.locks["2026-09-25"] = "midautumn"; }},
+    msgs:[["chen","Pretty girl! My family has a grill stall at the night market. This year we are in the best-stall vote: Wednesday, Thursday and Mid-Autumn night. Can you help us? I pay NT$1,000 a night!","美女！我們家在夜市有一攤烤肉。今年我們參加最佳攤位票選：星期三、星期四，還有中秋節晚上。妳可以來幫忙嗎？一個晚上給妳一千塊！"],
+          ["mia","Yes! I can help.","好啊！我可以去幫忙。"],
+          ["family","Mid-Autumn is on Friday the 25th. Dad will grill outside our building with the neighbors. Come after the stall!","中秋節是 25 號星期五。爸爸要跟鄰居在樓下烤肉，妳收攤後過來！"]],
+    fx:S=>{ STALL_DATES.forEach((d,i)=>{ S.locks[d] = "stall" + (i+1); }); }},
   {id:"ballot", at:"start", when:S=>S.blk === 6 && S.flags.decided,
     msgs:[["leo","[[Jie|jie]], you sent me a UK government website. By mistake? Are you moving to London?","姊，妳傳了一個英國政府的網站給我。傳錯人了嗎？妳要搬去倫敦喔？"],
           ["mia","Oops! Maybe. Young people from Taiwan can live and work in the UK for up to two years. But first, there is a [[ballot]] in February. And I must have £2,530 in the bank.","糟糕！也許吧。台灣的年輕人可以在英國生活、工作最多兩年。可是要先參加二月的抽籤，而且銀行裡至少要有 2,530 英鎊。"],
@@ -781,26 +854,99 @@ const RANKUP = {
 /* Mia's story pages: shown as a card on the day, then kept in her diary */
 const STORY = {
   camilleMeet:{spr:"croissant",
-    en:"At three o'clock, the woman from the bakery downstairs comes to my counter with a warm [[croissant]]. I know her face, but not her name. “Hi! I'm Camille. You look tired,” she says. She is right. We add each other on LINE.",
+    en:"At three o'clock, the woman from the bakery downstairs came to my counter with a warm [[croissant]]. I knew her face, but not her name. “Hi! I'm Camille. You look tired,” she said. She was right. We added each other on LINE.",
     zh:"三點，樓下麵包店的那個女生拿著一個熱可頌來到我的櫃位。我認得她的臉，可是不知道她的名字。「嗨！我是 Camille。妳看起來好累。」她說。她說得沒錯。我們互加了 LINE。"},
   camilleMeet2:{spr:"croissant",
-    en:"On Sunday, I buy bread at the bakery under the store. The woman there gives me a free [[croissant]]. “Hi! I'm Camille. You look tired,” she says. She is right. We add each other on LINE.",
-    zh:"星期天，我去店裡樓下的麵包店買麵包。店裡的女生送我一個可頌。「嗨！我是 Camille。妳看起來好累。」她說。她說得沒錯。我們互加了 LINE。"},
+    en:"Today I bought bread at the bakery under the store. The woman there gave me a free [[croissant]]. “Hi! I'm Camille. You look tired,” she said. She was right. We added each other on LINE.",
+    zh:"今天我去店裡樓下的麵包店買麵包。店裡的女生送我一個可頌。「嗨！我是 Camille。妳看起來好累。」她說。她說得沒錯。我們互加了 LINE。"},
   tingcall:{spr:"phone",
-    en:"Ting calls on Saturday night. “Finally! Are you hiding from me?” We laugh and talk for two hours.",
-    zh:"星期六晚上，婷打來了。「終於接了！妳在躲我嗎？」我們笑著聊了兩個小時。"},
+    en:"Ting called tonight. “Finally! Are you hiding from me?” We laughed and talked for two hours.",
+    zh:"今天晚上，婷打來了。「終於接了！妳在躲我嗎？」我們笑著聊了兩個小時。"},
   letter:{spr:"letter",
-    en:"Today I walk past our old school, and I think of Ting. Tonight I write her a [[letter]], on real paper. “We are far apart, but I think about you a lot.”",
+    en:"Today I walked past our old school, and I thought of Ting. Tonight I wrote her a [[letter]], on real paper. “We are far apart, but I think about you a lot.”",
     zh:"今天我經過我們以前的學校，想起了婷。今晚我寫了一封信給她，用真的信紙。「我們離得很遠，可是我常常想到妳。」"},
   redBus:{spr:"bus",
-    en:"I can't stop thinking about Camille's postcard. At night, I lie in bed and see a red bus in the rain.",
-    zh:"我一直想著 Camille 的明信片。晚上躺在床上，眼前都是雨中那台紅色巴士。"},
+    en:"I can't stop thinking about Camille's postcard. Last night in bed, I saw a red bus in the rain.",
+    zh:"我一直想著 Camille 的明信片。昨晚躺在床上，眼前都是雨中那台紅色巴士。"},
   moon:{spr:"moon",
-    en:"Late at night, I look up at the big, round moon. I think about the red bus in the rain, and I make up my mind. I want to try. A [[working holiday]] in London. Me!",
-    zh:"深夜，我抬頭看著又大又圓的月亮，想著雨中的紅色巴士，終於下定決心了。我想試試看。去倫敦打工度假。我！"},
+    en:"Tonight, after the stall, I looked up at the big, round moon. I thought about the red bus in the rain, and I made up my mind. I want to try. A [[working holiday]] in London. Me!",
+    zh:"今晚收攤後，我抬頭看著又大又圓的月亮，想著雨中的紅色巴士，終於下定決心了。我想試試看。去倫敦打工度假。我！"},
   tellmom:{spr:"mom",
-    en:"After dinner, I wash the dishes. Then I tell Mom about the ballot. She asks question after question. At last she says, “Your grandma took a boat to Japan when she was twenty. Nobody could stop her either.”",
+    en:"After dinner, I washed the dishes. Then I told Mom about the ballot. She asked question after question. At last she said, “Your grandma took a boat to Japan when she was twenty. Nobody could stop her either.”",
     zh:"晚飯後，我洗好碗，然後跟媽媽說了抽籤的事。她問了一個又一個問題。最後她說：「妳阿嬤二十歲的時候坐船去日本，也沒人攔得住她。」"}
+};
+
+/* ==== content/book1/stall.js ==== */
+/* ---------------- Phase C: the Mid-Autumn Night Market Stall (Wed Sep 23 – Fri Sep 25, 2026) ----------------
+   Auntie Chen's family grill stall enters the night market's best-stall vote. Three nights, one choice a night.
+   Each choice tests a stat (Night 1 Craft, Night 2 Fitness / Know-how, Night 3 English / Confidence, plus one
+   other path each night), and the result brings votes. After Night 3 the votes decide the place, and the prize
+   goes to the London savings. Then the moon card plays (the story page "moon").
+   English: A1 (the stall is before the Mid-Autumn decision). Rough vote scale: three great nights ≈ 120. */
+const STALL_DATES = ["2026-09-23", "2026-09-24", "2026-09-25"];
+const STALL = {
+  pay:1000,            /* Auntie Chen pays NT$1,000 cash a night (about five hours) */
+  votes:[12, 26, 40],  /* slip / good / great */
+  places:[             /* [votes at least, place, Mia's share of the prize] */
+    [100, 1, 6000], [80, 2, 3000], [60, 3, 1500], [0, 0, 0]],
+  nights:[
+    {title:["Night 1 · Prep", "第一晚・備料"],
+     scene:["Wednesday, five o'clock. Auntie Chen's stall smells of [[charcoal]] and soy sauce. Her son, Wei, gives me an [[apron]]. “Fifty stalls are in the vote this year,” he says. “We need something new on the grill.”",
+            "星期三，五點。陳阿姨的攤位飄著炭火和醬油的香味。她兒子阿偉遞給我一件圍裙。「今年有五十攤參加票選，」他說，「我們的烤架上需要一點新東西。」"],
+     opts:[
+      {st:"cr", t:["Make Grandma's pineapple and pork [[skewers|skewer]].", "做阿嬤的鳳梨豬肉串。"],
+       great:["The pineapple turns gold on the grill. A man eats one, then buys five more. Wei gives me a thumbs-up.", "鳳梨在烤架上烤成金黃色。一個男生吃了一串，又買了五串。阿偉對我比讚。"],
+       good:["The skewers are a little burnt, but people like the sweet and salty taste.", "肉串有一點焦，不過大家很喜歡這種又甜又鹹的味道。"],
+       slip:["I cut the pineapple too thick. It falls off the sticks. Auntie Chen laughs and helps me.", "我鳳梨切太厚了，一直從竹籤上掉下來。陳阿姨笑著過來幫我。"]},
+      {st:"kh", t:["Plan the night: cut, [[marinate|marinate]] and line everything up before six.", "先規劃好：六點前把東西切好、醃好、排好。"],
+       great:["At six, every tray is ready. When the crowd comes, we never stop.", "六點一到，每一盤都準備好了。人潮湧進來，我們一次都沒停下來。"],
+       good:["Most trays are ready. We only run out of corn once.", "大部分的盤子都準備好了。玉米只缺貨一次。"],
+       slip:["I forget the sauce. Wei runs to the store, and we lose twenty minutes.", "我忘了醬汁。阿偉跑去買，我們少賣了二十分鐘。"]},
+      {st:"co", t:["Ask Auntie Chen to teach me her secret sauce.", "請陳阿姨教我她的祕密醬汁。"],
+       great:["“Only for you, pretty girl,” she says, and shows me. My first try tastes just like hers.", "「只教妳喔，美女。」她說完示範給我看。我第一次做，味道就跟她的一模一樣。"],
+       good:["She shows me twice. My sauce is good, but hers is better.", "她示範了兩次。我的醬汁不錯，但她的更好吃。"],
+       slip:["I am too shy to ask more questions. My sauce tastes like salt water.", "我太害羞，不敢多問。我的醬汁吃起來像鹽水。"]}]},
+    {title:["Night 2 · The Rush", "第二晚・人潮"],
+     scene:["Thursday, seven o'clock. The line reaches the next stall. The charcoal is very hot, a boy drops his drink, and three people ask for the price at the same time.",
+            "星期四，七點。排隊的人一路排到隔壁攤。炭火好燙，一個小男孩打翻了飲料，三個人同時在問價錢。"],
+     opts:[
+      {st:"fi", t:["Run the grill and the cash box at the same time.", "一個人同時顧烤架和收錢。"],
+       great:["My arms ache, but I do not stop. The line moves fast. People cheer when they get their food.", "我的手好痠，但我沒有停。隊伍動得很快，大家拿到食物都在歡呼。"],
+       good:["I am slow sometimes, but nobody leaves the line.", "我有時候慢了一點，不過沒有人離開隊伍。"],
+       slip:["By nine, I am so tired. I give a woman the wrong change. Wei fixes it.", "到了九點，我累壞了，還找錯錢給一位小姐。阿偉幫我處理好。"]},
+      {st:"kh", t:["Make a number system with paper cups.", "用紙杯做一套號碼牌。"],
+       great:["Everyone gets a number on a cup. No one shouts. The woman at the next stall copies my idea!", "每個人都拿到一個寫著號碼的杯子，沒有人在大聲叫。隔壁攤的阿姨還學我的方法！"],
+       good:["The numbers help. Only a few people get confused.", "號碼牌有幫助，只有幾個人搞混了。"],
+       slip:["I write 7 on two cups. Two men argue about one bag of skewers.", "我在兩個杯子上都寫了 7 號，兩個男生為了一袋肉串吵起來。"]},
+      {st:"leo", t:["Text Leo: “Help! Come to the night market!”", "傳訊息給 Leo：「救命！快來夜市！」"],
+       great:["Leo is there in ten minutes. He takes the money, and I grill. “You owe me a bubble tea,” he says.", "Leo 十分鐘就到了。他收錢，我烤肉。「妳欠我一杯珍奶。」他說。"],
+       good:["Leo comes after an hour. He is slow, but he makes the line laugh.", "Leo 一個小時後才來。他動作很慢，但把排隊的人都逗笑了。"],
+       slip:["Leo reads my message too late. “Sorry, Jie! I was asleep.”", "Leo 太晚看到我的訊息。「姊，抱歉！我睡著了。」"]}]},
+    {title:["Night 3 · Tourists", "第三晚・觀光客"],
+     scene:["Friday, Mid-Autumn. Families everywhere, kids with [[pomelo]] hats, and the moon over the tents. A couple stops in front of our stall. “Hi! What is this? Is it spicy?”",
+            "星期五，中秋節。到處都是一家人，小朋友頭上戴著柚子皮帽子，月亮掛在帳篷上方。一對情侶停在我們攤位前。「嗨！這是什麼？會辣嗎？」"],
+     opts:[
+      {st:"en", t:["Explain the menu in English.", "用英文介紹菜單。"],
+       great:["“This is pork with pineapple. Not spicy. Sweet!” They buy everything, and they take a photo with me.", "「這是豬肉配鳳梨，不辣，甜甜的！」他們每樣都買了，還跟我合照。"],
+       good:["I forget some words, but I point and smile. They buy two skewers and say, “Delicious!”", "我忘了幾個單字，但我邊指邊笑。他們買了兩串，說：「好好吃！」"],
+       slip:["I say “chicken” for pork. The man is surprised, but he laughs and eats it anyway.", "我把豬肉說成雞肉。那個男生嚇了一跳，不過還是笑著吃掉了。"]},
+      {st:"co", t:["Smile, wave and give them a free taste.", "笑著揮手，請他們免費試吃。"],
+       great:["They love it. They bring four friends from their [[hostel]], and all of them vote for us.", "他們超愛。還從青年旅館帶了四個朋友來，每個人都投票給我們。"],
+       good:["They try it and nod. “Good!” They buy one skewer each.", "他們試吃後點點頭。「好吃！」每個人買了一串。"],
+       slip:["I wave too fast and drop the free taste on the ground. We all laugh. They buy one anyway.", "我揮手太用力，試吃的肉掉到地上。我們都笑了。他們還是買了一串。"]},
+      {st:"sty", t:["Make an English menu with pictures on a big piece of cardboard.", "在一大塊紙板上畫一張有圖的英文菜單。"],
+       great:["My menu is so cute that people take photos of it. Many tourists stop at our stall.", "我的菜單太可愛了，大家都拍照。好多觀光客都停在我們的攤位。"],
+       good:["The pictures help. The couple points at the pineapple and buys three.", "圖片很有幫助。那對情侶指著鳳梨，買了三串。"],
+       slip:["My pig looks like a cow. “Beef?” the woman asks. “No, no! Pork!” I say.", "我畫的豬看起來像牛。「牛肉嗎？」那位小姐問。「不是不是！是豬肉！」我說。"]}]}
+  ],
+  /* the end of Night 3: the vote, then the family barbecue; the moon card follows */
+  result:{
+    1:["The vote is in. Auntie Chen's stall is number one! She hugs me hard. “This is your share,” she says, and gives me a [[red envelope]].", "票選結果出來了：陳阿姨的攤位第一名！她用力抱住我。「這是妳的份。」她說，然後塞給我一個紅包。"],
+    2:["The vote is in. We are number two! Wei shouts so loud that everyone turns around. Auntie Chen gives me a [[red envelope]].", "票選結果出來了：我們第二名！阿偉叫得好大聲，大家都轉過頭來看。陳阿姨給了我一個紅包。"],
+    3:["The vote is in. We are number three! Auntie Chen pats my head. “Next year, number one,” she says, and gives me a [[red envelope]].", "票選結果出來了：我們第三名！陳阿姨拍拍我的頭。「明年拿第一。」她說，然後給了我一個紅包。"],
+    0:["The vote is in. We did not win. Auntie Chen shrugs. “Next year!” She gives me a box of mooncakes for my family.", "票選結果出來了，我們沒有得名。陳阿姨聳聳肩。「明年再來！」她給了我一盒月餅帶回家。"]
+  },
+  bbq:["After nine, I walk home. Dad is still at the grill outside our building. He saves me some corn.", "九點過後，我走路回家。爸爸還在我們家樓下烤肉，他幫我留了一些玉米。"]
 };
 
 /* ==== content/book1/trip-khh.js ==== */
@@ -835,7 +981,7 @@ khh:{
   ride:[
     {at:"Taichung", ann:"We are now arriving at Taichung. The doors will open on the left.", zh:"列車即將抵達台中，左側車門開啟。",
      scene:["A man stands next to me. He shows me his ticket. “Excuse me, I think this is my [[seat]].”","一個男人站到我旁邊，拿車票給我看：「不好意思，這好像是我的位子。」"],
-     opts:[{en:"Check my ticket", zh:"看看我的車票", stat:"kh", ok:["Car 6, seat 14. He is in car 5! We laugh. He walks to the next car.","第六車十四號。他是第五車！我們都笑了，他走去下一節車廂。"], fail:["I can't find my ticket. I stand up and look in my bag. Oh, it is in my pocket.","我找不到車票，站起來翻包包。喔，在口袋裡。"], g:{kh:1}},
+     opts:[{en:"Check my ticket", zh:"看看我的車票", stat:"kh", ok:["Car 6, seat 14. He is in car 5! We laugh. He walks to the next car.","第六車十四號。他是第五車！我們都笑了，他走去下一節車廂。"], fail:["I look in my bag. No ticket! I look in my phone case. No ticket! The man waits. At last, I find it in my back pocket. Car 6, seat 14. He is in car 5. My face turns red.","我翻包包，沒有車票！翻手機殼，也沒有！那個男人一直等。最後我在後口袋找到了：第六車十四號。他是第五車。我的臉都紅了。"], g:{kh:1}},
            {en:"Say sorry and move", zh:"說抱歉然後換位子", stat:null, ok:["I move. Later I check my ticket. It WAS my seat! Oh well.","我換了位子。後來看車票，那其實是我的位子！算了。"], g:{co:.3}}]},
     {at:"Chiayi", ann:"Next station, Chiayi.", zh:"下一站，嘉義。",
      scene:["A food cart comes down the [[aisle]]. It smells like pork and rice. Railway [[bento]], NT$100.","餐車沿著走道推過來，飄著排骨和白飯的香味。台鐵便當，一個 NT$100。"],
@@ -846,21 +992,27 @@ khh:{
      opts:[{en:"“Yes! I am going there too.”", zh:"「有！我也要去。」", stat:"en", ok:["She smiles. “Thank you!” We talk about [[seafood]] all the way to Kaohsiung.","她笑了：「謝謝！」我們一路聊海鮮聊到高雄。"], fail:["I say, “Yes… Kaohsiung… yes.” She understands. Good enough!","我說：「Yes……Kaohsiung……yes。」她聽懂了。夠好了！"], g:{en:1, co:1}},
            {en:"Nod and smile", zh:"點頭微笑", ok:["She nods back. She looks less worried.","她也點點頭，看起來沒那麼緊張了。"], g:{co:.2}}]}
   ],
-  /* Cijin island. x,y on a 300×360 map; links: [node, minutes on foot, energy]. Hills cost more. */
+  /* Cijin island, drawn to scale from real positions (2026-10-24): north is up, about 190 px per km.
+     The island runs from Cihou Hill at the northwest tip down to the southeast; the harbor and the mainland lie to the east
+     and north, across the channel from the ferry pier. Checked points: Cijin Tianhou Temple 22.6134 N 120.2684 E and the Kaohsiung Lighthouse
+     22.6154 N 120.2649 E (Wikipedia); Rainbow Church 22.6023 N 120.2734 E (about a 20-minute walk from the pier); Cihou Fort a
+     five-minute walk west of the lighthouse along the cliff top (walking guides), with its own path up from Old Street.
+     The ferry leaves the pier heading north-north-east, then turns north to Gushan (checked on Google Maps, 2026-10-24). Others placed from the street layout.
+     links: [node, minutes on foot, energy]. Hills cost more. */
   map:{
     start:"pier", arriveMin:60, ferry:40, sunsets:[["01-10","17:28"],["07-13","18:47"],["07-27","18:43"],["08-10","18:35"],["08-24","18:24"],["09-07","18:11"],["09-21","17:57"],["10-05","17:43"],["10-19","17:31"],["11-02","17:22"],["11-16","17:16"],["11-30","17:14"],["12-14","17:16"],["12-31","17:23"]], close:"21:00", energyBase:50,
     nodes:{
-      pier:{x:150, y:58, zh:"旗津渡輪站", en:"Cijin Ferry Pier", spr:"boat"},
-      oldst:{x:132, y:108, zh:"旗津老街", en:"Cijin Old Street", spr:"squid"},
-      temple:{x:168, y:96, zh:"旗津天后宮", en:"Tianhou Temple", spr:"temple"},
-      bikes:{x:110, y:140, zh:"租腳踏車", en:"Bike rental", spr:"bike"},
-      fort:{x:206, y:40, zh:"旗後砲台", en:"Cihou Fort", spr:"fort", hill:true},
-      light:{x:236, y:72, zh:"高雄燈塔", en:"Kaohsiung Lighthouse", spr:"lighthouse", hill:true},
-      beach:{x:74, y:200, zh:"旗津海水浴場", en:"Cijin Beach", spr:"wave"},
-      rainbow:{x:60, y:268, zh:"彩虹教堂", en:"Rainbow Church", spr:"rainbow"}
+      fort:{x:48, y:86, zh:"旗後砲台", en:"Cihou Fort", spr:"fort", hill:true},
+      light:{x:74, y:54, zh:"高雄燈塔", en:"Kaohsiung Lighthouse", spr:"lighthouse", hill:true},
+      temple:{x:128, y:96, zh:"旗津天后宮", en:"Tianhou Temple", spr:"temple"},
+      pier:{x:165, y:112, zh:"旗津渡輪站", en:"Cijin Ferry Pier", spr:"boat"},
+      oldst:{x:118, y:136, zh:"旗津老街", en:"Cijin Old Street", spr:"squid"},
+      bikes:{x:96, y:166, zh:"租腳踏車", en:"Bike rental", spr:"bike"},
+      beach:{x:60, y:192, zh:"旗津海水浴場", en:"Cijin Beach", spr:"wave"},
+      rainbow:{x:228, y:326, zh:"彩虹教堂", en:"Rainbow Church", spr:"rainbow"}
     },
-    links:[["pier","oldst",8,3],["pier","temple",6,2],["oldst","temple",5,2],["oldst","bikes",8,3],["oldst","beach",15,5],
-           ["pier","fort",25,14],["fort","light",15,10],["temple","light",30,16],["bikes","beach",10,3],["beach","rainbow",20,6],["bikes","rainbow",28,8]],
+    links:[["pier","temple",3,1],["pier","oldst",5,2],["oldst","temple",4,2],["oldst","bikes",3,1],["oldst","beach",10,4],["bikes","beach",5,2],
+           ["pier","light",15,12],["light","fort",5,4],["oldst","fort",12,10],["temple","light",18,14],["light","beach",15,6],["beach","rainbow",15,6],["bikes","rainbow",15,6]],
     visits:{
       oldst:{min:45, scene:["The street smells of the sea and [[grilled|grill]] [[squid]]. A tourist points at a squid and asks me, “What is this?”","整條街都是海的味道和烤魷魚香。一個觀光客指著魷魚問我：「這是什麼？」"],
         opts:[{en:"“It is squid! It is [[delicious]]. Try it!”", zh:"「這是魷魚！很好吃，試試看！」", stat:"en", ok:["He buys two and gives me one. “For my teacher!” he says.","他買了兩串，送我一串。他說：「給我的老師！」"], fail:["I try, but I forget the word. I make an octopus face. He laughs and buys one.","我想說，可是忘了那個字，只好做出章魚的表情。他笑著買了一串。"], g:{en:1.2, co:1}, energy:8},
@@ -1158,8 +1310,20 @@ const Music = (()=>{  /* the Lamplight Readers FM player */
     const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
     o.type = "triangle"; o.frequency.setValueAtTime(1500, t); o.frequency.exponentialRampToValueAtTime(700, t + .05);
     lp.type = "lowpass"; lp.frequency.value = 2400;
-    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.12 * vol, t + .004); g.gain.exponentialRampToValueAtTime(.0005, t + .07);
+    /* louder than before, and it falls more slowly than the music when the volume goes down (2026-10-24) */
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.16 * Math.pow(vol, .6), t + .004); g.gain.exponentialRampToValueAtTime(.0005, t + .07);
     o.connect(lp); lp.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + .09);
+  }
+  /* a soft two-note chime for a rank-up; silent when the music is off */
+  function chime(){
+    if(!ctx || cur < 0) return;
+    const t0 = ctx.currentTime + .03;
+    [[1318.5, 0], [1975.5, .12]].forEach(([f, d])=>{
+      const t = t0 + d, o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = "sine"; o.frequency.value = f;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.12 * Math.pow(vol, .6), t + .006); g.gain.exponentialRampToValueAtTime(.0005, t + .9);
+      o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 1);
+    });
   }
   function ui(){ $$("[data-music]").forEach(b=>{ b.classList.toggle("on", cur >= 0); b.setAttribute("aria-pressed", cur >= 0); }); }
   document.addEventListener("visibilitychange", ()=>{
@@ -1167,7 +1331,7 @@ const Music = (()=>{  /* the Lamplight Readers FM player */
     if(document.hidden){ clearInterval(timer); ctx.suspend(); }
     else ctx.resume().then(restart).catch(()=>{});
   });
-  return { TR, play, stop, want, wake, ui, click,
+  return { TR, play, stop, want, wake, ui, click, chime,
     get cur(){ return cur; }, get state(){ return ctx ? ctx.state : "none"; },
     setVol(v){ vol=v; store.set("vol", Math.round(v*100)); if(ctx) applyVol(); }, get vol(){ return vol; },
     duck(on){ ducked=on; if(ctx) applyVol(); } };
@@ -1176,26 +1340,63 @@ const Music = (()=>{  /* the Lamplight Readers FM player */
 /* iOS: a tap brings the music back after a call or a lock screen */
 ["touchend","click"].forEach(t=>document.addEventListener(t, ()=>Music.wake(), true));
 
-/* ---------------- speech: English voice for messages and announcements ---------------- */
+/* ---------------- speech ----------------
+   English voice for the text; foreign words (FOREIGN_WORDS in gloss.js) and any Chinese characters are read
+   mid-sentence by a voice for their language when the device has one, as in the Lamplight Readers and the textbooks. */
 const SYN = window.speechSynthesis || null;
+const NOVELTY = /Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Deranged|Good News|Hysterical|Jester|Junior|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Ralph|Fred|Kathy|Princess|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley/i;
+function vq(v){ const s = (v.voiceURI || "") + " " + v.name;
+  if(/premium|高品質|優質/i.test(s)) return 2; if(/enhanced|增強|加強|Natural|Neural|Online/i.test(s)) return 1; return 0; }
 let VOICE = null;
 function pickVoice(){
   if(!SYN) return;
-  const vs = SYN.getVoices().filter(v=>/^en[-_]US/i.test(v.lang) || /^en/i.test(v.lang));
-  VOICE = vs.find(v=>/Samantha|Google US English|Aria|Jenny|Ava|Allison/i.test(v.name)) || vs[0] || null;
+  const vs = SYN.getVoices().filter(v=>/^en/i.test(v.lang) && !NOVELTY.test(v.name));
+  VOICE = vs.find(v=>/Samantha|Google US English|Aria|Jenny|Ava|Allison/i.test(v.name) && /^en[-_]US/i.test(v.lang)) || vs.find(v=>/^en[-_]US/i.test(v.lang)) || vs[0] || null;
 }
 if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
 const sayAs = t => Object.entries(SAY_AS).reduce((x,[w,r])=>x.split(w).join(r), t);
+const FOREIGN = {};
+Object.entries(typeof FOREIGN_WORDS !== "undefined" ? FOREIGN_WORDS : {}).forEach(([k,v])=>{ FOREIGN[k.toLowerCase()] = {lang:v[0], en:v[1], nat:v[2] || k}; });
+const HAN = /^[\u3400-\u9fff]+$/;
+const FRX = new RegExp("(^|[^\\p{L}])(" + Object.keys(FOREIGN).sort((a,b)=>b.length-a.length)
+  .map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).concat(["[\\u3400-\\u9fff]+"]).join("|") + ")(?![\\p{L}])", "giu");
+function nativeVoice(lang){
+  if(!SYN || !lang) return null; const L = lang.toLowerCase(), base = L.split("-")[0];
+  const vs = SYN.getVoices().filter(v=>!NOVELTY.test(v.name)), norm = v => String(v.lang).replace("_","-").toLowerCase();
+  const best = a => a.slice().sort((x,y)=>vq(y)-vq(x))[0];
+  return best(vs.filter(v=>norm(v) === L)) || best(vs.filter(v=>norm(v).split("-")[0] === base)) || null;
+}
+/* split a line into parts read in order: [{t, nv}], nv = a native voice, or absent for the English voice */
+function speakParts(s){
+  const raw = []; let i = 0, m; FRX.lastIndex = 0;
+  while((m = FRX.exec(s))){ const st = m.index + m[1].length, w = m[2];
+    if(st > i) raw.push({t:s.slice(i, st)});
+    raw.push({t:w, f:FOREIGN[w.toLowerCase()] || (HAN.test(w) ? {lang:"zh-TW", en:"", nat:w.replace(/好吃/g, "郝吃")} : null)});
+    i = st + w.length; FRX.lastIndex = i; }
+  if(i < s.length) raw.push({t:s.slice(i)});
+  const parts = [];
+  raw.forEach(p=>{ const nv = p.f && nativeVoice(p.f.lang);
+    if(nv){ parts.push({t:p.f.nat, nv}); return; }
+    const t = p.f ? p.f.en : sayAs(p.t), last = parts[parts.length-1];
+    if(last && !last.nv) last.t += t; else parts.push({t}); });
+  return parts.filter(p=>p.nv || /[\p{L}\p{N}]/u.test(p.t));
+}
 /* say() tells the page when speech starts and ends, so the play log can wait while Mia's words are read */
 let sayId = 0;
 const ping = n => document.dispatchEvent(new Event(n));
 function say(t){
-  if(!SYN) return; SYN.cancel();
-  const id = ++sayId;
-  const u = new SpeechSynthesisUtterance(sayAs(plain(t)).replace(/[“”]/g,'"').replace(/[’‘]/g,"'"));
-  if(VOICE){ u.voice = VOICE; u.lang = VOICE.lang; } else u.lang = "en-US";
-  u.rate = .9; u.onend = u.onerror = ()=>{ if(id === sayId) ping("ws:sayEnd"); };
-  ping("ws:say"); SYN.speak(u);
+  if(!SYN) return;
+  const parts = speakParts(plain(t).replace(/[“”]/g,'"').replace(/[’‘]/g,"'"));
+  if(!parts.length) return;
+  SYN.cancel(); const id = ++sayId;
+  ping("ws:say");
+  parts.forEach((p, k)=>{
+    const u = new SpeechSynthesisUtterance(p.t), v = p.nv || VOICE;
+    if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "en-US";
+    u.rate = p.nv ? .85 : .9;
+    if(k === parts.length - 1) u.onend = u.onerror = ()=>{ if(id === sayId) ping("ws:sayEnd"); };
+    SYN.speak(u);
+  });
 }
 const ICON = {
   spk:'<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg>',
@@ -1636,6 +1837,10 @@ function migrate(s){
   if(s.flags.postcard && !s.flags.decided && s.date > "2026-09-25") s.flags.decided = "2026-09-25";
   /* saves from before the diary held story pages: fill in the moments already passed */
   if(s.opened == null) s.opened = s.blk;
+  if(s.locks && s.locks["2026-09-25"] === "midautumn" && s.date <= "2026-09-14" && !(s.phase === "play" && s.date === "2026-09-14" && s.day > 9)){
+    STALL_DATES.forEach((d,i)=>{ s.locks[d] = "stall" + (i+1); });
+    s.thread.push(["chen","Pretty girl! My family has a grill stall at the night market. This year we are in the best-stall vote: Wednesday, Thursday and Mid-Autumn night. Can you help us? I pay NT$1,000 a night!","美女！我們家在夜市有一攤烤肉。今年我們參加最佳攤位票選：星期三、星期四，還有中秋節晚上。妳可以來幫忙嗎？一個晚上給妳一千塊！"]);
+  }
   if(!s.dv){ s.dv = 2;
     const past = d => d && d < D.add(s.date, s.phase === "play" ? s.day : 0);
     const add = (id, date)=>{ if(past(date)) s.diary.push({kind:"story", id, date}); };
@@ -1689,6 +1894,7 @@ function preview(S){
     STAGE.bills.forEach(b=>{ if(D.day(date) === b.day) cost += b.amt; });
     if(!a) continue;
     cost += a.cost || 0; if(a.est) cost += a.est;
+    if(/^stall\d$/.test(id)) cashIn += STALL.pay;   /* Auntie Chen pays cash each night */
     if(a.pay && ACTS[id]){ const amt = payFor(S, id, date, true).amt; income += amt;
       if(a.cash || (a.weekly && payDate(date, a) <= blockDate(S, 13))) cashIn += amt; }   /* money that arrives inside these two weeks */
     stress = clamp(stress + (a.st || 0) - (id === "khh" || id === "khh2" ? 0 : STAGE.recover), 0, 100);
@@ -1744,6 +1950,8 @@ function clampAll(S){
 
 /* ---------------- one day plays ---------------- */
 function runDay(S, i){
+  if(S.stallQ) resolveStall(S, S.stallQ, stallAuto(S, S.stallQ));   /* a stall night left unanswered (a reload, the balance tool) */
+  S.stallRes = null;
   const date = blockDate(S, i), wd = D.wd(date), mk_ = monthKey(date);
   const before = {money:S.money, stress:S.stress, st:Object.assign({}, S.st), hearts:Object.assign({}, S.hearts)};
   const out = {i, date, msgs:[], pay:[], ok:true};
@@ -1779,7 +1987,7 @@ function runDay(S, i){
   if(!id && S.sickLeft > 0){ id = "sick"; }
   if(!id && S.stress > 80 && rand() < .3){ S.sickLeft = 3; id = "sick";
     out.msgs.push(["family","Mia, you are working too hard. Stay in bed. I am bringing soup.","Mia，妳太累了，躺著休息。我帶湯過去。"]); }
-  if(id === "sick") S.sickLeft--;
+  if(id === "sick" || (id && S.sickLeft > 0)) S.sickLeft--;   /* a locked day still counts toward getting better */
   if(id && S.plan[i] === "khh" && S.plan[i+1] === "khh2") S.plan[i+1] = null;   /* a lost first day cancels the trip */
   if(!id) id = S.plan[i] || "free";
   if(id === "driving" && S.flags.license) id = "free";   /* a lesson after the license becomes a free day */
@@ -1789,7 +1997,7 @@ function runDay(S, i){
   if(id === "callting") S.flags.calledTing = true;
   if(id === "tingcall") S.flags.calledTing = true;
   if(id === "tellmom") S.flags.toldMom = date;
-  if(id === "midautumn" && S.flags.postcard && !S.flags.decided){ S.flags.decided = date;
+  if((id === "midautumn" || id === "stall3") && S.flags.postcard && !S.flags.decided){ S.flags.decided = date;
     storyPage(S, out, "moon", date); }
   if(id === "khh"){ out.trip = "khh"; ml.acts[id] = (ml.acts[id]||0)+1; return finishDay(S, out, before); }
   if(id === "khh2"){ out.line = "Pier-2 Art Center, then the long train ride home."; ml.acts.khh2 = (ml.acts.khh2||0)+1; S.workRun = 0; return finishDay(S, out, before); }
@@ -1831,6 +2039,7 @@ function runDay(S, i){
   ml.acts[id] = (ml.acts[id]||0)+1;
   out.line = good ? pick(a.ok) : pick(a.slip || a.ok);
   if(a.story) storyPage(S, out, a.story, date);
+  if(/^stall\d$/.test(id)){ out.stall = +id.slice(5); S.stallQ = out.stall; }   /* the night's choice comes in a card */
   if(a.rain && rainyOn(date)){ out.line = pick(a.rain); out.ok = false; }
 
   /* small surprises */
@@ -1844,6 +2053,39 @@ function runDay(S, i){
   }
   return finishDay(S, out, before);
 }
+/* ---------------- the Mid-Autumn stall (Phase C) ----------------
+   One choice a night. The option's stat (or Leo's hearts) sets the odds; the result brings votes, a little growth and
+   the night's pay. After night 3 the votes decide the place, and Mia's share of the prize goes to her savings. */
+/* hearts run 0–100, about three times a September stat, so they count a third */
+const stallVal = (S, k) => STATS.includes(k) ? S.st[k] : (S.hearts[k] || 0) / 3;
+/* wider odds than everyday activities, so the choice matters: a weak stat can fail, a strong one rarely does */
+const stallChance = v => clamp(.62 + (v - 25) / 50, .35, .95);
+const stallAuto = (S, n) => { const o = STALL.nights[n-1].opts; let b = 0; o.forEach((x,i)=>{ if(stallVal(S, x.st) > stallVal(S, o[b].st)) b = i; }); return b; };
+function resolveStall(S, n, k){
+  const night = STALL.nights[n-1], o = night.opts[k], p = stallChance(stallVal(S, o.st)), r = rand();
+  const lvl = r < p - .35 ? 2 : r < p ? 1 : 0;
+  const votes = STALL.votes[lvl] + Math.floor(rand() * 5);
+  const res = {n, k, lvl, line:[o.great, o.good, o.slip][2 - lvl], votes, cash:STALL.pay, gain:{}, hearts:{}};
+  S.flags.stallVotes = (S.flags.stallVotes || 0) + votes;
+  S.money += STALL.pay;
+  const ml = S.mlog[monthKey(STALL_DATES[n-1])]; if(ml) ml.earned = (ml.earned || 0) + STALL.pay;
+  if(STATS.includes(o.st)){ const g = (lvl ? .9 : .5) * STAGE.gain; S.st[o.st] += g; res.gain[o.st] = g; }
+  else { const h = lvl ? 6 : 2; S.hearts[o.st] += h; res.hearts[o.st] = h; }
+  if(n === 3){
+    const v = S.flags.stallVotes, pl = STALL.places.find(x=>v >= x[0]);
+    S.flags.stallPlace = pl[1]; S.money += pl[2];
+    res.final = {votes:v, place:pl[1], prize:pl[2], line:STALL.result[pl[1]], bbq:STALL.bbq};
+  }
+  clampAll(S);
+  /* the day card in the log shows the night's pay and growth too */
+  const last = S.feed[S.feed.length-1];
+  if(last && last.stall === n){ last.cash = (last.cash || 0) + res.cash + (res.final ? res.final.prize : 0); last.d.money += res.cash + (res.final ? res.final.prize : 0);
+    for(const k in res.gain) last.d.st[k] = (last.d.st[k] || 0) + res.gain[k];
+    for(const k in res.hearts) last.d.hearts[k] = (last.d.hearts[k] || 0) + res.hearts[k]; }
+  S.stallQ = null; S.stallRes = res; save();   /* the result card stays until Continue, even after a reload */
+  return res;
+}
+
 /* a story moment: the play screen shows it as a card (S.storyQ until the player taps Continue), and it stays in the diary */
 function storyPage(S, out, id, date){
   if(out.story) return;
@@ -1856,8 +2098,8 @@ function checkRanks(S, msgs){
   S.rk = S.rk || {};
   STATS.forEach(k=>{
     const r = statRank(S.st[k]), was = S.rk[k] == null ? r : S.rk[k];
-    if(r > was){ const nm = RANK_NAMES[k][r], sn = STAT_NAME[k];
-      msgs.push(["rank", `Rank up! ${sn[0]}: ${nm[1]}.`, `升級了！${sn[1]}：${nm[0]}${k === "en" ? `（${nm[1]}）` : ""}。`]); }
+    if(r > was){
+      const ln = RANK_LINES[k][r]; msgs.push(["rank", ln[0], ln[1], k]); }   /* the 4th field names the stat for the card's header */
     S.rk[k] = Math.max(r, was);
   });
 }
@@ -1885,6 +2127,8 @@ function applyTrip(S, res){
 
 /* ---------------- a block closes ---------------- */
 function closeBlock(S){
+  if(S.stallQ) resolveStall(S, S.stallQ, stallAuto(S, S.stallQ));
+  S.stallRes = null;
   const sn = S.snap, sum = {money:S.money - sn.money, stress:S.stress - sn.stress, st:{}, hearts:{}, notes:S.notes.length - sn.notes, album:S.album.length - sn.album};
   STATS.forEach(k=>{ const v = S.st[k] - sn.st[k]; if(Math.abs(v) >= .05) sum.st[k] = v; });
   Object.keys(S.hearts).forEach(k=>{ const v = S.hearts[k] - sn.hearts[k]; if(v) sum.hearts[k] = v; });
@@ -1904,34 +2148,46 @@ function closeBlock(S){
 /* Mia's diary page at the end of each month, written at Book 1's level */
 const NUMW = ["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen","twenty"];
 const nw = n => NUMW[n] || String(n);
+/* the month-end diary page: [English, 中文] pairs, dated the month's last day (2026-10-24) */
 function diaryFor(S, mkey){
-  const ml = S.mlog[mkey] || {acts:{}, earned:0}, A = ml.acts, m = MON_FULL[+mkey.slice(5)-1];
-  const n = ids => ids.reduce((t,k)=>t+(A[k]||0), 0);
-  const lines = [`${m} is over. Here is my month.`];
-  const work = n(["dept","cafe","shoot","shootPaid","petsit","delivery"]);
-  const fun = n(["boba","nightmkt","ktv","family","callting","boardgame","ttrpg","midautumn","camille","tingcall","tellmom"]);
-  if(work) lines.push(`I worked ${nw(work)} ${work === 1 ? "day" : "days"}. ${work > 18 ? "That is a lot. My feet are tired!" : "My wallet is happy."}`);
-  else lines.push("I did not work this month. My wallet is sad!");
-  if(n(["english","tutor","study","exchange"])) lines.push("I studied English. Every day I know a few more words.");
-  if(A.cooking) lines.push("In cooking class, I learned to make new [[dishes|dish]].");
-  if(A.driving) lines.push(S.flags.license && monthKey(S.flags.license) <= mkey ? "I have my [[driver's license]] now!" : "I am learning to drive. The car is big, and I am small.");
-  if(A.barista) lines.push("At the barista course, I made coffee all day. I love the smell.");
+  const ml = S.mlog[mkey] || {acts:{}, earned:0}, A = ml.acts, mi = +mkey.slice(5), m = MON_FULL[mi-1];
+  const n = ids => ids.reduce((t,k)=>t+(A[k]||0), 0), cash = v => Math.round(v).toLocaleString("en-US");
+  const lines = [], L = (en, zh) => lines.push([en, zh]);
+  L(`${m} is over. Here is my month.`, `${mi} 月結束了，來看看我的這個月。`);
+  const work = n(["dept","cafe","shoot","shootPaid","petsit","delivery","stall1","stall2","stall3"]);
+  const fun = n(["boba","nightmkt","ktv","family","callting","boardgame","ttrpg","midautumn","stall3","camille","tingcall","tellmom"]);
+  if(work) L(`I worked ${nw(work)} ${work === 1 ? "day" : "days"}. ${work > 18 ? "That is a lot. My feet are tired!" : "My wallet is happy."}`,
+             `我上了 ${work} 天班。${work > 18 ? "好多天，我的腳好痠！" : "我的荷包很開心。"}`);
+  else L("I did not work this month. My wallet is sad!", "這個月我沒有上班，我的荷包好傷心！");
+  if(n(["english","tutor","study","exchange"])) L("I studied English. Every day I know a few more words.", "我有讀英文。每天都多認識幾個單字。");
+  if(A.cooking) L("In cooking class, I learned to make new [[dishes|dish]].", "在烹飪課上，我學會做新的菜。");
+  if(A.driving) S.flags.license && monthKey(S.flags.license) <= mkey ? L("I have my [[driver's license]] now!", "我拿到駕照了！")
+                                                                   : L("I am learning to drive. The car is big, and I am small.", "我在學開車。車子好大，我好小。");
+  if(A.barista) L("At the barista course, I made coffee all day. I love the smell.", "上咖啡師課的時候，我整天都在煮咖啡。我好愛那個香味。");
   const sh = (A.shoot||0) + (A.shootPaid||0);
-  if(sh) lines.push(`I did ${nw(sh)} photo ${sh === 1 ? "shoot" : "shoots"}. I am learning to [[pose]].`);
-  if(A.khh) lines.push("The best day: my trip to Kaohsiung. I want to travel more.");
-  if(S.flags.decided && monthKey(S.flags.decided) === mkey) lines.push("This month, under the Mid-Autumn moon, I decided: I want to try a [[working holiday]] in London.");
+  if(sh) L(`I did ${nw(sh)} photo ${sh === 1 ? "shoot" : "shoots"}. I am learning to [[pose]].`, `我拍了 ${sh} 次照。我在學怎麼擺姿勢。`);
+  if(S.flags.stallPlace != null && mkey === "2026-09") L(...[
+    ["At the night market, Auntie Chen's stall did not win, but I loved every night.", "在夜市，陳阿姨的攤位沒有得名，但每個晚上我都好喜歡。"],
+    ["At the night market, Auntie Chen's stall won first place! I helped.", "在夜市，陳阿姨的攤位得了第一名！我也有幫忙。"],
+    ["At the night market, Auntie Chen's stall came in second. I helped!", "在夜市，陳阿姨的攤位得了第二名。我也有幫忙！"],
+    ["At the night market, Auntie Chen's stall came in third. I helped!", "在夜市，陳阿姨的攤位得了第三名。我也有幫忙！"]][S.flags.stallPlace]);
+  if(A.khh) L("The best day: my trip to Kaohsiung. I want to travel more.", "最棒的一天：我的高雄之旅。我想多去旅行。");
+  if(S.flags.decided && monthKey(S.flags.decided) === mkey) L("This month, under the Mid-Autumn moon, I decided: I want to try a [[working holiday]] in London.",
+                                                              "這個月，在中秋的月亮下，我下定決心：我想去倫敦打工度假。");
   else if(S.flags.decided && monthKey(S.flags.decided) < mkey){
-    if(S.money < 0) lines.push("I am saving for London, but I owe money now. London feels very far away.");
-    else if(S.money >= VISA_GOAL.ntd) lines.push("I have enough money for the visa now! London, here I come.");
-    else lines.push(`I am saving for London. I have NT$${Math.round(S.money).toLocaleString("en-US")} now, and I need about NT$${VISA_GOAL.ntd.toLocaleString("en-US")}.`);
+    if(S.money < 0) L("I am saving for London, but I owe money now. London feels very far away.", "我在為倫敦存錢，可是現在我欠錢了。倫敦感覺好遠。");
+    else if(S.money >= VISA_GOAL.ntd) L("I have enough money for the visa now! London, here I come.", "簽證要的錢我存夠了！倫敦，我來了。");
+    else L(`I am saving for London. I have NT$${cash(S.money)} now, and I need about NT$${cash(VISA_GOAL.ntd)}.`,
+           `我在為倫敦存錢。我現在有 NT$${cash(S.money)}，大約需要 NT$${cash(VISA_GOAL.ntd)}。`);
   }
-  if(fun) lines.push(`I saw my friends and family ${nw(fun)} ${fun === 1 ? "time" : "times"}.`);
-  else lines.push("I did not see my friends much. I miss them.");
-  if(A.sick) lines.push("I got sick. Next month, I will rest more.");
-  else if(S.stress > 60) lines.push("I feel tired. I need a slow day soon.");
-  else lines.push("I feel good. Life in Taipei is busy, but it is mine.");
-  if(S.flags.whIdea && mkey === "2026-08") lines.push("Ting's message is still in my head. A [[working holiday]]… me?");
-  return {month:mkey, lines};
+  if(fun) L(`I saw my friends and family ${nw(fun)} ${fun === 1 ? "time" : "times"}.`, `我見了朋友和家人 ${fun} 次。`);
+  else L("I did not see my friends much. I miss them.", "我不太常見到朋友，好想他們。");
+  if(A.sick) L("I got sick. Next month, I will rest more.", "我生病了。下個月我要多休息。");
+  else if(S.stress > 60) L("I feel tired. I need a slow day soon.", "我好累，需要找一天好好休息。");
+  else L("I feel good. Life in Taipei is busy, but it is mine.", "我感覺很好。台北的生活很忙，但這是我的生活。");
+  if(S.flags.whIdea && mkey === "2026-08") L("Ting's message is still in my head. A [[working holiday]]… me?", "婷的訊息還在我腦海裡。打工度假……我嗎？");
+  const last = D.add(D.add(mkey + "-01", 32).slice(0,7) + "-01", -1);
+  return {month:mkey, date:last, lines};
 }
 
 /* ==== engine/ui.js ==== */
@@ -1956,7 +2212,9 @@ function topBar(){
 }
 function msgHTML(m){
   const f = FROM[m[0]] || FROM.mia;
-  return `<div class="msg"><div class="from"><span>${esc(N(f))}</span><span class="row" style="gap:4px"><button class="zhb" data-zh>${T("showZh")}</button><button class="ib" style="width:30px;height:30px" data-say="${esc(plain(m[1]))}" aria-label="speak">${ICON.spk}</button></span></div>
+  /* a rank-up is a reward: gold card, a star, and the stat in the header */
+  const rank = m[0] === "rank", head = rank ? `★ ${esc(N(f))}${m[3] ? (LANG === "en" ? " · " : "・") + esc(statName(m[3])) : ""}` : esc(N(f));
+  return `<div class="msg${rank ? " rank" : ""}"><div class="from"><span>${head}</span><span class="row" style="gap:4px"><button class="zhb" data-zh>${T("showZh")}</button><button class="ib" style="width:30px;height:30px" data-say="${esc(plain(m[1]))}" aria-label="speak">${ICON.spk}</button></span></div>
     <div>${mk(m[1])}</div><div class="zht" hidden>${esc(m[2])}</div></div>`;
 }
 function ticksHTML(d, extra){
@@ -1979,7 +2237,7 @@ function askConfirm(msg, yes){
   });
 }
 document.addEventListener("click", e=>{
-  const z = e.target.closest("[data-zh]"); if(z){ const t = z.closest(".msg,.scene,.de").querySelector(".zht"); if(t) t.hidden = !t.hidden; return; }
+  const z = e.target.closest("[data-zh]"); if(z){ const ts = z.closest(".msg,.scene,.de").querySelectorAll(".zht"), show = ts.length && ts[0].hidden; ts.forEach(t=>{ t.hidden = !show; }); return; }
   const mu = e.target.closest("[data-music]"); if(mu){ if(Music.cur >= 0) Music.stop(); else Music.play(musicFor()); return; }
   const go = e.target.closest("[data-go]"); if(go){ info(go.dataset.go); return; }
 });
@@ -2094,7 +2352,9 @@ function planNotes(){
   for(let i=0;i<14;i++){ const d = blockDate(S, i), h = holidayOn(d); if(h) out.push(`${D.short(d)} ${N(h)}`); }
   const sl = SALES.find(x=>x.from <= blockDate(S, 13) && x.to >= S.date);
   if(sl) out.push(`${N(sl)} ${D.short(sl.from)}–${sl.from.slice(0,7) === sl.to.slice(0,7) && LANG === "en" ? +sl.to.slice(8) : D.short(sl.to)}`);
-  return out.length ? `<p class="muted pnotes">${esc(out.join(" · "))}</p>` : "";
+  /* the stall nights are tiring: a reminder in the planner for the block that has them (2026-10-24) */
+  const stall = Object.values(S.locks).some(v=>/^stall\d$/.test(v)) && STALL_DATES.some(d=>d >= S.date && d <= blockDate(S, 13));
+  return (out.length ? `<p class="muted pnotes">${esc(out.join(" · "))}</p>` : "") + (stall ? `<p class="warn">${T("stallWarn")}</p>` : "");
 }
 function copyLast(){
   S.plan = new Array(14).fill(null);
@@ -2181,6 +2441,7 @@ function playShell(){
   $("#play").innerHTML = topBar() + `<h2>${LANG === "en" ? "Two weeks in Taipei" : "台北的兩週"}</h2><div class="feed" id="feed"></div>
     <div class="playbar"><div class="in"><button class="btn alt small" id="spd">${T("speed")} ×${playSpeed}</button><button class="btn alt small" id="pau">${T("pause")}</button><button class="btn small" id="skip">${T("skip")} ⏩</button></div></div>`;
   Music.ui(); paused = false; tripPending = false; follow = true; holds.clear();
+  if(feedRO){ feedRO.disconnect(); feedRO.observe($("#feed")); }
   $("#spd").onclick = ()=>{ playSpeed = {0.5:1, 1:2, 2:4, 4:0.5}[playSpeed] || 1; store.set("speed", playSpeed); $("#spd").textContent = `${T("speed")} ×${playSpeed}`; };
   let pauWas = null;   /* tapping Resume also closes an open tooltip, which releases its hold first: decide from the moment of the tap */
   $("#pau").onpointerdown = ()=>{ pauWas = paused || holds.size > 0; };
@@ -2197,7 +2458,11 @@ function resumePlay(){
   const last = S.feed[S.feed.length-1];
   if(last && last.trip && !last.tripRes){ S.feed.pop(); S.day = last.i;   /* a trip cut short starts again */
     const out = runDay(S, S.day); save(); addDayCard(out); return goTrip(out); }
-  if(S.storyQ) return storyCard(S.storyQ, ()=>{ playTimer = setTimeout(nextDay, 600); });   /* a story card left open */
+  const go = ()=>{ clearTimeout(playTimer); playTimer = setTimeout(nextDay, 600); };
+  const after = ()=> S.storyQ ? storyCard(S.storyQ, go) : go();
+  if(S.stallQ) return stallCard(S.stallQ, after);   /* a stall night left open */
+  if(S.stallRes) return stallResult(S.stallRes, after);   /* its result, not yet closed */
+  if(S.storyQ) return storyCard(S.storyQ, go);   /* a story card left open */
   playTimer = setTimeout(nextDay, 500);
 }
 let tripPending = false;   /* while a trip is open, the days wait for it */
@@ -2210,15 +2475,48 @@ function goTrip(out){
 function nextDay(){
   clearTimeout(playTimer);
   if(holds.size || paused) return;   /* waiting for the player: a tooltip, a voice, or a hand on the log */
-  if(tripPending || S.storyQ) return;
+  if(tripPending || S.storyQ || S.stallQ || stallOpen) return;
   if(S.day >= 14) return endBlock();
   const out = runDay(S, S.day); save();
   addDayCard(out);
+  if(out.msgs.some(m=>m[0] === "rank")) Music.chime();
   if(out.trip) return goTrip(out);
-  if(out.story) return storyCard(out.story, ()=>{ playTimer = setTimeout(nextDay, playSpeed >= 99 ? 30 : 600 / Math.min(playSpeed, 2)); });
+  const go = ()=>{ clearTimeout(playTimer); playTimer = setTimeout(nextDay, playSpeed >= 99 ? 30 : 600 / Math.min(playSpeed, 2)); };
+  if(out.stall) return stallCard(out.stall, ()=> out.story ? storyCard(out.story, go) : go());   /* the stall's choice, then the moon */
+  if(out.story) return storyCard(out.story, go);
   const wait = out.msgs.length ? 2500 : 1500;   /* normal speed: 1.5 s a day, longer when messages arrive */
   if(!paused) playTimer = setTimeout(nextDay, playSpeed >= 99 ? 30 : wait / playSpeed);
 }
+/* ---------------- the Mid-Autumn stall: one choice a night, then the result ---------------- */
+let stallOpen = false;   /* while a stall card (choice or result) is open, the days wait, whatever a voice or tooltip does */
+function stallCard(n, then){
+  clearTimeout(playTimer); stallOpen = true;
+  const night = STALL.nights[n-1], L = LANG === "en" ? 0 : 1, colon = LANG === "en" ? ": " : "：";
+  const label = k => STATS.includes(k) ? statName(k) : `${N(CAST[k])} ♥`;
+  modal(`<h2>${esc(night.title[L])}</h2>${sceneHTML(night.scene)}
+    <p class="muted" style="font-size:13px;margin:10px 0 0">${T("stallVotes")}${colon}${Math.round(S.flags.stallVotes || 0)}</p>
+    <div class="choices">${night.opts.map((o,k)=>`<button class="btn alt sopt" data-k="${k}"><b>${esc(plain(o.t[0]))}</b><small>${esc(o.t[1])} · ${esc(label(o.st))}</small></button>`).join("")}</div>`, box=>{
+    box.querySelectorAll(".sopt[data-k]").forEach(b=> b.onclick = ()=>stallResult(resolveStall(S, n, +b.dataset.k), then));
+  });
+}
+function stallResult(r, then){
+  clearTimeout(playTimer); stallOpen = true;
+  const night = STALL.nights[r.n-1], L = LANG === "en" ? 0 : 1, colon = LANG === "en" ? ": " : "：";
+  const gains = [`<span class="up">+${fmt(r.cash)}</span>`, `<span class="up">${T("stallVotes")} +${r.votes}</span>`]
+    .concat(Object.entries(r.gain).map(([k,v])=>`<span class="up">${statName(k)} ${fmtD(v)}</span>`))
+    .concat(Object.entries(r.hearts).map(([k,v])=>`<span class="up">♥ ${esc(N(CAST[k]))} +${v}</span>`));
+  const fin = r.final ? `${sceneHTML(r.final.line)}<div class="ticks st-ticks" style="margin-top:6px">${r.final.prize ? `<span class="up">${T("stallPrize")} +${fmt(r.final.prize)}</span>` : ""}<span>${T("stallTotal")}${colon}${r.final.votes}</span></div>${sceneHTML(r.final.bbq)}` : "";
+  modal(`<h2>${esc(night.title[L])}</h2>${sceneHTML(r.line)}<div class="ticks st-ticks" style="margin:6px 0 10px">${gains.join("")}</div>${fin}
+    <button class="btn" id="stDone" style="width:100%;margin-top:14px">${T("cont")}</button>`, b2=>{
+    b2.querySelector("#stDone").onclick = ()=>{ S.stallRes = null; save(); stallOpen = false; closeModal(); updateTop(); refreshLastDay(); then(); };
+  });
+}
+/* the last day card picks up the night's pay and growth */
+function refreshLastDay(){
+  const last = S.feed[S.feed.length-1], el = last && $(`#feed .day[data-i="${last.i}"]`);
+  if(el){ const [fresh] = dayCardEls(last); el.replaceWith(fresh); }
+}
+
 /* ---------------- story cards and the diary ---------------- */
 /* a story moment stops the days: a diary page opens over the log and waits for Continue, at any speed */
 function storyCard(pg, then){
@@ -2235,17 +2533,21 @@ function diaryEntryHTML(pg, pic){
     return `<div class="de">${pic ? `<canvas class="dpic" width="48" height="48" data-spr="${st.spr}"></canvas>` : ""}<p class="dd">${esc(D.long(pg.date))} ${tools(st.en, st.zh)}</p>
       <p>${mk(st.en)}</p><p class="zht" hidden>${esc(st.zh)}</p></div>`;
   }
-  const m = +pg.month.slice(5) - 1, all = pg.lines.map(plain).join(" ");
-  return `<div class="de"><p class="dd">${LANG === "en" ? `${T("monthEnd")} ${MON_FULL[m]}` : `${m+1} ${T("monthEnd")}`} ${tools(all, "")}</p>${pg.lines.map(l=>`<p>${mk(l)}</p>`).join("")}</div>`;
+  /* month-end page: dated the month's last day; lines are [English, 中文] (pages from before build 15 are English only) */
+  /* with 中 on, each Chinese line sits right under its English line */
+  const date = pg.date || monthEnd(pg.month), rows = pg.lines.map(l=>Array.isArray(l) ? l : [l, ""]), hasZh = rows.some(r=>r[1]);
+  return `<div class="de"><p class="dd">${esc(D.long(date))} ${tools(rows.map(r=>plain(r[0])).join(" "), hasZh ? "zh" : "")}</p>${rows.map(r=>`<p>${mk(r[0])}</p>${r[1] ? `<p class="zht" hidden>${esc(r[1])}</p>` : ""}`).join("")}</div>`;
 }
 const pgMonth = pg => pg.kind === "story" ? pg.date.slice(0,7) : pg.month;
+const monthEnd = mkey => D.add(D.add(mkey + "-01", 32).slice(0,7) + "-01", -1);
+const pgKey = pg => pg.kind === "story" ? pg.date + "0" : (pg.date || monthEnd(pg.month)) + "9";   /* the month-end page comes last on its day */
 let diaryPg = -1;
 function diaryHTML(){
   const months = [...new Set(S.diary.map(pgMonth))].sort();
   if(!months.length) return `<p class="muted">${T("diaryEmpty")}</p>`;
   if(diaryPg < 0 || diaryPg >= months.length) diaryPg = months.length - 1;
   const mk_ = months[diaryPg], y = mk_.slice(0,4), m = +mk_.slice(5) - 1;
-  const pages = S.diary.filter(p=>pgMonth(p) === mk_).sort((a,b)=>(a.date || "9") < (b.date || "9") ? -1 : 1);
+  const pages = S.diary.filter(p=>pgMonth(p) === mk_).sort((a,b)=>pgKey(a) < pgKey(b) ? -1 : pgKey(a) > pgKey(b) ? 1 : 0);
   return `<div class="dnav"><button class="btn alt small" id="dPrev" aria-label="${T("prevM")}" ${diaryPg ? "" : "disabled"}>‹</button>
     <b>${LANG === "en" ? `${MON_FULL[m]} ${y}` : `${y} 年 ${m+1} 月`}</b>
     <button class="btn alt small" id="dNextM" aria-label="${T("nextM")}" ${diaryPg < months.length - 1 ? "" : "disabled"}>›</button></div>
@@ -2273,7 +2575,8 @@ let follow = true, lastHand = 0, autoAt = 0;
 /* measured from the last card, so it works whether the page or the app around it does the scrolling:
    the bottom means the last card sits fully above the button bar */
 const atBottom = ()=>{ const l = $("#feed") && $("#feed").lastElementChild, bar = $("#play .playbar");
-  return !l || l.getBoundingClientRect().bottom <= (bar ? bar.getBoundingClientRect().top : innerHeight) + 2; };
+  const vv = window.visualViewport, screenBottom = vv ? vv.offsetTop + vv.height : innerHeight;
+  return !l || l.getBoundingClientRect().bottom <= Math.min(bar ? bar.getBoundingClientRect().top : screenBottom, screenBottom) + 2; };
 
 /* ---- the week waits for the player (2026-10-14) ----
    Touching the log (a tap, a drag, a wheel), opening a word's tooltip or playing a voice pauses the days.
@@ -2281,7 +2584,7 @@ const atBottom = ()=>{ const l = $("#feed") && $("#feed").lastElementChild, bar 
    bottom carries on too, for logs too short to scroll. The Pause button still works on its own. */
 const holds = new Set();
 let leftBottom = false;
-const playingNow = ()=> !!S && $("#play").classList.contains("on") && S.phase === "play" && S.day < 14 && !tripPending && !S.storyQ && playSpeed < 99;
+const playingNow = ()=> !!S && $("#play").classList.contains("on") && S.phase === "play" && S.day < 14 && !tripPending && !S.storyQ && !S.stallQ && !stallOpen && playSpeed < 99;
 function pauUI(){ const b = $("#pau"); if(!b) return; const on = paused || holds.size > 0; b.textContent = on ? T("resume") : T("pause"); b.classList.toggle("on", on); }
 function hold(r){ if(!playingNow()) return; if(r === "hand" && !holds.has("hand")) leftBottom = !atBottom(); holds.add(r); clearTimeout(playTimer); follow = false; pauUI(); }
 function release(r){
@@ -2310,8 +2613,17 @@ function watchLast(){
     if(lastHand > autoAt && Date.now() - lastHand < 1500) follow = e.isIntersecting; }, {rootMargin:"0px 0px -40px 0px"});
   watch.observe(l);
 }
-/* when the app grows the frame after a new card, catch up to the end */
-addEventListener("resize", ()=>{ if(follow && $("#play").classList.contains("on")) toLogEnd(false); });
+/* the newest card can still grow after it is placed (its picture, fonts, the app resizing its frame),
+   so while the log is following, any change in its size or in the visible screen scrolls to the end again (2026-10-24) */
+function catchUp(){
+  if(!follow || holds.size || !$("#play").classList.contains("on") || Date.now() - lastHand < 1500) return;
+  autoAt = Date.now(); toLogEnd(false);
+}
+let feedRO = null, catchRAF = 0;
+const catchSoon = ()=>{ cancelAnimationFrame(catchRAF); catchRAF = requestAnimationFrame(catchUp); };
+if("ResizeObserver" in window) feedRO = new ResizeObserver(catchSoon);
+addEventListener("resize", catchSoon);
+if(window.visualViewport) visualViewport.addEventListener("resize", catchSoon);
 /* scroll the newest card fully above the button bar. The bar's height is measured each time, since the
    iPhone's home-indicator area makes it taller than a fixed margin allows; a check after a smooth scroll
    finishes the job if a new card or the frame cut it short. */
@@ -2373,8 +2685,8 @@ function summaryModal(sum){
   function after(){ closeModal(); Music.want(STAGE.music.home); if(S.done) return endScreen(); openBlock(S); renderHome(); }
 }
 function showDiary(dy, then){
-  modal(`<h2>${T("diary")}</h2><div class="diary">${dy.lines.map(l=>`<p>${mk(l)}</p>`).join("")}</div>
-    <div class="row" style="margin-top:12px;justify-content:space-between"><button class="btn alt small" data-say="${esc(dy.lines.map(plain).join(" "))}">${ICON.spk}</button><button class="btn" id="dNext">${T("next")}</button></div>`, box=>{
+  modal(`<h2>${T("diary")}</h2><div class="diary">${diaryEntryHTML(dy, false)}</div>
+    <button class="btn" id="dNext" style="width:100%;margin-top:14px">${T("next")}</button>`, box=>{
     box.querySelector("#dNext").onclick = then;
   });
 }
@@ -2641,25 +2953,36 @@ function neighbors(){
 }
 function drawMap(cv){
   const M = TS.TR.map, c = cv.getContext("2d"), W = cv.width, H = cv.height;
+  const near = new Set(neighbors().map(x=>x.to));
   c.fillStyle = "#5C9CC9"; c.fillRect(0,0,W,H);
   c.fillStyle = "#4E8BB8"; for(let y=8;y<H;y+=16) for(let x=(y/16%2)*10;x<W;x+=24) c.fillRect(x, y, 8, 2);
-  /* mainland (Gushan) at the top right, harbor between */
-  c.fillStyle = "#9FC98A"; c.beginPath(); c.moveTo(150,0); c.lineTo(W,0); c.lineTo(W,40); c.lineTo(200,18); c.closePath(); c.fill();
-  /* Cijin: a long thin island running south */
-  c.fillStyle = "#E8D9A8"; c.beginPath(); c.moveTo(190,30); c.lineTo(255,60); c.lineTo(240,92); c.lineTo(175,130); c.lineTo(110,220); c.lineTo(80,330); c.lineTo(40,350); c.lineTo(48,250); c.lineTo(90,150); c.lineTo(130,80); c.closePath(); c.fill();
-  c.fillStyle = "#7BBF6A"; c.beginPath(); c.arc(220,58,26,0,7); c.fill();   /* Cihou hill */
-  c.fillStyle = "#3B3735"; c.beginPath(); c.moveTo(48,250); c.lineTo(90,150); c.lineTo(84,150); c.lineTo(42,250); c.closePath(); c.fill();  /* black sand */
+  /* the mainland (Gushan) to the north-east, across the harbor entrance */
+  c.fillStyle = "#9FC98A"; c.beginPath(); c.moveTo(118,0); c.lineTo(W,0); c.lineTo(W,22); c.lineTo(262,12); c.lineTo(214,7); c.lineTo(160,4); c.closePath(); c.fill();
+  /* Cijin: Cihou Hill at the north-west tip, then a thin strip running south-east and off the map */
+  c.fillStyle = "#E8D9A8"; c.beginPath();
+  [[78,10],[104,14],[122,34],[140,66],[178,98],[188,140],[200,196],[256,256],[W,292],[W,H],[244,H],[150,268],[70,214],[44,172],[40,112],[46,60],[58,24]].forEach(([x,y],k)=> k ? c.lineTo(x,y) : c.moveTo(x,y));
+  c.closePath(); c.fill();
+  c.fillStyle = "#7BBF6A"; c.beginPath(); c.ellipse(66, 62, 32, 34, 0, 0, 7); c.fill();   /* Cihou Hill */
+  c.strokeStyle = "#3B3735"; c.lineWidth = 5; c.beginPath(); c.moveTo(44,150); c.lineTo(70,216); c.lineTo(150,270); c.lineTo(244,H); c.stroke();   /* black sand on the west coast */
+  /* paths */
   c.strokeStyle = "rgba(43,37,54,.35)"; c.lineWidth = 2; c.setLineDash([4,4]);
   M.links.forEach(l=>{ const a = M.nodes[l[0]], b = M.nodes[l[1]]; c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(b.x,b.y); c.stroke(); });
-  c.setLineDash([]);
-  c.strokeStyle = "#fff"; c.setLineDash([2,3]); c.beginPath(); c.moveTo(150,58); c.lineTo(175,14); c.stroke(); c.setLineDash([]);
+  /* the ferry from the mainland */
+  c.strokeStyle = "#fff"; c.setLineDash([2,3]); c.beginPath(); c.moveTo(M.nodes.pier.x, M.nodes.pier.y); c.lineTo(176, 78); c.lineTo(180, 0); c.stroke();   /* north-north-east, then north to Gushan */ c.setLineDash([]);
+  /* places: gold when visited; a dashed ring on the places Mia can walk to from here */
   Object.entries(M.nodes).forEach(([id,n])=>{
     const t = document.createElement("canvas"); drawSprite(t, SPR[n.spr], 2);
-    c.fillStyle = TS.visited[id] ? "#F4C542" : "#fff"; c.beginPath(); c.arc(n.x, n.y, 15, 0, 7); c.fill();
+    c.fillStyle = TS.visited[id] ? "#F4C542" : "#fff"; c.beginPath(); c.arc(n.x, n.y, 14, 0, 7); c.fill();
     c.drawImage(t, n.x-12, n.y-12);
+    if(near.has(id)){ c.strokeStyle = "#fff"; c.lineWidth = 2; c.setLineDash([3,3]); c.beginPath(); c.arc(n.x, n.y, 18, 0, 7); c.stroke(); c.setLineDash([]); }
     if(id === TS.cur){ c.strokeStyle = "#D9534F"; c.lineWidth = 3; c.beginPath(); c.arc(n.x, n.y, 17, 0, 7); c.stroke(); }
   });
-  const m = document.createElement("canvas"); drawSprite(m, SPR.mia, 1); const n = M.nodes[TS.cur]; c.drawImage(m, n.x+10, n.y-22, 16, 16);
+  const m = document.createElement("canvas"); drawSprite(m, SPR.mia, 1); const n = M.nodes[TS.cur]; c.drawImage(m, n.x-8, n.y-36, 16, 16);   /* Mia stands just above her spot */
+  /* compass and scale: 500 m is about 95 px */
+  c.fillStyle = "#fff"; c.font = "bold 12px system-ui, sans-serif"; c.textAlign = "center";
+  c.fillText("N", 278, 98); c.beginPath(); c.moveTo(278,74); c.lineTo(272,86); c.lineTo(284,86); c.closePath(); c.fill();
+  c.fillRect(12, H-14, 95, 3); c.fillRect(12, H-19, 2, 8); c.fillRect(105, H-19, 2, 8);
+  c.textAlign = "left"; c.fillText("500 m", 12, H-22);
 }
 function drawHud(){
   const h = $("#hud"); if(!h) return;
@@ -2669,12 +2992,19 @@ function drawHud(){
 function mapScreen(){
   const M = TS.TR.map, here = M.nodes[TS.cur];
   if(TS.time >= toMin(M.close)) return nightScene(true);
-  const nb = neighbors();
+  /* unvisited places first; places already seen stay fully clickable, so Mia can walk back (2026-10-24) */
+  const nb = neighbors().sort((a,b)=>(!!TS.visited[a.to] || a.to === M.start) - (!!TS.visited[b.to] || b.to === M.start));
+  const todo = Object.keys(M.visits).filter(id=>!TS.visited[id] && id !== TS.cur);
+  /* a place left for later (the lighthouse) can be visited from where Mia stands */
+  const here_ = M.visits[TS.cur] && !TS.visited[TS.cur];
   $("#trip").innerHTML = tripHead("Cijin · 旗津") + `<canvas class="map" id="map" width="300" height="350"></canvas>
     <div class="hud" id="hud"></div>
-    <h3>${LANG === "en" ? "You are at" : "妳在"}：${esc(N(here))}</h3>
-    <div class="nodes">${nb.map(x=>{ const n = M.nodes[x.to], can = TS.energy >= x.en;
-      return `<button class="node${TS.visited[x.to] ? " done" : ""}" data-to="${x.to}" ${can ? "" : "disabled"}><span><span class="nm">${esc(N(n))}</span>${TS.visited[x.to] ? " ✓" : ""}${n.hill ? ` <span class="tag">${LANG === "en" ? "hill" : "上坡"}</span>` : ""}</span>
+    <h3>${LANG === "en" ? "You are at" : "妳在"}${LANG === "en" ? ": " : "："}${esc(N(here))}</h3>
+    ${todo.length ? `<p class="muted" style="font-size:14px;margin:4px 0 0">${LANG === "en" ? "Still to see" : "還沒去"}${LANG === "en" ? ": " : "："}${todo.map(id=>esc(N(M.nodes[id]))).join(LANG === "en" ? ", " : "、")}</p>` : ""}
+    ${here_ ? `<button class="btn" id="mHere" style="width:100%;margin-top:8px">${TS.cur === "light" ? (LANG === "en" ? "Go up to the lighthouse" : "上燈塔") : (LANG === "en" ? "Look around here" : "在這裡逛逛")}</button>` : ""}
+    <p class="muted" style="font-size:13px;margin:8px 0 0">${LANG === "en" ? "Walk to (you can go back the way you came):" : "可以走去（走過的路也可以往回走）："}</p>
+    <div class="nodes">${nb.map(x=>{ const n = M.nodes[x.to], can = TS.energy >= x.en, been = TS.visited[x.to] || x.to === M.start;
+      return `<button class="node${been ? " done" : ""}" data-to="${x.to}" ${can ? "" : "disabled"}><span><span class="nm">${esc(N(n))}</span>${been ? ` <span class="tag">${LANG === "en" ? "✓ been there" : "✓ 去過了"}</span>` : ""}${n.hill ? ` <span class="tag">${LANG === "en" ? "hill" : "山路"}</span>` : ""}</span>
         <span class="cost">${x.min} ${LANG === "en" ? "min" : "分"} · ${T("energy")} −${x.en}${can ? "" : (LANG === "en" ? " · too tired" : " · 體力不夠")}</span></button>`; }).join("")}</div>
     <button class="btn alt" id="mEnd" style="width:100%;margin-top:10px">${T("leave")}</button>`; tripTop();
   drawMap($("#map")); drawHud(); Music.ui();
@@ -2683,6 +3013,7 @@ function mapScreen(){
     visit(x.to);
   });
   $("#mEnd").onclick = ()=>askConfirm(T("confirmEnd"), ()=>nightScene(false));
+  const mh = $("#mHere"); if(mh) mh.onclick = ()=>visit(TS.cur);
 }
 function visit(id){
   const M = TS.TR.map, v = M.visits[id];
