@@ -1608,7 +1608,14 @@ let VOICE = null;
 function pickVoice(){
   if(!SYN) return;
   const vs = SYN.getVoices().filter(v=>/^en/i.test(v.lang) && !NOVELTY.test(v.name));
-  VOICE = vs.find(v=>/Samantha|Google US English|Aria|Jenny|Ava|Allison/i.test(v.name) && /^en[-_]US/i.test(v.lang)) || vs.find(v=>/^en[-_]US/i.test(v.lang)) || vs[0] || null;
+  /* a woman's voice by default: the best-known female voices in order (iPhone and Mac, Chrome, Edge, Windows), then any
+     American voice that isn't one of the known male ones (Windows Chrome lists Microsoft David first) */
+  const FEMALE = ["Samantha","Google US English","Jenny","Aria","Ava","Allison","Susan","Zira","Emma","Michelle","Joanna","Salli","Karen","Moira","Tessa","Serena","Hazel","Libby","Sonia","Google UK English Female"];
+  const MALE = /David|Mark|Guy|George|Ryan|Christopher|Eric|Roger|Steffan|Brian|Daniel|Alex|Aaron|Tom|Oliver|Arthur|Gordon|Rishi|Thomas|Male/i;
+  const us = v => /^en[-_]US/i.test(v.lang);
+  for(const n of FEMALE){ VOICE = vs.find(v=>v.name.includes(n) && us(v)) || null; if(VOICE) break; }
+  if(!VOICE) for(const n of FEMALE){ VOICE = vs.find(v=>v.name.includes(n)) || null; if(VOICE) break; }
+  VOICE = VOICE || vs.find(v=>us(v) && !MALE.test(v.name)) || vs.find(v=>!MALE.test(v.name)) || vs.find(us) || vs[0] || null;
 }
 if(SYN){ pickVoice(); SYN.onvoiceschanged = pickVoice; }
 const sayAs = t => Object.entries(SAY_AS).reduce((x,[w,r])=>x.split(w).join(r), t);
