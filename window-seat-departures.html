@@ -466,6 +466,17 @@ mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
   .who{grid-column:1/-1;text-align:left;padding:0;}
   #reader{padding-top:20px;}
 }
+/* the hand pointer (Book 1): a 16-bit sprite on a fixed layer above everything, tip at the box's origin */
+#ptr{position:fixed;left:0;top:0;z-index:65;pointer-events:none;opacity:0;transition:opacity .25s;will-change:transform;}
+#ptr.on{opacity:1;}
+#ptr .ptr-b{position:absolute;width:88px;height:132px;filter:drop-shadow(6px 8px 3px rgba(20,40,70,.4));}
+#ptr img,.ptrb img{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;}
+#ptrTrail{position:absolute;left:0;top:0;width:1px;height:1px;overflow:visible;pointer-events:none;z-index:64;opacity:0;transition:opacity .6s;}
+#ptrTrail.on{opacity:1;transition:opacity .1s;}
+#ptrTrail polyline{fill:none;stroke:#e0523f;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;opacity:.85;}
+.tbtn.ptrb{padding:2px 8px;}
+.tbtn.ptrb img{width:22px;height:33px;margin:-6px 0 -5px;}
+.tbtn.ptrb:not(.on) img{opacity:.75;filter:saturate(.7);}
 @media (prefers-reduced-motion:reduce){
   .drift,.steam rect,.bee,.wing,.zz,.blink,.eq i,.rainfall{animation:none;}
   #pop,#drawer,#scrim,#toast{transition:none;}
@@ -1925,6 +1936,10 @@ const Music = (()=>{
   };
 })();
 
+/* the hand pointer (engine/pointer.js) plugs in here when a book has one; null otherwise */
+let ptrApi = null;
+const ptrOn = ()=> ptrApi && ptrApi.on ? ptrApi : null;
+
 /* ---------------- speech ----------------
    Order of preference for every paragraph / dialogue line:
    1. a recorded clip listed in audio/manifest.json   (audio/L01-read-01.mp3 …)
@@ -2041,12 +2056,14 @@ function stopSpeech(){
   try{ player.pause(); }catch(e){}
   clearSpeaking(); Q = null;
   playing = null; Music.duck(false); playBtns();
+  if(ptrApi) ptrApi.end();
 }
 function pauseSpeech(){
   if(!Q || Q.paused) return;
   qid++; Q.paused = true; Q.k = Math.max(0, Q.k - 1);
   if(SYN) SYN.cancel(); try{ player.pause(); }catch(e){}
   Music.duck(false); playBtns();
+  if(ptrApi) ptrApi.end();
 }
 function resumeSpeech(){ if(Q && Q.paused){ Q.paused = false; runQueue(); } }
 function sayQueue(items, mode){
@@ -2063,7 +2080,7 @@ function runQueue(){
   playing = S.mode; playBtns(); Music.duck(true);
   const next = ()=>{
     if(my !== qid) return;
-    if(S.k >= q.length){ clearSpeaking(); Q = null; playing = null; Music.duck(false); playBtns(); return; }
+    if(S.k >= q.length){ clearSpeaking(); Q = null; playing = null; Music.duck(false); playBtns(); if(ptrApi) ptrApi.end(); return; }
     const x = q[S.k++];
     if(!x.el) clearSpeaking();
     else if(!x.el.classList.contains("speaking")){ clearSpeaking(); x.el.classList.add("speaking"); if(q.length > 1) x.el.scrollIntoView({block:"nearest", behavior:"smooth"}); }
@@ -2075,6 +2092,7 @@ function runQueue(){
       player.src = `${BOOK.audio || "audio/"}${x.audio}.mp3`;
       player.playbackRate = rate < .8 ? .85 : 1;
       const pr = player.play(); if(pr && pr.catch) pr.catch(fail);
+      if(ptrOn()) ptrApi.speak(x, null);
       return;
     }
     if(!SYN){ next(); return; }
@@ -2083,14 +2101,15 @@ function runQueue(){
     u.rate = x.rate; u.pitch = x.pitch;
     u.onend = ()=>{ if(my === qid) setTimeout(next, x.gap); };
     u.onerror = ()=>{ if(my === qid) setTimeout(next, 50); };
+    if(ptrOn()) ptrApi.speak(x, u);
     SYN.speak(u);
   };
   setTimeout(next, 60);
 }
 /* a note with its own lang (a French place name) is read whole by a native voice when the device has one */
-function say(t, lang){ const nv = nativeVoice(lang);
-  if(nv){ stopSpeech(); const u = new SpeechSynthesisUtterance(speakable(t)); u.voice = nv; u.lang = nv.lang; u.rate = Math.min(.9, rate); SYN.speak(u); return; }
-  sayQueue([{text:t}]); }
+function say(t, lang, el){ const nv = nativeVoice(lang);
+  if(nv){ stopSpeech(); if(ptrOn() && el) ptrApi.point(el); const u = new SpeechSynthesisUtterance(speakable(t)); u.voice = nv; u.lang = nv.lang; u.rate = Math.min(.9, rate); SYN.speak(u); return; }
+  sayQueue([{text:t, el:el && ptrOn() ? el : null}]); }
 /* iOS unlocks speech only when speak() runs inside a tap. A <select> change isn't a tap,
    so the first real tap anywhere speaks one silent utterance to unlock it for later. */
 let speechUnlocked = false;
@@ -2149,7 +2168,8 @@ function render(i){
     (hwCount(i) ? `<button class="hwjump" id="hwJump" data-i="${i}"><span class="px">★ ${hwCount(i)}/${HW_N}</span>繼續本課作業<span class="sp"></span>→</button>` : "");
 
   h += secHead("read","READ","課文",
-    `<button class="tbtn" id="playRead"></button><button class="tbtn" id="playReadRe" hidden aria-label="從頭朗讀">${SVGI.restart}<span>從頭</span></button><button class="tbtn${showZh?" on":""}" id="zhBtn" aria-pressed="${showZh}">中文</button>`);
+    `<button class="tbtn" id="playRead"></button><button class="tbtn" id="playReadRe" hidden aria-label="從頭朗讀">${SVGI.restart}<span>從頭</span></button><button class="tbtn${showZh?" on":""}" id="zhBtn" aria-pressed="${showZh}">中文</button>` +
+    (BOOK.pointer ? `<button class="tbtn ptrb${ptrOn() ? " on" : ""}" id="ptrBtn" aria-pressed="${!!ptrOn()}" aria-label="教鞭 Pointer" title="教鞭 Pointer"><img alt="" src="${BOOK.pointer}"></button>` : ""));
   h += `<p class="legend"><span class="lv1">單字</span><span class="lv2">文法</span><span class="lv3">文化</span>點一下看解釋</p><div class="read">`;
   h += l.read.map((p,j)=>`<p class="rp ${p[2]||""}" data-i="${j}"><button class="spk pspk" data-para="${j}" aria-label="聽這一段">${SVGI.spk}</button><span class="en"><span class="hl">${mk(p[0])}</span></span><span class="zh">${esc(p[1])}</span></p>`).join("");
   h += `</div></section>`;
@@ -2232,15 +2252,15 @@ function openPop(k){
 function closePop(){ pop.classList.remove("on"); pop.setAttribute("aria-hidden","true"); }
 $("#popX").onclick = closePop;
 pop.addEventListener("click", e=>{
-  const s = e.target.closest("[data-say]"); if(s){ say(s.dataset.say, s.dataset.lang); return; }
+  const s = e.target.closest("[data-say]"); if(s){ say(s.dataset.say, s.dataset.lang, s); return; }
   const j = e.target.closest("[data-jump]");
   if(j){ closePop(); const el = document.getElementById(j.dataset.jump); if(el){ el.scrollIntoView({block:"start",behavior:"smooth"}); } }
 });
 
 /* ---------------- reader events ---------------- */
 $("#reader").addEventListener("click", e=>{
-  const g = e.target.closest(".g"); if(g){ openPop(g.dataset.k); return; }
-  const sp = e.target.closest("[data-say]"); if(sp){ say(sp.dataset.say, sp.dataset.lang); return; }
+  const g = e.target.closest(".g"); if(g){ openPop(g.dataset.k); if(ptrOn()) ptrApi.point(g); return; }
+  const sp = e.target.closest("[data-say]"); if(sp){ say(sp.dataset.say, sp.dataset.lang, sp); return; }
   const wr = e.target.closest(".wr"); if(wr){ openPop(wr.dataset.k); return; }
   const ln = e.target.closest("[data-line]");
   if(ln){ const l = L[cur], j = +ln.dataset.line, x = l.talk.lines[j];
@@ -2249,6 +2269,7 @@ $("#reader").addEventListener("click", e=>{
   /* open the homework of the lesson the button belongs to, not whatever cur says */
   const ho = e.target.closest("#hwOpen, #hwJump"); if(ho){ openHW(ho.dataset.i != null ? +ho.dataset.i : cur); return; }
   if(e.target.closest("#zhBtn")){ setZh(!showZh); return; }
+  if(e.target.closest("#ptrBtn")){ if(ptrApi) ptrApi.toggle(); return; }
   const pp = e.target.closest("[data-para]");
   if(pp){ const j = +pp.dataset.para;
     if(Q && Q.mode === "p"+j){ stopSpeech(); return; }   /* tap again to stop */
@@ -2436,7 +2457,7 @@ function showCover(){
 }
 function leaveCover(){ document.body.classList.remove("cover"); }
 /* title screen: START = music on + open the book where the reader left off; MUSIC = toggle music, stay on the cover */
-$("#coverGo").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(lessonTrack(cur)); leaveCover(); go(cur); };
+$("#coverGo").onclick = e=>{ e.stopPropagation(); leaveCover(); go(cur); };   /* music stays off until the reader turns it on with ♪ (2026-10-31) */
 $("#coverMusic").onclick = e=>{ e.stopPropagation(); if(Music.cur < 0) Music.play(lessonTrack(cur)); else Music.stop(); };
 
 /* keys */
