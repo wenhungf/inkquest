@@ -477,6 +477,21 @@ mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
 .tbtn.ptrb{padding:2px 8px;}
 .tbtn.ptrb img{width:22px;height:33px;margin:-6px 0 -5px;}
 .tbtn.ptrb:not(.on) img{opacity:.75;filter:saturate(.7);}
+/* phones: keep the reading tools on one line while a reading plays (Pause, 從頭, 中文, the pointer) */
+@media (max-width:520px){
+  #sec-read .sh{gap:6px;flex-wrap:nowrap;}
+  #sec-read .sh .tbtn{padding:5px 7px;gap:4px;white-space:nowrap;flex:none;}
+  #sec-read .sh .sp{min-width:0;}
+  #sec-read .sh #playReadRe span{display:none;}
+  #sec-read .sh .tbtn.ptrb{padding:2px 6px;}
+}
+@media (max-width:370px){
+  #sec-read .sh .shz{display:none;}
+  #sec-read .sh{gap:4px;}
+  #sec-read .sh .tbtn{padding:5px 5px;font-size:12px;}
+  #sec-read .sh .tbtn.ptrb{padding:2px 4px;}
+  #sec-read .sh .px{padding:1px 5px 0;}
+}
 @media (prefers-reduced-motion:reduce){
   .drift,.steam rect,.bee,.wing,.zz,.blink,.eq i,.rainfall{animation:none;}
   #pop,#drawer,#scrim,#toast{transition:none;}
@@ -613,6 +628,9 @@ const MOOD = {
 };
 
 
+/* the hand pointer (教鞭): a 16-bit blue hand on a stainless rod, 44 x 66, drawn in tools/pointer/hand.px.js */
+const PTR_IMG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAABCCAMAAAAbpMQZAAAAHlBMVEUAAAAdNVeq3PPy+/9YoM98w+Y6c6bDzNb3+/9/jJnrXuwIAAAAAXRSTlMAQObYZgAAAQVJREFUeNrt1dEKwzAIBdBcq6b5/x8e0QbakjX6MBhsPpaDWDVJKR5ACQeIwhy0bcSIWtpEFVEsHMQFKUybcEbHsWlNaEmkllPVWE3INMOCiAJahEZgVbXwwCI8L2V8de3B8072CjFWz5nHBONUIC54ovsSkYiVck09mxGEe6F9+de4T0CtZ/AuPOLuLTddf/DtZsH6dbNvdwWjuwE7ViOMmRM6gwtUVW/4QSOBnd8Cz5feMRzh5Xk/9srx8rjjsF7yCo/hGF1dDeDQz537rao1dgMD2GttNfwW7Dn8Lanbp+qoe/2N1AinVm0tqrW18CPdWuqR5vgjDaV/6p9LrZ/Cdq12+wLlwwxc4EchIQAAAABJRU5ErkJggg==";
+
 /* =========================================================
    BOOK 1 — Home (A1)
    ========================================================= */
@@ -624,8 +642,7 @@ const BOOK = {
   blurbZh:"十篇短課文，每課 10 個單字、文法、對話和口說題。點畫線的字就會跳出白話解釋和 KK 音標。",
   version:"1.1・2026 年 9 月",
   hi:/B/,
-  /* the hand pointer (教鞭): a 16-bit sprite, 44 x 66, drawn in tools/pointer/hand.px.js; switches on engine/pointer.js and book1/pointer.js */
-  pointer:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAABCCAMAAAAbpMQZAAAAHlBMVEUAAAAdNVeq3PPy+/9YoM98w+Y6c6bDzNb3+/9/jJnrXuwIAAAAAXRSTlMAQObYZgAAAQVJREFUeNrt1dEKwzAIBdBcq6b5/x8e0QbakjX6MBhsPpaDWDVJKR5ACQeIwhy0bcSIWtpEFVEsHMQFKUybcEbHsWlNaEmkllPVWE3INMOCiAJahEZgVbXwwCI8L2V8de3B8072CjFWz5nHBONUIC54ovsSkYiVck09mxGEe6F9+de4T0CtZ/AuPOLuLTddf/DtZsH6dbNvdwWjuwE7ViOMmRM6gwtUVW/4QSOBnd8Cz5feMRzh5Xk/9srx8rjjsF7yCo/hGF1dDeDQz537rao1dgMD2GttNfwW7Dn8Lanbp+qoe/2N1AinVm0tqrW18CPdWuqR5vgjDaV/6p9LrZ/Cdq12+wLlwwxc4EchIQAAAABJRU5ErkJggg==",
+  pointer:true,   /* the hand pointer (教鞭): engine/pointer.js with book1/pointer.js */
   gradBadge:"窗邊畢業生",
   about:`<h4>關於這本《Window Seat・Home》</h4>
         <p>這是 InkQuest 寫給初學者的第一本小課本。主角 Mia 在台北的百貨公司上班：早上趕著出門、傍晚被鄰居的貓造訪、下雨天想起阿嬤。十篇短短的課文，都是生活裡的一小段時光。</p>
@@ -2259,7 +2276,7 @@ function render(i){
 
   h += secHead("read","READ","課文",
     `<button class="tbtn" id="playRead"></button><button class="tbtn" id="playReadRe" hidden aria-label="從頭朗讀">${SVGI.restart}<span>從頭</span></button><button class="tbtn${showZh?" on":""}" id="zhBtn" aria-pressed="${showZh}">中文</button>` +
-    (BOOK.pointer ? `<button class="tbtn ptrb${ptrOn() ? " on" : ""}" id="ptrBtn" aria-pressed="${!!ptrOn()}" aria-label="教鞭 Pointer" title="教鞭 Pointer"><img alt="" src="${BOOK.pointer}"></button>` : ""));
+    (BOOK.pointer ? `<button class="tbtn ptrb${ptrOn() ? " on" : ""}" id="ptrBtn" aria-pressed="${!!ptrOn()}" aria-label="教鞭 Pointer" title="教鞭 Pointer"><img alt="" src="${PTR_IMG}"></button>` : ""));
   h += `<p class="legend"><span class="lv1">單字</span><span class="lv2">文法</span><span class="lv3">文化</span>點一下看解釋</p><div class="read">`;
   h += l.read.map((p,j)=>`<p class="rp ${p[2]||""}" data-i="${j}"><button class="spk pspk" data-para="${j}" aria-label="聽這一段">${SVGI.spk}</button><span class="en"><span class="hl">${mk(p[0])}</span></span><span class="zh">${esc(p[1])}</span></p>`).join("");
   h += `</div></section>`;
@@ -2660,7 +2677,7 @@ const PTR = (()=>{
   function build(){
     if(root) return;
     root = document.createElement("div"); root.id = "ptr"; root.setAttribute("aria-hidden", "true");
-    root.innerHTML = `<div class="ptr-b"><img alt="" src="${BOOK.pointer}"></div>`;
+    root.innerHTML = `<div class="ptr-b"><img alt="" src="${PTR_IMG}"></div>`;
     document.body.appendChild(root);
     body = root.firstChild; img = body.firstChild;
     body.style.left = (-TIP[0]*SCALE) + "px"; body.style.top = (-TIP[1]*SCALE) + "px";

@@ -477,6 +477,21 @@ mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
 .tbtn.ptrb{padding:2px 8px;}
 .tbtn.ptrb img{width:22px;height:33px;margin:-6px 0 -5px;}
 .tbtn.ptrb:not(.on) img{opacity:.75;filter:saturate(.7);}
+/* phones: keep the reading tools on one line while a reading plays (Pause, 從頭, 中文, the pointer) */
+@media (max-width:520px){
+  #sec-read .sh{gap:6px;flex-wrap:nowrap;}
+  #sec-read .sh .tbtn{padding:5px 7px;gap:4px;white-space:nowrap;flex:none;}
+  #sec-read .sh .sp{min-width:0;}
+  #sec-read .sh #playReadRe span{display:none;}
+  #sec-read .sh .tbtn.ptrb{padding:2px 6px;}
+}
+@media (max-width:370px){
+  #sec-read .sh .shz{display:none;}
+  #sec-read .sh{gap:4px;}
+  #sec-read .sh .tbtn{padding:5px 5px;font-size:12px;}
+  #sec-read .sh .tbtn.ptrb{padding:2px 4px;}
+  #sec-read .sh .px{padding:1px 5px 0;}
+}
 @media (prefers-reduced-motion:reduce){
   .drift,.steam rect,.bee,.wing,.zz,.blink,.eq i,.rainfall{animation:none;}
   #pop,#drawer,#scrim,#toast{transition:none;}
@@ -613,6 +628,9 @@ const MOOD = {
 };
 
 
+/* the hand pointer (教鞭): a 16-bit blue hand on a stainless rod, 44 x 66, drawn in tools/pointer/hand.px.js */
+const PTR_IMG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAABCCAMAAAAbpMQZAAAAHlBMVEUAAAAdNVeq3PPy+/9YoM98w+Y6c6bDzNb3+/9/jJnrXuwIAAAAAXRSTlMAQObYZgAAAQVJREFUeNrt1dEKwzAIBdBcq6b5/x8e0QbakjX6MBhsPpaDWDVJKR5ACQeIwhy0bcSIWtpEFVEsHMQFKUybcEbHsWlNaEmkllPVWE3INMOCiAJahEZgVbXwwCI8L2V8de3B8072CjFWz5nHBONUIC54ovsSkYiVck09mxGEe6F9+de4T0CtZ/AuPOLuLTddf/DtZsH6dbNvdwWjuwE7ViOMmRM6gwtUVW/4QSOBnd8Cz5feMRzh5Xk/9srx8rjjsF7yCo/hGF1dDeDQz537rao1dgMD2GttNfwW7Dn8Lanbp+qoe/2N1AinVm0tqrW18CPdWuqR5vgjDaV/6p9LrZ/Cdq12+wLlwwxc4EchIQAAAABJRU5ErkJggg==";
+
 /* =========================================================
    BOOK 4 — Homeward (B2)
    ========================================================= */
@@ -624,6 +642,7 @@ const BOOK = {
   blurbZh:"十篇課文，每課 15 個單字和片語、3 個文法重點。跟著 Mia 旅行、道別，然後回家。",
   version:"1.0・2026 年 10 月",
   hi:/C/,
+  pointer:true,   /* the hand pointer (教鞭): engine/pointer.js with book4/pointer.js */
   /* read-aloud respellings for names the browser voices tend to get wrong */
   sayAs:{"Walthamstow":"Wallthamstoe","St Pancras":"Saint Pancras","Taoyuan":"Tao-yuan","Élise":"Eh-leez","Lyon":"Lee-on","Valence":"Vah-lahnss","Camille":"Kah-mee"},
   foreign:{"Lyon Part-Dieu":["fr-FR","lee on par dew"],"Part-Dieu":["fr-FR","par dew"],"Fourvière":["fr-FR","foor vee air"],"Gare de Lyon":["fr-FR","gar duh lee on"],
@@ -2349,7 +2368,7 @@ function render(i){
 
   h += secHead("read","READ","課文",
     `<button class="tbtn" id="playRead"></button><button class="tbtn" id="playReadRe" hidden aria-label="從頭朗讀">${SVGI.restart}<span>從頭</span></button><button class="tbtn${showZh?" on":""}" id="zhBtn" aria-pressed="${showZh}">中文</button>` +
-    (BOOK.pointer ? `<button class="tbtn ptrb${ptrOn() ? " on" : ""}" id="ptrBtn" aria-pressed="${!!ptrOn()}" aria-label="教鞭 Pointer" title="教鞭 Pointer"><img alt="" src="${BOOK.pointer}"></button>` : ""));
+    (BOOK.pointer ? `<button class="tbtn ptrb${ptrOn() ? " on" : ""}" id="ptrBtn" aria-pressed="${!!ptrOn()}" aria-label="教鞭 Pointer" title="教鞭 Pointer"><img alt="" src="${PTR_IMG}"></button>` : ""));
   h += `<p class="legend"><span class="lv1">單字</span><span class="lv2">文法</span><span class="lv3">文化</span>點一下看解釋</p><div class="read">`;
   h += l.read.map((p,j)=>`<p class="rp ${p[2]||""}" data-i="${j}"><button class="spk pspk" data-para="${j}" aria-label="聽這一段">${SVGI.spk}</button><span class="en"><span class="hl">${mk(p[0])}</span></span><span class="zh">${esc(p[1])}</span></p>`).join("");
   h += `</div></section>`;
@@ -2701,6 +2720,268 @@ buildToc();
 const hm = /^#l(\d+)$/.exec(location.hash);
 if(hm && +hm[1] >= 1 && +hm[1] <= L.length){ render(+hm[1]-1); }
 else { render(cur); showCover(); }
+
+/* =========================================================
+   BOOK 4 — what the hand pointer does in each lesson (2026-10-31)
+   [phrase, style]: circle | light | tap | mischief | rapid | furious (see book1/pointer.js).
+   A tap lands on the *starred* word, or on the last word of the phrase.
+   ========================================================= */
+const PTR_MARKS = [
+/* 1 Regular */    [["Grim out there","circle"], ["Not *bad*","rapid"], ["“Not bad” is a compliment","circle"], ["British understatement","circle"], ["Cheeky","mischief"], ["Well. It’s *hot*","furious"], ["“Lovely” is bad","mischief"]],
+/* 2 Offer */      [["never a good sign","mischief"], ["More hours, more money, your own keys","circle"], ["sleep on it","circle"], ["on the fence","circle"], ["gut feeling","circle"], ["I should have asked for more *money*","furious"], ["Seven pros, seven cons","mischief"]],
+/* 3 Grand Tour */ [["28 days","circle"], ["something French and *expensive*","mischief"], ["90 days in any 180 days","circle"], ["fingerprints and a photo","circle"], ["in case my phone died","rapid"], ["at least ninety minutes","circle"], ["But don’t *miss* it","furious"]],
+/* 4 Lyon */       [["La bise","circle"], ["Right cheek, then left","mischief"], ["Hands on the table","rapid"], ["traboules","circle"], ["a red bus","circle"], ["It worked, didn’t it","mischief"], ["*Four*. I counted","furious"]],
+/* 5 Missed train */ [["Very *late*","furious"], ["the doors had closed","circle"], ["completely flat","rapid"], ["the piece of paper","circle"], ["Flexible","circle"], ["Why is your phone always *dead*","furious"], ["the jam is safe","mischief"]],
+/* 6 Souvenirs */  [["thirty-one names","circle"], ["About *twenty*","rapid"], ["bàn shǒu lǐ","circle"], ["MADE IN CHINA","mischief"], ["TOURISTS GO HOME","circle"], ["made in E17","circle"]],
+/* 7 Leaving do */ [["Nobody wants a *speech*","mischief"], ["COME BACK SOON","circle"], ["So much for no speeches","mischief"], ["Not bad","circle"], ["Not bad, *kid*","rapid"], ["his fifth *toast*","furious"]],
+/* 8 Got wrong */  [["quiet, not cold","circle"], ["“Sorry” means sorry. It *doesn’t*","furious"], ["You’re standing on my *foot*","rapid"], ["we’re in this together","circle"], ["It was my mistakes that made me friends","circle"], ["Sorry for the long post","mischief"]],
+/* 9 Thirteen hours */ [["twenty-six kilos","circle"], ["like *scarves*","mischief"], ["the most British moment","circle"], ["reverse culture shock","circle"], ["WELCOME TO THE HEAT","circle"], ["I’m wearing half of my suitcase","mischief"]],
+/* 10 The usual */ [["The *usual*","rapid"], ["a different bubble tea shop","mischief"], ["So many stations","light"], ["A year ago, I was them","circle"], ["It started with a postcard","circle"], ["where my window seat is","circle"], ["Für Elise","mischief"]]
+];
+
+/* =========================================================
+   WINDOW SEAT — the hand pointer (教鞭), Book 1 only (2026-10-31)
+   An inside joke turned teaching tool: a blue cartoon hand on a stainless rod.
+   When it is switched on, it follows every read-aloud word by word, circles key
+   phrases and taps words: lightly, mischievously, impatiently, or REALLY impatiently.
+   Which phrases get which treatment: PTR_MARKS in bookN/pointer.js.
+   The tap looks real: the hand lifts (bigger, shadow far), rolls a little, presses
+   down (smaller, shadow tight) and clicks; circling scratches like a pencil on paper.
+   ========================================================= */
+const PTR = (()=>{
+  const SCALE = 2, TIP = [7.5, 2];   /* sprite pixels to screen pixels; the fingertip inside the 44 x 66 sprite */
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let on = !!store.get("ptr", false);
+  let root, body, img, trail;
+  let pos = null, target = null, anchor = null, raf = 0, hideT = 0, visible = false;
+  let busy = 0;                 /* while a gesture plays, word-following waits */
+  let path = null;              /* circling: a function of time that gives the tip position */
+  let follow = null;            /* the element being read and its words */
+  const done = new Set();       /* phrases already marked in this reading */
+
+  /* ---------- the sprite and the overlay ---------- */
+  function build(){
+    if(root) return;
+    root = document.createElement("div"); root.id = "ptr"; root.setAttribute("aria-hidden", "true");
+    root.innerHTML = `<div class="ptr-b"><img alt="" src="${PTR_IMG}"></div>`;
+    document.body.appendChild(root);
+    body = root.firstChild; img = body.firstChild;
+    body.style.left = (-TIP[0]*SCALE) + "px"; body.style.top = (-TIP[1]*SCALE) + "px";
+    body.style.transformOrigin = `${TIP[0]*SCALE}px ${TIP[1]*SCALE}px`;
+    trail = document.createElementNS("http://www.w3.org/2000/svg", "svg"); trail.id = "ptrTrail";
+    document.body.appendChild(trail);
+    addEventListener("scroll", ()=>{ if(visible) place(true); }, {passive:true});
+    addEventListener("resize", ()=>{ if(visible) place(true); });
+  }
+
+  /* ---------- sound: a plastic tap on paper, and a pencil scratch ---------- */
+  let ac = null;
+  function actx(){ try{ ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if(ac.state === "suspended") ac.resume(); }catch(e){ ac = null; } return ac; }
+  function noise(c, sec){ const n = Math.ceil(c.sampleRate*sec), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0); for(let i=0;i<n;i++) d[i] = Math.random()*2-1; return b; }
+  function tapSound(v){
+    const c = actx(); if(!c) return; const t = c.currentTime;
+    const s = c.createBufferSource(); s.buffer = noise(c, .05);
+    const f = c.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 2300 + Math.random()*600; f.Q.value = 1.4;
+    const g = c.createGain(); g.gain.setValueAtTime(.55*v, t); g.gain.exponentialRampToValueAtTime(.001, t + .045);
+    s.connect(f); f.connect(g); g.connect(c.destination); s.start(t); s.stop(t + .05);
+    const o = c.createOscillator(); o.frequency.setValueAtTime(190, t); o.frequency.exponentialRampToValueAtTime(90, t + .06);
+    const g2 = c.createGain(); g2.gain.setValueAtTime(.32*v, t); g2.gain.exponentialRampToValueAtTime(.001, t + .07);
+    o.connect(g2); g2.connect(c.destination); o.start(t); o.stop(t + .08);
+  }
+  function scratchSound(sec){
+    const c = actx(); if(!c) return; const t = c.currentTime;
+    const s = c.createBufferSource(); s.buffer = noise(c, sec);
+    const f = c.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 3800; f.Q.value = .9;
+    const h = c.createBiquadFilter(); h.type = "highpass"; h.frequency.value = 1500;
+    const g = c.createGain(); g.gain.setValueAtTime(0, t);
+    for(let k=0, n=Math.floor(sec/.045); k<n; k++){ g.gain.linearRampToValueAtTime((.05 + Math.random()*.09), t + k*.045 + .02); }   /* the grain of the paper */
+    g.gain.linearRampToValueAtTime(0, t + sec);
+    s.connect(f); f.connect(h); h.connect(g); g.connect(c.destination); s.start(t); s.stop(t + sec);
+  }
+
+  /* ---------- moving: the tip glides to its target and stays on it while the page scrolls ---------- */
+  const rectOf = a => a ? (a.getBoundingClientRect ? a.getBoundingClientRect() : null) : null;
+  function spot(a){   /* the tip touches a word near its bottom, a little left of its middle; the hand hangs below it */
+    const r = rectOf(a); if(!r || (!r.width && !r.height)) return null;
+    return [r.left + Math.min(r.width*.45, 22), r.bottom - r.height*.28];   /* touching the lower part of the word */
+  }
+  function show(){
+    build(); clearTimeout(hideT);
+    if(!visible){ visible = true; root.classList.add("on"); }   /* a hand that was away drops straight onto its first word (see tick) */
+    if(!raf) raf = requestAnimationFrame(tick);
+  }
+  function hideSoon(ms){ clearTimeout(hideT); hideT = setTimeout(()=>{ if(!root) return; visible = false; root.classList.remove("on"); anchor = null; path = null; follow = null; done.clear(); setTimeout(()=>{ if(!visible) pos = null; }, 400); }, ms == null ? 1400 : ms); }
+  function place(now){ const p = path ? path(performance.now()) : anchor ? spot(anchor) : null; if(p) target = p; if(now && target){ pos = target.slice(); draw(); } }
+  function draw(){ if(root && pos) root.style.transform = `translate3d(${pos[0].toFixed(1)}px,${pos[1].toFixed(1)}px,0)`; }
+  function tick(){
+    raf = 0; if(!visible && !root.classList.contains("on")) return;
+    place(false);
+    if(!pos && target) pos = [target[0] + 26, target[1] + 34];   /* arriving: start just below-right of the target, so it settles in at once */
+    if(target && pos){ const k = path ? .55 : reduce ? 1 : .22; pos[0] += (target[0]-pos[0])*k; pos[1] += (target[1]-pos[1])*k; draw(); }
+    raf = requestAnimationFrame(tick);
+  }
+  function aim(a){ anchor = a; path = null; show(); }
+
+  /* ---------- gestures, played on the hand itself (the outer box keeps the tip in place) ---------- */
+  const UP = (s, r, d) => ({transform:`scale(${s}) rotate(${r}deg)`, filter:`drop-shadow(${d}px ${d*1.4}px ${Math.max(1, d*.45)}px rgba(20,40,70,${(.5 - d*.018).toFixed(2)}))`});
+  function play(frames, ms, sounds){
+    if(!body || reduce){ sounds && sounds.forEach(([t,v])=>setTimeout(()=>tapSound(v), t*ms)); return wait(ms); }
+    const a = body.animate(frames, {duration:ms, easing:"linear"});
+    (sounds || []).forEach(([t,v])=>setTimeout(()=>{ if(on) tapSound(v); }, t*ms));
+    return new Promise(res=>{ a.onfinish = res; a.oncancel = res; });
+  }
+  const wait = ms => new Promise(r=>setTimeout(r, ms));
+  /* one press: lift (big, shadow far, rolled) -> contact (small, shadow tight) -> back up a little */
+  function taps(n, {lift=1.12, roll=-6, ms=200, v=.8, jitter=0}={}){
+    const fr = [UP(1.04, 0, 6)], snd = [];
+    for(let i=0;i<n;i++){
+      const r = roll + (jitter ? (Math.random()*2-1)*jitter : 0), base = i/n, step = 1/n;
+      fr.push(Object.assign(UP(lift, r, 12), {offset: base + step*.35}));
+      fr.push(Object.assign(UP(.94, r*.3, 1), {offset: base + step*.62}));
+      snd.push([base + step*.62, v]);
+    }
+    fr.push(Object.assign(UP(1.04, 0, 6), {offset:1}));
+    return play(fr, n*ms, snd);
+  }
+  const STYLES = {
+    /* a light touch */
+    light: ()=>taps(1, {lift:1.08, roll:-4, ms:340, v:.45}),
+    /* two firm taps */
+    tap: ()=>taps(2, {lift:1.12, roll:-6, ms:260, v:.8}),
+    /* mischievous: rise up high, roll one way, then the other, wiggle, then a sharp poke and a twist */
+    mischief: ()=>play([UP(1.04,0,6), UP(1.22,-14,18), UP(1.2,12,17), UP(1.22,-10,18), UP(1.2,8,17), UP(1.24,-4,19),
+      Object.assign(UP(.9,-2,1),{offset:.78}), Object.assign(UP(1.0,9,4),{offset:.88}), UP(1.04,0,6)], 1500, [[.78, 1]]),
+    /* impatient: quick taps */
+    rapid: ()=>taps(4, {lift:1.1, roll:-5, ms:120, v:.75, jitter:4}),
+    /* REALLY impatient: fast, hard, shaking, and bigger */
+    furious: async ()=>{ await play([UP(1.04,0,6), UP(1.3,-10,20), UP(1.32,-12,22)], 260); return taps(8, {lift:1.24, roll:-8, ms:85, v:1, jitter:9}); }
+  };
+  async function gesture(style, a){
+    if(!on) return; busy++;
+    try{
+      aim(a); await wait(reduce ? 0 : 240);
+      if(style === "circle") await circle(a);
+      else await (STYLES[style] || STYLES.tap)();
+    } finally { busy--; }
+  }
+  /* circle a phrase: the tip runs once and a bit around it, leaving a red-pencil loop that fades.
+     A phrase that wraps onto the next line gets one loop per line. */
+  const lines = a => { const rs = Array.from(a.getClientRects ? a.getClientRects() : [rectOf(a)]).filter(r=>r.width > 1), out = [];
+    rs.forEach(r=>{ const l = out.find(o=>Math.abs(o.top - r.top) < r.height*.5);
+      if(l){ l.left = Math.min(l.left, r.left); l.right = Math.max(l.right, r.right); l.bottom = Math.max(l.bottom, r.bottom); }
+      else out.push({left:r.left, right:r.right, top:r.top, bottom:r.bottom}); });
+    return out; };
+  async function circle(a){
+    const n = lines(a).length; if(!n || reduce) return STYLES.tap();
+    trail.innerHTML = ""; trail.classList.add("on");
+    for(let i=0;i<n;i++) await loop(a, i, n);
+    path = null; anchor = a; setTimeout(()=>trail.classList.remove("on"), 1300);
+  }
+  function loop(a, i, n){
+    const l0 = lines(a)[i]; if(!l0) return wait(0);
+    const w = l0.right - l0.left, ms = Math.min(1500, (n > 1 ? 650 : 900) + w*2), t0 = performance.now(), turns = 1.1, start = -2.4;
+    const geo = ()=>{ const r = lines(a)[i] || l0; return {cx:(r.left + r.right)/2, cy:(r.top + r.bottom)/2 + 1, rx:(r.right - r.left)/2 + 11, ry:(r.bottom - r.top)/2 + 8}; };
+    const pl = document.createElementNS("http://www.w3.org/2000/svg", "polyline"); trail.appendChild(pl);
+    const pts = [];
+    scratchSound(ms/1000);
+    path = now=>{ const k = Math.min(1, (now - t0)/ms), e = k < .5 ? 2*k*k : 1 - Math.pow(-2*k + 2, 2)/2, g = geo();
+      const th = start + e*turns*Math.PI*2, wob = 1 + Math.sin(e*19)*.025;
+      const p = [g.cx + Math.cos(th)*g.rx*wob, g.cy + Math.sin(th)*g.ry*wob];
+      if(!pts.length || Math.hypot(p[0]-pts[pts.length-1][0], p[1]-pts[pts.length-1][1]) > 2){ pts.push(p);
+        pl.setAttribute("points", pts.map(q=>`${(q[0]+scrollX).toFixed(1)},${(q[1]+scrollY).toFixed(1)}`).join(" ")); }
+      return p; };
+    body.animate([UP(1.04,0,6), UP(.97,-3,2), UP(.97,3,2), UP(.97,-3,2), UP(1.04,0,6)], {duration:ms});
+    return wait(ms + 40);
+  }
+
+  /* ---------- words: what is on the page, so the tip can find each spoken word ---------- */
+  const N = s => String(s).toLowerCase().replace(/[’']/g, "").replace(/[^a-z0-9]/g, "");
+  const WRX = /[A-Za-z0-9](?:[A-Za-z0-9’'.:\-]*[A-Za-z0-9])?/g;   /* 7:15, a.m., one-third stay one word */
+  function wordsIn(el){
+    const root = el.querySelector(".en, .ln-en") || el, out = [];
+    const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode:n=>n.parentElement.closest(".zh, .who, svg, .spk") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT});
+    let n; while((n = tw.nextNode())){ let m; WRX.lastIndex = 0;
+      while((m = WRX.exec(n.data))){ const r = document.createRange(); r.setStart(n, m.index); r.setEnd(n, m.index + m[0].length); out.push({n:N(m[0]), r, g:!!n.parentElement.closest(".g")}); } }
+    return out;
+  }
+  function phraseRange(ws, i, len){ const r = document.createRange(); r.setStart(ws[i].r.startContainer, ws[i].r.startOffset); r.setEnd(ws[i+len-1].r.endContainer, ws[i+len-1].r.endOffset); return r; }
+  /* the lesson's marks: [phrase, style], matched word by word */
+  function marks(){ return ((typeof PTR_MARKS !== "undefined" && PTR_MARKS[cur]) || []).map(([p, s])=>{
+    const raw = p.match(/\*?[A-Za-z0-9](?:[A-Za-z0-9’'.\-]*[A-Za-z0-9])?\*?/g) || [], star = raw.findIndex(w=>w.startsWith("*"));
+    return {w:raw.map(w=>N(w)), s, at: star >= 0 ? star : raw.length - 1}; }); }   /* *word* = where a tap lands; otherwise the last word */
+  function markAt(ws, i){
+    for(const m of marks()){ if(!m.w.length || i + m.w.length > ws.length) continue;
+      if(m.w.every((w,k)=>ws[i+k].n === w)) return m; }
+    return null;
+  }
+  /* move along to the spoken word: look a few words ahead, so a respelled name doesn't lose the place */
+  function reach(word){
+    const f = follow; if(!f) return;
+    const w = N(word); if(!w) return;
+    let j = -1;
+    for(let k = f.k; k < Math.min(f.ws.length, f.k + 7); k++){ const t = f.ws[k].n; if(t === w || (w.length > 2 && (t.startsWith(w) || w.startsWith(t)))){ j = k; break; } }
+    if(j < 0) j = Math.min(f.k, f.ws.length - 1);
+    f.k = j + 1;
+    const m = markAt(f.ws, j), key = f.el.dataset.i + ":" + (f.el.dataset.j || "") + ":" + j;
+    if(m && !done.has(key)){ done.add(key);
+      gesture(m.s, m.s === "circle" ? phraseRange(f.ws, j, m.w.length) : f.ws[j + m.at].r);
+      return; }
+    if(busy) return;
+    aim(f.ws[j].r);
+    if(f.ws[j].g && !reduce) taps(1, {lift:1.05, roll:-3, ms:220, v:.3});   /* glossary words get a soft touch */
+  }
+  /* a spoken part starts: follow it with word-boundary events, or with a word clock when the voice sends none */
+  function speak(x, u){
+    if(!on || !x.el) return;
+    const el = textOf(x.el);
+    if(!follow || follow.el !== el){ const ws = wordsIn(el); if(!ws.length) return; follow = {el, ws, k:0};
+      if(ws.length > 3 && !busy) aim(ws[0].r); }   /* go to the first word at once, before the voice reports anything */
+    if(follow.ws.length <= 3){   /* a word or two: a gesture, not a follow-along */
+      if(follow.tapped) return; follow.tapped = true;
+      const m = markAt(follow.ws, 0), pick = ["light","tap","tap","mischief","rapid","rapid","furious"];
+      const r = follow.ws.length > 1 ? phraseRange(follow.ws, 0, follow.ws.length) : follow.ws[0].r;
+      gesture(m ? m.s : pick[Math.floor(Math.random()*pick.length)], r); return;
+    }
+    const words = String(x.text).match(WRX) || [];
+    let got = false, clock = 0, n = 0;
+    const step = ()=>{ if(got || n >= words.length || !follow || follow.el !== el) return; reach(words[n++]); clock = setTimeout(step, 330 / (x.rate || 1)); };
+    if(u){
+      u.addEventListener("boundary", e=>{ if(e.name && e.name !== "word") return; if(!got){ got = true; clearTimeout(clock); }
+        const s = x.text.slice(e.charIndex), w = e.charLength ? s.slice(0, e.charLength) : (s.match(WRX) || [""])[0]; reach(w); });
+      u.addEventListener("start", ()=>{ clearTimeout(clock); clock = setTimeout(()=>{ if(!got) step(); }, 380); });
+      clock = setTimeout(()=>{ if(!got && !n) step(); }, 900);   /* iPhone sometimes sends neither start nor word events for the first sentence: keep time anyway */
+      u.addEventListener("end", ()=>clearTimeout(clock));
+    } else step();
+    show();
+  }
+  /* the text a speaker button belongs to: the word beside it in the word list or the tooltip, or its own label */
+  function textOf(el){
+    if(!el.matches(".spk")) return el;
+    return (el.closest(".wl li") && el.closest("li").querySelector(".wr-w")) || (el.closest(".p-h") && el.closest(".p-h").querySelector(".p-w")) || el;
+  }
+  /* a word or a tooltip, tapped without anything being read aloud (a native-voice word, a glossary word) */
+  function point(el){
+    if(!on || !el) return;
+    const a = textOf(el);
+    follow = null;
+    const ws = wordsIn(a);
+    if(ws.length > 3){ follow = {el:a, ws, k:0}; return true; }   /* an example sentence: follow it as it is read */
+    const m = ws.length ? markAt(ws, 0) : null, pick = ["light","tap","tap","mischief","rapid","rapid","furious"];
+    gesture(m ? m.s : pick[Math.floor(Math.random()*pick.length)], a);
+    return false;
+  }
+  function end(){ follow = null; if(!busy) hideSoon(); else setTimeout(end, 300); }
+
+  /* ---------- the switch ---------- */
+  function sync(){ const b = $("#ptrBtn"); if(b){ b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); } }
+  function toggle(){
+    on = !on; store.set("ptr", on); sync();
+    if(on){ const b = $("#ptrBtn"); build(); actx(); if(b){ aim(b); gesture("mischief", b).then(()=>hideSoon(600)); } }   /* hello! */
+    else hideSoon(0);
+  }
+  return {get on(){ return on; }, toggle, sync, speak, point, end};
+})();
+ptrApi = PTR; PTR.sync();
 
 </script>
 </body>
