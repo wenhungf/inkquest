@@ -2691,6 +2691,15 @@ const PTR = (()=>{
   /* ---------- sound: a plastic tap on paper, and a pencil scratch ---------- */
   let ac = null;
   function actx(){ try{ ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if(ac.state === "suspended") ac.resume(); }catch(e){ ac = null; } return ac; }
+  /* iPhone: sound only starts inside a tap, and the silent switch mutes it unless the page plays as media.
+     Every tap while the pointer is on wakes the sound with a silent blip, so later taps and scratches are heard. (2026-10-31) */
+  function unlock(){
+    if(!on) return;
+    try{ if(navigator.audioSession) navigator.audioSession.type = "playback"; }catch(e){}
+    const c = actx(); if(!c) return;
+    try{ const b = c.createBuffer(1, 1, c.sampleRate), s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(0); }catch(e){}
+  }
+  ["touchend","click","keydown"].forEach(t=> document.addEventListener(t, unlock, true));
   function noise(c, sec){ const n = Math.ceil(c.sampleRate*sec), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0); for(let i=0;i<n;i++) d[i] = Math.random()*2-1; return b; }
   function tapSound(v){
     const c = actx(); if(!c) return; const t = c.currentTime;
@@ -2856,14 +2865,17 @@ const PTR = (()=>{
       const r = follow.ws.length > 1 ? phraseRange(follow.ws, 0, follow.ws.length) : follow.ws[0].r;
       gesture(m ? m.s : pick[Math.floor(Math.random()*pick.length)], r); return;
     }
-    const words = String(x.text).match(WRX) || [];
+    const words = String(x.text).match(WRX) || [], base = follow.k;   /* where this sentence starts */
     let got = false, clock = 0, n = 0;
     const step = ()=>{ if(got || n >= words.length || !follow || follow.el !== el) return; reach(words[n++]); clock = setTimeout(step, 330 / (x.rate || 1)); };
     if(u){
-      u.addEventListener("boundary", e=>{ if(e.name && e.name !== "word") return; if(!got){ got = true; clearTimeout(clock); }
+      u.addEventListener("boundary", e=>{ if(e.name && e.name !== "word") return;
+        /* the voice's first word: if the word clock already ran ahead, go back to the start of this sentence,
+           so the search finds this "I", not the next one ("I jump out…" must not skip to "I am late") */
+        if(!got){ got = true; clearTimeout(clock); if(follow && follow.el === el) follow.k = base; }
         const s = x.text.slice(e.charIndex), w = e.charLength ? s.slice(0, e.charLength) : (s.match(WRX) || [""])[0]; reach(w); });
-      u.addEventListener("start", ()=>{ clearTimeout(clock); clock = setTimeout(()=>{ if(!got) step(); }, 380); });
-      clock = setTimeout(()=>{ if(!got && !n) step(); }, 900);   /* iPhone sometimes sends neither start nor word events for the first sentence: keep time anyway */
+      u.addEventListener("start", ()=>{ clearTimeout(clock); clock = setTimeout(()=>{ if(!got) step(); }, 650); });
+      clock = setTimeout(()=>{ if(!got && !n) step(); }, 1400);   /* iPhone sometimes sends neither start nor word events for the first sentence: keep time anyway */
       u.addEventListener("end", ()=>clearTimeout(clock));
     } else step();
     show();
