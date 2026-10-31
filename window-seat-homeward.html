@@ -2775,62 +2775,40 @@ const PTR = (()=>{
   }
 
   /* ---------- sound: a plastic tap on paper, and a pencil scratch ----------
-     Pre-rendered into small WAV files and played with <audio> elements, not Web Audio: on an iPhone the
-     read-aloud voice takes over Web Audio and leaves it silent afterwards, while <audio> plays alongside
-     the voice and keeps working. Each element is unlocked once inside a tap, as iPhone requires. (2026-10-31) */
-  const SR = 22050;
-  function wav(f32){
-    const n = f32.length, b = new ArrayBuffer(44 + n*2), v = new DataView(b), w = (o,t)=>{ for(let i=0;i<t.length;i++) v.setUint8(o+i, t.charCodeAt(i)); };
-    w(0,"RIFF"); v.setUint32(4, 36 + n*2, true); w(8,"WAVE"); w(12,"fmt "); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
-    v.setUint32(24,SR,true); v.setUint32(28,SR*2,true); v.setUint16(32,2,true); v.setUint16(34,16,true); w(36,"data"); v.setUint32(40,n*2,true);
-    for(let i=0;i<n;i++) v.setInt16(44 + i*2, Math.max(-1, Math.min(1, f32[i]))*32767, true);
-    return URL.createObjectURL(new Blob([b], {type:"audio/wav"}));
-  }
-  function bandpass(x, fc, q){   /* a plain biquad band-pass */
-    const w0 = 2*Math.PI*fc/SR, al = Math.sin(w0)/(2*q), a0 = 1 + al, b0 = al/a0, b2 = -al/a0, a1 = -2*Math.cos(w0)/a0, a2 = (1 - al)/a0;
-    const y = new Float32Array(x.length); let x1=0,x2=0,y1=0,y2=0;
-    for(let i=0;i<x.length;i++){ const o = b0*x[i] + b2*x2 - a1*y1 - a2*y2; x2 = x1; x1 = x[i]; y2 = y1; y1 = o; y[i] = o; } return y;
-  }
-  function tapWave(v, fc){
-    const n = Math.round(SR*.09), nz = new Float32Array(n); for(let i=0;i<n;i++) nz[i] = Math.random()*2 - 1;
-    const click = bandpass(nz, fc, 1.4), out = new Float32Array(n); let ph = 0;
-    for(let i=0;i<n;i++){ const t = i/SR, f = 190*Math.pow(90/190, Math.min(1, t/.06)); ph += 2*Math.PI*f/SR;
-      out[i] = v*(1.6*click[i]*Math.exp(-t/.011) + .32*Math.sin(ph)*Math.exp(-t/.018)); }
-    return wav(out);
-  }
-  function scratchWave(sec){
-    const n = Math.round(SR*sec), nz = new Float32Array(n); for(let i=0;i<n;i++) nz[i] = Math.random()*2 - 1;
-    const y = bandpass(nz, 3800, .9), out = new Float32Array(n); let g = 0, tg = .1;
-    for(let i=0;i<n;i++){ if(i % Math.round(SR*.045) === 0) tg = .5 + Math.random()*.9;   /* the grain of the paper */
-      g += (tg - g)*.004; const edge = Math.min(1, i/(SR*.03), (n - i)/(SR*.08)); out[i] = y[i]*g*edge*.9; }
-    return wav(out);
-  }
-  let SND = null;
-  const POOL = 4;
-  function sounds(){
-    if(SND) return SND;
-    const mk = url => Array.from({length:POOL}, ()=>{ const a = new Audio(url); a.preload = "auto"; a.setAttribute("playsinline", ""); return a; });
-    SND = {soft:[mk(tapWave(.35, 2400)), mk(tapWave(.35, 2700))], mid:[mk(tapWave(.7, 2300)), mk(tapWave(.7, 2650))], loud:[mk(tapWave(1, 2200)), mk(tapWave(1, 2550))],
-           scratch:mk(scratchWave(1.6)), next:0, ready:false};
-    return SND;
-  }
-  /* iPhone: an <audio> element plays later only if it was started once inside a tap; and as media, so the silent switch doesn't mute it */
+     Web Audio. On an iPhone the read-aloud voice pauses it ("interrupted"), so taps during a reading may be
+     silent there; every tap on the page and the end of every sentence wake it again. (<audio> elements were
+     tried on 2026-10-31 and cut the iPhone voice off mid-sentence, so not those.) */
+  let ac = null;
+  function actx(){ try{ ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if(ac.state !== "running") ac.resume().catch(()=>{}); }catch(e){ ac = null; } return ac; }
+  /* iPhone: sound only starts inside a tap, and the silent switch mutes it unless the page plays as media.
+     Every tap while the pointer is on wakes the sound with a silent blip, so later taps and scratches are heard. (2026-10-31) */
   function unlock(){
     if(!on) return;
     try{ if(navigator.audioSession) navigator.audioSession.type = "playback"; }catch(e){}
-    const S = sounds(); if(S.ready) return; S.ready = true;
-    [].concat(...S.soft, ...S.mid, ...S.loud, S.scratch).forEach(a=>{ a.muted = true; const p = a.play(); const done = ()=>{ a.pause(); a.currentTime = 0; a.muted = false; };
-      if(p && p.then) p.then(done, ()=>{ a.muted = false; S.ready = false; }); else done(); });
+    const c = actx(); if(!c) return;
+    try{ const b = c.createBuffer(1, 1, c.sampleRate), s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(0); }catch(e){}
   }
   ["touchend","click","keydown"].forEach(t=> document.addEventListener(t, unlock, true));
-  function grab(list){ const S = sounds(); const a = list[S.next++ % list.length]; return a; }
+  function noise(c, sec){ const n = Math.ceil(c.sampleRate*sec), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0); for(let i=0;i<n;i++) d[i] = Math.random()*2-1; return b; }
   function tapSound(v){
-    const S = sounds(), set = v < .5 ? S.soft : v < .9 ? S.mid : S.loud, a = grab(set[Math.random() < .5 ? 0 : 1]);
-    try{ a.currentTime = 0; const p = a.play(); if(p && p.catch) p.catch(()=>{}); }catch(e){}
+    const c = actx(); if(!c) return; const t = c.currentTime;
+    const s = c.createBufferSource(); s.buffer = noise(c, .05);
+    const f = c.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 2300 + Math.random()*600; f.Q.value = 1.4;
+    const g = c.createGain(); g.gain.setValueAtTime(.55*v, t); g.gain.exponentialRampToValueAtTime(.001, t + .045);
+    s.connect(f); f.connect(g); g.connect(c.destination); s.start(t); s.stop(t + .05);
+    const o = c.createOscillator(); o.frequency.setValueAtTime(190, t); o.frequency.exponentialRampToValueAtTime(90, t + .06);
+    const g2 = c.createGain(); g2.gain.setValueAtTime(.32*v, t); g2.gain.exponentialRampToValueAtTime(.001, t + .07);
+    o.connect(g2); g2.connect(c.destination); o.start(t); o.stop(t + .08);
   }
   function scratchSound(sec){
-    const a = grab(sounds().scratch);
-    try{ a.currentTime = 0; const p = a.play(); if(p && p.catch) p.catch(()=>{}); setTimeout(()=>{ try{ a.pause(); }catch(e){} }, Math.min(1600, sec*1000)); }catch(e){}
+    const c = actx(); if(!c) return; const t = c.currentTime;
+    const s = c.createBufferSource(); s.buffer = noise(c, sec);
+    const f = c.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 3800; f.Q.value = .9;
+    const h = c.createBiquadFilter(); h.type = "highpass"; h.frequency.value = 1500;
+    const g = c.createGain(); g.gain.setValueAtTime(0, t);
+    for(let k=0, n=Math.floor(sec/.045); k<n; k++){ g.gain.linearRampToValueAtTime((.05 + Math.random()*.09), t + k*.045 + .02); }   /* the grain of the paper */
+    g.gain.linearRampToValueAtTime(0, t + sec);
+    s.connect(f); f.connect(h); h.connect(g); g.connect(c.destination); s.start(t); s.stop(t + sec);
   }
 
   /* ---------- moving: the tip glides to its target and stays on it while the page scrolls ---------- */
@@ -2948,14 +2926,10 @@ const PTR = (()=>{
       if(m.w.every((w,k)=>ws[i+k].n === w)) return m; }
     return null;
   }
-  /* move along to the spoken word: look a few words ahead, so a respelled name doesn't lose the place */
-  function reach(word){
-    const f = follow; if(!f) return;
-    const w = N(word); if(!w) return;
-    let j = -1;
-    for(let k = f.k; k < Math.min(f.ws.length, f.k + 7); k++){ const t = f.ws[k].n; if(t === w || (w.length > 2 && (t.startsWith(w) || w.startsWith(t)))){ j = k; break; } }
-    if(j < 0) j = Math.min(f.k, f.ws.length - 1);
-    f.k = j + 1;
+  /* point at word j of the text being read: a mark there plays its gesture, otherwise the hand moves on */
+  function goTo(j){
+    const f = follow; if(!f || !f.ws.length) return;
+    j = Math.max(0, Math.min(f.ws.length - 1, j)); f.k = j + 1;
     const m = markAt(f.ws, j), key = f.el.dataset.i + ":" + (f.el.dataset.j || "") + ":" + j;
     if(m && !done.has(key)){ done.add(key);
       gesture(m.s, m.s === "circle" ? phraseRange(f.ws, j, m.w.length) : f.ws[j + m.at].r);
@@ -2963,6 +2937,12 @@ const PTR = (()=>{
     if(busy) return;
     aim(f.ws[j].r);
     if(f.ws[j].g && !reduce) taps(1, {lift:1.05, roll:-3, ms:220, v:.3});   /* glossary words get a soft touch */
+  }
+  /* where a spoken sentence starts on the page: its first words, matched in order from where the last one ended */
+  function sentenceStart(words){
+    const f = follow, w = words.slice(0, 3).map(N), ok = (t, x)=> t === x || (x.length > 2 && (t.startsWith(x) || x.startsWith(t)));
+    for(let k = f.k; k <= f.ws.length - w.length; k++) if(w.every((x, i)=>ok(f.ws[k+i].n, x))) return k;
+    return Math.min(f.k, f.ws.length - 1);
   }
   /* a spoken part starts: follow it with word-boundary events, or with a word clock when the voice sends none */
   function speak(x, u){
@@ -2976,18 +2956,20 @@ const PTR = (()=>{
       const r = follow.ws.length > 1 ? phraseRange(follow.ws, 0, follow.ws.length) : follow.ws[0].r;
       gesture(m ? m.s : pick[Math.floor(Math.random()*pick.length)], r); return;
     }
-    const words = String(x.text).match(WRX) || [], base = follow.k;   /* where this sentence starts */
+    /* each sentence is placed on the page once; after that, a word's position in the sentence says where to point,
+       so a repeated word ("I jump…", "I am late") can never send the hand to the wrong one */
+    const words = String(x.text).match(WRX) || [], base = sentenceStart(words);
     let got = false, clock = 0, n = 0;
-    const step = ()=>{ if(got || n >= words.length || !follow || follow.el !== el) return; reach(words[n++]); clock = setTimeout(step, 330 / (x.rate || 1)); };
+    const step = ()=>{ if(got || n >= words.length || !follow || follow.el !== el) return; goTo(base + n++); clock = setTimeout(step, 330 / (x.rate || 1)); };
     if(u){
       u.addEventListener("boundary", e=>{ if(e.name && e.name !== "word") return;
-        /* the voice's first word: if the word clock already ran ahead, go back to the start of this sentence,
-           so the search finds this "I", not the next one ("I jump out…" must not skip to "I am late") */
-        if(!got){ got = true; clearTimeout(clock); if(follow && follow.el === el) follow.k = base; }
-        const s = x.text.slice(e.charIndex), w = e.charLength ? s.slice(0, e.charLength) : (s.match(WRX) || [""])[0]; reach(w); });
+        if(!got){ got = true; clearTimeout(clock); }
+        if(!follow || follow.el !== el) return;
+        let before = 0; for(const m of String(x.text).matchAll(WRX)){ if(m.index + m[0].length <= e.charIndex) before++; else break; }   /* whole words before this one */
+        goTo(base + before); });
       u.addEventListener("start", ()=>{ clearTimeout(clock); clock = setTimeout(()=>{ if(!got) step(); }, 650); });
-      clock = setTimeout(()=>{ if(!got && !n) step(); }, 1400);   /* iPhone sometimes sends neither start nor word events for the first sentence: keep time anyway */
-      u.addEventListener("end", ()=>clearTimeout(clock));
+      clock = setTimeout(()=>{ if(!got && !n) step(); }, 1400);   /* iPhone sometimes sends neither start nor word events: keep time anyway */
+      u.addEventListener("end", ()=>{ clearTimeout(clock); if(follow && follow.el === el) follow.k = Math.max(follow.k, base + words.length); actx(); });
     } else step();
     show();
   }
