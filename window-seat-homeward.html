@@ -2774,38 +2774,63 @@ const PTR = (()=>{
     addEventListener("resize", ()=>{ if(visible) place(true); });
   }
 
-  /* ---------- sound: a plastic tap on paper, and a pencil scratch ---------- */
-  let ac = null;
-  function actx(){ try{ ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if(ac.state === "suspended") ac.resume(); }catch(e){ ac = null; } return ac; }
-  /* iPhone: sound only starts inside a tap, and the silent switch mutes it unless the page plays as media.
-     Every tap while the pointer is on wakes the sound with a silent blip, so later taps and scratches are heard. (2026-10-31) */
+  /* ---------- sound: a plastic tap on paper, and a pencil scratch ----------
+     Pre-rendered into small WAV files and played with <audio> elements, not Web Audio: on an iPhone the
+     read-aloud voice takes over Web Audio and leaves it silent afterwards, while <audio> plays alongside
+     the voice and keeps working. Each element is unlocked once inside a tap, as iPhone requires. (2026-10-31) */
+  const SR = 22050;
+  function wav(f32){
+    const n = f32.length, b = new ArrayBuffer(44 + n*2), v = new DataView(b), w = (o,t)=>{ for(let i=0;i<t.length;i++) v.setUint8(o+i, t.charCodeAt(i)); };
+    w(0,"RIFF"); v.setUint32(4, 36 + n*2, true); w(8,"WAVE"); w(12,"fmt "); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+    v.setUint32(24,SR,true); v.setUint32(28,SR*2,true); v.setUint16(32,2,true); v.setUint16(34,16,true); w(36,"data"); v.setUint32(40,n*2,true);
+    for(let i=0;i<n;i++) v.setInt16(44 + i*2, Math.max(-1, Math.min(1, f32[i]))*32767, true);
+    return URL.createObjectURL(new Blob([b], {type:"audio/wav"}));
+  }
+  function bandpass(x, fc, q){   /* a plain biquad band-pass */
+    const w0 = 2*Math.PI*fc/SR, al = Math.sin(w0)/(2*q), a0 = 1 + al, b0 = al/a0, b2 = -al/a0, a1 = -2*Math.cos(w0)/a0, a2 = (1 - al)/a0;
+    const y = new Float32Array(x.length); let x1=0,x2=0,y1=0,y2=0;
+    for(let i=0;i<x.length;i++){ const o = b0*x[i] + b2*x2 - a1*y1 - a2*y2; x2 = x1; x1 = x[i]; y2 = y1; y1 = o; y[i] = o; } return y;
+  }
+  function tapWave(v, fc){
+    const n = Math.round(SR*.09), nz = new Float32Array(n); for(let i=0;i<n;i++) nz[i] = Math.random()*2 - 1;
+    const click = bandpass(nz, fc, 1.4), out = new Float32Array(n); let ph = 0;
+    for(let i=0;i<n;i++){ const t = i/SR, f = 190*Math.pow(90/190, Math.min(1, t/.06)); ph += 2*Math.PI*f/SR;
+      out[i] = v*(1.6*click[i]*Math.exp(-t/.011) + .32*Math.sin(ph)*Math.exp(-t/.018)); }
+    return wav(out);
+  }
+  function scratchWave(sec){
+    const n = Math.round(SR*sec), nz = new Float32Array(n); for(let i=0;i<n;i++) nz[i] = Math.random()*2 - 1;
+    const y = bandpass(nz, 3800, .9), out = new Float32Array(n); let g = 0, tg = .1;
+    for(let i=0;i<n;i++){ if(i % Math.round(SR*.045) === 0) tg = .5 + Math.random()*.9;   /* the grain of the paper */
+      g += (tg - g)*.004; const edge = Math.min(1, i/(SR*.03), (n - i)/(SR*.08)); out[i] = y[i]*g*edge*.9; }
+    return wav(out);
+  }
+  let SND = null;
+  const POOL = 4;
+  function sounds(){
+    if(SND) return SND;
+    const mk = url => Array.from({length:POOL}, ()=>{ const a = new Audio(url); a.preload = "auto"; a.setAttribute("playsinline", ""); return a; });
+    SND = {soft:[mk(tapWave(.35, 2400)), mk(tapWave(.35, 2700))], mid:[mk(tapWave(.7, 2300)), mk(tapWave(.7, 2650))], loud:[mk(tapWave(1, 2200)), mk(tapWave(1, 2550))],
+           scratch:mk(scratchWave(1.6)), next:0, ready:false};
+    return SND;
+  }
+  /* iPhone: an <audio> element plays later only if it was started once inside a tap; and as media, so the silent switch doesn't mute it */
   function unlock(){
     if(!on) return;
     try{ if(navigator.audioSession) navigator.audioSession.type = "playback"; }catch(e){}
-    const c = actx(); if(!c) return;
-    try{ const b = c.createBuffer(1, 1, c.sampleRate), s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(0); }catch(e){}
+    const S = sounds(); if(S.ready) return; S.ready = true;
+    [].concat(...S.soft, ...S.mid, ...S.loud, S.scratch).forEach(a=>{ a.muted = true; const p = a.play(); const done = ()=>{ a.pause(); a.currentTime = 0; a.muted = false; };
+      if(p && p.then) p.then(done, ()=>{ a.muted = false; S.ready = false; }); else done(); });
   }
   ["touchend","click","keydown"].forEach(t=> document.addEventListener(t, unlock, true));
-  function noise(c, sec){ const n = Math.ceil(c.sampleRate*sec), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0); for(let i=0;i<n;i++) d[i] = Math.random()*2-1; return b; }
+  function grab(list){ const S = sounds(); const a = list[S.next++ % list.length]; return a; }
   function tapSound(v){
-    const c = actx(); if(!c) return; const t = c.currentTime;
-    const s = c.createBufferSource(); s.buffer = noise(c, .05);
-    const f = c.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 2300 + Math.random()*600; f.Q.value = 1.4;
-    const g = c.createGain(); g.gain.setValueAtTime(.55*v, t); g.gain.exponentialRampToValueAtTime(.001, t + .045);
-    s.connect(f); f.connect(g); g.connect(c.destination); s.start(t); s.stop(t + .05);
-    const o = c.createOscillator(); o.frequency.setValueAtTime(190, t); o.frequency.exponentialRampToValueAtTime(90, t + .06);
-    const g2 = c.createGain(); g2.gain.setValueAtTime(.32*v, t); g2.gain.exponentialRampToValueAtTime(.001, t + .07);
-    o.connect(g2); g2.connect(c.destination); o.start(t); o.stop(t + .08);
+    const S = sounds(), set = v < .5 ? S.soft : v < .9 ? S.mid : S.loud, a = grab(set[Math.random() < .5 ? 0 : 1]);
+    try{ a.currentTime = 0; const p = a.play(); if(p && p.catch) p.catch(()=>{}); }catch(e){}
   }
   function scratchSound(sec){
-    const c = actx(); if(!c) return; const t = c.currentTime;
-    const s = c.createBufferSource(); s.buffer = noise(c, sec);
-    const f = c.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 3800; f.Q.value = .9;
-    const h = c.createBiquadFilter(); h.type = "highpass"; h.frequency.value = 1500;
-    const g = c.createGain(); g.gain.setValueAtTime(0, t);
-    for(let k=0, n=Math.floor(sec/.045); k<n; k++){ g.gain.linearRampToValueAtTime((.05 + Math.random()*.09), t + k*.045 + .02); }   /* the grain of the paper */
-    g.gain.linearRampToValueAtTime(0, t + sec);
-    s.connect(f); f.connect(h); h.connect(g); g.connect(c.destination); s.start(t); s.stop(t + sec);
+    const a = grab(sounds().scratch);
+    try{ a.currentTime = 0; const p = a.play(); if(p && p.catch) p.catch(()=>{}); setTimeout(()=>{ try{ a.pause(); }catch(e){} }, Math.min(1600, sec*1000)); }catch(e){}
   }
 
   /* ---------- moving: the tip glides to its target and stays on it while the page scrolls ---------- */
@@ -2988,7 +3013,7 @@ const PTR = (()=>{
   function sync(){ const b = $("#ptrBtn"); if(b){ b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); } }
   function toggle(){
     on = !on; store.set("ptr", on); sync();
-    if(on){ const b = $("#ptrBtn"); build(); actx(); if(b){ aim(b); gesture("mischief", b).then(()=>hideSoon(600)); } }   /* hello! */
+    if(on){ const b = $("#ptrBtn"); build(); unlock(); if(b){ aim(b); gesture("mischief", b).then(()=>hideSoon(600)); } }   /* hello! */
     else hideSoon(0);
   }
   return {get on(){ return on; }, toggle, sync, speak, point, end};
