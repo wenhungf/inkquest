@@ -2782,15 +2782,23 @@ const PTR = (()=>{
   function actx(){ try{ ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if(ac.state !== "running") ac.resume().catch(()=>{}); }catch(e){ ac = null; } return ac; }
   /* iPhone: sound only starts inside a tap, and the silent switch mutes it unless the page plays as media.
      Every tap while the pointer is on wakes the sound with a silent blip, so later taps and scratches are heard. (2026-10-31) */
-  function unlock(){
+  function unlock(e){
     if(!on) return;
+    /* on an iPhone, leave the sound alone when the tap starts the voice: waking it at that moment can stop the voice */
+    if(IOS && (hush() || (e && e.target && e.target.closest && e.target.closest("[data-para],[data-line],[data-say],#playRead,#playTalk,#playReadRe,#playTalkRe")))) return;
     try{ if(navigator.audioSession) navigator.audioSession.type = "playback"; }catch(e){}
     const c = actx(); if(!c) return;
     try{ const b = c.createBuffer(1, 1, c.sampleRate), s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(0); }catch(e){}
   }
   ["touchend","click","keydown"].forEach(t=> document.addEventListener(t, unlock, true));
   function noise(c, sec){ const n = Math.ceil(c.sampleRate*sec), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0); for(let i=0;i<n;i++) d[i] = Math.random()*2-1; return b; }
+  /* iPhone and iPad: starting any page sound while the voice is speaking can knock the voice out mid-sentence
+     (it stopped after "It is seven…", where the soft glossary taps begin), so there the pointer stays silent while
+     the voice speaks and only taps out loud between readings. (2026-10-31) */
+  const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const hush = ()=> IOS && window.speechSynthesis && (speechSynthesis.speaking || speechSynthesis.pending);
   function tapSound(v){
+    if(hush()) return;
     const c = actx(); if(!c) return; const t = c.currentTime;
     const s = c.createBufferSource(); s.buffer = noise(c, .05);
     const f = c.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 2300 + Math.random()*600; f.Q.value = 1.4;
@@ -2801,6 +2809,7 @@ const PTR = (()=>{
     o.connect(g2); g2.connect(c.destination); o.start(t); o.stop(t + .08);
   }
   function scratchSound(sec){
+    if(hush()) return;
     const c = actx(); if(!c) return; const t = c.currentTime;
     const s = c.createBufferSource(); s.buffer = noise(c, sec);
     const f = c.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 3800; f.Q.value = .9;
@@ -2969,7 +2978,7 @@ const PTR = (()=>{
         goTo(base + before); });
       u.addEventListener("start", ()=>{ clearTimeout(clock); clock = setTimeout(()=>{ if(!got) step(); }, 650); });
       clock = setTimeout(()=>{ if(!got && !n) step(); }, 1400);   /* iPhone sometimes sends neither start nor word events: keep time anyway */
-      u.addEventListener("end", ()=>{ clearTimeout(clock); if(follow && follow.el === el) follow.k = Math.max(follow.k, base + words.length); actx(); });
+      u.addEventListener("end", ()=>{ clearTimeout(clock); if(follow && follow.el === el) follow.k = Math.max(follow.k, base + words.length); if(!IOS) actx(); });
     } else step();
     show();
   }
