@@ -3848,6 +3848,7 @@ const Hike = (()=>{
       addEventListener("keydown", keydown); addEventListener("keyup", keyup);
       if(typeof Music !== "undefined" && typeof STAGE !== "undefined"){ if(o.music && Music.cur < 0) Music.play(STAGE.music.hike); else Music.want(STAGE.music.hike); } };
     introCard();
+    if(typeof Music !== "undefined" && typeof STAGE !== "undefined") Music.want(STAGE.music.hike);   /* the hike's song starts with its instructions, if music is on */
     const st = host.querySelector(".hk-stage");
     st.addEventListener("pointerdown", e=>{ e.preventDefault(); press(); });
     ["pointerup","pointercancel","pointerleave"].forEach(t=> st.addEventListener(t, release));
