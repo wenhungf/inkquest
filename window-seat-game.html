@@ -474,6 +474,12 @@ textarea{width:100%;min-height:80px;font:13px ui-monospace,monospace;border-radi
 .cp-num{position:absolute;top:4px;left:6px;background:#7cb26a;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:13px;}
 .cp-no{animation:cpShake .3s;}
 @keyframes cpShake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.cp-zhrow{text-align:right;margin-top:8px;}
+.cp-step .zht{display:block;font-size:13px;color:var(--muted);margin-top:2px;}
+.cp-step .zht[hidden]{display:none;}
+.hk-story .hk-how{margin:8px 0 4px;}
+.hk-story .hk-how li{display:flex;gap:6px;}
+.hk-story .zht{font-size:14px;color:var(--muted);}
 .cp-stars{font-size:30px;color:#f2b632;letter-spacing:4px;margin:2px 0 6px;}
 .cp-stars span{color:var(--line);}
 </style>
@@ -598,6 +604,19 @@ const TRACKS = [
 /* ==== content/book1/gloss.js ==== */
 /* ---------------- glosses for [[marked]] words: Chinese first, then a short note ---------------- */
 const GLOSS = {
+  /* the camping trip (2026-11-03) */
+  "set up camp":{w:"set up camp", kk:"[sɛt ʌp kæmp]", zh:"紮營、把營地搭好"},
+  "firewood":{w:"firewood", kk:"[ˋfaɪrˏwʊd]", zh:"柴火", d:"不可數：a piece of firewood、four pieces of firewood。"},
+  "stick":{w:"stick", kk:"[stɪk]", zh:"樹枝、棍子", d:"複數 sticks。"},
+  "campfire":{w:"campfire", kk:"[ˋkæmpˏfaɪr]", zh:"營火"},
+  "instant noodles":{w:"instant noodles", kk:"[ˋɪnstənt ˋnudḷz]", zh:"泡麵"},
+  "dessert":{w:"dessert", kk:"[dɪˋzɝt]", zh:"甜點", d:"別和 desert（沙漠）搞混：dessert 多一個 s。"},
+  "owl":{w:"owl", kk:"[aʊl]", zh:"貓頭鷹"},
+  "hoot":{w:"hoot", kk:"[hut]", zh:"（貓頭鷹）咕咕叫", d:"第三人稱：an owl hoots。"},
+  "stump":{w:"stump", kk:"[stʌmp]", zh:"樹樁", d:"複數 stumps。"},
+  "log":{w:"log", kk:"[lɔg]", zh:"原木、倒在地上的樹幹", d:"複數 logs。"},
+  "toadstool":{w:"toadstool", kk:"[ˋtodˏstul]", zh:"毒菇", d:"英文常把不能吃的野菇叫 toadstool，能吃的叫 mushroom。"},
+  "poisonous":{w:"poisonous", kk:"[ˋpɔɪzṇəs]", zh:"有毒的"},
   "charcoal":{w:"charcoal", kk:"[ˋtʃɑrˏkol]", zh:"木炭、炭火"},
   "apron":{w:"apron", kk:"[ˋeprən]", zh:"圍裙"},
   "red envelope":{w:"red envelope", kk:"[rɛd ˋɛnvəˏlop]", zh:"紅包", d:"過年、結婚會包紅包；老闆想謝謝員工時，也常塞一個紅包。"},
@@ -3371,8 +3390,8 @@ const Hike = (()=>{
 
   /* ---------- the trail: [x, kind] in game pixels from the start; the camp sign stands at the end ---------- */
   const ITEMS = {
-    berry:  {name:["raspberries","覆盆子"], n:"berries"},
-    blue:   {name:["blueberries","藍莓"], n:"berries"},
+    berry:  {name:["raspberry","覆盆子"], n:"berries"},
+    blue:   {name:["blueberry","藍莓"], n:"berries"},
     shroom: {name:["mushroom","香菇"], n:"mushrooms"},
     wood:   {name:["firewood","柴火"], n:"wood"}};
   const COURSE = [
@@ -3572,9 +3591,9 @@ const Hike = (()=>{
     S.pops.push({s, x:MIAX + 16, y:S.mia.y - 50, t:-wait, c}); }
   function hurt(why){
     const m = S.mia; S.hearts = Math.max(0, S.hearts - 1); m.hurtT = 1.1;
-    if(S.hearts === 0){ m.state = "rest"; m.stateT = 2.4; S.rests++; SFX.rest(); pop(L("Need a rest…","休息一下……"), "#ffe3a8"); return; }
+    if(S.hearts === 0){ m.state = "rest"; m.stateT = 2.4; S.rests++; SFX.rest(); pop(L("I need a rest…","休息一下……"), "#ffe3a8"); return; }
     if(why === "trip"){ m.state = "trip"; m.stateT = .8; S.trips++; m.vy = 0; SFX.ouch(); pop(L("Ouch!","哎喲！"), "#ffb3b3");
-      if(S.got.berries > 0){ S.got.berries--; setTimeout(()=>pop(L("A berry rolled away…","一顆莓果滾走了……"), "#ffd0d0"), 450); } }
+      if(S.got.berries > 0){ S.got.berries--; setTimeout(()=>pop(L("A berry rolls away…","一顆莓果滾走了……"), "#ffd0d0"), 450); } }
   }
   function step(dt){
     const m = S.mia; S.time += dt;
@@ -3641,7 +3660,7 @@ const Hike = (()=>{
     });
     if(S.dist >= END - MIAX - 44 && !S.done) arrive();   /* she stops just before the camp sign */
   }
-  function arrive(){ S.done = true; const m = S.mia; m.state = "cheer"; m.stateT = 1.8; m.y = GROUND; SFX.cheer(); pop(L("We made it!","到營地了！"), "#fff3a8"); }
+  function arrive(){ S.done = true; const m = S.mia; m.state = "cheer"; m.stateT = 1.8; m.y = GROUND; SFX.cheer(); pop(L("I made it!","到營地了！"), "#fff3a8"); }
   function finish(){ const r = {berries:S.got.berries, mushrooms:S.got.mushrooms, wood:S.got.wood, hearts:S.hearts, maxHearts:S.maxH, trips:S.trips, toads:S.toads, rests:S.rests, time:Math.round(S.time)}; startCamp(r); }   /* the trail's result goes on to the camp */
 
 
@@ -3651,9 +3670,9 @@ const Hike = (()=>{
      mushrooms), a starry night with its own song, breakfast, and the tent down again, then a score card. */
   const TENT = [
     ["Lay the tent flat on the ground.", "把帳篷平鋪在地上。"],
-    ["Fit the poles together.", "把營柱接起來。"],
+    ["Put the poles together.", "把營柱接起來。"],
     ["Lift the tent up on its poles.", "用營柱把帳篷撐起來。"],
-    ["Pull the ropes tight and peg them down.", "拉緊營繩，用營釘固定。"]];
+    ["Pull the ropes tight. Push the pegs into the ground.", "拉緊營繩，把營釘插進地裡。"]];
   const FIREX = 104, TENTX = 176;
   const CAMPY = GROUND + 9;   /* the camp stands on the path, not on its grassy back edge: the tent and the fire are drawn as if seen a little from above, so their feet need the path's depth */
   SFX.crackle = ()=>{ for(let i=0;i<6;i++) noise(.05, 2400, .06, i*.09 + Math.random()*.05, "highpass"); };
@@ -3661,9 +3680,9 @@ const Hike = (()=>{
   SFX.yum = ()=>{ tone(523, 0, .1, "triangle", .08); tone(659, 0, .14, "triangle", .08, .1); };
   function fireLevel(w){ return w >= 4 ? 3 : w >= 2 ? 2 : 1; }
   function dinnerOf(m, b){
-    const main = m >= 4 ? ["grilled mushrooms and mushroom soup", "烤香菇和香菇湯"] : m >= 1 ? ["mushroom soup", "香菇湯"] : ["instant noodles from the backpack", "背包裡的泡麵"];
-    const sweet = b >= 6 ? ["a big bowl of berries for dessert", "一大碗莓果當甜點"] : b >= 1 ? ["a handful of berries for dessert", "一小把莓果當甜點"] : null;
-    return sweet ? [`Dinner tonight: ${main[0]}, with ${sweet[0]}.`, `今晚的晚餐：${main[1]}，還有${sweet[1]}。`] : [`Dinner tonight: ${main[0]}.`, `今晚的晚餐：${main[1]}。`];
+    const main = m >= 4 ? ["grilled mushrooms and mushroom soup", "烤香菇和香菇湯"] : m >= 1 ? ["mushroom soup", "香菇湯"] : ["[[instant noodles]] from my backpack", "我背包裡的泡麵"];
+    const sweet = b >= 6 ? ["a big bowl of berries for [[dessert]]", "一大碗莓果當甜點"] : b >= 1 ? ["a few berries for [[dessert]]", "幾顆莓果當甜點"] : null;
+    return sweet ? [`Dinner tonight is ${main[0]}, with ${sweet[0]}.`, `今晚的晚餐是${main[1]}，還有${sweet[1]}。`] : [`Dinner tonight is ${main[0]}.`, `今晚的晚餐是${main[1]}。`];
   }
   function starField(){   /* scattered at random (a fixed seed, so every night is the same sky), not in lines: most faint, a few bright */
     let q = 20261103; const rnd = ()=> (q = (q*1103515245 + 12345) % 2147483648)/2147483648;
@@ -3720,6 +3739,10 @@ const Hike = (()=>{
       if(C.sleep > .8){ text("z", W/2 - 6, H/2 - Math.sin(S.time*2)*3, "#fffdf6", 9, "center"); text("z", W/2 + 6, H/2 - 10 - Math.sin(S.time*2 + 1)*3, "#fffdf6", 6.5, "center"); } }
     S.pops.forEach(p=>{ if(p.t < 0) return; x.globalAlpha = Math.max(0, 1 - p.t/1.2); text(p.s, p.x, p.y - p.t*16, p.c || "#fffdf6", 7.5, "center", true); x.globalAlpha = 1; });
   }
+  /* story text in English with a 中 button and a voice, the way the Kaohsiung trip tells its scenes; menus, buttons
+     and the words that pop up over the picture follow the menu language instead (2026-11-03) */
+  const numWord = n => ["no","one","two","three","four","five","six","seven","eight","nine","ten"][n] || String(n);
+  const tell = (e, z)=> typeof sceneHTML === "function" ? sceneHTML([e, z]) : `<p>${L(e, z)}</p>`;
   function campPop(s, c, px){ S.pops.push({s, x:px || 160, y:60, t:0, c}); }
   /* the panel under the picture: one thing to read and one thing to do at a time */
   function panel(step){
@@ -3728,13 +3751,14 @@ const Hike = (()=>{
     if(step === "intro"){
       card.innerHTML = `<h3>${L("Welcome to camp!","歡迎來到營地！")}</h3>
         <div class="hk-got"><span>🍓 ${r.berries}</span><span>🍄 ${r.mushrooms}</span><span>🪵 ${r.wood}</span></div>
-        <p>${L("The sun is getting low. Let's set up camp before dark.","太陽快下山了。天黑前先把營地搭好吧。")}</p>${btn("cpGo","Pitch the tent","搭帳篷")}`;
+        ${tell("The sun is low. I want to [[set up camp]] before dark.","太陽快下山了。我想在天黑前把營地搭好。")}${btn("cpGo","Pitch the tent","搭帳篷")}`;
       card.querySelector("#cpGo").onclick = ()=>panel("tent"); return; }
     if(step === "tent"){
       if(!C.order){ C.order = [0,1,2,3].sort(()=>Math.random() - .5); if(C.order.join() === "0,1,2,3") C.order.reverse(); }
       const order = C.order;   /* kept, so a language switch redraws the same buttons with the same progress */
       card.innerHTML = `<h3>${L("Pitch the tent","搭帳篷")}</h3><p class="cp-ask">${C.tent < 0 ? L("Tap the steps in order. What comes first?","依照順序點選步驟。第一步是什麼？") : L("Good! What comes next?","很好！下一步呢？")}</p>
-        <div class="cp-steps">${order.map(n=>`<button class="cp-step${n <= C.tent ? " cp-done" : ""}" data-n="${n}"${n <= C.tent ? " disabled" : ""}>${n <= C.tent ? `<b class="cp-num">${n + 1}</b>` : ""}<i class="cp-pic"><img src="${HD["cp_tent" + n]}" alt="" style="width:${img("cp_tent" + n).naturalWidth}px"></i><span>${L(TENT[n][0], TENT[n][1])}</span></button>`).join("")}</div>`;
+        <div class="scene cp-quiz"><div class="cp-steps">${order.map(n=>`<button class="cp-step${n <= C.tent ? " cp-done" : ""}" data-n="${n}"${n <= C.tent ? " disabled" : ""}>${n <= C.tent ? `<b class="cp-num">${n + 1}</b>` : ""}<i class="cp-pic"><img src="${HD["cp_tent" + n]}" alt="" style="width:${img("cp_tent" + n).naturalWidth}px"></i><span>${esc(TENT[n][0])}<span class="zht" hidden>${esc(TENT[n][1])}</span></span></button>`).join("")}</div>
+        <div class="cp-zhrow"><button class="zhb" data-zh>${T("showZh")}</button></div></div>`;
       card.querySelectorAll(".cp-step").forEach(b=> b.onclick = ()=>{
         const n = +b.dataset.n; actx();
         if(n !== C.tent + 1){ b.classList.remove("cp-no"); void b.offsetWidth; b.classList.add("cp-no"); tone(196, 0, .12, "triangle", .06);
@@ -3745,25 +3769,25 @@ const Hike = (()=>{
       return; }
     if(step === "fire"){
       const w = r.wood, lv = fireLevel(w);
-      const say = lv === 3 ? ["A big, roaring campfire!", "熊熊的營火！"] : lv === 2 ? ["A good fire, warm and bright.", "火生得很好，又暖又亮。"] : ["A small fire, just enough to keep warm.", "小小的火，剛好可以取暖。"];
+      const say = lv === 3 ? ["A big, bright [[campfire]]! I feel warm all over.", "好大好亮的營火！我全身都暖起來了。"] : lv === 2 ? ["A good fire, warm and bright.", "火生得很好，又暖又亮。"] : ["A small fire. It is just enough to keep me warm.", "小小的火，剛好夠我取暖。"];
       card.innerHTML = `<h3>${L("Build the fire","生火")}</h3>
-        <p>${w ? L(`You found ${w} firewood on the trail.`, `你在山路上撿到 ${w} 份柴火。`) : L("You didn't find any firewood, so Mia picks up a few dry sticks near the tent.","你沒撿到柴火，所以 Mia 在帳篷旁撿了幾根乾樹枝。")}</p>
+        ${w ? tell(`I have ${numWord(w)} ${w === 1 ? "piece" : "pieces"} of [[firewood]] from the trail.`, `我從山路上撿了 ${w} 份柴火。`) : tell("I have no [[firewood]], so I pick up some dry [[sticks|stick]] near the tent.","我沒有柴火，所以在帳篷旁撿了一些乾樹枝。")}
         ${btn("cpGo","Light the fire","點火")}`;
-      const lit = ()=>{ card.innerHTML = `<h3>${L("Build the fire","生火")}</h3><p>${L(say[0], say[1])}</p>${btn("cpGo","Cook dinner","煮晚餐")}`;
+      const lit = ()=>{ card.innerHTML = `<h3>${L("Build the fire","生火")}</h3>${tell(say[0], say[1])}${btn("cpGo","Cook dinner","煮晚餐")}`;
         card.querySelector("#cpGo").onclick = ()=>panel("dinner"); };
       if(C.fireTo) return lit();
       card.querySelector("#cpGo").onclick = ()=>{ actx(); C.fireTo = lv; C.t = 0; lit(); };
       return; }
     if(step === "dinner"){
       C.mia = "sit"; const d = dinnerOf(r.mushrooms, r.berries);
-      card.innerHTML = `<h3>${L("Dinner by the fire","營火晚餐")}</h3><p>${L(d[0], d[1])}</p>${btn("cpGo","Eat!","開動！")}`;
+      card.innerHTML = `<h3>${L("Dinner by the fire","營火晚餐")}</h3>${tell(d[0], d[1])}${btn("cpGo","Eat!","開動！")}`;
       card.querySelector("#cpGo").onclick = ()=>{ SFX.yum(); C.pot = false; campPop(L("Yum!","好吃！"), "#ffe0c0", 70); C.darkTo = 1; S.night = true;
         if(typeof Music !== "undefined" && typeof STAGE !== "undefined") Music.want(STAGE.music.camp);
         setTimeout(()=>panel("night"), 1600); };
       return; }
     if(step === "night"){
       card.innerHTML = `<h3>${L("A starry night","滿天星斗")}</h3>
-        <p>${L("The sky is full of stars. Mia lies back by the fire and counts them. Somewhere in the trees, an owl hoots.","滿天都是星星。Mia 躺在營火旁數星星。樹林裡，有隻貓頭鷹在叫。")}</p>${btn("cpGo","Go to sleep","去睡覺")}`;
+        ${tell("The sky is full of stars. I lie back by the fire and count them. In the trees, an [[owl]] [[hoots|hoot]].","滿天都是星星。我躺在營火旁數星星。樹林裡，有隻貓頭鷹在咕咕叫。")}${btn("cpGo","Go to sleep","去睡覺")}`;
       if(!C.owl){ C.owl = true; setTimeout(()=>{ if(S && S.camp && S.camp.step === "night") SFX.owl(); }, 1500); }
       card.querySelector("#cpGo").onclick = ()=>{ C.sleepTo = 1; card.hidden = true;
         setTimeout(()=>{ C.darkTo = 0; C.dark = 0; C.fire = 0; C.fireTo = 0; C.mia = "stand"; S.night = false; C.sleepTo = 0;
@@ -3773,7 +3797,7 @@ const Hike = (()=>{
     if(step === "morning"){
       const left = r.berries >= 3;
       card.innerHTML = `<h3>${L("Good morning!","早安！")}</h3>
-        <p>${left ? L("Breakfast: hot tea, toast and the last of the berries.","早餐：熱茶、吐司，還有最後的莓果。") : L("Breakfast: hot tea and toast. The birds are singing.","早餐：熱茶和吐司。小鳥在唱歌。")}</p>
+        ${left ? tell("Breakfast is hot tea and toast. I eat my last berries too.","早餐是熱茶和吐司。我把最後的莓果也吃了。") : tell("Breakfast is hot tea and toast. The birds are singing.","早餐是熱茶和吐司。小鳥在唱歌。")}
         ${btn("cpGo","Take down the tent","收帳篷")}`;
       card.querySelector("#cpGo").onclick = ()=>{ card.hidden = true; let n = 3;
         const down = ()=>{ n--; C.tent = n; SFX.pick(n + 1); if(n >= 0) setTimeout(down, 550); else setTimeout(()=>panel("done"), 400); };
@@ -3812,6 +3836,17 @@ const Hike = (()=>{
 
   /* ---------- a language switch mid-walk: redraw the words, keep the walk where it is ---------- */
   let introCard = ()=>{};
+  const HOW = [["", "Tap the picture to jump. Hold it to jump higher and further.", "點一下畫面就會跳，按住可以跳得更高更遠。"],
+    ["🍓", "Jump to pick the berries above the bushes.", "跳起來摘樹叢上的莓果。"],
+    ["🍄‍🟫", "Walk over mushrooms and [[firewood]] to pick them up.", "走過香菇和柴火就會撿起來。"],
+    ["🪨", "Jump over rocks, [[stumps|stump]], [[logs|log]] and mud.", "跳過石頭、樹樁、倒木和泥巴。"],
+    ["🍄", "Red [[toadstools|toadstool]] with white spots are [[poisonous]]. Jump over them!", "有白點的紅色毒菇不能碰，跳過去！"]];
+  function howTo(){   /* the instructions are English to read, with a 中 button and a voice, like a trip scene */
+    const sp = typeof ICON !== "undefined" ? ICON.spk : "🔊";
+    return `<div class="msg scene hk-story"><p>${mk(HOW[0][1])}<span class="zht" hidden><br>${esc(HOW[0][2])}</span></p>
+      <ul class="hk-how">${HOW.slice(1).map(h=>`<li><span>${h[0]}</span><span>${mk(h[1])}<span class="zht" hidden><br>${esc(h[2])}</span></span></li>`).join("")}</ul>
+      <div style="text-align:right;margin-top:4px"><button class="zhb" data-zh>${T("showZh")}</button> <button class="ib" style="width:30px;height:30px;vertical-align:middle" data-say="${esc(plain(HOW.map(h=>h[1]).join(" ")))}">${sp}</button></div></div>`;
+  }
   function relang(){
     if(!host || !cv || !cv.isConnected) return;
     const hint = host.querySelector(".hk-bar .muted"), ps = host.querySelector(".hk-paused"), card = host.querySelector("#hkCard");
@@ -3835,11 +3870,7 @@ const Hike = (()=>{
     cv = host.querySelector("canvas"); x = cv.getContext("2d");
     const card = host.querySelector("#hkCard");
     introCard = ()=>{ card.innerHTML = `<h3>${L("The trail to camp","往營地的山路")}</h3>
-      <p>${L("Tap the picture to jump. Hold it to jump higher and further.","點一下畫面就會跳，按住可以跳得更高更遠。")}</p>
-      <ul class="hk-how"><li>🍓 ${L("Jump to grab the berries above the bushes.","跳起來摘樹叢上的莓果。")}</li>
-      <li>🍄‍🟫 ${L("Walk over mushrooms and firewood to pick them up.","走過香菇和柴火就會撿起來。")}</li>
-      <li>🪨 ${L("Jump over rocks, stumps, logs and mud.","跳過石頭、樹樁、倒木和泥巴。")}</li>
-      <li>🍄 ${L("Red toadstools with white spots are poisonous. Jump over them!","有白點的紅色毒菇不能碰，跳過去！")}</li></ul>
+      ${howTo()}
       <button class="btn" id="hkGo" style="width:100%">${L("Start walking","出發")}</button>`;
       card.querySelector("#hkGo").onclick = go; };
     ready().then(()=>{ S = newWalk(o); draw();
