@@ -474,8 +474,8 @@ mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
 #ptrTrail{position:absolute;left:0;top:0;width:1px;height:1px;overflow:visible;pointer-events:none;z-index:64;opacity:0;transition:opacity .6s;}
 #ptrTrail.on{opacity:1;transition:opacity .1s;}
 #ptrTrail polyline{fill:none;stroke:#e0523f;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;opacity:.85;}
-.tbtn.ptrb{padding:2px 8px;}
-.tbtn.ptrb img{width:22px;height:33px;margin:-6px 0 -5px;}
+.tbtn.ptrb{padding:0 5px;align-self:stretch;justify-content:center;min-width:38px;}   /* as tall as Listen and 中文, the hand filling it */
+.tbtn.ptrb img{width:26px;height:26px;margin:0;}
 .tbtn.ptrb:not(.on) img{opacity:.75;filter:saturate(.7);}
 /* phones: keep the reading tools on one line while a reading plays (Pause, 從頭, 中文, the pointer) */
 @media (max-width:520px){
@@ -483,13 +483,13 @@ mark.hit-m{background:var(--hl);color:inherit;padding:0 1px;}
   #sec-read .sh .tbtn{padding:5px 7px;gap:4px;white-space:nowrap;flex:none;}
   #sec-read .sh .sp{min-width:0;}
   #sec-read .sh #playReadRe span{display:none;}
-  #sec-read .sh .tbtn.ptrb{padding:2px 6px;}
+  #sec-read .sh .tbtn.ptrb{padding:0 4px;min-width:36px;}
 }
 @media (max-width:370px){
   #sec-read .sh .shz{display:none;}
   #sec-read .sh{gap:4px;}
   #sec-read .sh .tbtn{padding:5px 5px;font-size:12px;}
-  #sec-read .sh .tbtn.ptrb{padding:2px 4px;}
+  #sec-read .sh .tbtn.ptrb{padding:0 3px;min-width:34px;}
   #sec-read .sh .px{padding:1px 5px 0;}
 }
 @media (prefers-reduced-motion:reduce){
@@ -630,6 +630,8 @@ const MOOD = {
 
 /* the hand pointer (教鞭): a 16-bit blue hand on a stainless rod, 44 x 66, drawn in tools/pointer/hand.px.js */
 const PTR_IMG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAABCCAMAAAAbpMQZAAAAHlBMVEUAAAAdNVeq3PPy+/9YoM98w+Y6c6bDzNb3+/9/jJnrXuwIAAAAAXRSTlMAQObYZgAAAQVJREFUeNrt1dEKwzAIBdBcq6b5/x8e0QbakjX6MBhsPpaDWDVJKR5ACQeIwhy0bcSIWtpEFVEsHMQFKUybcEbHsWlNaEmkllPVWE3INMOCiAJahEZgVbXwwCI8L2V8de3B8072CjFWz5nHBONUIC54ovsSkYiVck09mxGEe6F9+de4T0CtZ/AuPOLuLTddf/DtZsH6dbNvdwWjuwE7ViOMmRM6gwtUVW/4QSOBnd8Cz5feMRzh5Xk/9srx8rjjsF7yCo/hGF1dDeDQz537rao1dgMD2GttNfwW7Dn8Lanbp+qoe/2N1AinVm0tqrW18CPdWuqR5vgjDaV/6p9LrZ/Cdq12+wLlwwxc4EchIQAAAABJRU5ErkJggg==";
+/* the toggle button shows just the hand, cropped from the same sprite (no rod or handle), 36 x 36 */
+const PTR_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAkCAYAAADhAJiYAAACS0lEQVR42s1XMU/CQBh9JR1xJgyFARYHiQuJiYkzGyMSBxY3JyEx/gRjIkwuhkEnAhsbs4mJCYNJHVxwgA6NK8fmcA5wzfW8a6+2FW6C5Nq+e+/1fa9AyLKqDWpVGxS7sKxqg45mhI5mhG4dGAOz/KZ0+U3paEbo6eNb6qAyKjB3gz5qxSwm8xUAwHYJFu8fsE7qSBNURmfT7auL2efXvygjBeRMh0aneb4VqwQyNJmvUCtmvf+Fg/21pCnKpgTEWJrMV7g6yu8GQzyoh7NDv/FTYskM27AGBYpBH+VSDgCweP9IjSFTd6PtEp+XWAQAoM50aMiigz+U7nO0N1rVBm11ewDgi4CX+xvp/rtB3/vdaZ5rgzKi0CmCYhJW8nuh1+qCykTVmD28XMpphaXtEtguwfHFtdagVmqvOg0bK8xTPFOyxYNmL4PzPFbe3xSBMO07TblZeaZsl3hgkhotBn9qXd1FlqIACmPJ5yF+TNguQavbC9SdN3OQbCKY0Bxi4Wd3e95J2QNa3R4q+T10mqBRMyVWMDrTofHUhsfE4qSOwsE+yqUcbJf4vCWTN1EPqd6m44trnxRi3vzFQ2E+Cpz2YgqzTIkDJnZS8+mchESR3jIVU0/tSx+QNOtspNGRBJCw1qkFSGQpzRV52m860K8T/8VHMi+ZUW60uZAyyrfaGCXtL5E+LbbO2GNANZjFrNKtIpmkqBYHswhGd8iacYHwXyUyVlTMpAZIlEeVVSIQ53ks/SJJrEqwYazTeYIqbKLdRpZTOqzs9PoBPqSI/3KMxqIAAAAASUVORK5CYII=";
 
 /* =========================================================
    BOOK 2 — Departures (A2)
@@ -2188,7 +2190,7 @@ function render(i){
 
   h += secHead("read","READ","課文",
     `<button class="tbtn" id="playRead"></button><button class="tbtn" id="playReadRe" hidden aria-label="從頭朗讀">${SVGI.restart}<span>從頭</span></button><button class="tbtn${showZh?" on":""}" id="zhBtn" aria-pressed="${showZh}">中文</button>` +
-    (BOOK.pointer ? `<button class="tbtn ptrb${ptrOn() ? " on" : ""}" id="ptrBtn" aria-pressed="${!!ptrOn()}" aria-label="教鞭 Pointer" title="教鞭 Pointer"><img alt="" src="${PTR_IMG}"></button>` : ""));
+    (BOOK.pointer ? `<button class="tbtn ptrb${ptrOn() ? " on" : ""}" id="ptrBtn" aria-pressed="${!!ptrOn()}" aria-label="教鞭 Pointer" title="教鞭 Pointer"><img alt="" src="${PTR_ICON}"></button>` : ""));
   h += `<p class="legend"><span class="lv1">單字</span><span class="lv2">文法</span><span class="lv3">文化</span>點一下看解釋</p><div class="read">`;
   h += l.read.map((p,j)=>`<p class="rp ${p[2]||""}" data-i="${j}"><button class="spk pspk" data-para="${j}" aria-label="聽這一段">${SVGI.spk}</button><span class="en"><span class="hl">${mk(p[0])}</span></span><span class="zh">${esc(p[1])}</span></p>`).join("");
   h += `</div></section>`;
