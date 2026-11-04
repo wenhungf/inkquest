@@ -2477,7 +2477,7 @@ function askChoice(evId){
   const m = e.msgs[e.msgs.length-1];
   modal(`<div class="msg">${mk(m[1])}<div class="zht">${esc(m[2])}</div></div>
     <h3 style="margin-top:12px">${LANG === "en" ? esc(e.choice.q[0]) : esc(e.choice.q[1])}</h3>
-    <div class="choices">${e.choice.opts.map((o,k)=>`<button class="btn alt" data-opt="${k}">${esc(N(o))}</button>`).join("")}</div>`, box=>{
+    <div class="choices">${e.choice.opts.map((o,k)=>`<button class="btn alt" data-opt="${k}" style="justify-content:flex-start;text-align:left;white-space:normal">${choiceLabel(o.en, o.zh)}</button>`).join("")}</div>`, box=>{
     box.querySelectorAll("[data-opt]").forEach(b=> b.onclick = ()=>{ answer(S, evId, +b.dataset.opt); closeModal(); renderHome(); });
   });
 }
@@ -2675,7 +2675,7 @@ function stallCard(n, then){
   const label = k => STATS.includes(k) ? statName(k) : `${N(CAST[k])} ♥`;
   modal(`${picHTML("sl_night" + n)}<h2>${esc(night.title[L])}</h2>${sceneHTML(night.scene)}
     <p class="muted" style="font-size:13px;margin:10px 0 0">${T("stallVotes")}${colon}${Math.round(S.flags.stallVotes || 0)}</p>
-    <div class="choices">${night.opts.map((o,k)=>`<button class="btn alt sopt${STALL_PROP[n+"-"+k] ? " withprop" : ""}" data-k="${k}">${STALL_PROP[n+"-"+k] ? hdImg(STALL_PROP[n+"-"+k], "sprop") : ""}<span><b>${esc(plain(o.t[0]))}</b><small>${esc(o.t[1])} · ${esc(label(o.st))}</small></span></button>`).join("")}</div>`, box=>{
+    <div class="choices">${night.opts.map((o,k)=>`<button class="btn alt sopt${STALL_PROP[n+"-"+k] ? " withprop" : ""}" data-k="${k}">${STALL_PROP[n+"-"+k] ? hdImg(STALL_PROP[n+"-"+k], "sprop") : ""}<span><b>${esc(plain(o.t[0]))}</b><small>${LANG === "en" ? "" : esc(o.t[1]) + " · "}${esc(label(o.st))}</small></span></button>`).join("")}</div>`, box=>{
     box.querySelectorAll(".sopt[data-k]").forEach(b=> b.onclick = ()=>stallResult(resolveStall(S, n, +b.dataset.k), then));
   });
 }
@@ -3137,8 +3137,13 @@ function pullIn(at){
     sg.querySelector("b").textContent = STATION_ZH[at] || ""; sg.querySelector("i").textContent = at.toUpperCase(); sg.hidden = false; }
 }
 /* a scene with options; stat checks, costs and gains; then a Next button */
+/* one rule for every choice in the game (2026-11-04): a choice is what Mia says or does, so it is story text:
+   English first in bold, the Chinese small underneath in the default (Chinese-menu) mode, English only in English mode */
+function choiceLabel(en, zh){
+  return `<span style="display:flex;flex-direction:column;width:100%"><b>${esc(plain(en))}</b>${LANG === "en" ? "" : `<small style="font-weight:600;opacity:.8">${esc(plain(zh))}</small>`}</span>`;
+}
 function choiceBlock(box, scene, opts, next){
-  box.innerHTML = sceneHTML(scene) + `<div class="choices" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${opts.map((o,j)=>`<button class="btn alt" data-o="${j}" style="justify-content:flex-start;text-align:left;white-space:normal;flex-wrap:wrap;width:100%">${LANG === "en" ? esc(plain(o.en)) : `<span style="display:block;width:100%">${esc(plain(o.zh))}</span><span style="display:block;width:100%;font-weight:400;opacity:.85">${esc(plain(o.en))}</span>`}${o.cost ? ` <span class="tag">NT$${o.cost}</span>` : ""}${o.stat ? ` <span class="tag">${statName(o.stat)}</span>` : ""}</button>`).join("")}</div>`;
+  box.innerHTML = sceneHTML(scene) + `<div class="choices" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${opts.map((o,j)=>`<button class="btn alt" data-o="${j}" style="justify-content:flex-start;text-align:left;white-space:normal;flex-wrap:wrap;width:100%">${choiceLabel(o.en, o.zh)}${o.cost ? ` <span class="tag">NT$${o.cost}</span>` : ""}${o.stat ? ` <span class="tag">${statName(o.stat)}</span>` : ""}</button>`).join("")}</div>`;
   box.querySelectorAll("[data-o]").forEach(b=> b.onclick = e=>{
     const o = opts[+b.dataset.o]; const ok = o.stat ? rollStat(o.stat) : true;
     if(o.cost) spend(o.cost);
@@ -3291,9 +3296,9 @@ function lighthouse(){
   }
   if(TS.time < sun - 30){
     box.innerHTML = sceneHTML(B.early.map(x=>x.replace("{t}", sunsetFor()))) + `<div class="choices" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
-      <button class="btn alt" id="lWait">${LANG === "en" ? "Sit at the café and wait for sunset (rest, NT$120)" : "在咖啡座坐著等日落（休息，NT$120）"}</button>
-      <button class="btn alt" id="lNow">${LANG === "en" ? "Climb to the top now" : "現在就爬上去"}</button>
-      <button class="btn alt" id="lLater">${LANG === "en" ? "Come back later" : "等一下再來"}</button></div>`;
+      <button class="btn alt" id="lWait">${choiceLabel("Sit at the café and wait for sunset (rest, NT$120)", "在咖啡座坐著等日落（休息，NT$120）")}</button>
+      <button class="btn alt" id="lNow">${choiceLabel("Climb to the top now", "現在就爬上去")}</button>
+      <button class="btn alt" id="lLater">${choiceLabel("Come back later", "等一下再來")}</button></div>`;
     $("#lWait").onclick = ()=>{ TS.energy += Math.round((sun - 25 - TS.time)/10); TS.time = sun - 25; spend(120); climb(); };
     $("#lNow").onclick = climb;
     $("#lLater").onclick = ()=>{ TS.visited.light = false; mapScreen(); };
@@ -3309,7 +3314,7 @@ function nightScene(forced){
   $("#trip").innerHTML = tripHead(LANG === "en" ? "Night in Kaohsiung" : "高雄的夜晚") +
     (forced ? sceneHTML(["It is late. The lighthouse is closing, so I take the ferry back across the harbor.","很晚了，燈塔要關了，我搭渡輪回到對岸。"]) : sceneHTML(["I take the ferry back. The harbor lights shine on the water.","我搭渡輪回去，港口的燈光映在水面上。"])) +
     `<h3 style="margin-top:12px">${esc(LANG === "en" ? st.q[0] : st.q[1])}</h3>
-    <div style="display:flex;flex-direction:column;gap:8px">${st.opts.map(o=>`<button class="btn alt" data-stay="${o.id}" style="justify-content:flex-start;text-align:left;white-space:normal" ${okStay(o) ? "" : "disabled"}>${esc(N(o))}${okStay(o) ? "" : `<br><small>${esc(LANG === "en" ? o.why[0] : o.why[1])}</small>`}</button>`).join("")}</div>
+    <div style="display:flex;flex-direction:column;gap:8px">${st.opts.map(o=>`<button class="btn alt" data-stay="${o.id}" style="justify-content:flex-start;text-align:left;white-space:normal" ${okStay(o) ? "" : "disabled"}>${choiceLabel(o.en, o.zh)}${okStay(o) ? "" : `<br><small>${esc(LANG === "en" ? o.why[0] : o.why[1])}</small>`}</button>`).join("")}</div>
     <div id="nPic" style="margin-top:10px"></div><div id="nBox" style="margin-top:8px"></div>`; tripTop();
   Music.want(STAGE.music.night); Music.ui();
   $$("#trip [data-stay]").forEach(b=> b.onclick = ()=>{
