@@ -350,6 +350,8 @@ img.icon{width:34px;height:34px;margin-top:0;flex:none;}
 .de::after{content:"";display:block;clear:both;}
 .de .dd{color:var(--muted);font-size:15px;height:28px;display:flex;align-items:center;gap:6px;white-space:nowrap;}
 .de .dpic{float:right;width:48px;height:48px;margin:0 0 0 10px;border-radius:8px;}
+.de .dpic.dscene{width:120px;height:80px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.18);}
+.de .dpic.dscene canvas{display:block;width:100%;height:100%;}
 .dtools{display:inline-flex;gap:4px;align-items:center;}
 .dtools .ib{width:24px;height:24px;}
 .dtools .zhb{line-height:20px;}
@@ -3039,7 +3041,10 @@ function diaryEntryHTML(pg, pic){
   const tools = (en, zh)=>`<span class="dtools">${zh ? `<button class="zhb" data-zh>${T("showZh")}</button>` : ""}<button class="ib" data-say="${esc(plain(en))}" aria-label="speak">${ICON.spk}</button></span>`;
   if(pg.kind === "story"){
     const st = STORY[pg.id]; if(!st) return "";
-    return `<div class="de">${pic ? `<canvas class="dpic" width="48" height="48" data-spr="${st.spr}"></canvas>` : ""}<p class="dd">${esc(D.long(pg.date))} ${tools(st.en, st.zh)}</p>
+    /* the story's own picture (the Gemini scene, with Mia), small beside the entry; the old sprite only if a story has no picture (2026-11-05) */
+    const thumb = STORY_SCENE[pg.id] && HD[STORY_SCENE[pg.id][0]] ? `<span class="dpic dscene"><canvas width="320" height="213" data-story="${pg.id}"></canvas></span>`
+      : `<canvas class="dpic" width="48" height="48" data-spr="${st.spr}"></canvas>`;
+    return `<div class="de">${pic ? thumb : ""}<p class="dd">${esc(D.long(pg.date))} ${tools(st.en, st.zh)}</p>
       <p>${mk(st.en)}</p><p class="zht" hidden>${esc(st.zh)}</p></div>`;
   }
   /* month-end page: dated the month's last day; lines are [English, 中文] (pages from before build 15 are English only) */
@@ -3284,7 +3289,7 @@ function info(page){
       <div style="padding:10px 0"><b>${T("load")}</b><textarea id="codeIn" placeholder="…"></textarea><div class="row" style="margin-top:6px"><button class="btn small alt" id="cLoad">${T("load")}</button></div></div></details></div>`;
   }
   $("#info").innerHTML = h + `</div>`;
-  paintSprites($("#info")); Music.ui();
+  paintSprites($("#info")); paintStory($("#info")); Music.ui();
   $$("#info canvas[data-card]").forEach(cv=>drawCard(cv, cv.dataset.card));
   $("#iBack").onclick = ()=>{ const b = infoBack || "home"; if(b === "title") renderTitle(), show("title"); else if(b === "plan") renderPlan(); else if(b === "play" || b === "trip"){ show(b); Music.want(musicFor(b)); if(b === "trip" && typeof Hike !== "undefined") Hike.relang(); } else if(S && S.done) endScreen(); else renderHome(); };
   $$("#info [data-l]").forEach(b=> b.onclick = ()=>{ setLang(b.dataset.l); info(page); });
