@@ -169,6 +169,9 @@ h3{font-size:17px;margin:2px 0 6px;font-weight:800;}
 .goal{margin-top:12px;padding:12px;border-radius:14px;background:var(--gold-bg);border:1.5px solid var(--gold);}
 .goal .n{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:800;}
 .goal .neg{color:var(--bad);}
+.goal .gl-list{margin-top:8px;display:grid;gap:2px;font-size:13px;}
+.goal .gl-i{display:flex;justify-content:space-between;gap:8px;color:var(--muted, #8a7d72);}
+.goal .gl-i.ok{color:inherit;font-weight:800;}
 .bar.gl i{background:var(--gold);}
 /* the phone: messages as chat bubbles */
 .phone{margin-top:22px;background:var(--phone);border:3px solid var(--phone-line);border-radius:26px;padding:14px 12px 16px;}
@@ -606,7 +609,7 @@ const UI = {
   livingCost:{zh:"生活費（吃飯、交通）", en:"Living costs (food, transport)"},
   holTag:{zh:"假", en:"Off"}, saleTag:{zh:"慶", en:"Sale"}, newTag:{zh:"新", en:"New"},
   classHoliday:{zh:"國定假日不上課", en:"No class on a national holiday"}, petsTrip:{zh:"顧寵物的兩週不能出遠門", en:"No trips in two weeks with pet-sitting"},
-  visaGoal:{zh:"簽證存款目標", en:"Visa savings goal"}, visaGoalNote:{zh:"英國打工度假簽證要求帳戶裡至少有 £2,530（約 NT$109,000）。", en:"The UK visa needs at least £2,530 in the bank (about NT$109,000)."}, libClosed:{zh:"圖書館週一休館", en:"The library is closed on Mondays"}, licenseDone:{zh:"已經拿到駕照，或十堂課都排好了", en:"You have your license, or all ten lessons are planned"}, plusComm:{zh:"＋抽成", en:" + commission"}, commIn:{zh:"抽成", en:"Commission"}
+  visaGoal:{zh:"倫敦預算", en:"London budget"}, visaGoalNote:{zh:"簽證要求帳戶裡有 £2,530，另外還要付簽證費、醫療附加費和機票。", en:"The visa needs £2,530 in the bank. The fees and the flight come on top."}, bg_savings:{zh:"簽證存款 £2,530", en:"Visa savings £2,530"}, bg_fee:{zh:"簽證申請費 £340", en:"Visa fee £340"}, bg_ihs:{zh:"醫療附加費 £1,552（兩年）", en:"Health surcharge £1,552 (two years)"}, bg_flight:{zh:"單程機票（估計）", en:"One-way flight (estimate)"}, noMoney:{zh:"錢不夠：排了這個，兩週後會變負數", en:"Not enough money: this plan would end below zero"}, libClosed:{zh:"圖書館週一休館", en:"The library is closed on Mondays"}, licenseDone:{zh:"已經拿到駕照，或十堂課都排好了", en:"You have your license, or all ten lessons are planned"}, plusComm:{zh:"＋抽成", en:" + commission"}, commIn:{zh:"抽成", en:"Commission"}
 };
 
 /* ==== content/book1/tracks.js ==== */
@@ -758,6 +761,7 @@ const GLOSS = {
   "model":{w:"model", kk:"[ˋmɑdḷ]", zh:"當模特兒；模特兒"},
   "typhoon":{w:"typhoon", kk:"[taɪˋfun]", zh:"颱風"},
   "father's day":{w:"Father's Day", zh:"父親節", d:"台灣的父親節是 8 月 8 日，因為「八八」聽起來像「爸爸」。美國和英國是 6 月的第三個星期日。"},
+  "lips sealed":{w:"My lips are sealed.", zh:"我會守口如瓶", d:"意思是「我不會說出去」。"},
   "usual":{w:"the usual", kk:"[ˋjuʒʊəl]", zh:"老樣子（常點的那個）"},
   "seat":{w:"seat", kk:"[sit]", zh:"座位"},
   "aisle":{w:"aisle", kk:"[aɪl]", zh:"走道", d:"s 不發音。window seat 靠窗，aisle seat 靠走道。"},
@@ -902,11 +906,11 @@ const ACTS = {
     ok:["I make my first [[latte art]]. It is a heart! Well, almost.", "We taste six coffees. I can tell the light one from the dark one."], slip:["The milk is too hot. It screams in the jug."]},
 
   /* work */
-  dept:{menu:"work", open:0, s:{zh:"百貨", en:"Store"}, zh:"百貨公司櫃位", en:"Department store", spr:"bag", days:null, cost:0, pay:"dept", payday:5, st:5, g:{sty:0.8, co:0.8}, odds:"sty", need:{sty:20},
+  dept:{menu:"work", open:0, s:{zh:"百貨", en:"Store"}, zh:"百貨公司櫃位", en:"Department store", spr:"bag", days:null, cost:0, pay:"dept", payday:5, st:3, g:{sty:0.8, co:0.8}, odds:"sty", need:{sty:20},
     sub:{zh:"三樓包包櫃・時薪 NT$196（2027 年起 NT$205）加業績抽成・週末、假日和週年慶抽成高", en:"Bags, 3rd floor · NT$196/hr (NT$205 from 2027) plus commission · more on weekends, holidays and sale days"},
     ok:["I sell three [[handbags|handbag]] today. My feet hurt, but I am happy.", "A [[customer]] wants a red bag. I find the perfect one.", "Ben brings me a coffee. “Busy day?” he asks. “Very!”"],
     slip:["I give a customer the wrong [[receipt]]. My [[manager]] is not happy."]},
-  cafe:{menu:"work", open:0, s:{zh:"咖啡館", en:"Café"}, zh:"咖啡館打工", en:"Café shift", spr:"cup", days:[0,2,3,4,5,6], cost:0, pay:"cafe", payday:10, st:4, g:{cr:1.2, co:0.6}, odds:"cr",
+  cafe:{menu:"work", open:0, s:{zh:"咖啡館", en:"Café"}, zh:"咖啡館打工", en:"Café shift", spr:"cup", days:[0,2,3,4,5,6], cost:0, pay:"cafe", payday:10, st:3, g:{cr:1.2, co:0.6}, odds:"cr",
     sub:{zh:"巷口咖啡館・一班六小時・時薪 NT$196，2027 年起 NT$205・週二公休", en:"Corner café · 6-hour shift · NT$196/hr, NT$205 from 2027 · closed Tuesdays"},
     ok:["I make twenty [[lattes|latte]]. Some are beautiful!", "A [[regular]] says, “Your coffee is the best!”"], slip:["I drop a cup. [[Oops]]!"]},
   /* in-home pet-sitting in Taipei: about NT$300–800 an hour for a single visit (PRO360, 2025) */
@@ -914,7 +918,7 @@ const ACTS = {
     sub:{zh:"鄰居週末出門・一天兩次到府・NT$700，當天付現", en:"When the neighbors go away on weekends · two visits a day · NT$700, paid the same day"},
     ok:["Mochi's family is away. I feed her and clean her box. She sits on my feet.", "I walk Lucky the dog two times. He pulls me to every tree."], slip:["Lucky runs after a cat. I run after Lucky."]},
   /* Uber Eats says riders net about NT$270 an hour while delivering (2025); unions say waiting time makes it less */
-  delivery:{menu:"work", open:4, s:{zh:"外送", en:"Delivery"}, zh:"騎機車送外送", en:"Food delivery by scooter", spr:"scooter", days:null, cost:0, pay:1300, weekly:true, st:6, g:{kh:0.8, fi:0.8}, odds:"kh", need:{fi:25},
+  delivery:{menu:"work", open:4, s:{zh:"外送", en:"Delivery"}, zh:"騎機車送外送", en:"Food delivery by scooter", spr:"scooter", days:null, cost:0, pay:1300, weekly:true, st:5, g:{kh:0.8, fi:0.8}, odds:"kh", need:{fi:25},
     sub:{zh:"按單計酬・約十單 NT$1,300・下雨騎慢一點，單會變少・每週三入帳上週的錢", en:"Paid by the order · about ten orders, NT$1,300 · fewer orders on rainy days · paid every Wednesday for last week"},
     ok:["Ten orders today. I know every alley near the night market now.", "A customer gives me a NT$50 tip and says, “Thank you, be safe!”"],
     slip:["I take a wrong turn in the alleys, so I finish fewer orders today."],
@@ -1033,7 +1037,11 @@ const statRank = v => { let r = 0; RANK_AT.forEach((t,i)=>{ if(v >= t) r = i; })
 const rankProgress = v => { const r = statRank(v); return r >= RANK_AT.length - 1 ? 1 : (v - RANK_AT[r]) / (RANK_AT[r+1] - RANK_AT[r]); };
 
 /* the visa savings Book 2 talks about: £2,530, NT$108,588 at the Bank of Taiwan's rate on Oct 14, 2026 (42.92), so the goal rounds up to NT$109,000 */
-const VISA_GOAL = {gbp:2530, ntd:109000};
+/* the full London budget (Phase G, decided 2026-11-16), at the same October 14 rate so it agrees with Camille's question:
+   the visa savings (they stay Mia's and pay for her first weeks in London), the visa fee (£340 since April 8, 2026),
+   the health surcharge (£776 a year, two years), and a one-way flight (about NT$30,000, an estimate) */
+const VISA_GOAL = {gbp:2530, ntd:109000, items:[["savings", 109000], ["fee", 14600], ["ihs", 66700], ["flight", 30000]]};
+VISA_GOAL.total = VISA_GOAL.items.reduce((t, x)=>t + x[1], 0);
 
 /* rain on a given day: the same quick hash as the room's window, one day in four */
 /* about one day in four is rainy; the date is mixed well so rainy days don't clump (fixed in build 19) */
@@ -1177,7 +1185,7 @@ const EVENTS = [
     msgs:[["leo","[[Jie|jie]], you sent me a UK government website. By mistake? Are you moving to London?","姊，妳傳了一個英國政府的網站給我。傳錯人了嗎？妳要搬去倫敦喔？"],
           ["mia","Oops! Maybe. Young people from Taiwan can live and work in the UK for up to two years. But first, there is a [[ballot]] in February. And I must have £2,530 in the bank.","糟糕！也許吧。台灣的年輕人可以在英國生活、工作最多兩年。可是要先參加二月的抽籤，而且銀行裡至少要有 2,530 英鎊。"],
           ["mia","February is four months away. I can do this. Can you not tell Mom yet? I will tell her on Sunday.","離二月還有四個月，我做得到。你可以先不要跟媽說嗎？我星期天會跟她說。"],
-          ["leo","My lips are sealed. For one bubble tea.","我嘴巴很緊。一杯珍奶就好。"]],
+          ["leo","My [[lips are sealed|lips sealed]]. For one bubble tea.","我嘴巴很緊。一杯珍奶就好。"]],
     fx:S=>{ S.locks[D.add(S.date, 6)] = "tellmom"; }},
   {id:"open6", at:"start", when:S=>S.blk === 6,
     msgs:[["ben","Big news: game night is now a [[TTRPG]] on Friday nights. Dragons, dice, snacks. We need one more player!","大消息：遊戲夜改成星期五晚上跑團了。有龍、有骰子、有零食。我們還缺一個玩家！"],
@@ -1468,7 +1476,7 @@ const XMAS = {
    Kaohsiung Main Station (R11) to Hamasen (O1, for the Gushan ferry) NT$20, Yanchengpu (O2, by Pier-2) to R11 NT$20;
    Zuoying (R16) to Hamasen NT$35, Yanchengpu to Zuoying NT$35. The way home is the MRT too: the light rail does not stop
    at Kaohsiung Station.
-   Gushan–Cijin ferry, a few minutes, about NT$40, 05:00–02:00 (2026 guide; older sources say NT$30);
+   Gushan–Cijin ferry, a few minutes, NT$30 cash or card since Nov 1, 2024 (食尚玩家 2026, checked 2026-11-16), 05:00–02:00;
    Cijin Tianhou Temple founded 1673, Kaohsiung's first Mazu temple (Wikipedia);
    Cihou Fort, Qing-era, guarded the harbor entrance; Kaohsiung (Cihou) Lighthouse: 1883, rebuilt 1918,
    open to 21:00, closed Mondays; Cijin Beach has black sand; Rainbow Church is an art frame in the
@@ -1547,7 +1555,7 @@ khh:{
      The ferry leaves the pier heading north-north-east, then turns north to Gushan (checked on Google Maps, 2026-10-24). Others placed from the street layout.
      links: [node, minutes on foot, energy]. Hills cost more. */
   map:{
-    start:"pier", arriveMin:60, ferry:40, sunsets:[["01-10","17:28"],["07-13","18:47"],["07-27","18:43"],["08-10","18:35"],["08-24","18:24"],["09-07","18:11"],["09-21","17:57"],["10-05","17:43"],["10-19","17:31"],["11-02","17:22"],["11-16","17:16"],["11-30","17:14"],["12-14","17:16"],["12-31","17:23"]], close:"21:00", energyBase:50,
+    start:"pier", arriveMin:60, ferry:30, sunsets:[["01-10","17:28"],["07-13","18:47"],["07-27","18:43"],["08-10","18:35"],["08-24","18:24"],["09-07","18:11"],["09-21","17:57"],["10-05","17:43"],["10-19","17:31"],["11-02","17:22"],["11-16","17:16"],["11-30","17:14"],["12-14","17:16"],["12-31","17:23"]], close:"21:00", energyBase:50,
     nodes:{
       fort:{x:48, y:86, zh:"旗後砲台", en:"Cihou Fort", spr:"fort", hill:true},
       light:{x:74, y:54, zh:"高雄燈塔", en:"Kaohsiung Lighthouse", spr:"lighthouse", hill:true},
@@ -2182,6 +2190,11 @@ function canPlace(S, id, i){
   if(a.need) for(const k in a.need) if(S.st[k] < a.need[k]) return {ok:false, why:"need", k, v:a.need[k]};
   if(a.flag && !S.flags[a.flag]) return {ok:false, why:"flag"};
   if(a.span === 2){ if(i >= 13 || lockOf(S, i+1)) return {ok:false, why:"span"}; }
+  /* a paid activity can't go in when the two weeks would end below zero (Phase G, 2026-11-16); free ones and work always can */
+  if((a.cost || a.est) && S.plan[i] !== id){
+    const keep = S.plan; S.plan = keep.slice(); setPlan(S, i, id); const end = preview(S).end; S.plan = keep;
+    if(end < 0) return {ok:false, why:"money"};
+  }
   return {ok:true};
 }
 /* two-day trips (Kaohsiung, camping): the first day is the activity, the second its own id ("khh2", "camp2") */
@@ -2458,9 +2471,11 @@ function xmasResult(S, date){
   clampAll(S);
   return {stars, key, name:orn[2], line:XMAS.result.open[key], stress:-c[0], co:c[1], date};
 }
-/* Dec 31: the friend with the most hearts comes up the hill (a tie goes to family) */
+/* Dec 31: the friend with the most hearts comes up the hill, if that friend has 40 or more; otherwise the family
+   (Phase G, 2026-11-16: Sunday dinners filled family hearts to 100, so family used to win every time) */
 function countdownOf(S){
-  const who = ["family", "leo", "ben", "camille"].reduce((b,k)=> (S.hearts[k] || 0) > (S.hearts[b] || 0) ? k : b, "family");
+  const best = ["leo", "ben", "camille"].reduce((b,k)=> (S.hearts[k] || 0) > (S.hearts[b] || 0) ? k : b, "leo");
+  const who = (S.hearts[best] || 0) >= 40 ? best : "family";
   S.flags.nyWith = who; if(!S.album.includes("ny_101")) S.album.push("ny_101");
   return {who};
 }
@@ -2565,9 +2580,10 @@ function diaryFor(S, mkey){
                                                               "這個月，在中秋的月亮下，我下定決心：我想去倫敦打工度假。");
   else if(S.flags.decided && monthKey(S.flags.decided) < mkey){
     if(S.money < 0) L("I am saving for London, but I owe money now. London feels very far away.", "我在為倫敦存錢，可是現在我欠錢了。倫敦感覺好遠。");
-    else if(S.money >= VISA_GOAL.ntd) L("I have enough money for the visa now! London, here I come.", "簽證要的錢我存夠了！倫敦，我來了。");
-    else L(`I am saving for London. I have NT$${cash(S.money)} now, and I need about NT$${cash(VISA_GOAL.ntd)}.`,
-           `我在為倫敦存錢。我現在有 NT$${cash(S.money)}，大約需要 NT$${cash(VISA_GOAL.ntd)}。`);
+    else if(S.money >= VISA_GOAL.total) L("I have enough money for the whole trip now! London, here I come.", "整趟旅程的錢我都存夠了！倫敦，我來了。");
+    else if(S.money >= VISA_GOAL.ntd) L("I have the visa savings now! Next, the fees and the flight.", "簽證存款存夠了！接下來是簽證費和機票。");
+    else L(`I am saving for London. I have NT$${cash(S.money)} now, and I need about NT$${cash(VISA_GOAL.total)}.`,
+           `我在為倫敦存錢。我現在有 NT$${cash(S.money)}，大約需要 NT$${cash(VISA_GOAL.total)}。`);
   }
   if(fun) L(`I saw my friends and family ${nw(fun)} ${fun === 1 ? "time" : "times"}.`, `我見了朋友和家人 ${fun} 次。`);
   else L("I did not see my friends much. I miss them.", "我不太常見到朋友，好想他們。");
@@ -2767,8 +2783,11 @@ function renderHome(){
     return `<div class="stat"><div class="n">${hdImg("ic_" + k)}<span class="nm">${statName(k)}</span><span class="v px" style="color:var(--k-${k})">${Math.floor(v)}</span></div>
       <span class="rk r${r}" style="background:var(--t-${k});color:var(--k-${k})">${esc(LANG === "en" ? nm[1] : (k === "en" ? `${nm[0]} ${nm[1]}` : nm[0]))}</span>
       <div class="seg sm"><i style="width:${Math.round(rankProgress(v)*100)}%;--c:var(--s-${k})"></i></div></div>`; }).join("");
-  const goal = S.flags.decided ? (()=>{ const p = Math.max(0, Math.min(1, S.money / VISA_GOAL.ntd));
-    return `<div class="goal"><div class="n"><span>${T("visaGoal")}</span><span class="px${S.money < 0 ? " neg" : ""}">${fmt(S.money)} / ${fmt(VISA_GOAL.ntd)}</span></div><div class="bar gl" style="margin-top:6px"><i style="width:${Math.round(p*100)}%"></i></div><p class="muted" style="font-size:12px;margin:4px 0 0">${T("visaGoalNote")}</p></div>`; })() : "";
+  const goal = S.flags.decided ? (()=>{ const p = Math.max(0, Math.min(1, S.money / VISA_GOAL.total)); let run = 0;
+    /* each line is ticked once the savings pass it, in order: savings, fee, surcharge, flight */
+    const lines = VISA_GOAL.items.map(([k, v])=>{ run += v; const ok = S.money >= run;
+      return `<div class="gl-i${ok ? " ok" : ""}"><span>${ok ? "✓" : "·"} ${T("bg_" + k)}</span><span class="px">${fmt(v)}</span></div>`; }).join("");
+    return `<div class="goal"><div class="n"><span>${T("visaGoal")}</span><span class="px${S.money < 0 ? " neg" : ""}">${fmt(S.money)} / ${fmt(VISA_GOAL.total)}</span></div><div class="bar gl" style="margin-top:6px"><i style="width:${Math.round(p*100)}%"></i></div><div class="gl-list">${lines}</div><p class="muted" style="font-size:12px;margin:4px 0 0">${T("visaGoalNote")}</p></div>`; })() : "";
   const pend = S.payQ.reduce((t,p)=>t+p.amt, 0);
   $("#home").innerHTML = topBar() + `
     <div class="room"><div class="photo"><canvas id="roomCv" width="320" height="213" role="img" aria-label="${esc(T("roomAlt"))}"></canvas></div><span class="tape"></span></div>
@@ -2861,6 +2880,7 @@ function whyText(r, a){
   if(r.why === "holiday") return T("classHoliday");
   if(r.why === "pets") return T("petsTrip");
   if(r.why === "done") return T("licenseDone");
+  if(r.why === "money") return T("noMoney");
   return T("locked");
 }
 function openSheet(keepTab){
@@ -3228,21 +3248,21 @@ function showDiary(dy, then){
 /* ---------------- end of the slice ---------------- */
 /* Stage 1's results card (2026-11-04): the ornament, the countdown, the savings against the visa goal, then Stage 2 */
 function stageEndHTML(){
-  const en = LANG === "en", orn = S.flags.xmOrn, who = S.flags.nyWith, goal = VISA_GOAL.ntd;
+  const en = LANG === "en", orn = S.flags.xmOrn, who = S.flags.nyWith, goal = VISA_GOAL.total, pend = S.payQ.reduce((t,p)=>t+p.amt, 0);
   const ornName = orn ? XMAS.ornaments.find(x=>x[1] === orn)[2][en ? 0 : 1] : null;
   const whoName = who ? (who === "family" ? (en ? "my family" : "家人") : N(CAST[who]).replace(/\s*[（(].*$/, "")) : null;   /* "Camille", not "Camille (coworker)" */
   const pct = Math.max(0, Math.min(100, Math.round(S.money / goal * 100)));
   return `${orn ? `<div class="propbig xm-orn" style="margin-top:12px">${hdImg("xm_orn_" + orn)}</div><p style="text-align:center;font-weight:900;margin:0">${esc(ornName)}</p>` : ""}
     <div class="diary" style="margin-top:12px">${en
-      ? `<p>That's Stage 1: July to December 2026.</p>${whoName ? `<p>I watched the New Year's fireworks with ${esc(whoName)}. ${S.flags.decided ? "Next stop: London." : ""}</p>` : ""}<p>London savings: ${fmt(S.money)} of ${fmt(goal)} (${pct}%).</p><p>Next: the February ballot. Stage 2 will be its own game. Keep your save file: it carries Mia, her money and her friends into the next stage.</p>`
-      : `<p>第一階段結束了：2026 年 7 月到 12 月。</p>${whoName ? `<p>跨年夜，Mia 和${/^[A-Za-z]/.test(whoName) ? " " + esc(whoName) + " " : esc(whoName)}一起看煙火。${S.flags.decided ? "下一站：倫敦。" : ""}</p>` : ""}<p>倫敦存款：${fmt(S.money)}／${fmt(goal)}（${pct}%）。</p><p>接下來：二月的抽籤。第二階段會是另一個遊戲檔。請保存妳的存檔：它會把 Mia、她的存款和朋友們一起帶到下一個階段。</p>`}</div>`;
+      ? `<p>That's Stage 1: July to December 2026.</p>${whoName ? `<p>I watched the New Year's fireworks with ${esc(whoName)}. ${S.flags.decided ? "Next stop: London." : ""}</p>` : ""}<p>London budget: ${fmt(S.money)} of ${fmt(goal)} (${pct}%)${pend ? `, and ${fmt(pend)} of pay is still on the way` : ""}.</p><p>Next: the February ballot. Stage 2 will be its own game. Keep your save file: it carries Mia, her money and her friends into the next stage.</p>`
+      : `<p>第一階段結束了：2026 年 7 月到 12 月。</p>${whoName ? `<p>跨年夜，我和${/^[A-Za-z]/.test(whoName) ? " " + esc(whoName) + " " : esc(whoName)}一起看煙火。${S.flags.decided ? "下一站：倫敦。" : ""}</p>` : ""}<p>倫敦預算：${fmt(S.money)}／${fmt(goal)}（${pct}%）${pend ? `，另外有 ${fmt(pend)} 薪水還沒入帳` : ""}。</p><p>接下來：二月的抽籤。第二階段會是另一個遊戲檔。請保存妳的存檔：它會把 Mia、她的存款和朋友們一起帶到下一個階段。</p>`}</div>`;
 }
 function endScreen(){
   show("info");
   const top2 = STATS.slice().sort((a,b)=>S.st[b]-S.st[a]).slice(0,2);
   $("#info").innerHTML = `<div style="padding-top:20px"><h2>${S.flags.xmOrn ? (LANG === "en" ? "Stage 1 complete" : "第一階段完成") : T("endSlice")}</h2>
     <div class="hero"><canvas id="endBust" style="width:128px;height:128px"></canvas><div><div class="who">Mia</div><div class="sub">${fmt(S.money)} · ${T("stress")} ${Math.round(S.stress)}</div>
-    ${S.payQ.length ? `<div class="sub">${T("pendingPay")}：${fmt(S.payQ.reduce((t,p)=>t+p.amt,0))}</div>` : ""}<div class="sub">${statName(top2[0])} ${Math.floor(S.st[top2[0]])} · ${statName(top2[1])} ${Math.floor(S.st[top2[1]])}</div></div></div>
+    ${S.payQ.length ? `<div class="sub">${T("pendingPay")}${LANG === "en" ? ": " : "："}${fmt(S.payQ.reduce((t,p)=>t+p.amt,0))}</div>` : ""}<div class="sub">${statName(top2[0])} ${Math.floor(S.st[top2[0]])} · ${statName(top2[1])} ${Math.floor(S.st[top2[1]])}</div></div></div>
     ${stageEndHTML()}
     <button class="btn" id="eSave" style="width:100%;margin-top:12px">${LANG === "en" ? "Download your save for Stage 2" : "下載存檔，帶到第二階段"}</button>
     <div class="menu"><button class="btn alt" data-go="album">${T("album")}</button><button class="btn alt" data-go="notebook">${T("notebook")}</button>
